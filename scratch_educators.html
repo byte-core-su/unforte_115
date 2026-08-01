@@ -10,62 +10,72 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { color-scheme: dark; }
+    :root { color-scheme: light; }
     html { scroll-behavior: smooth; }
-    body { font-family: "Noto Sans TC", system-ui, sans-serif; background: #020617; }
-    .grid-pattern { background-image: linear-gradient(rgba(148, 163, 184, .07) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, .07) 1px, transparent 1px); background-size: 28px 28px; }
+    body { font-family: "Noto Sans TC", system-ui, sans-serif; background: #f8fafc; }
+    .grid-pattern { background-image: linear-gradient(rgba(148, 163, 184, .16) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, .16) 1px, transparent 1px); background-size: 28px 28px; }
     .screen-card { transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
-    .screen-card:hover { transform: translateY(-4px); border-color: rgba(103, 232, 249, .6); box-shadow: 0 18px 35px rgba(8, 47, 73, .35); }
+    .screen-card:hover { transform: translateY(-4px); border-color: rgba(6, 182, 212, .65); box-shadow: 0 18px 35px rgba(14, 116, 144, .14); }
     .screen-card img { aspect-ratio: 16 / 9; object-fit: cover; object-position: top; }
     @media (min-width: 1024px) { .screen-card--wide { grid-column: span 2 / span 2; } .screen-card--wide img { aspect-ratio: 16 / 8.2; } }
+
+    /* Tailwind 元件在此頁統一使用淺色外觀，保留原本的青、紫、綠色主題。 */
+    .bg-slate-950, .bg-slate-900 { background-color: #ffffff !important; }
+    .bg-slate-900\/50 { background-color: #f8fafc !important; }
+    .border-slate-800, .border-slate-700 { border-color: #e2e8f0 !important; }
+    .text-slate-300 { color: #475569 !important; }
+    .text-slate-500 { color: #64748b !important; }
+    .text-cyan-300 { color: #0e7490 !important; }
+    .text-violet-300 { color: #6d28d9 !important; }
+    .text-emerald-300 { color: #047857 !important; }
   </style>
 </head>
 <body class="min-h-screen text-slate-100">
-  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+  <header class="border-b border-slate-200 bg-white/90 backdrop-blur">
     <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
-      <a href="index.html" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-300 transition hover:text-cyan-300" aria-label="返回首頁">
+      <a href="index.html" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-cyan-700" aria-label="返回首頁">
         <span aria-hidden="true">←</span> 返回課程首頁
       </a>
-      <a href="https://scratch.mit.edu/educators/" target="_blank" rel="noopener noreferrer" class="rounded-full border border-cyan-400/40 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-200 transition hover:bg-cyan-400/20">
+      <a href="https://scratch.mit.edu/educators/" target="_blank" rel="noopener noreferrer" class="rounded-full border border-cyan-200 bg-cyan-50 px-4 py-2 text-sm font-semibold text-cyan-700 transition hover:bg-cyan-100">
         開啟 Scratch Educators ↗
       </a>
     </div>
   </header>
 
   <main>
-    <section class="grid-pattern overflow-hidden border-b border-slate-800 bg-gradient-to-br from-slate-950 via-indigo-950 to-cyan-950">
+    <section class="grid-pattern overflow-hidden border-b border-slate-200 bg-gradient-to-br from-sky-50 via-indigo-50 to-cyan-50">
       <div class="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24">
-        <p class="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-slate-950/40 px-4 py-2 text-sm font-semibold text-cyan-200"><span aria-hidden="true">✦</span> 教師自動化工具專區・Scratch 資源</p>
-        <h1 class="max-w-4xl text-4xl font-extrabold tracking-tight text-white sm:text-5xl">Scratch Educators<br><span class="text-cyan-300">教師資源與帳戶設定圖解</span></h1>
-        <p class="mt-6 max-w-3xl text-lg leading-8 text-slate-300">依原始 Scratch Educators 操作紀錄整理，將教育者資源、教師帳戶申請與班級學生管理流程集中在同一頁，方便授課前快速查閱。</p>
+        <p class="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-white/85 px-4 py-2 text-sm font-semibold text-cyan-700 shadow-sm"><span aria-hidden="true">✦</span> 教師自動化工具專區・Scratch 資源</p>
+        <h1 class="max-w-4xl text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">Scratch Educators<br><span class="text-cyan-700">教師資源與帳戶設定圖解</span></h1>
+        <p class="mt-6 max-w-3xl text-lg leading-8 text-slate-600">依原始 Scratch Educators 操作紀錄整理，將教育者資源、教師帳戶申請與班級學生管理流程集中在同一頁，方便授課前快速查閱。</p>
         <div class="mt-9 flex flex-wrap gap-3 text-sm font-semibold">
-          <a href="#educators" class="rounded-xl bg-cyan-400 px-5 py-3 text-slate-950 transition hover:bg-cyan-300">查看教師資源</a>
-          <a href="#teacher-account" class="rounded-xl border border-slate-500 bg-slate-900/70 px-5 py-3 text-slate-100 transition hover:border-cyan-300 hover:text-cyan-200">教師帳戶申請</a>
-          <a href="#classroom" class="rounded-xl border border-slate-500 bg-slate-900/70 px-5 py-3 text-slate-100 transition hover:border-cyan-300 hover:text-cyan-200">班級與學生管理</a>
+          <a href="#educators" class="rounded-xl bg-cyan-600 px-5 py-3 text-white shadow-sm transition hover:bg-cyan-700">查看教師資源</a>
+          <a href="#teacher-account" class="rounded-xl border border-slate-300 bg-white px-5 py-3 text-slate-700 shadow-sm transition hover:border-cyan-400 hover:text-cyan-700">教師帳戶申請</a>
+          <a href="#classroom" class="rounded-xl border border-slate-300 bg-white px-5 py-3 text-slate-700 shadow-sm transition hover:border-cyan-400 hover:text-cyan-700">班級與學生管理</a>
         </div>
       </div>
     </section>
 
     <section class="mx-auto max-w-7xl px-5 py-10 lg:px-8">
       <div class="grid gap-4 md:grid-cols-3">
-        <a href="#educators" class="rounded-2xl border border-slate-700 bg-slate-900 p-5 transition hover:border-cyan-400/70 hover:bg-slate-800">
-          <p class="text-sm font-bold text-cyan-300">01・教師資源</p><p class="mt-2 text-sm leading-6 text-slate-300">瀏覽 Educators 網頁，查找適用於教學現場的資源與資訊。</p>
+        <a href="#educators" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-cyan-400/70 hover:bg-cyan-50/40">
+          <p class="text-sm font-bold text-cyan-700">01・教師資源</p><p class="mt-2 text-sm leading-6 text-slate-600">瀏覽 Educators 網頁，查找適用於教學現場的資源與資訊。</p>
         </a>
-        <a href="#teacher-account" class="rounded-2xl border border-slate-700 bg-slate-900 p-5 transition hover:border-violet-400/70 hover:bg-slate-800">
-          <p class="text-sm font-bold text-violet-300">02・教師帳戶</p><p class="mt-2 text-sm leading-6 text-slate-300">依畫面逐步填寫使用情境、電子信箱，並完成信箱驗證。</p>
+        <a href="#teacher-account" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-violet-400/70 hover:bg-violet-50/40">
+          <p class="text-sm font-bold text-violet-700">02・教師帳戶</p><p class="mt-2 text-sm leading-6 text-slate-600">依畫面逐步填寫使用情境、電子信箱，並完成信箱驗證。</p>
         </a>
-        <a href="#classroom" class="rounded-2xl border border-slate-700 bg-slate-900 p-5 transition hover:border-emerald-400/70 hover:bg-slate-800">
-          <p class="text-sm font-bold text-emerald-300">03・班級與學生</p><p class="mt-2 text-sm leading-6 text-slate-300">建立班級、匯入學生名單，讓教學帳號管理更有組織。</p>
+        <a href="#classroom" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-emerald-400/70 hover:bg-emerald-50/40">
+          <p class="text-sm font-bold text-emerald-700">03・班級與學生</p><p class="mt-2 text-sm leading-6 text-slate-600">建立班級、匯入學生名單，讓教學帳號管理更有組織。</p>
         </a>
       </div>
     </section>
 
-    <section id="educators" class="scroll-mt-6 border-y border-slate-800 bg-slate-900/50">
+    <section id="educators" class="scroll-mt-6 border-y border-slate-200 bg-slate-50">
       <div class="mx-auto max-w-7xl px-5 py-14 lg:px-8">
         <div class="mb-8 max-w-3xl">
-          <p class="text-sm font-bold tracking-wider text-cyan-300">01・EXPLORE</p>
-          <h2 class="mt-2 text-3xl font-extrabold text-white">Scratch Educators 教師資源</h2>
-          <p class="mt-3 leading-7 text-slate-300">原始紀錄從教師專頁開始，依序呈現資源、教師社群與帳戶功能。點選任一畫面可開啟原尺寸截圖。</p>
+          <p class="text-sm font-bold tracking-wider text-cyan-700">01・EXPLORE</p>
+          <h2 class="mt-2 text-3xl font-extrabold text-slate-900">Scratch Educators 教師資源</h2>
+          <p class="mt-3 leading-7 text-slate-600">原始紀錄從教師專頁開始，依序呈現資源、教師社群與帳戶功能。點選任一畫面可開啟原尺寸截圖。</p>
         </div>
         <div class="grid gap-5 lg:grid-cols-2">
           <figure class="screen-card screen-card--wide overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"><a href="imgs/scratch-educators/01-educators-01.png" target="_blank"><img src="imgs/scratch-educators/01-educators-01.png" alt="Scratch Educators 教師專頁首圖" class="w-full" loading="eager"></a><figcaption class="flex items-center justify-between gap-4 px-5 py-4 text-sm text-slate-300"><span>教師專頁入口與資源導覽</span><span class="font-semibold text-cyan-300">畫面 01 ↗</span></figcaption></figure>
@@ -86,7 +96,7 @@
       <div class="mx-auto max-w-7xl px-5 py-14 lg:px-8">
         <div class="mb-8 max-w-3xl">
           <p class="text-sm font-bold tracking-wider text-violet-300">02・REGISTER</p>
-          <h2 class="mt-2 text-3xl font-extrabold text-white">教師帳戶申請與驗證</h2>
+          <h2 class="mt-2 text-3xl font-extrabold text-slate-900">教師帳戶申請與驗證</h2>
           <p class="mt-3 leading-7 text-slate-300">先說明在組織中使用 Scratch 的方式，接著填寫並確認電子信箱；最後到信箱開啟驗證連結。實際欄位與審查流程請以官方網站當下畫面為準。</p>
         </div>
         <div class="grid gap-5 lg:grid-cols-2">
@@ -102,7 +112,7 @@
       <div class="mx-auto max-w-7xl px-5 py-14 lg:px-8">
         <div class="mb-8 max-w-3xl">
           <p class="text-sm font-bold tracking-wider text-emerald-300">03・ORGANIZE</p>
-          <h2 class="mt-2 text-3xl font-extrabold text-white">班級與學生名單管理</h2>
+          <h2 class="mt-2 text-3xl font-extrabold text-slate-900">班級與學生名單管理</h2>
           <p class="mt-3 leading-7 text-slate-300">帳戶完成設定後，可建立班級並管理學生帳號。截圖也示範了以文字檔預先整理帳號與姓名，方便後續匯入或逐一建立。</p>
         </div>
         <div class="grid gap-5 lg:grid-cols-2">
@@ -117,13 +127,13 @@
     </section>
 
     <section class="mx-auto max-w-7xl px-5 py-12 lg:px-8">
-      <div class="rounded-2xl border border-cyan-400/25 bg-cyan-950/30 p-6 sm:flex sm:items-center sm:justify-between sm:gap-8">
-        <div><h2 class="text-xl font-bold text-white">需要最新的功能與規則嗎？</h2><p class="mt-2 text-sm leading-6 text-slate-300">本頁保存的是操作紀錄；帳戶申請、班級功能及驗證要求仍應以 Scratch 官方網站的即時資訊為準。</p></div>
-        <a href="https://scratch.mit.edu/educators/" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex shrink-0 items-center justify-center rounded-xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300 sm:mt-0">前往官方教師專頁 ↗</a>
+      <div class="rounded-2xl border border-cyan-200 bg-cyan-50 p-6 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-8">
+        <div><h2 class="text-xl font-bold text-slate-900">需要最新的功能與規則嗎？</h2><p class="mt-2 text-sm leading-6 text-slate-300">本頁保存的是操作紀錄；帳戶申請、班級功能及驗證要求仍應以 Scratch 官方網站的即時資訊為準。</p></div>
+        <a href="https://scratch.mit.edu/educators/" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex shrink-0 items-center justify-center rounded-xl bg-cyan-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-cyan-700 sm:mt-0">前往官方教師專頁 ↗</a>
       </div>
     </section>
   </main>
 
-  <footer class="border-t border-slate-800 bg-slate-950 px-5 py-8 text-center text-sm text-slate-500"><a href="index.html" class="transition hover:text-cyan-300">115 學年度課程資源</a><span class="mx-2">·</span>Scratch Educators 操作圖解</footer>
+  <footer class="border-t border-slate-200 bg-white px-5 py-8 text-center text-sm text-slate-500"><a href="index.html" class="transition hover:text-cyan-700">115 學年度課程資源</a><span class="mx-2">·</span>Scratch Educators 操作圖解</footer>
 </body>
 </html>
