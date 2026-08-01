@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>資訊科技課程入口網</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght=300;400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 隱藏捲軸但保留捲動功能 (選用) */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- 頁首 Hero 區塊 -->
+    <header class="bg-gradient-to-br from-indigo-700 via-blue-600 to-blue-500 text-white pt-20 pb-24 px-6 relative overflow-hidden">
+        <!-- 裝飾性背景圖形 -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none opacity-20">
+            <svg class="absolute -top-24 -left-24 w-96 h-96 text-white" fill="currentColor" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"/></svg>
+            <svg class="absolute top-1/2 right-12 w-64 h-64 text-white" fill="currentColor" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"/></svg>
+        </div>
+
+        <div class="max-w-5xl mx-auto text-center relative z-10">
+            <div class="inline-flex items-center justify-center p-3 bg-white/20 rounded-2xl mb-6 backdrop-blur-sm shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold mb-6 tracking-tight">資訊科技課程入口網</h1>
+            <p class="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto leading-relaxed">
+                整合七、八年級課程資源與自動化管理工具，<br class="hidden md:block">提升教學效率與學生學習體驗。
+            </p>
+        </div>
+    </header>
+
+    <!-- 主要內容區 -->
+    <main class="flex-grow max-w-5xl mx-auto px-6 -mt-10 relative z-20 w-full mb-20 space-y-12">
+        
+        <!-- 模組 1: 課程模組 (七年級 / 八年級) -->
+        <section>
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- 七年級模組卡片 -->
+                <a href="1150700.html" class="block bg-white rounded-2xl shadow-sm border border-slate-200 p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                        </div>
+                        <span class="text-xs font-semibold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">基礎篇</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-slate-800 group-hover:text-indigo-600 transition-colors">七年級模組</h3>
+                    <p class="text-slate-500 mb-6 leading-relaxed">
+                        引導學生認識運算思維的基本步驟與流程圖繪製，並學習「循序、選擇、重複」三大控制結構，建立演算法與程式設計的扎實基礎。
+                    </p>
+                    <div class="inline-flex items-center text-indigo-600 font-medium group-hover:underline underline-offset-4">
+                        進入課程 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                    </div>
+                </a>
+
+                <!-- 八年級模組卡片 -->
+                <a href="1150800.html" class="block bg-white rounded-2xl shadow-sm border border-slate-200 p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-14 h-14 bg-cyan-50 text-cyan-600 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:bg-cyan-600 group-hover:text-white transition-all duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                            </svg>
+                        </div>
+                        <span class="text-xs font-semibold bg-cyan-100 text-cyan-700 px-3 py-1 rounded-full">進階篇</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-slate-800 group-hover:text-cyan-600 transition-colors">八年級模組</h3>
+                    <p class="text-slate-500 mb-6 leading-relaxed">
+                        進階邏輯訓練與程式設計入門，結合專題導向學習，培養解決問題與創新思考能力。
+                    </p>
+                    <div class="inline-flex items-center text-cyan-600 font-medium group-hover:underline underline-offset-4">
+                        進入課程 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- 模組 2: Google Classroom 自動化管理系統 (整合功能介紹) -->
+        <section>
+            <div class="flex items-center mb-6 px-2">
+                <div class="w-2 h-8 bg-amber-500 rounded-full mr-3"></div>
+                <h2 class="text-2xl font-bold text-slate-800">Google Classroom 自動化管理系統</h2>
+            </div>
+
+            <div class="space-y-6">
+                
+                <!-- 教師端整合卡片 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+                    <!-- 教師端 Header & 按鈕 -->
+                    <div class="p-6 md:p-8 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <div class="flex items-start md:items-center">
+                            <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mr-5 shrink-0 shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-slate-800 mb-1">教師端</h3>
+                                <p class="text-slate-500">智慧教學與自動化評分工作站</p>
+                            </div>
+                        </div>
+                        <a href="easy-classroom.html" class="inline-flex items-center justify-center px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md shadow-blue-500/30 transition-all hover:-translate-y-0.5 whitespace-nowrap">
+                            前往教師管理系統
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- 教師端功能細節 -->
+                    <div class="p-6 md:p-8 grid lg:grid-cols-2 gap-8 bg-white">
+                        <!-- 左側：Classroom 作業管理 -->
+                        <div>
+                            <h4 class="font-bold text-lg text-violet-700 mb-5 flex items-center border-b border-slate-100 pb-3">
+                                <span class="w-8 h-8 bg-violet-100 text-violet-600 rounded-lg flex items-center justify-center mr-3 shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                    </svg>
+                                </span>
+                                1. Classroom 作業管理
+                            </h4>
+                            <div class="space-y-4">
+                                <div class="group">
+                                    <div class="font-bold text-slate-800 text-[15px] mb-1 flex items-center">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-violet-500 mr-2"></span> Classroom 作業與班級管理
+                                    </div>
+                                    <p class="text-sm text-slate-500 pl-3.5 leading-relaxed">集中管理您的 Google Classroom，在此發佈的作業能完美支援「自動寫回成績」功能。</p>
+                                </div>
+                                <div class="group">
+                                    <div class="font-bold text-slate-800 text-[15px] mb-1 flex items-center">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-violet-500 mr-2"></span> 發佈作業至 Classroom
+                                    </div>
+                                    <p class="text-sm text-slate-500 pl-3.5 leading-relaxed">由此系統派發作業給學生，未來學生繳交後，即可使用 Scratch 評分模組的「一鍵批改」功能，將成績自動同步回 Classroom 草稿。</p>
+                                </div>
+                                <div class="group">
+                                    <div class="font-bold text-slate-800 text-[15px] mb-1 flex items-center">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-violet-500 mr-2"></span> 作業繳交即時看板
+                                    </div>
+                                    <p class="text-sm text-slate-500 pl-3.5 leading-relaxed">以視覺化卡片即時顯示全班學生的繳交狀態。可自訂需檢查的附檔名（支援多檔、智慧日期展開與模糊搜尋），輕鬆掌握全班進度。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 右側：Scratch 智慧評分系統 -->
+                        <div>
+                            <h4 class="font-bold text-lg text-orange-700 mb-5 flex items-center border-b border-slate-100 pb-3">
+                                <span class="w-8 h-8 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center mr-3 shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                                    </svg>
+                                </span>
+                                2. Scratch 智慧評分系統
+                            </h4>
+                            <div class="space-y-4">
+                                <div class="bg-orange-50/50 rounded-xl p-4 border border-orange-100">
+                                    <div class="font-bold text-slate-800 text-[15px] mb-3">(1) 教師設定端</div>
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <span class="inline-flex items-center bg-white border border-orange-200 text-orange-700 px-3 py-1.5 rounded-lg text-sm font-medium shadow-sm">
+                                            <span class="bg-orange-100 text-orange-800 w-5 h-5 rounded-md flex items-center justify-center text-xs mr-2 shrink-0">1</span> 上傳解答與測資
+                                        </span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-orange-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                        <span class="inline-flex items-center bg-white border border-orange-200 text-orange-700 px-3 py-1.5 rounded-lg text-sm font-medium shadow-sm">
+                                            <span class="bg-orange-100 text-orange-800 w-5 h-5 rounded-md flex items-center justify-center text-xs mr-2 shrink-0">2</span> 程式邏輯結構設定
+                                        </span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-orange-300 hidden xl:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                        <span class="inline-flex items-center bg-white border border-orange-200 text-orange-700 px-3 py-1.5 rounded-lg text-sm font-medium shadow-sm">
+                                            <span class="bg-orange-100 text-orange-800 w-5 h-5 rounded-md flex items-center justify-center text-xs mr-2 shrink-0">3</span> 評分總結與配分
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-emerald-50/50 rounded-xl p-4 border border-emerald-100">
+                                    <div class="flex items-center mb-2">
+                                        <div class="font-bold text-slate-800 text-[15px]">(2) 批改工作區</div>
+                                        <span class="ml-3 text-xs font-bold bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-md">一鍵批改</span>
+                                    </div>
+                                    <p class="text-sm text-slate-600 leading-relaxed mb-2">進入專屬批改工作區，系統將自動執行測試資料比對與程式邏輯檢查。</p>
+                                    <div class="flex items-center text-sm font-medium text-emerald-700 bg-white border border-emerald-200 rounded-lg p-2.5 shadow-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        批改完成後自動同步至 Classroom 草稿
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 學生端 & 安裝說明 雙欄卡片 -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- 學生端 (Scratch AI 助教測試站) -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col sm:flex-row items-start hover:shadow-md transition-all duration-300">
+                        <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mr-5 shrink-0 mb-4 sm:mb-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                            </svg>
+                        </div>
+                        <div class="flex-grow flex flex-col h-full justify-between">
+                            <div>
+                                <h4 class="text-xl font-bold mb-1 text-slate-800">Scratch AI 助教測試站</h4>
+                                <p class="text-sm text-slate-600 mb-1 leading-relaxed font-medium">
+                                    繳交作業前，先讓 AI 幫你檢查邏輯對不對吧！
+                                </p>
+                                <p class="text-xs text-slate-400 mb-5">
+                                    （等待老師發佈後，可上傳 Scratch 程式檔檢查）
+                                </p>
+                            </div>
+                            
+                            <!-- 按鈕操作區 -->
+                            <div class="flex flex-col gap-3 mt-2">
+                                <a href="easy-student.html" class="inline-flex items-center justify-center w-full px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-sm transition-colors">
+                                    <span>進入測試站</span> 
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                </a>
+                                <a href="https://app.notion.com/p/Scratch-Educators-38bebd21bbdb80bfb34dd3eeb80239f8" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-full px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-sm font-bold rounded-xl transition-colors">
+                                    <span>教師專區：Educators 註冊與使用</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 安裝說明 -->
+                    <a href="https://resilient-hydrangea-0fc.notion.site/Easy-Classroom-378ebd21bbdb807c9b4ae49ec52f8c9a" target="_blank" rel="noopener noreferrer" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex items-start hover:shadow-md hover:-translate-y-1 transition-all group">
+                        <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mr-5 shrink-0 group-hover:scale-105 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                        <div class="flex-grow">
+                            <h4 class="text-xl font-bold mb-1 text-slate-800 group-hover:text-amber-600 transition-colors">系統安裝與設定教學</h4>
+                            <p class="text-sm text-slate-600 mb-2 leading-relaxed font-medium">
+                                針對 Google Classroom 自動化管理系統各式授權設定、自動化腳本部署與初次啟用圖文教學。
+                            </p>
+                            <div class="grid grid-cols-2 gap-2 mb-4">
+                                <span class="bg-amber-50 border border-amber-200 text-amber-700 px-2 py-1 rounded text-[11px] font-semibold shadow-sm truncate text-center" title="Google Apps Script">1. Google Apps Script</span>
+                                <span class="bg-amber-50 border border-amber-200 text-amber-700 px-2 py-1 rounded text-[11px] font-semibold shadow-sm truncate text-center">2. Google Sites</span>
+                                <span class="bg-amber-50 border border-amber-200 text-amber-700 px-2 py-1 rounded text-[11px] font-semibold shadow-sm truncate text-center">3. Ngrok</span>
+                                <span class="bg-amber-50 border border-amber-200 text-amber-700 px-2 py-1 rounded text-[11px] font-semibold shadow-sm truncate text-center">4. Google Colab</span>
+                            </div>
+                            <span class="text-sm font-semibold text-amber-600 flex items-center">
+                                閱讀說明文件 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                            </span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 Footer -->
+    <footer class="bg-slate-100 py-10 mt-auto border-t border-slate-200 text-center">
+        <div class="max-w-5xl mx-auto px-6">
+            <p class="text-slate-500 text-sm font-medium">
+                &copy; 2026 資訊科技教學團隊 版權所有。
+            </p>
+            <p class="text-slate-400 text-xs mt-2">
+                Designed for IT Education.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Toast 提示元件 (用於處理尚未綁定連結的點擊) -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-800 text-white px-6 py-4 rounded-xl shadow-2xl transform transition-all duration-300 translate-y-24 opacity-0 z-50 flex items-center space-x-3 pointer-events-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span class="font-medium text-sm">連結即將開放，敬請期待！</span>
+    </div>
+
+    <!-- 互動腳本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toast = document.getElementById('toast');
+            let toastTimeout;
+
+            // 處理所有帶有 class="placeholder-link" 的假連結
+            document.querySelectorAll('.placeholder-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault(); // 阻止跳轉
+
+                    // 顯示 Toast
+                    clearTimeout(toastTimeout);
+                    toast.classList.remove('translate-y-24', 'opacity-0');
+                    
+                    // 3 秒後隱藏
+                    toastTimeout = setTimeout(() => {
+                        toast.classList.add('translate-y-24', 'opacity-0');
+                    }, 3000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LESSON 1 - Scratch 積木大考驗</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #F8F9FA; color: #333333; }
+        .slide-up-fade { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        .quiz-option:hover { border-color: #6366F1; background-color: #EEF2FF; }
+    </style>
+</head>
+<body class="antialiased selection:bg-slate-200 selection:text-slate-800">
+
+    <header class="bg-white border-b border-gray-100 pt-8 pb-12 slide-up-fade">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8">
+            <!-- 返回網站首頁按鈕 -->
+            <div class="mb-6">
+                <a href="https://su-yung-sheng.github.io/unforte115/" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> 
+                    返回網站首頁
+                </a>
+            </div>
+            <p class="text-sm font-medium text-indigo-500 mb-2 tracking-widest uppercase">演算法與程式設計</p>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight">星際防禦工程師：<br class="hidden md:block">用程式編織能量防護網</h1>
+            <p class="text-lg text-slate-500 font-light max-w-2xl">結合「IPO 思維」與「重複結構」，循序漸進建立邏輯思維與幾何繪圖能力，並透過實作防禦網任務，體驗程式設計的強大魔力。</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 lg:px-8 py-12 relative">
+        <a href="https://su-yung-sheng.github.io/unforte115/1150700.html" class="mb-6 inline-flex items-center text-sm font-medium text-slate-400 hover:text-slate-800 transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 返回課程總覽
+        </a>
+        
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-10 mb-8 relative min-h-[500px] flex flex-col slide-up-fade">
+            <span class="text-sm font-semibold text-slate-400 tracking-wider block mb-2">LESSON 1</span>
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">資格認證：Scratch 積木大考驗</h2>
+            <p class="text-slate-500 font-light text-base mb-8 pb-6 border-b border-slate-100">星際防禦工程師資格考驗！我們將進行 10 題系統測驗，包含 <strong class="text-emerald-600">5 題核心基本題</strong> 與 <strong class="text-indigo-600">5 題隨機進階題</strong>。滿 80 分即可獲得專屬通關證書，取得操作防護網發生器的權限！</p>
+            
+            <div id="quiz-start-screen" class="flex-grow flex flex-col items-center justify-center text-center pb-8 slide-up-fade">
+                <div class="text-6xl mb-6 animate-bounce">🧩</div>
+                <h3 class="text-2xl font-bold text-slate-700 mb-3">準備好接受挑戰了嗎？</h3>
+                <p class="text-slate-500 mb-8">仔細閱讀每一題，選出最正確的積木功能！</p>
+                <button onclick="startQuiz()" class="bg-indigo-600 text-white px-8 py-3 rounded-full font-bold hover:bg-indigo-700 shadow-md transition-all transform hover:scale-105">開始測驗 🚀</button>
+            </div>
+
+            <div id="quiz-active-screen" class="hidden flex-grow flex flex-col slide-up-fade">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-sm font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">第 <span id="quiz-current-q" class="text-indigo-600">1</span> / 10 題</span>
+                    <span class="text-sm font-bold text-slate-400">目前得分：<span id="quiz-score" class="text-emerald-500">0</span></span>
+                </div>
+                
+                <div class="bg-slate-50 p-6 md:p-8 rounded-2xl border border-slate-200 mb-6 flex-grow flex items-center justify-center text-left">
+                    <h3 id="quiz-question-text" class="text-xl md:text-2xl font-bold text-slate-800 leading-relaxed inline-block">題目載入中...</h3>
+                </div>
+                <div id="quiz-options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+
+            <div id="quiz-result-screen" class="hidden flex-grow flex flex-col items-center justify-center text-center pb-8 slide-up-fade">
+                <div id="quiz-result-emoji" class="text-7xl mb-6">🏆</div>
+                <h3 id="quiz-result-title" class="text-3xl font-bold text-slate-800 mb-3">測驗完成！</h3>
+                <p class="text-slate-500 mb-6 text-lg">你的最終得分是：<strong id="quiz-final-score" class="text-3xl text-indigo-600 mx-2">100</strong> 分</p>
+                <p id="quiz-result-msg" class="text-slate-600 font-medium mb-4 bg-slate-50 px-6 py-3 rounded-xl border border-slate-200"></p>
+                
+                <div id="quiz-cert-form" class="hidden flex-col items-center gap-3 w-full max-w-sm mx-auto mb-8 bg-amber-50 p-6 rounded-2xl border border-amber-200">
+                    <p class="text-sm font-bold text-amber-800 mb-1">輸入資料，領取專屬通關證書 🎓</p>
+                    <input type="text" id="cert-class" placeholder="班級 (例如: 六年甲班)" class="w-full border border-amber-300 rounded-lg p-2.5 text-sm text-center focus:outline-none focus:border-amber-500 font-bold text-slate-700">
+                    <input type="text" id="cert-seat" placeholder="座號 (例如: 15)" class="w-full border border-amber-300 rounded-lg p-2.5 text-sm text-center focus:outline-none focus:border-amber-500 font-bold text-slate-700">
+                    <input type="text" id="cert-name" placeholder="姓名 (例如: 王小明)" class="w-full border border-amber-300 rounded-lg p-2.5 text-sm text-center focus:outline-none focus:border-amber-500 font-bold text-slate-700">
+                    <p id="cert-error-msg" class="text-xs text-rose-500 font-bold hidden w-full text-left mt-1">⚠️ 請填寫完整的班級、座號與姓名喔！</p>
+                    <button onclick="generateQuizCertificate()" class="w-full bg-amber-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-amber-600 shadow-sm transition-all mt-2">發出我的證書</button>
+                </div>
+
+                <div class="flex gap-4">
+                    <button onclick="startQuiz()" class="bg-white border-2 border-indigo-200 text-indigo-600 px-6 py-2.5 rounded-full font-bold hover:bg-indigo-50 transition-all">再挑戰一次</button>
+                    <a href="https://su-yung-sheng.github.io/unforte115/1150702.html" class="bg-indigo-600 text-white px-6 py-2.5 rounded-full font-bold hover:bg-indigo-700 shadow-md transition-all hidden flex items-center" id="quiz-next-btn">前往 Lesson 2 ➔</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div id="cert-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-slate-900/60 backdrop-blur-sm transition-opacity opacity-0 rounded-3xl">
+        <div class="bg-white p-10 rounded-3xl shadow-2xl text-center border-4 border-amber-400 max-w-lg transform scale-90 transition-transform duration-500 mx-4" id="cert-content">
+            <div class="text-6xl mb-4">🏆</div>
+            <h2 class="text-3xl font-bold text-amber-600 mb-4">恭喜通關！</h2>
+            <div id="cert-student-info" class="hidden mb-6">
+                <div class="inline-block bg-indigo-50 border border-indigo-100 text-indigo-800 px-5 py-2.5 rounded-xl text-lg font-bold shadow-sm">
+                    <span id="cert-display-class"></span> <span class="mx-2 text-indigo-300">|</span> 座號：<span id="cert-display-seat"></span> <span class="mx-2 text-indigo-300">|</span> <span id="cert-display-name"></span>
+                </div>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-4">Scratch 積木大師 證書</h3>
+            <p class="text-slate-600 mb-8 text-sm leading-relaxed">你以優異的成績通過了隨機題庫的嚴格考驗，成功證明了你對 Scratch 積木的熟練度！準備好進入邏輯大腦的訓練了嗎？</p>
+            <button onclick="closeCertificate()" class="bg-amber-500 text-white px-8 py-3 rounded-full font-bold hover:bg-amber-600 shadow-md transition-all">收下證書並繼續</button>
+        </div>
+    </div>
+
+    <script>
+        const basicPool = [
+            { cat: "event", catName: "事件", q: "通常放在程式的起頭，用來啟動程式。", options: [{t: "當 🟢 綠旗被點擊", c: "event"}, {t: "當 (空白鍵) 鍵被按下", c: "event"}, {t: "廣播訊息 (開始)", c: "event"}, {t: "當這個角色被點擊", c: "event"}], ans: 0 },
+            { cat: "control", catName: "控制", q: "可以嵌入需要重複執行的積木。輸入重複執行次數。", options: [{t: "重複 [10] 次", c: "control"}, {t: "重複無限次", c: "control"}, {t: "如果 < > 那麼", c: "control"}, {t: "等待直到 < >", c: "control"}], ans: 0 },
+            { cat: "motion", catName: "動作", q: "設定角色往前移動距離，移動幾點代表移動幾個像素。", options: [{t: "移動 [10] 點", c: "motion"}, {t: "x 改變 [10]", c: "motion"}, {t: "定位到 x: [0] y: [0]", c: "motion"}, {t: "面朝 [90] 度", c: "motion"}], ans: 0 },
+            { cat: "looks", catName: "外觀", q: "設定角色換至下一種造型，或由最後的造型換至第一種造型。", options: [{t: "下一個造型", c: "looks"}, {t: "造型換成 (造型1)", c: "looks"}, {t: "換成下一個背景", c: "looks"}, {t: "清除圖像效果", c: "looks"}], ans: 0 },
+            { cat: "control", catName: "控制", q: "設定角色移動速度。等待時間愈長，移動速度愈慢。", options: [{t: "等待 [1] 秒", c: "control"}, {t: "停止 (全部)", c: 'control'}, {t: "建立 (自己) 的分身", c: "control"}, {t: "重複直到 < >", c: "control"}], ans: 0 }
+        ];
+
+        const advancedPool = [
+            { cat: "motion", catName: "動作", q: "探測車降落後，必須放在舞台正中央作為起點。請選出能讓角色精準回到中心點的積木：", options: [{t: "移動 [10] 點", c: "motion"}, {t: "面朝 [90] 度", c: "motion"}, {t: "定位到 x: [0] y: [0]", c: "motion"}, {t: "滑行 [1] 秒到 (隨機位置)", c: "motion"}], ans: 2 },
+            { cat: "motion", catName: "動作", q: "畫正方形前，我們希望畫筆「朝向右邊」準備畫第一條線。代表朝向右邊的積木是？", options: [{t: "面朝 [-90] 度", c: "motion"}, {t: "面朝 [0] 度", c: "motion"}, {t: "右轉 ↻ [90] 度", c: "motion"}, {t: "面朝 [90] 度", c: "motion"}], ans: 3 },
+            { cat: "motion", catName: "動作", q: "探測車畫完正方形的第一條邊後，必須在角落進行「直角轉彎」。正確積木是？", options: [{t: "左轉 ↺ [90] 度", c: "motion"}, {t: "面朝 [180] 度", c: "motion"}, {t: "右轉 ↻ [90] 度", c: "motion"}, {t: "移動 [-90] 點", c: "motion"}], ans: 2 },
+            { cat: "motion", catName: "動作", q: "在製作自動導航系統時，希望無人機永遠面向著玩家（滑鼠游標）的方向，應該使用？", options: [{t: "面朝 (滑鼠指標) 向", c: "motion"}, {t: "定位到 (滑鼠指標)", c: "motion"}, {t: "右轉 ↻ [15] 度", c: "motion"}, {t: "碰到邊緣就反彈", c: "motion"}], ans: 0 },
+            { cat: "motion", catName: "動作", q: "如果只想讓角色在畫面上「單純向左平移」，而不改變它原本面朝的方向，我們應該？", options: [{t: "y 改變 [-10]", c: "motion"}, {t: "x 設為 [0]", c: "motion"}, {t: "x 改變 [-10]", c: "motion"}, {t: "y 改變 [10]", c: "motion"}], ans: 2 },
+            { cat: "motion", catName: "動作", q: "角色在舞台邊緣反彈後，常常會變成「上下顛倒」。為了讓角色只能在左右兩側翻轉，我們需要加入？", options: [{t: "碰到邊緣就反彈", c: "motion"}, {t: "迴轉方式設為 (左-右)", c: "motion"}, {t: "面朝 [90] 度", c: "motion"}, {t: "定位到 x: [0] y: [0]", c: "motion"}], ans: 1 },
+            { cat: "pen", catName: "畫筆", q: "開始每一次全新的幾何繪圖前，必須把上次留在舞台上的舊線條全部擦掉。這要使用哪個積木？", options: [{t: "停筆", c: "pen"}, {t: "刪除這一個分身", c: "control"}, {t: "清除圖像效果", c: "looks"}, {t: "筆跡全部清除", c: "pen"}], ans: 3 },
+            { cat: "pen", catName: "畫筆", q: "探測車抵達起點後，必須把機器筆「放下來」接觸地面，這樣移動時才會留下軌跡。對應的積木是？", options: [{t: "下筆", c: "pen"}, {t: "蓋章", c: "pen"}, {t: "顯示", c: "looks"}, {t: "畫筆顏色設為 [顏色]", c: "pen"}], ans: 0 },
+            { cat: "pen", catName: "畫筆", q: "當探測車要移動到下一個陣列基地，且中途不想留下任何連結的線條時，它必須在移動前先執行哪一個積木？", options: [{t: "筆跡全部清除", c: "pen"}, {t: "隱藏", c: "looks"}, {t: "停筆", c: "pen"}, {t: "停止 (全部)", c: "control"}], ans: 2 },
+            { cat: "pen", catName: "畫筆", q: "如果不想要畫連續的線條，而是想要在畫布上留下角色當下的圖案（像貼紙一樣印上去），可以使用畫筆的？", options: [{t: "下筆", c: "pen"}, {t: "建立 (自己) 的分身", c: "control"}, {t: "蓋章", c: "pen"}, {t: "造型換成 (造型1)", c: "looks"}], ans: 2 },
+            { cat: "pen", catName: "畫筆", q: "為了讓幾何曼陀羅圖案更繽紛，希望每次迴圈畫完一個圖形後，畫筆顏色能自動產生變化，這時要用哪一個積木？", options: [{t: "畫筆 (顏色) 改變 [10]", c: "pen"}, {t: "畫筆顏色設為 [顏色]", c: "pen"}, {t: "圖像效果 (顏色) 改變 [25]", c: "looks"}, {t: "下筆", c: "pen"}], ans: 0 },
+            { cat: "pen", catName: "畫筆", q: "如果覺得畫出來的多邊形線條太細了，想要把線條的粗度固定設定為 5，應該選擇哪一個畫筆指令？", options: [{t: "畫筆粗細改變 [5]", c: "pen"}, {t: "畫筆粗細設為 [5]", c: "pen"}, {t: "尺寸設為 [50] %", c: "looks"}, {t: "畫筆 (顏色) 改變 [5]", c: "pen"}], ans: 1 },
+            { q: "在設計背景音樂或是持續掉落的隕石時，我們希望這個動作永遠不要停下來，這時候必須用到哪一種控制結構？", cat: "control", catName: "控制", options: [{t: "重複無限次", c: "control"}, {t: "重複 [10] 次", c: "control"}, {t: "等待 [1] 秒", c: "control"}, {t: "如果 < > 那麼 / 否則", c: "control"}], ans: 0 },
+            { q: "若遊戲設定「如果玩家得分大於 60 分，就過關；如果不是，就失敗」。面對這種「二選一」的岔路，應該使用哪一個積木？", cat: "control", catName: "控制", options: [{t: "重複直到 < >", c: "control"}, {t: "如果 < > 那麼", c: "control"}, {t: "如果 < > 那麼 / 否則", c: "control"}, {t: "等待直到 < >", c: "control"}], ans: 2 },
+            { q: "在「如果...那麼」積木上方，有一個特殊的六角形凹槽。下列哪一個積木符合這個判斷條件的形狀？", cat: "control", catName: "控制", options: [{t: "((分數))", c: "variable"}, {t: "<碰到 (滑鼠指標) ?>", c: "sensing"}, {t: "(( [1] 到 [10] 隨機取數 ))", c: "operator"}, {t: "((字串組合 [蘋果] 和 [香蕉]))", c: "operator"}], ans: 1 },
+            { q: "當碰到超級大魔王或是遊戲時間歸零時，我們需要一個「緊急煞車」把場上所有正在運行的程式碼強制關閉，要使用哪個積木？", cat: "control", catName: "控制", options: [{t: "停止 (這個角色的其他程式)", c: "control"}, {t: "隱藏", c: "looks"}, {t: "停止 (全部)", c: "control"}, {t: "等待 [10] 秒", c: "control"}], ans: 2 },
+            { q: "遊戲中需要發射大量的雷射子彈，但我們不可能事先畫 100 個角色。要複製一模一樣的自己，使用的積木是？", cat: "control", catName: "控制", options: [{t: "蓋章", c: "pen"}, {t: "建立 (自己) 的分身", c: "control"}, {t: "顯示", c: "looks"}, {t: "廣播訊息 (發射)", c: "event"}], ans: 1 },
+            { q: "當雷射子彈飛到畫面邊緣時，為了避免浪費電腦記憶體導致遊戲當機，我們必須讓這個分身消失。正確的積木是？", cat: "control", catName: "控制", options: [{t: "隱藏", c: "looks"}, {t: "清除圖像效果", c: "looks"}, {t: "停止 (這個程式)", c: "control"}, {t: "刪除這一個分身", c: "control"}], ans: 3 },
+            { q: "如果程式需要問玩家：「你要畫幾邊形？」，並將畫面暫停直到玩家在下方打字輸入，這屬於偵測類別的哪一個積木？", cat: "sensing", catName: "偵測", options: [{t: "說出 [你要畫幾邊形？] [2] 秒", c: "looks"}, {t: "詢問 [你要畫幾邊形？] 並等待", c: "sensing"}, {t: "廣播訊息 (你要畫幾邊形？)", c: "event"}, {t: "變數 (形狀) 設為 [你要畫幾邊形？]", c: "variable"}], ans: 1 },
+            { q: "當執行了「詢問並等待」積木後，玩家在畫面上打字送出的內容（例如輸入 6），會自動被儲存在下列哪一個特殊的圓形數值積木裡？", cat: "sensing", catName: "偵測", options: [{t: "((計時器))", c: "sensing"}, {t: "(( ([字串] 的長度) ))", c: "operator"}, {t: "((詢問的答案))", c: "sensing"}, {t: "((變數))", c: "variable"}], ans: 2 },
+            { q: "為了讓來回走動的敵人碰到螢幕邊界自動轉向，我們可以使用如果條件判斷。下列哪一個六角形積木能偵測邊緣？", cat: "sensing", catName: "偵測", options: [{t: "<碰到 (邊緣) ?>", c: "sensing"}, {t: "<顏色 [#FF0000] 碰到顏色 [#00FF00] ?>", c: "sensing"}, {t: "<(空白鍵) 鍵被按下 ?>", c: "sensing"}, {t: "((與 (滑鼠指標) 的間距))", c: "sensing"}], ans: 0 },
+            { q: "在設計寵物跟隨主人的遊戲中，我們需要隨時知道寵物與滑鼠的距離。這個擁有數值回傳功能的圓形積木是？", cat: "sensing", catName: "偵測", options: [{t: "<碰到 (滑鼠指標) ?>", c: "sensing"}, {t: "((與 (滑鼠指標) 的間距))", c: "sensing"}, {t: "((游標的 x 座標))", c: "sensing"}, {t: "面朝 (滑鼠指標) 向", c: "motion"}], ans: 1 },
+            { q: "我們想要記錄玩家目前的通關「分數」，就像準備一個可以隨時更換數字的盒子一樣，我們必須建立什麼？", cat: "variable", catName: "變數", options: [{t: "建立一個清單", c: "list"}, {t: "建立一個變數", c: "variable"}, {t: "建立一個積木", c: "custom"}, {t: "建立一個事件", c: "event"}], ans: 1 },
+            { q: "每次遊戲重新開始（點擊綠旗）時，為了公平起見，我們必須把分數歸零。應該將哪個積木放在初始化的流程中？", cat: "variable", catName: "變數", options: [{t: "變數 (分數) 改變 [0]", c: "variable"}, {t: "隱藏變數 (分數)", c: "variable"}, {t: "變數 (分數) 設為 [0]", c: "variable"}, {t: "變數 (分數) 改變 [-1]", c: "variable"}], ans: 2 },
+            { q: "在「計算 1+2+...+N」的重複結構中，我們希望變數 `i` 每次執行完都能自動加 1 (遞增)，這時最簡潔的變數操作指令是哪一個？", cat: "variable", catName: "變數", options: [{t: "變數 (i) 設為 [1]", c: "variable"}, {t: "變數 (i) 改變 [1]", c: "variable"}, {t: "變數 (i) 設為 [0]", c: "variable"}, {t: "顯示變數 (i)", c: "variable"}], ans: 1 },
+            { q: "如果程式想要非常人性化地輸出結果：「你的總分是 100」，它必須將文字與變數結合。運算類別中哪一個積木能做到這件事？", cat: "operator", catName: "運算", options: [{t: "(( [你的總分是] + ((分數)) ))", c: "operator"}, {t: "(( ([你的總分是] 的第 [1] 個字) ))", c: "operator"}, {t: "((字串組合 [你的總分是 ] 和 ((分數)) ))", c: "operator"}, {t: "< [你的總分是] 包含 ((分數)) ?>", c: "operator"}], ans: 2 },
+            { q: "在選擇結構中，如果我們想把「作業成績(A)」乘上「0.4」的加權比例，我們必須使用綠色運算類別的哪一個積木符號？", cat: "operator", catName: "運算", options: [{t: "(( ((A)) / [0.4] ))", c: "operator"}, {t: "(( ((A)) * [0.4] ))", c: "operator"}, {t: "(( ((A)) + [0.4] ))", c: "operator"}, {t: "(( ((A)) - [0.4] ))", c: "operator"}], ans: 1 },
+            { q: "如果希望星際探測車每次畫出的多邊形邊長都充滿驚喜，介於 50 到 100 之間，應該把哪一個積木塞入「移動點數」的格子中？", cat: "operator", catName: "運算", options: [{t: "((字串組合 [50] 和 [100]))", c: "operator"}, {t: "(( [50] / [100] ))", c: "operator"}, {t: "(( [50] 到 [100] 隨機取數 ))", c: "operator"}, {t: "(( [100] 除以 [50] 的餘數 ))", c: "operator"}], ans: 2 },
+            { q: "在防呆機制中，如果規定輸入的長度「必須大於 0」，我們可以用哪一個綠色六角形積木來做為「如果...那麼」的條件？", cat: "operator", catName: "運算", options: [{t: "<((詢問的答案)) > [0]>", c: "operator"}, {t: "<((詢問的答案)) = [0]>", c: "operator"}, {t: "<((詢問的答案)) < [0]>", c: "operator"}, {t: "(( [0] + ((詢問的答案)) ))", c: "operator"}], ans: 0 },
+            { q: "如果一場考驗規定「分數要及格 (大於60)」而且「時間不能超時 (小於100)」，我們要用哪一個邏輯積木把這兩個判斷綁在一起？", cat: "operator", catName: "運算", options: [{t: "< < > 或 < > >", c: "operator"}, {t: "< < > 不成立 >", c: "operator"}, {t: "((字串組合 [字串1] 和 [字串2]))", c: "operator"}, {t: "< < > 且 < > >", c: "operator"}], ans: 3 },
+            { q: "若要畫一個完美的「正三角形」，重複 3 次的迴圈內，畫筆每次右轉的角度應該設定為多少度？（提示：360 ÷ 邊數）", cat: "motion", catName: "動作", options: [{t: "右轉 ↻ [60] 度", c: "motion"}, {t: "右轉 ↻ [90] 度", c: "motion"}, {t: "右轉 ↻ [120] 度", c: "motion"}, {t: "右轉 ↻ [180] 度", c: "motion"}], ans: 2 },
+            { q: "當我們畫完美麗的幾何圖騰後，發現探測車角色擋住了圖案的中心。若想讓探測車跑到圖形最下方，應該使用哪個外觀積木？", cat: "looks", catName: "外觀", options: [{t: "移到 (最上層)", c: "looks"}, {t: "移到 (最下層)", c: "looks"}, {t: "隱藏", c: "looks"}, {t: "尺寸設為 [50] %", c: "looks"}], ans: 1 },
+            { q: "如果我們希望在不點擊綠旗的情況下，玩家一按下鍵盤的「空白鍵」就會清空畫布，應該使用哪一個事件帽子積木？", cat: "event", catName: "事件", options: [{t: "當 🟢 綠旗被點擊", c: "event"}, {t: "當 (空白鍵) 鍵被按下", c: "event"}, {t: "當這個角色被點擊", c: "event"}, {t: "<(空白鍵) 鍵被按下 ?>", c: "sensing"}], ans: 1 },
+            { q: "當程式需要告訴使用者「計算完成！」的訊息，且不希望文字框立刻消失，應該使用哪一個積木最合適？", cat: "looks", catName: "外觀", options: [{t: "說出 [計算完成！] [2] 秒", c: "looks"}, {t: "說出 [計算完成！]", c: "looks"}, {t: "詢問 [計算完成！] 並等待", c: "sensing"}, {t: "想著 [計算完成！] [2] 秒", c: "looks"}], ans: 0 },
+            { q: "當背景音樂播放完畢，想要通知另一個「煙火」角色開始播放動畫，最好的溝通方式是使用哪一個積木發送訊號？", cat: "event", catName: "事件", options: [{t: "變數 (訊號) 設為 [1]", c: "variable"}, {t: "當收到訊息 (播放煙火)", c: "event"}, {t: "廣播訊息 (播放煙火)", c: "event"}, {t: "說出 [播放煙火]", c: "looks"}], ans: 2 },
+            { q: "承上題，「煙火」角色如果想要在收到訊號的那一刻開始動作，它的程式區塊頂端必須放置哪一個有帽子的積木？", cat: "event", catName: "事件", options: [{t: "廣播訊息 (播放煙火)", c: "event"}, {t: "當 🟢 綠旗被點擊", c: "event"}, {t: "當 (空白鍵) 鍵被按下", c: "event"}, {t: "當收到訊息 (播放煙火)", c: "event"}], ans: 3 },
+            { q: "如果我們想要知道一個數字是否為偶數，我們可以把該數字除以 2，並檢查其「餘數」是否為 0。請問該使用哪個運算積木？", cat: "operator", catName: "運算", options: [{t: "(( ((數)) / [2] ))", c: "operator"}, {t: "(( 四捨五入 ((數)) ))", c: "operator"}, {t: "(( ((數)) 除以 [2] 的餘數 ))", c: "operator"}, {t: "(( ((數)) * [2] ))", c: "operator"}], ans: 2 },
+            { q: "如果我們想知道玩家輸入的「名字」總共有幾個字元長度，在綠色的運算積木中應該選擇哪一個？", cat: "operator", catName: "運算", options: [{t: "(( ((詢問的答案)) 的長度 ))", c: "operator"}, {t: "(( ((詢問的答案)) 的第 [1] 個字 ))", c: "operator"}, {t: "((字串組合 [長度是] 和 ((詢問的答案)) ))", c: "operator"}, {t: "< [字串] 包含 ((詢問的答案)) ?>", c: "operator"}], ans: 0 },
+            { q: "我們想要讓探測車的輪子看起來像在轉動，並幫角色畫了 3 張不同角度的圖案。若要讓它不斷切換圖案產生動畫，要使用：", cat: "looks", catName: "外觀", options: [{t: "造型換成 (造型1)", c: "looks"}, {t: "下一個造型", c: "looks"}, {t: "換成下一個背景", c: "looks"}, {t: "圖像效果 (顏色) 改變 [25]", c: "looks"}], ans: 1 },
+            { q: "當玩家順利將太陽能板全部鋪設完成，我們希望將行星的背景從「白天」切換到「星空黑夜」，應該使用哪一個積木？", cat: "looks", catName: "外觀", options: [{t: "背景換成 (黑夜)", c: "looks"}, {t: "換成下一個背景", c: "looks"}, {t: "隱藏", c: "looks"}, {t: "清除圖像效果", c: "looks"}], ans: 0 },
+            { q: "如果我們不只要記錄一個分數，而是想要把「全班 30 個人的成績」通通記錄下來，這時候只用「變數」不夠，我們需要建立什麼？", cat: "list", catName: "清單", options: [{t: "建立一個事件", c: "event"}, {t: "建立一個清單", c: "list"}, {t: "建立一個分身", c: "control"}, {t: "建立一個函式", c: "custom"}], ans: 1 },
+            { q: "如果在播放過關音效時，我們不希望它因為程式還沒播完就繼續往下畫圖而造成干擾，應該使用哪一個聲音積木？", cat: "sound", catName: "音效", options: [{t: "播放音效 (過關)", c: "sound"}, {t: "停止所有音效", c: "sound"}, {t: "音量設為 [100] %", c: "sound"}, {t: "播放音效 (過關) 直到結束", c: "sound"}], ans: 3 },
+            { q: "在設計迷宮遊戲時，如果規定「碰到黑色牆壁就退回原點」，我們要在「如果...那麼」中放入哪一種偵測積木？", cat: "sensing", catName: "偵測", options: [{t: "<碰到顏色 [#000000] ?>", c: "sensing"}, {t: "<碰到 (邊緣) ?>", c: "sensing"}, {t: "(( [0] 到 [10] 隨機取數 ))", c: "operator"}, {t: "<((分數)) > [0]>", c: "operator"}], ans: 0 },
+            { q: "如果想讓探測車不是用跳躍的（定位到），而是有平滑移動的視覺效果，從左下角花 2 秒鐘開到右上角，該使用哪個積木？", cat: "motion", catName: "動作", options: [{t: "移動 [100] 點", c: "motion"}, {t: "定位到 x: [200] y: [150]", c: "motion"}, {t: "滑行 [2] 秒到 x: [200] y: [150]", c: "motion"}, {t: "x 改變 [200]", c: "motion"}], ans: 2 },
+            { q: "如果遊戲有一扇門，我們希望程式卡在這裡「一直等到玩家拿到鑰匙（變數=1）才開門」，應該使用控制類別中的哪個積木？", cat: "control", catName: "控制", options: [{t: "如果 < > 那麼", c: "control"}, {t: "等待直到 <((鑰匙)) = [1]>", c: "control"}, {t: "重複無限次", c: "control"}, {t: "等待 [1] 秒", c: "control"}], ans: 1 },
+            { q: "當我們的畫圖程式碼越來越長，想要把「畫正方形」打包成一個新的專屬指令，我們應該前往哪一個積木分類中操作？", cat: "custom", catName: "函式積木", options: [{t: "變數類別", c: "variable"}, {t: "控制類別", c: "control"}, {t: "建立一個積木 (My Blocks)", c: "custom"}, {t: "畫筆類別", c: "pen"}], ans: 2 }
+        ];
+
+        function shuffleQuestionOptions(qObj) {
+            let opts = qObj.options.map((opt, index) => ({ opt, index }));
+            for (let i = opts.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [opts[i], opts[j]] = [opts[j], opts[i]];
+            }
+            let newAns = opts.findIndex(item => item.index === qObj.ans);
+            return { ...qObj, options: opts.map(item => item.opt), ans: newAns };
+        }
+
+        function getCategoryTag(cat, catName) {
+            let bgClass = "", textClass = "text-white";
+            switch(cat) {
+                case 'motion': bgClass = 'bg-[#4C97FF]'; break;
+                case 'looks': bgClass = 'bg-[#9966FF]'; break;
+                case 'sound': bgClass = 'bg-[#CF63CF]'; break;
+                case 'event': bgClass = 'bg-[#FFD500]'; textClass = 'text-slate-800'; break;
+                case 'control': bgClass = 'bg-[#FFAB19]'; break;
+                case 'sensing': bgClass = 'bg-[#5CB1D6]'; break;
+                case 'operator': bgClass = 'bg-[#59C059]'; break;
+                case 'variable': bgClass = 'bg-[#FF8C1A]'; break;
+                case 'list': bgClass = 'bg-[#FF661A]'; break;
+                case 'pen': bgClass = 'bg-[#0FBD8C]'; break;
+                case 'custom': bgClass = 'bg-[#FF6680]'; break;
+                default: bgClass = 'bg-slate-500';
+            }
+            return `<span class="inline-block px-2 py-0.5 rounded ${bgClass} ${textClass} text-xs font-bold mr-2 mb-1 shadow-sm shrink-0">[${catName}]</span>`;
+        }
+
+        function getBlockHTML(text, category) {
+            let bgClass = "", borderClass = "", shapeClass = "rounded-md", textClass = "text-white";
+            switch(category) {
+                case 'motion': bgClass = 'bg-[#4C97FF]'; borderClass = 'border-[#3373CC]'; break;
+                case 'looks': bgClass = 'bg-[#9966FF]'; borderClass = 'border-[#774DCB]'; break;
+                case 'sound': bgClass = 'bg-[#CF63CF]'; borderClass = 'border-[#C94FC9]'; break;
+                case 'event': bgClass = 'bg-[#FFD500]'; borderClass = 'border-[#CC9900]'; textClass = 'text-slate-800'; shapeClass = 'rounded-t-xl rounded-b-md'; break;
+                case 'control': bgClass = 'bg-[#FFAB19]'; borderClass = 'border-[#CF8B17]'; break;
+                case 'sensing': bgClass = 'bg-[#5CB1D6]'; borderClass = 'border-[#2E8EB8]'; break;
+                case 'operator': bgClass = 'bg-[#59C059]'; borderClass = 'border-[#389438]'; shapeClass = 'rounded-full'; break;
+                case 'variable': bgClass = 'bg-[#FF8C1A]'; borderClass = 'border-[#DB6E00]'; shapeClass = 'rounded-md'; break; 
+                case 'list': bgClass = 'bg-[#FF661A]'; borderClass = 'border-[#DB3300]'; shapeClass = 'rounded-md'; break;
+                case 'pen': bgClass = 'bg-[#0FBD8C]'; borderClass = 'border-[#0B8E69]'; break;
+                case 'custom': bgClass = 'bg-[#FF6680]'; borderClass = 'border-[#FF3355]'; break;
+                default: bgClass = 'bg-slate-500'; borderClass = 'border-slate-600';
+            }
+            
+            if (text.startsWith('((') && text.endsWith('))')) {
+                shapeClass = "rounded-full";
+                text = text.substring(2, text.length - 2);
+            } else if (text.startsWith('<') && text.endsWith('>')) {
+                shapeClass = "rounded-tl-lg rounded-bl-lg rounded-tr-lg rounded-br-lg";
+                text = text.substring(1, text.length - 1);
+            }
+
+            let formattedText = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            formattedText = formattedText
+                .replace(/\[(.*?)\]/g, '<span class="bg-white/95 text-slate-800 px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-bold mx-1 shadow-inner border border-slate-300">$1</span>')
+                .replace(/\(\((.*?)\)\)/g, '<span class="bg-black/15 text-inherit px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-bold mx-1 shadow-inner border border-black/10">$1</span>')
+                .replace(/\((.*?)\)/g, '<span class="bg-black/15 text-inherit px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-bold mx-1 shadow-inner border border-black/10">$1 ▾</span>');
+
+            return `<div class="inline-flex items-center px-3 py-1.5 ${bgClass} border-b-[3px] ${borderClass} ${shapeClass} ${textClass} font-bold text-xs sm:text-sm shadow-sm whitespace-nowrap leading-tight">${formattedText}</div>`;
+        }
+
+        let currentQuizQuestions = [];
+        let currentQIndex = 0;
+        let currentScore = 0;
+
+        function startQuiz() {
+            let basicQs = basicPool.map(q => shuffleQuestionOptions(q));
+            basicQs = basicQs.sort(() => 0.5 - Math.random());
+            const shuffledAdvanced = [...advancedPool].sort(() => 0.5 - Math.random());
+            const advancedQs = shuffledAdvanced.slice(0, 5).map(q => shuffleQuestionOptions(q));
+            
+            currentQuizQuestions = [...basicQs, ...advancedQs];
+            currentQIndex = 0;
+            currentScore = 0;
+            
+            document.getElementById('quiz-start-screen').classList.add('hidden');
+            document.getElementById('quiz-result-screen').classList.add('hidden');
+            document.getElementById('quiz-active-screen').classList.remove('hidden');
+            
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const qData = currentQuizQuestions[currentQIndex];
+            document.getElementById('quiz-current-q').textContent = currentQIndex + 1;
+            document.getElementById('quiz-score').textContent = currentScore * 10;
+            
+            const catTagHTML = getCategoryTag(qData.cat, qData.catName);
+            document.getElementById('quiz-question-text').innerHTML = `${catTagHTML} ${qData.q}`;
+            
+            const container = document.getElementById('quiz-options-container');
+            container.innerHTML = '';
+            
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "quiz-option w-full bg-white border-2 border-slate-200 text-slate-700 font-bold p-3 sm:p-4 rounded-xl text-lg transition-all text-left flex flex-col xl:flex-row items-start xl:items-center gap-3";
+                const label = String.fromCharCode(65 + idx); 
+                btn.innerHTML = `<span class="bg-slate-100 text-slate-500 w-8 h-8 rounded shrink-0 flex items-center justify-center text-sm">${label}</span> ${getBlockHTML(opt.t, opt.c)}`;
+                btn.onclick = () => selectAnswer(idx);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(selectedIndex) {
+            const qData = currentQuizQuestions[currentQIndex];
+            const isCorrect = (selectedIndex === qData.ans);
+            
+            const buttons = document.getElementById('quiz-options-container').querySelectorAll('button');
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true; 
+                if (idx === qData.ans) {
+                    btn.classList.replace('border-slate-200', 'border-emerald-500');
+                    btn.classList.replace('text-slate-700', 'text-emerald-700');
+                    btn.classList.add('bg-emerald-50');
+                } else if (idx === selectedIndex && !isCorrect) {
+                    btn.classList.replace('border-slate-200', 'border-rose-500');
+                    btn.classList.replace('text-slate-700', 'text-rose-700');
+                    btn.classList.add('bg-rose-50');
+                }
+            });
+
+            if (isCorrect) currentScore++;
+
+            setTimeout(() => {
+                currentQIndex++;
+                if (currentQIndex < 10) loadQuestion();
+                else finishQuiz();
+            }, 800); 
+        }
+
+        function finishQuiz() {
+            document.getElementById('quiz-active-screen').classList.add('hidden');
+            document.getElementById('quiz-result-screen').classList.remove('hidden');
+            
+            const finalScore = currentScore * 10;
+            document.getElementById('quiz-final-score').textContent = finalScore;
+            
+            const emoji = document.getElementById('quiz-result-emoji');
+            const title = document.getElementById('quiz-result-title');
+            const msg = document.getElementById('quiz-result-msg');
+            const nextBtn = document.getElementById('quiz-next-btn');
+            const certForm = document.getElementById('quiz-cert-form');
+            const errorMsg = document.getElementById('cert-error-msg');
+
+            certForm.classList.add('hidden');
+            nextBtn.classList.remove('hidden');
+            errorMsg.classList.add('hidden');
+
+            if (finalScore >= 80) {
+                emoji.textContent = "🎉";
+                title.textContent = "太棒了！測驗通關";
+                msg.textContent = "你具備了扎實的 Scratch 基礎，趕快填寫資料領取你的專屬通關證書吧！";
+                msg.className = "text-emerald-600 font-bold mb-6 bg-emerald-50 px-6 py-3 rounded-xl border border-emerald-200";
+                
+                certForm.classList.remove('hidden');
+                certForm.classList.add('flex');
+                nextBtn.classList.add('hidden');
+                
+                try { localStorage.setItem('unforte115_l1QuizPassed', 'true'); } catch(e){}
+            } else {
+                emoji.textContent = "💪";
+                title.textContent = "再接再厲！";
+                msg.textContent = "差一點點就 80 分囉！建議再挑戰一次，加深對積木的印象！";
+                msg.className = "text-rose-600 font-bold mb-8 bg-rose-50 px-6 py-3 rounded-xl border border-rose-200";
+            }
+        }
+
+        function generateQuizCertificate() {
+            const cls = document.getElementById('cert-class').value.trim();
+            const seat = document.getElementById('cert-seat').value.trim();
+            const name = document.getElementById('cert-name').value.trim();
+            const errorMsg = document.getElementById('cert-error-msg');
+
+            if (!cls || !seat || !name) {
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+            errorMsg.classList.add('hidden');
+
+            document.getElementById('cert-student-info').classList.remove('hidden');
+            document.getElementById('cert-display-class').textContent = cls;
+            document.getElementById('cert-display-seat').textContent = seat;
+            document.getElementById('cert-display-name').textContent = name;
+            
+            document.getElementById('cert-modal').classList.remove('hidden');
+            void document.getElementById('cert-modal').offsetWidth;
+            document.getElementById('cert-modal').classList.add('opacity-100');
+            document.getElementById('cert-content').classList.remove('scale-90');
+            document.getElementById('cert-content').classList.add('scale-100');
+            
+            document.getElementById('quiz-cert-form').classList.add('hidden');
+            document.getElementById('quiz-cert-form').classList.remove('flex');
+            document.getElementById('quiz-next-btn').classList.remove('hidden');
+        }
+
+        function closeCertificate() {
+            document.getElementById('cert-modal').classList.remove('opacity-100');
+            document.getElementById('cert-content').classList.remove('scale-100');
+            document.getElementById('cert-content').classList.add('scale-90');
+            setTimeout(() => document.getElementById('cert-modal').classList.add('hidden'), 300);
+        }
+    </script>
+</body>
+</html>

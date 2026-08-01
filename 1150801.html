@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LESSON 1 星艦資料庫基礎</title>
+    
+    <!-- 引入 React, ReactDOM, Babel -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone@7.24.4/babel.min.js"></script>
+    
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #F8F9FA; color: #333333; }
+        .slide-up-fade { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 隱藏數字輸入框的上下箭頭 */
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        
+        /* Scratch 積木樣式 */
+        .scratch-list-color { background-color: #ff661a; }
+        .scratch-reporter { background-color: #ff661a; border-radius: 9999px; }
+        .scratch-boolean { background-color: #ff661a; clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%); padding-left: 15px; padding-right: 15px;}
+        
+        /* 自訂捲軸樣式 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-15px) scale(0.95); } to { opacity: 1; transform: translateX(0) scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="antialiased selection:bg-cyan-100 selection:text-cyan-900">
+
+    <!-- Header (頁首顯示，維持版面整體感) -->
+    <header id="main-header" class="bg-white border-b border-gray-100 pt-12 pb-12 slide-up-fade relative overflow-hidden">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8 relative z-10">
+            <div class="mb-6">
+                <a href="https://su-yung-sheng.github.io/unforte115/" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> 
+                    返回網站首頁
+                </a>
+            </div>
+            <p class="text-sm font-bold text-cyan-600 mb-3 tracking-widest uppercase">演算法與程式設計</p>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight">星際陣列指揮官：<br class="hidden md:block">用清單打造星際任務</h1>
+            <p class="text-lg text-slate-500 font-light max-w-2xl leading-relaxed">
+                化身星際指揮官，透過任務關卡循序漸進建立邏輯思維，完整掌握 <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span> 的強大威力！
+            </p>
+        </div>
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-cyan-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+        <div class="absolute bottom-0 right-40 w-72 h-72 bg-sky-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+    </header>
+
+    <!-- React 應用程式掛載點 -->
+    <main id="app-container" class="max-w-6xl mx-auto px-4 lg:px-8 py-12 relative min-h-[50vh]"></main>
+
+    <footer class="bg-slate-50 border-t border-slate-200 mt-10 py-8">
+        <div class="max-w-6xl mx-auto px-6 lg:px-8 text-center">
+            <p class="text-sm font-medium text-slate-400">© 演算法與程式設計 - 星際陣列指揮官</p>
+        </div>
+    </footer>
+
+    <!-- React 互動程式邏輯 -->
+    <script type="text/babel" data-type="module">
+        const { useState, useEffect, useRef } = React;
+
+        // ==========================================
+        // 課程介紹標頭 (原網頁的保留資料)
+        // ==========================================
+        const LessonHeader = () => (
+            <div className="slide-up-fade mb-10">
+                <button onClick={() => window.location.href="https://su-yung-sheng.github.io/unforte115/1150800.html"} className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors px-4 py-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm mb-6">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 
+                    返回任務儀表板
+                </button>
+                <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div className="p-8 md:p-10 border-b border-slate-100 bg-slate-50/50 flex flex-col items-start gap-4">
+                        <div className="flex items-center gap-5">
+                            <div className="w-14 h-14 bg-cyan-100 text-cyan-600 rounded-2xl flex items-center justify-center shrink-0 shadow-sm">
+                                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                            </div>
+                            <div>
+                                <span className="text-cyan-500 font-bold text-sm tracking-widest uppercase mb-1 block">LESSON 1</span>
+                                <h2 className="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">星艦資料庫基礎 <span className="text-slate-400 font-medium text-2xl">(清單原理與概念)</span></h2>
+                            </div>
+                        </div>
+                        <p className="text-slate-600 font-light text-lg leading-relaxed mt-2 max-w-3xl">
+                            在建立複雜的系統前，我們必須先了解星艦資料庫的最基本單位：數據陣列（清單）。認識什麼是「索引值」，並學會基本操作。
+                        </p>
+                    </div>
+                    <div className="p-8 md:p-10 bg-white">
+                        <h3 className="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4">
+                            <span className="bg-indigo-100 text-indigo-600 p-1.5 rounded-lg">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            </span>任務目標
+                        </h3>
+                        <div className="bg-indigo-50 text-indigo-900 p-5 rounded-2xl border border-indigo-100/50 leading-relaxed font-medium">
+                            了解清單（陣列）與一般變數的差異，認識「索引值（座號）」的概念，並熟悉 Scratch 中對清單「新增、讀取、修改、刪除」的四大基本操作。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        // ==========================================
+        // 元件 1：右側的「星艦裝備庫」與「系統 AI」 (共用元件)
+        // ==========================================
+        const CargoDisplay = ({ list, message }) => {
+            const listEndRef = useRef(null);
+            
+            useEffect(() => {
+                if (listEndRef.current) {
+                    listEndRef.current.scrollTop = listEndRef.current.scrollHeight;
+                }
+            }, [list]);
+
+            return (
+                <div className="w-full flex flex-col h-full z-10">
+                    {/* 清單顯示器 */}
+                    <div className="bg-slate-800 border-2 border-slate-700 rounded-lg shadow-xl flex flex-col flex-grow mb-4 overflow-hidden relative min-h-[300px]">
+                        <div className="bg-slate-900 text-center py-2 font-bold text-cyan-400 text-sm border-b border-slate-700 tracking-widest">
+                            [ 星艦裝備庫 ]
+                        </div>
+                        <div className="flex-grow p-2 overflow-y-auto space-y-1 bg-slate-800 relative" ref={listEndRef}>
+                            {list.length === 0 ? (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500 italic">
+                                    <div className="text-4xl mb-2 opacity-50">📦</div>
+                                    裝備庫目前為空
+                                </div>
+                            ) : (
+                                list.map((item, index) => (
+                                    <div key={`${index}-${item}`} className="flex items-center text-sm group animate-[slideIn_0.2s_ease-out]">
+                                        <div className="w-6 text-right mr-2 text-cyan-600 font-bold shrink-0">{index + 1}</div>
+                                        <div className="bg-[#ff661a] text-white px-3 py-1.5 rounded w-full shadow-sm font-bold truncate transition-all group-hover:scale-[1.02]">
+                                            {item}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                        <div className="bg-slate-900 border-t border-slate-700 px-3 py-2 text-xs text-slate-400 font-bold flex justify-between rounded-b-lg">
+                            <span>陣列長度 (Length)</span>
+                            <span className="bg-slate-700 text-cyan-400 px-2 rounded border border-slate-600">{list.length}</span>
+                        </div>
+                    </div>
+
+                    {/* 系統 AI */}
+                    <div className="bg-white rounded-2xl p-4 shadow-xl border-4 border-cyan-400 relative shrink-0 transition-all duration-300">
+                        <div className="absolute -top-6 -left-2 w-16 h-16 bg-cyan-400 rounded-full flex items-center justify-center shadow-md text-white">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                                <circle cx="12" cy="5" r="2"></circle>
+                                <path d="M12 7v4"></path>
+                                <line x1="8" y1="16" x2="8" y2="16"></line>
+                                <line x1="16" y1="16" x2="16" y2="16"></line>
+                            </svg>
+                        </div>
+                        <div className="ml-14">
+                            <h3 className="text-sm text-cyan-700 font-extrabold mb-1">系統導航 AI 報告：</h3>
+                            <p className="text-slate-700 font-medium min-h-[3.5rem] flex items-center leading-snug">
+                                {message}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ==========================================
+        // 元件 2：第一階段 - 星際特訓 (Tutorial Mode)
+        // ==========================================
+        const TutorialMode = ({ list, setList, setMessage, onComplete }) => {
+            const [step, setStep] = useState(0);
+            const [stepCompleted, setStepCompleted] = useState(false);
+
+            const steps = [
+                {
+                    title: "🛸 任務一：收集能源 (添加)",
+                    desc: "星際旅程即將開始，基地配發了備用能源。請點擊按鈕，把它存入星艦裝備庫中。",
+                    btnText: "存入 🔋 能量電池",
+                    action: () => {
+                        setList([...list, '🔋 能量電池']);
+                        setMessage("很好！「添加」指令會自動把新物資存放在裝備庫的最底層（清單最後一項）。");
+                    }
+                },
+                {
+                    title: "🛸 任務二：緊急防禦 (插入)",
+                    desc: "警告！偵測到前方有碎星石群！你需要馬上啟動防護。請將「🛡️ 基礎防護罩」【插入】到裝備庫的第 1 個位置，取得最高啟動權限！",
+                    btnText: "將 🛡️ 基礎防護罩 插入第 1 項",
+                    action: () => {
+                        const newList = [...list];
+                        newList.splice(0, 0, '🛡️ 基礎防護罩');
+                        setList(newList);
+                        setMessage("切換迅速！「插入」會把物資硬擠進指定位置，原本在後面的項目（像是能量電池）都會自動往後退一格。");
+                    }
+                },
+                {
+                    title: "🛸 任務三：裝備升級 (替換)",
+                    desc: "太棒了！指揮艦隊遠端傳送了升級數據。請將第 1 項的基礎防護罩直接【替換】為「✨ 量子力場盾」。",
+                    btnText: "替換第 1 項為 ✨ 量子力場盾",
+                    action: () => {
+                        const newList = [...list];
+                        newList[0] = '✨ 量子力場盾';
+                        setList(newList);
+                        setMessage("升級完成！「替換」會直接覆蓋該位置原本的物資，換成新資料，裝備總數不會改變。");
+                    }
+                },
+                {
+                    title: "🛸 任務四：消耗能源 (刪除)",
+                    desc: "穿越碎星石帶消耗了星艦大量能量。請使用掉裝備庫裡的「🔋 能量電池」（將它從清單中刪除）。",
+                    btnText: "消耗(刪除) 🔋 能量電池",
+                    action: () => {
+                        const appleIndex = list.indexOf('🔋 能量電池');
+                        const newList = [...list];
+                        if(appleIndex > -1) newList.splice(appleIndex, 1);
+                        setList(newList);
+                        setMessage("能量已補充！「刪除」會把指定的項目移除，它後方的所有項目都會自動往前遞補空位喔。");
+                    }
+                },
+                {
+                    title: "🎉 基礎陣列訓練完成！",
+                    desc: "恭喜指揮官！你已經親手體驗了陣列清單的四大核心指令：添加、插入、替換、刪除。接下來，請進入完整的「控制台實驗室」自由配置裝備吧！",
+                    btnText: "🚀 進入控制台實驗室",
+                    action: () => {
+                        setMessage("歡迎來到指揮官控制台！現在你可以自由點擊上方的按鈕，或者直接點擊 Scratch 積木來操控星艦裝備陣列！");
+                        onComplete();
+                    }
+                }
+            ];
+
+            const current = steps[step];
+
+            // 冒險地圖的地點設定
+            const mapNodes = [
+                { icon: '🌍', name: '地球基地' },
+                { icon: '🛰️', name: '太空港' },
+                { icon: '☄️', name: '碎星石帶' },
+                { icon: '🌌', name: '星雲區' },
+                { icon: '🛸', name: '指揮艦' }
+            ];
+
+            const handleAction = () => {
+                current.action();
+                if (step < steps.length - 1) {
+                    setStepCompleted(true);
+                }
+            };
+
+            const handleNext = () => {
+                setStep(step + 1);
+                setStepCompleted(false);
+                setMessage("任務更新！請看左側的終端機新指示完成挑戰。");
+            };
+
+            return (
+                <div className="bg-white rounded-3xl shadow-lg p-8 md:p-10 border-t-8 border-cyan-500 animate-[fadeIn_0.5s_ease-out] min-h-[500px] flex flex-col justify-center">
+                    <h2 className="text-3xl font-black text-slate-800 mb-4">{current.title}</h2>
+                    <p className="text-xl text-slate-700 mb-8 leading-relaxed bg-cyan-50 p-5 rounded-2xl border border-cyan-100">
+                        {current.desc}
+                    </p>
+
+                    <div className="flex flex-col items-center justify-center gap-6 bg-slate-50 p-8 rounded-2xl border-2 border-dashed border-slate-300 min-h-[160px]">
+                        {!stepCompleted ? (
+                            <button
+                                onClick={handleAction}
+                                className="bg-cyan-600 hover:bg-cyan-700 text-white text-2xl font-bold py-4 px-8 rounded-full shadow-lg transition-all active:scale-95 flex items-center gap-2 hover:-translate-y-1"
+                            >
+                                {current.btnText}
+                            </button>
+                        ) : (
+                            <div className="flex flex-col items-center gap-5 animate-[fadeIn_0.3s_ease-out]">
+                                <div className="text-cyan-700 font-extrabold text-xl md:text-2xl flex items-center gap-2 text-center">
+                                    ✅ 任務達成！請看右邊系統 AI 的報告。
+                                </div>
+                                <button
+                                    onClick={handleNext}
+                                    className="bg-indigo-600 hover:bg-indigo-700 text-white text-xl font-bold py-3 px-8 rounded-full shadow-lg transition-transform active:scale-95 flex items-center gap-2 animate-bounce mt-2"
+                                >
+                                    前往下一座標 ➡️
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* 任務航線 */}
+                    <div className="mt-10 pt-6 border-t-2 border-dashed border-slate-200 w-full animate-[fadeIn_0.5s_ease-out]">
+                        <h3 className="text-sm font-bold text-slate-400 mb-8 text-center tracking-widest">🗺️ 星際航線進度</h3>
+                        <div className="flex items-center w-full px-2 md:px-8">
+                            {mapNodes.map((node, i) => {
+                                const isPast = i < step;
+                                const isCurrent = i === step;
+                                return (
+                                    <React.Fragment key={i}>
+                                        <div className="flex flex-col items-center relative z-10">
+                                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-xl md:text-2xl border-4 transition-all duration-500 bg-white ${
+                                                isPast ? 'border-cyan-500 scale-95' :
+                                                isCurrent ? 'border-indigo-500 scale-110 shadow-lg shadow-indigo-200 ring-4 ring-indigo-50' :
+                                                'border-slate-300 opacity-50 grayscale'
+                                            }`}>
+                                                {isPast && i !== mapNodes.length - 1 ? '✔️' : node.icon}
+                                            </div>
+                                            <span className={`absolute top-12 md:top-14 text-xs font-bold whitespace-nowrap transition-colors duration-300 ${
+                                                isCurrent ? 'text-indigo-700 font-extrabold' :
+                                                isPast ? 'text-cyan-600' : 'text-slate-400'
+                                            }`}>
+                                                {node.name}
+                                            </span>
+                                        </div>
+                                        {i < mapNodes.length - 1 && (
+                                            <div className="flex-1 h-1.5 mx-1 md:mx-2 relative z-0 rounded-full overflow-hidden">
+                                                <div className="absolute inset-0 bg-slate-200"></div>
+                                                <div className={`absolute inset-0 bg-cyan-500 transition-transform duration-700 ease-in-out origin-left ${
+                                                    i < step ? 'scale-x-100' : 'scale-x-0'
+                                                }`}></div>
+                                            </div>
+                                        )}
+                                    </React.Fragment>
+                                );
+                            })}
+                        </div>
+                        <div className="h-6 md:h-8"></div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ==========================================
+        // 元件 3：第二階段 - 自由探索 (Sandbox Mode)
+        // ==========================================
+        const SandboxMode = ({ list, setList, setMessage }) => {
+            const [useItemIndex, setUseItemIndex] = useState('1');
+            const [removeItemIndex, setRemoveItemIndex] = useState('1');
+            const [scenarioInsertIndex, setScenarioInsertIndex] = useState('1');
+            const [scenarioReplaceIndex, setScenarioReplaceIndex] = useState('1');
+            const [addValue, setAddValue] = useState('🔧 奈米修復劑');
+            const [deleteIndex, setDeleteIndex] = useState('1');
+            const [insertValue, setInsertValue] = useState('🔫 雷射光槍');
+            const [insertIndex, setInsertIndex] = useState('2');
+            const [replaceIndex, setReplaceIndex] = useState('1');
+            const [replaceValue, setReplaceValue] = useState('✨ 終極核心');
+            const [getItemIndex, setGetItemIndex] = useState('1');
+            const [containsValue, setContainsValue] = useState('💎 星際礦石');
+
+            // --- 情境區專用功能 ---
+            const collectItem = (itemName) => {
+                setList([...list, itemName]);
+                setMessage(`⚔️ 指揮官收集了「${itemName}」！這在程式裡等於使用了【添加 (${itemName}) 到清單】積木喔。`);
+            };
+
+            const handleScenarioInsert = () => {
+                const idx = parseInt(scenarioInsertIndex);
+                if (isNaN(idx) || idx < 1 || idx > list.length + 1) {
+                    setMessage(`⚠️ 權限錯誤！裝備庫的編號只能是 1 到 ${list.length + 1} 之間。`);
+                    return;
+                }
+                const newList = [...list];
+                newList.splice(idx - 1, 0, '🛡️ 基礎防護罩');
+                setList(newList);
+                setMessage(`🛡️ 系統將「🛡️ 基礎防護罩」緊急排入第 ${idx} 項！這在程式裡等於使用了【插入】積木。`);
+            };
+
+            const handleScenarioReplace = () => {
+                const idx = parseInt(scenarioReplaceIndex);
+                if (isNaN(idx) || idx < 1 || idx > list.length) {
+                    setMessage(`⚠️ 找不到第 ${idx} 項裝備，升級失敗！`);
+                    return;
+                }
+                const oldItem = list[idx - 1];
+                const newList = [...list];
+                newList[idx - 1] = '✨ 量子力場盾';
+                setList(newList);
+                setMessage(`✨ 系統把第 ${idx} 項的「${oldItem}」升級成「✨ 量子力場盾」了！這等於使用了【替換】積木。`);
+            };
+
+            const useFirstItem = () => {
+                if (list.length === 0) {
+                    setMessage("⚠️ 裝備庫是空的！沒有資源可以使用。");
+                    return;
+                }
+                const item = list[0];
+                const newList = list.slice(1);
+                setList(newList);
+                setMessage(`✨ 指揮官消耗了「${item}」！這等於使用了【刪除清單的第 (1) 項】積木。後方的物資自動往前遞補了！`);
+            };
+
+            const handleUseNthItem = () => {
+                const idx = parseInt(useItemIndex);
+                if (isNaN(idx) || idx < 1 || idx > list.length) {
+                    setMessage(`⚠️ 裝備庫裡沒有第 ${idx} 項裝備喔！請確認輸入的編號。`);
+                    return;
+                }
+                const item = list[idx - 1];
+                const newList = list.filter((_, i) => i !== (idx - 1));
+                setList(newList);
+                setMessage(`✨ 指揮官使用了第 ${idx} 項的「${item}」！這相當於先用【第 (${idx}) 項】讀取它，再用【刪除第 (${idx}) 項】移除它。`);
+            };
+
+            const handleRemoveNthItem = () => {
+                const idx = parseInt(removeItemIndex);
+                if (isNaN(idx) || idx < 1 || idx > list.length) {
+                    setMessage(`⚠️ 找不到第 ${idx} 項裝備，無法移除！`);
+                    return;
+                }
+                const item = list[idx - 1];
+                const newList = list.filter((_, i) => i !== (idx - 1));
+                setList(newList);
+                setMessage(`🗑️ 指揮官把第 ${idx} 項的「${item}」拋棄了！等於直接使用了【刪除清單的第 (${idx}) 項】積木。`);
+            };
+
+            // --- 積木區專用功能 ---
+            const handleAdd = () => {
+                if (!addValue) { setMessage("請輸入要加入的物資！"); return; }
+                setList([...list, addValue]);
+                setMessage(`👉 已將「${addValue}」存入清單的最後面！目前長度變為 ${list.length + 1}。`);
+            };
+            const handleDelete = () => {
+                const idx = parseInt(deleteIndex);
+                if (isNaN(idx) || idx < 1 || idx > list.length) { setMessage("❌ 找不到這個編號！請輸入正確的項目編號。"); return; }
+                const deletedItem = list[idx - 1];
+                setList(list.filter((_, i) => i !== (idx - 1)));
+                setMessage(`🗑️ 已刪除第 ${idx} 項的「${deletedItem}」。後面的項目會自動往前遞補喔！`);
+            };
+            const handleDeleteAll = () => {
+                setList([]);
+                setMessage("🌪️ 已經清空整個星艦裝備庫了！現在清單長度是 0。");
+            };
+            const handleInsert = () => {
+                const idx = parseInt(insertIndex);
+                if (!insertValue) { setMessage("請輸入要插入的物資！"); return; }
+                if (isNaN(idx) || idx < 1 || idx > list.length + 1) { setMessage(`❌ 無法插入！編號只能是 1 到 ${list.length + 1} 之間。`); return; }
+                const newList = [...list];
+                newList.splice(idx - 1, 0, insertValue);
+                setList(newList);
+                setMessage(`➡️ 已將「${insertValue}」配置進第 ${idx} 個位置。原本在它後面的項目都往後退一格了！`);
+            };
+            const handleReplace = () => {
+                const idx = parseInt(replaceIndex);
+                if (!replaceValue) { setMessage("請輸入要替換成什麼物資！"); return; }
+                if (isNaN(idx) || idx < 1 || idx > list.length) { setMessage("❌ 找不到這個編號，無法替換！"); return; }
+                const oldItem = list[idx - 1];
+                const newList = [...list];
+                newList[idx - 1] = replaceValue;
+                setList(newList);
+                setMessage(`🔄 已將第 ${idx} 項原本的「${oldItem}」直接覆蓋替換成「${replaceValue}」！`);
+            };
+            const handleGetItem = () => {
+                const idx = parseInt(getItemIndex);
+                if (isNaN(idx) || idx < 1 || idx > list.length) { setMessage("❌ 找不到這個編號！"); return; }
+                setMessage(`🔍 第 ${idx} 項裡裝的物資是：「${list[idx - 1]}」`);
+            };
+            const handleLength = () => {
+                setMessage(`📏 目前裝備庫的總長度（共有幾個項目）是：${list.length}`);
+            };
+            const handleContains = () => {
+                if (!containsValue) { setMessage("請輸入要檢查的物資！"); return; }
+                const isContain = list.includes(containsValue);
+                setMessage(isContain ? `✅ 掃描完成！裝備庫裡面**包含**「${containsValue}」。` : `❌ 掃描完成！裝備庫裡面**不包含**「${containsValue}」。`);
+            };
+
+            // --- UI 元件 ---
+            const BlockInput = ({ value, onChange, placeholder, width = "w-16" }) => (
+                <input type="text" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={`text-black text-center px-1 rounded-full outline-none shadow-inner mx-1 ${width}`} onClick={(e) => e.stopPropagation()} />
+            );
+            const BlockNumInput = ({ value, onChange, placeholder, width = "w-10" }) => (
+                <input type="number" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={`text-black text-center px-1 rounded-full outline-none shadow-inner mx-1 ${width}`} onClick={(e) => e.stopPropagation()} />
+            );
+            const PlayBtn = () => (
+                <div className="bg-white/20 hover:bg-white/40 rounded-full w-8 h-8 flex items-center justify-center mr-2 cursor-pointer transition-colors shrink-0"><span className="text-white text-lg ml-1">▶</span></div>
+            );
+
+            return (
+                <div className="animate-[fadeIn_0.5s_ease-out]">
+                    {/* 區塊 1：真實場景應用 */}
+                    <div className="bg-white rounded-2xl shadow-md p-6 mb-8 border-t-8 border-indigo-500">
+                        <h2 className="text-2xl font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            🎮 情境體驗：星際裝備陣列控制
+                        </h2>
+                        <p className="text-slate-600 mb-4 bg-indigo-50 p-3 rounded-lg border border-indigo-100 text-sm leading-relaxed">
+                            有了「清單 (List)」，指揮官就像擁有了一個<strong>無限擴展的資料陣列</strong>，可以依序存放所有物資。試著點擊下方按鈕對終端機進行操作吧！
+                        </p>
+                        
+                        <div className="space-y-4">
+                            <div>
+                                <h3 className="text-sm font-bold text-slate-500 mb-2">1. 探索並收集物資 (添加項目)</h3>
+                                <div className="flex flex-wrap gap-2">
+                                    <button onClick={() => collectItem('🔋 能量電池')} className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-4 py-2 rounded-xl font-bold shadow-sm transition-transform active:scale-95 flex items-center gap-1">收集能量電池</button>
+                                    <button onClick={() => collectItem('🔫 雷射光槍')} className="bg-slate-50 hover:bg-slate-200 text-slate-700 border border-slate-300 px-4 py-2 rounded-xl font-bold shadow-sm transition-transform active:scale-95 flex items-center gap-1">裝載雷射槍</button>
+                                    <button onClick={() => collectItem('🔧 奈米修復劑')} className="bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 px-4 py-2 rounded-xl font-bold shadow-sm transition-transform active:scale-95 flex items-center gap-1">取得修復劑</button>
+                                    <button onClick={() => collectItem('💎 星際礦石')} className="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-4 py-2 rounded-xl font-bold shadow-sm transition-transform active:scale-95 flex items-center gap-1">採集礦石</button>
+                                </div>
+                            </div>
+
+                            <div className="pt-2 border-t border-slate-100">
+                                <h3 className="text-sm font-bold text-slate-500 mb-2">2. 緊急防禦 (插入項目)</h3>
+                                <div className="bg-cyan-50 border border-cyan-200 rounded-xl flex items-center shadow-sm p-1 pr-3 w-max">
+                                    <button onClick={handleScenarioInsert} className="hover:bg-cyan-100 text-cyan-700 px-3 py-1.5 rounded-lg font-bold transition-transform active:scale-95 flex items-center gap-1">
+                                        🛡️ 插入 防護罩 到第
+                                    </button>
+                                    <input type="number" min="1" value={scenarioInsertIndex} onChange={(e) => setScenarioInsertIndex(e.target.value)} className="w-12 text-center border border-cyan-300 rounded mx-1 py-1 outline-none font-bold bg-white" />
+                                    <span className="text-cyan-700 font-bold">項</span>
+                                </div>
+                            </div>
+
+                            <div className="pt-2 border-t border-slate-100">
+                                <h3 className="text-sm font-bold text-slate-500 mb-2">3. 裝備升級 (替換項目)</h3>
+                                <div className="bg-indigo-50 border border-indigo-200 rounded-xl flex items-center shadow-sm p-1 pr-3 w-max">
+                                    <button onClick={handleScenarioReplace} className="hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg font-bold transition-transform active:scale-95 flex items-center gap-1">
+                                        ✨ 將第
+                                    </button>
+                                    <input type="number" min="1" value={scenarioReplaceIndex} onChange={(e) => setScenarioReplaceIndex(e.target.value)} className="w-12 text-center border border-indigo-300 rounded mx-1 py-1 outline-none font-bold bg-white" />
+                                    <span className="text-indigo-700 font-bold">項升級為 量子力場盾</span>
+                                </div>
+                            </div>
+                            
+                            <div className="pt-2 border-t border-slate-100">
+                                <h3 className="text-sm font-bold text-slate-500 mb-2">4. 使用或管理物資 (讀取與刪除)</h3>
+                                <div className="flex flex-col gap-3">
+                                    <div>
+                                        <button onClick={useFirstItem} className="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-4 py-2 rounded-xl font-bold shadow-sm transition-transform active:scale-95 flex items-center gap-1">
+                                            ✨ 消耗最優先順位物資 (第 1 項)
+                                        </button>
+                                    </div>
+                                    <div className="flex flex-wrap gap-3">
+                                        <div className="bg-blue-50 border border-blue-200 rounded-xl flex items-center shadow-sm p-1 pr-3 w-max">
+                                            <button onClick={handleUseNthItem} className="hover:bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-bold transition-transform active:scale-95 flex items-center gap-1">
+                                                ✨ 消耗第
+                                            </button>
+                                            <input type="number" min="1" value={useItemIndex} onChange={(e) => setUseItemIndex(e.target.value)} className="w-12 text-center border border-blue-300 rounded mx-1 py-1 outline-none font-bold bg-white" />
+                                            <span className="text-blue-700 font-bold">項裝備</span>
+                                        </div>
+                                        <div className="bg-slate-50 border border-slate-200 rounded-xl flex items-center shadow-sm p-1 pr-3 w-max">
+                                            <button onClick={handleRemoveNthItem} className="hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-bold transition-transform active:scale-95 flex items-center gap-1">
+                                                🗑️ 移除第
+                                            </button>
+                                            <input type="number" min="1" value={removeItemIndex} onChange={(e) => setRemoveItemIndex(e.target.value)} className="w-12 text-center border border-slate-300 rounded mx-1 py-1 outline-none font-bold bg-white" />
+                                            <span className="text-slate-700 font-bold">項裝備</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 區塊 2：Scratch 積木對應區 */}
+                    <div className="bg-white rounded-2xl shadow-md p-6 border-t-8 border-[#ff661a]">
+                        <h2 className="text-2xl font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            🧩 幕後原理：Scratch 陣列積木控制台
+                        </h2>
+                        <p className="text-slate-600 mb-6 bg-orange-50 p-3 rounded-lg border border-orange-100 text-sm leading-relaxed">
+                            剛剛在情境裡的操作，其實都可以用 Scratch 的清單積木來完成！點擊下方積木最左邊的「▶」按鈕來模擬執行程式。
+                        </p>
+
+                        <div className="space-y-4 overflow-x-auto pb-4">
+                            <div className="scratch-list-color text-white p-2 rounded-lg flex items-center shadow-md select-none w-max border-b-4 border-[#cc5214] active:border-b-0 active:translate-y-1 transition-all" onClick={handleAdd}>
+                                <PlayBtn /><span className="font-bold text-lg tracking-wide whitespace-nowrap">添加 <BlockInput value={addValue} onChange={setAddValue} placeholder="物品" width="w-24" /> 到 [星艦裝備庫]</span>
+                            </div>
+                            <div className="scratch-list-color text-white p-2 rounded-lg flex items-center shadow-md select-none w-max border-b-4 border-[#cc5214] active:border-b-0 active:translate-y-1 transition-all" onClick={handleDelete}>
+                                <PlayBtn /><span className="font-bold text-lg tracking-wide whitespace-nowrap">刪除 [星艦裝備庫] 的第 <BlockNumInput value={deleteIndex} onChange={setDeleteIndex} /> 項</span>
+                            </div>
+                            <div className="scratch-list-color text-white p-2 rounded-lg flex items-center shadow-md select-none w-max border-b-4 border-[#cc5214] active:border-b-0 active:translate-y-1 transition-all" onClick={handleDeleteAll}>
+                                <PlayBtn /><span className="font-bold text-lg tracking-wide whitespace-nowrap">刪除 [星艦裝備庫] 的所有項目</span>
+                            </div>
+                            <hr className="my-4 border-slate-200" />
+                            <div className="scratch-list-color text-white p-2 rounded-lg flex items-center shadow-md select-none w-max border-b-4 border-[#cc5214] active:border-b-0 active:translate-y-1 transition-all" onClick={handleInsert}>
+                                <PlayBtn /><span className="font-bold text-lg tracking-wide whitespace-nowrap">插入 <BlockInput value={insertValue} onChange={setInsertValue} width="w-24" /> 到 [星艦裝備庫] 的第 <BlockNumInput value={insertIndex} onChange={setInsertIndex} /> 項</span>
+                            </div>
+                            <div className="scratch-list-color text-white p-2 rounded-lg flex items-center shadow-md select-none w-max border-b-4 border-[#cc5214] active:border-b-0 active:translate-y-1 transition-all" onClick={handleReplace}>
+                                <PlayBtn /><span className="font-bold text-lg tracking-wide whitespace-nowrap">將 [星艦裝備庫] 的第 <BlockNumInput value={replaceIndex} onChange={setReplaceIndex} /> 項替換為 <BlockInput value={replaceValue} onChange={setReplaceValue} width="w-24" /></span>
+                            </div>
+                            <hr className="my-4 border-slate-200" />
+                            <div className="bg-[#9966ff] text-white p-2 rounded-lg flex items-center shadow-md select-none w-max border-b-4 border-[#7a52cc] active:border-b-0 active:translate-y-1 transition-all" onClick={handleGetItem}>
+                                <PlayBtn /><span className="font-bold text-lg tracking-wide whitespace-nowrap flex items-center">說出<span className="scratch-reporter px-3 py-1 mx-2 flex items-center border border-[#cc5214]">[星艦裝備庫] 的第 <BlockNumInput value={getItemIndex} onChange={setGetItemIndex} /> 項</span></span>
+                            </div>
+                            <div className="bg-[#9966ff] text-white p-2 rounded-lg flex items-center shadow-md select-none w-max border-b-4 border-[#7a52cc] active:border-b-0 active:translate-y-1 transition-all" onClick={handleLength}>
+                                <PlayBtn /><span className="font-bold text-lg tracking-wide whitespace-nowrap flex items-center">說出<span className="scratch-reporter px-3 py-1 mx-2 flex items-center border border-[#cc5214]">[星艦裝備庫] 的長度</span></span>
+                            </div>
+                            <div className="bg-[#9966ff] text-white p-2 rounded-lg flex items-center shadow-md select-none w-max border-b-4 border-[#7a52cc] active:border-b-0 active:translate-y-1 transition-all" onClick={handleContains}>
+                                <PlayBtn /><span className="font-bold text-lg tracking-wide whitespace-nowrap flex items-center">說出<span className="scratch-boolean py-1 mx-2 flex items-center border border-[#cc5214]">[星艦裝備庫] 包含 <BlockInput value={containsValue} onChange={setContainsValue} width="w-24" /> ？</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ==========================================
+        // 主程式 (控制階段切換與版面)
+        // ==========================================
+        function App() {
+            const [mode, setMode] = useState('tutorial'); // 階段狀態：'tutorial' 或 'sandbox'
+            const [list, setList] = useState([]);         // 共享的背包資料
+            const [message, setMessage] = useState("指揮官您好！我是星艦導航 AI。在出發執行任務前，請先完成左側的「陣列特訓」，學習怎麼管理星艦的裝備庫！");
+
+            return (
+                <div>
+                    {/* 課程介紹區域 */}
+                    <LessonHeader />
+
+                    {/* 互動學習區域 */}
+                    <div className="flex flex-col md:flex-row gap-8 relative">
+                        
+                        {/* 左側：操作區 (根據階段切換介面) */}
+                        <div className="w-full md:w-3/5 pb-20">
+                            {mode === 'tutorial' ? (
+                                <TutorialMode 
+                                    list={list} 
+                                    setList={setList} 
+                                    setMessage={setMessage} 
+                                    onComplete={() => setMode('sandbox')} 
+                                />
+                            ) : (
+                                <SandboxMode 
+                                    list={list} 
+                                    setList={setList} 
+                                    setMessage={setMessage} 
+                                />
+                            )}
+                        </div>
+
+                        {/* 右側：視覺化清單與回饋區 (保持黏貼在畫面上) */}
+                        <div className="w-full md:w-2/5 md:sticky md:top-6 md:h-[calc(100vh-3rem)] z-10">
+                            <CargoDisplay list={list} message={message} />
+                        </div>
+
+                    </div>
+
+                    {/* 單元導覽按鈕 (全域顯示在頁面最下方) */}
+                    <div className="mt-12 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 pb-8">
+                        <a href="https://su-yung-sheng.github.io/unforte115/1150800.html" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 hover:text-cyan-600 transition-colors shadow-sm">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                            上一單元 (任務首頁)
+                        </a>
+                        <a href="https://su-yung-sheng.github.io/unforte115/1150802.html" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-cyan-600 text-white font-bold rounded-xl hover:bg-cyan-700 transition-colors shadow-sm">
+                            下一單元
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </a>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('app-container'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

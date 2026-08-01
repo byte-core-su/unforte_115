@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用清單打造星際任務 - LESSON 2</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #F8F9FA; color: #333333; }
+        .slide-up-fade { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* 自訂滾動條樣式 (針對資料庫清單與DP圖表) */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.2); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
+        
+        /* 琴鍵按壓動畫輔助 */
+        .key-pressed { transform: scaleY(0.98); box-shadow: inset 0 4px 6px rgba(0,0,0,0.35); }
+        .key-active-white { background-color: #6366f1 !important; color: white !important; }
+        .key-active-black { background-color: #4f46e5 !important; border-color: #4338ca !important; }
+    </style>
+</head>
+<body class="antialiased selection:bg-cyan-100 selection:text-cyan-900 pb-12">
+
+    <!-- Header -->
+    <header id="main-header" class="bg-white border-b border-gray-100 pt-12 pb-12 slide-up-fade relative overflow-hidden">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8 relative z-10">
+            <div class="mb-6">
+                <a href="https://su-yung-sheng.github.io/unforte115/" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> 
+                    返回網站首頁
+                </a>
+            </div>
+            <p class="text-sm font-bold text-cyan-600 mb-3 tracking-widest uppercase">演算法與程式設計</p>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight">星際陣列指揮官：<br class="hidden md:block">用清單打造星際任務</h1>
+            <p class="text-lg text-slate-500 font-light max-w-2xl leading-relaxed">
+                化身星際指揮官，透過六大任務關卡，循序漸進建立邏輯思維，完整掌握 <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span> 的強大威力！
+            </p>
+        </div>
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-cyan-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+        <div class="absolute bottom-0 right-40 w-72 h-72 bg-sky-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+    </header>
+
+    <main id="app-container" class="max-w-6xl mx-auto px-6 lg:px-8 py-12 relative min-h-[50vh]"></main>
+
+    <footer class="bg-slate-50 border-t border-slate-200 mt-10 py-8">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8 text-center">
+            <p class="text-sm font-medium text-slate-400">© 演算法與程式設計 - 星際陣列指揮官</p>
+        </div>
+    </footer>
+
+    <script>
+        // ================= 核心資料庫 =================
+        const PIANO_NOTES = {
+            '60': { type: 'white', jianpu: '1', scratch: 'C(60)', name: 'Do', freq: 261.63 },
+            '62': { type: 'white', jianpu: '2', scratch: 'D(62)', name: 'Re', freq: 293.66 },
+            '64': { type: 'white', jianpu: '3', scratch: 'E(64)', name: 'Mi', freq: 329.63 },
+            '65': { type: 'white', jianpu: '4', scratch: 'F(65)', name: 'Fa', freq: 349.23 },
+            '67': { type: 'white', jianpu: '5', scratch: 'G(67)', name: 'Sol', freq: 392.00 },
+            '69': { type: 'white', jianpu: '6', scratch: 'A(69)', name: 'La', freq: 440.00 },
+            '71': { type: 'white', jianpu: '7', scratch: 'B(71)', name: 'Si', freq: 493.88 },
+            '72': { type: 'white', jianpu: '1̇', scratch: 'C(72)', name: 'Do 高', freq: 523.25 },
+            '74': { type: 'white', jianpu: '2̇', scratch: 'D(74)', name: 'Re 高', freq: 587.33 },
+            '76': { type: 'white', jianpu: '3̇', scratch: 'E(76)', name: 'Mi 高', freq: 659.25 },
+            '61': { type: 'black', jianpu: '1#', scratch: 'C#(61)', name: 'Do#', freq: 277.18, leftOffset: '7%' },
+            '63': { type: 'black', jianpu: '2#', scratch: 'D#(63)', name: 'Re#', freq: 311.13, leftOffset: '17%' },
+            '66': { type: 'black', jianpu: '4#', scratch: 'F#(66)', name: 'Fa#', freq: 369.99, leftOffset: '37%' },
+            '68': { type: 'black', jianpu: '5#', scratch: 'G#(68)', name: 'Sol#', freq: 415.30, leftOffset: '47%' },
+            '70': { type: 'black', jianpu: '6#', scratch: 'A#(70)', name: 'La#', freq: 466.16, leftOffset: '57%' },
+            '73': { type: 'black', jianpu: '1̇#', scratch: 'C#(73)', name: 'Do#高', freq: 554.37, leftOffset: '77%' },
+            '75': { type: 'black', jianpu: '2̇#', scratch: 'D#(75)', name: 'Re#高', freq: 622.25, leftOffset: '87%' },
+        };
+
+        const JIANPU_TO_MIDI = {
+            '1': '60', '2': '62', '3': '64', '4': '65', '5': '67', '6': '69', '7': '71',
+            '1.': '72', '2.': '74', '3.': '76', '1̇': '72', '2̇': '74', '3̇': '76'
+        };
+
+        const SONGS = [
+            { id: 1, title: '小星星', artist: '頻率編號 001', notation: '1 1 5 5 | 6 6 5 - | 4 4 3 3 | 2 2 1 - / 5 5 4 4 | 3 3 2 - | 5 5 4 4 | 3 3 2 - / 1 1 5 5 | 6 6 5 - | 4 4 3 3 | 2 2 1 -' },
+            { id: 2, title: '兩隻老虎', artist: '頻率編號 002', notation: '1 2 3 1 | 1 2 3 1 | 3 4 5 - | 3 4 5 - / 5 6 5 4 3 1 | 5 6 5 4 3 1 | 2 5 1 - | 2 5 1 -' },
+            { id: 3, title: '歡樂頌', artist: '頻率編號 003', notation: '3 3 4 5 | 5 4 3 2 | 1 1 2 3 | 3 - 2 - / 3 3 4 5 | 5 4 3 2 | 1 1 2 3 | 2 - 1 - / 2 2 3 1 | 2 3 4 3 1 | 2 3 4 3 2 | 1 2 5 - / 3 3 4 5 | 5 4 3 2 | 1 1 2 3 | 2 - 1 -' },
+            { id: 4, title: '生日快樂歌', artist: '頻率編號 004', notation: '5 5 6 5 | 1. 7 - - / 5 5 6 5 | 2. 1. - - / 5 5 5. 3. | 1. 7 6 - / 4 4 3. 1. | 2. 1. - -' },
+            { id: 5, title: '瑪莉有隻小綿羊', artist: '頻率編號 005', notation: '3 2 1 2 | 3 3 3 - | 2 2 2 - | 3 5 5 - / 3 2 1 2 | 3 3 3 3 | 2 2 3 2 | 1 - - -' },
+            { id: 6, title: '茉莉花', artist: '頻率編號 006', notation: '3 3 5 6 | 1. 1. 6 5 | 5 6 5 - / 3 3 5 6 | 1. 1. 6 5 | 5 6 5 - / 5 5 5 3 | 2 3 5 - / 3 2 1 2 | 3 5 3 2 | 1 - - -' },
+            { id: 7, title: '捕魚歌', artist: '頻率編號 007', notation: '1 1 1 3 | 5 5 5 - | 6 6 5 3 | 1 2 3 - / 1 1 1 3 | 5 5 5 - | 6 6 5 3 | 2 3 1 -' },
+            { id: 8, title: '妹妹背著洋娃娃', artist: '頻率編號 008', notation: '3 3 4 5 | 5 3 1 - | 2 2 3 4 | 4 3 2 - / 1 1 2 3 | 3 2 1 - | 2 2 3 2 | 1 - - -' },
+            { id: 9, title: '春神來了', artist: '頻率編號 009', notation: '3 3 3 1 | 2 2 2 7 | 1 2 3 4 | 5 - - - / 3 3 3 1 | 2 2 2 7 | 1 3 2 7 | 1 - - -' },
+            { id: 10, title: '倫敦鐵橋垮下來', artist: '頻率編號 010', notation: '5 6 5 4 | 3 4 5 - | 2 3 4 - | 3 4 5 - / 5 6 5 4 | 3 4 5 - | 2 - 5 - | 3 1 - -' },
+            { id: 11, title: '蜜蜂做工', artist: '頻率編號 011', notation: '5 3 3 - | 4 2 2 - | 1 2 3 4 | 5 5 5 - / 5 3 3 - | 4 2 2 - | 1 3 5 5 | 1 - - -' },
+            { id: 12, title: '火車快飛', artist: '頻率編號 012', notation: '5 3 3 - | 4 2 2 - | 1 2 3 4 | 5 5 5 - / 5 3 3 - | 4 2 2 - | 1 3 5 5 | 1 - - -' },
+            { id: 13, title: '只要我長大', artist: '頻率編號 013', notation: '5 5 3 1 | 2 4 3 - | 5 5 3 1 | 2 4 3 - / 2 2 4 4 | 3 3 5 5 | 6 6 4 6 | 5 - - -' },
+            { id: 14, title: '造飛機', artist: '頻率編號 014', notation: '3 3 1 - | 3 3 1 - | 5 5 3 1 | 2 - - - / 2 2 2 - | 2 2 3 - | 4 4 3 2 | 3 - - - / 3 3 1 - | 3 3 1 - | 5 5 3 1 | 2 - - -' },
+            { id: 15, title: '蝴蝶', artist: '頻率編號 015', notation: '5 3 3 - | 4 2 2 - | 1 2 3 4 | 5 5 5 - / 5 3 3 - | 4 2 2 - | 1 3 5 5 | 1 - - - / 2 2 2 2 | 2 3 4 - | 3 3 3 3 | 3 4 5 -' },
+            { id: 16, title: '王老先生有塊地', artist: '頻率編號 016', notation: '1 1 1 5 | 6 6 5 - | 3 3 2 2 | 1 - - - / 5 1 1 1 | 5 6 6 5 - | 3 3 2 2 | 1 - - -' },
+            { id: 17, title: '大象', artist: '頻率編號 017', notation: '5 5 3 - | 5 5 3 - | 5 3 5 6 | 5 4 3 2 / 4 4 2 - | 4 4 2 - | 4 2 4 5 | 4 3 2 1' },
+            { id: 18, title: '小毛驢', artist: '頻率編號 018', notation: '1 1 1 3 | 5 5 5 - | 6 6 6 1. | 5 - - - / 4 4 4 6 | 3 3 3 - | 2 2 2 4 | 3 - - -' },
+            { id: 19, title: '拔蘿蔔', artist: '頻率編號 019', notation: '1 5 1 5 | 1 5 1 5 | 3 3 3 - | 3 3 3 - / 2 5 2 5 | 2 5 2 5 | 3 2 1 - | 3 2 1 -' },
+            { id: 20, title: '頭兒肩膀膝腳趾', artist: '頻率編號 020', notation: '1 1 1 3 | 5 5 5 - | 4 4 4 6 | 1. 1. 1. - / 1. 7 6 5 | 4 3 2 - | 5 5 4 2 | 1 - - -' },
+            { id: 21, title: '三輪車', artist: '頻率編號 021', notation: '1 1 1 1 | 5 5 5 - | 6 6 6 6 | 5 - - - / 4 4 4 4 | 3 3 3 - | 2 2 2 2 | 1 - - -' },
+            { id: 22, title: '娃娃國', artist: '頻率編號 022', notation: '1 1 1 1 | 1 2 3 - | 3 3 3 3 | 3 4 5 - / 5 5 5 5 | 5 6 5 - | 4 4 4 4 | 4 5 4 -' },
+            { id: 23, title: '泥娃娃', artist: '頻率編號 023', notation: '3 1 3 1 | 3 5 5 - | 2 3 4 2 | 3 1 1 - / 6 6 6 4 | 5 5 5 3 | 4 4 4 2 | 3 5 5 -' },
+            { id: 24, title: '哥哥爸爸真偉大', artist: '頻率編號 024', notation: '1 1 1 - | 1 1 1 - | 1 2 3 4 | 5 - - - / 5 5 5 - | 3 3 3 - | 1 2 3 2 | 1 - - -' },
+            { id: 25, title: '桃太郎', artist: '頻率編號 025', notation: '1 1 1 - | 1 2 3 - | 5 5 3 1 | 2 - - - / 1 1 1 - | 1 2 3 - | 5 5 3 2 | 1 - - -' },
+            { id: 26, title: '甜蜜的家庭', artist: '頻率編號 026', notation: '3 5 1. 7 | 6 1. 5 - | 4 6 5 3 | 2 4 3 - / 3 5 1. 7 | 6 1. 5 - | 4 6 5 3 | 2 3 1 -' },
+            { id: 27, title: '螢火蟲', artist: '頻率編號 027', notation: '3 3 3 4 | 5 5 5 - | 4 4 4 5 | 6 6 6 - / 5 5 4 4 | 3 3 2 - | 1 1 2 3 | 1 - - -' },
+            { id: 28, title: '兩隻小鳥', artist: '頻率編號 028', notation: '1 1 1 2 | 3 3 3 - | 2 2 2 3 | 4 4 4 - / 3 3 3 4 | 5 5 5 - | 4 4 4 5 | 6 6 6 -' },
+            { id: 29, title: '伊比呀呀', artist: '頻率編號 029', notation: '5 5 5 3 | 1 1 1 - | 2 2 2 4 | 3 3 3 - / 5 5 5 3 | 1 1 1 - | 2 2 2 4 | 3 - - -' },
+            { id: 30, title: '當我們同在一起', artist: '頻率編號 030', notation: '1 1 1 1 | 3 3 3 - | 2 2 2 2 | 4 4 4 - / 3 3 3 3 | 5 5 5 - | 4 4 3 2 | 1 - - -' }
+        ];
+
+        // ================= 教學內容資料 =================
+        const lesson = {
+            id: 2, icon: "radio", title: "星際通訊", subtitle: "(小星星廣播)",
+            description: "總部傳來了一段名為《小星星》的神秘頻率。我們需要建立清單來儲存這串音符，並依序播放出來。",
+            objective: "學習清單的序列播放應用。透過將音樂簡譜資料輸入清單，練習連續資料的儲存方法，實作結合計次迴圈依序取出資料執行播放的高效管理邏輯。",
+            pseudoCode: `WHEN SPRITE CLICKED\nSAY "現在開始為您演奏「小星星」"\nSET 第幾個音 TO 1\nREPEAT LENGTH("小星星") TIMES:\n    BROADCAST GET_ITEM(第幾個音) FROM "小星星"\n    PLAY NOTE GET_ITEM(第幾個音) FROM "小星星" FOR 0.5 BEATS\n    CHANGE 第幾個音 BY 1`,
+            scratchBlocks: [
+                { type: "event", text: "當角色被點擊" },
+                { type: "looks", text: '說出 <span class="bg-white text-slate-900 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm leading-none">現在開始為您演奏「小星星」</span>' },
+                { type: "variable", text: '變數 <span class="bg-black/10 text-white px-2 py-1 rounded border border-black/20 shadow-inner inline-flex items-center leading-none">第幾個音 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 設為 <span class="bg-white text-slate-900 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm leading-none">1</span>' },
+                { type: "control", text: '重複 <span class="bg-[#FF661A] text-white px-3 py-1.5 rounded-full border border-black/20 shadow-sm inline-flex items-center font-bold leading-none">清單 <span class="bg-black/10 text-white px-2 py-1 rounded border border-black/20 shadow-inner inline-flex items-center mx-1">小星星 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 的長度</span> 次', nested: [
+                    { type: "event", text: '廣播訊息 <span class="bg-[#FF661A] text-white px-3 py-1.5 rounded-full border border-black/20 shadow-sm inline-flex items-center font-bold leading-none"><span class="bg-black/10 text-white px-2 py-1 rounded border border-black/20 shadow-inner inline-flex items-center mr-1">小星星 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 的第 <span class="bg-[#FF8C1A] text-white px-3 py-1 rounded-full border border-black/20 shadow-sm inline-block mx-1">第幾個音</span> 項</span>' },
+                    { type: "music", text: '演奏音階 <span class="bg-[#FF661A] text-white px-3 py-1.5 rounded-full border border-black/20 shadow-sm inline-flex items-center font-bold leading-none"><span class="bg-black/10 text-white px-2 py-1 rounded border border-black/20 shadow-inner inline-flex items-center mr-1">小星星 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 的第 <span class="bg-[#FF8C1A] text-white px-3 py-1 rounded-full border border-black/20 shadow-sm inline-block mx-1">第幾個音</span> 項</span> <span class="bg-white text-slate-900 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1 leading-none">0.5</span> 拍' },
+                    { type: "variable", text: '變數 <span class="bg-black/10 text-white px-2 py-1 rounded border border-black/20 shadow-inner inline-flex items-center leading-none">第幾個音 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 改變 <span class="bg-white text-slate-900 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm leading-none">1</span>' }
+                ]}
+            ]
+        };
+
+        window.goToHome = function() { window.location.href = "https://su-yung-sheng.github.io/unforte115/1150800.html"; };
+
+        function getBlockColorClass(type) {
+            switch(type) {
+                case 'event': return 'bg-[#FFBF00] text-slate-900 border-[#CC9900]';
+                case 'list': return 'bg-[#FF661A] text-white border-[#CC5214]';
+                case 'looks': return 'bg-[#9966FF] text-white border-[#774DCC]';
+                case 'variable': return 'bg-[#FF8C1A] text-white border-[#DB6E00]';
+                case 'control': return 'bg-[#FFAB19] text-slate-900 border-[#CF8B17]';
+                case 'sensing': return 'bg-[#5CB1D6] text-white border-[#478AA6]';
+                case 'music': return 'bg-[#0FBD8C] text-white border-[#0A8563]';
+                default: return 'bg-slate-400 text-white border-slate-500';
+            }
+        }
+
+        function renderScratchBlock(block) {
+            let nestedHtml = '';
+            let bottomHtml = '';
+            if (block.nested && block.nested.length > 0) {
+                const nestedBlocks = block.nested.map(renderScratchBlock).join('');
+                nestedHtml = `<div class="ml-4 pl-2 border-l-4 border-slate-300 flex flex-col gap-1 mt-1">${nestedBlocks}</div>`;
+                bottomHtml = `<div class="h-3 w-16 rounded-b-md border-b-2 mt-1 shadow-sm ${getBlockColorClass(block.type)}"></div>`;
+            }
+            return `
+                <div class="flex flex-col items-start font-medium text-sm md:text-base w-max max-w-full">
+                    <div class="px-4 py-2 rounded-t-md rounded-br-md rounded-bl-sm border-b-2 shadow-sm flex items-center flex-wrap gap-1 ${getBlockColorClass(block.type)} transition-transform hover:-translate-y-0.5">${block.text}</div>
+                    ${nestedHtml}${bottomHtml}
+                </div>`;
+        }
+
+        // ================= UI 組裝 =================
+        function renderLessonDetail(lesson) {
+            const dt = { iconBg: 'bg-cyan-100 text-cyan-600', tagText: 'text-cyan-500' };
+            
+            const topHtml = `
+                <div class="slide-up-fade">
+                    <button onclick="goToHome()" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors px-4 py-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm mb-6">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回任務儀表板
+                    </button>
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mb-10">
+                        <div class="p-8 md:p-10 border-b border-slate-100 bg-slate-50/50 flex flex-col items-start gap-4">
+                            <div class="flex items-center gap-5">
+                                <div class="w-14 h-14 ${dt.iconBg} rounded-2xl flex items-center justify-center shrink-0 shadow-sm">
+                                    <i data-lucide="${lesson.icon}" class="w-7 h-7"></i>
+                                </div>
+                                <div>
+                                    <span class="${dt.tagText} font-bold text-sm tracking-widest uppercase mb-1 block">LESSON ${lesson.id}</span>
+                                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">${lesson.title} <span class="text-slate-400 font-medium text-2xl">${lesson.subtitle}</span></h2>
+                                </div>
+                            </div>
+                            <p class="text-slate-600 font-light text-lg leading-relaxed mt-2 max-w-3xl">${lesson.description}</p>
+                        </div>
+                        <div class="p-8 md:p-10 flex flex-col gap-10">
+                            <section>
+                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-indigo-100 text-indigo-600 p-1.5 rounded-lg"><i data-lucide="target" class="w-5 h-5"></i></span>任務目標</h3>
+                                <div class="bg-indigo-50 text-indigo-900 p-5 rounded-2xl border border-indigo-100/50 leading-relaxed font-medium">${lesson.objective}</div>
+                            </section>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <section class="h-full flex flex-col">
+                                    <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-blue-100 text-blue-600 p-1.5 rounded-lg"><i data-lucide="code-2" class="w-5 h-5"></i></span>虛擬碼 (Pseudo Code)</h3>
+                                    <div class="bg-slate-800 text-slate-200 p-6 rounded-2xl overflow-x-auto shadow-inner grow no-scrollbar border border-slate-700">
+                                        <pre class="font-mono text-sm md:text-base leading-relaxed whitespace-pre-wrap"><code>${lesson.pseudoCode}</code></pre>
+                                    </div>
+                                </section>
+                                <section class="h-full flex flex-col">
+                                    <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-orange-100 text-orange-600 p-1.5 rounded-lg"><i data-lucide="blocks" class="w-5 h-5"></i></span>Scratch 實作積木</h3>
+                                    <div class="bg-[#F9F9F9] border border-slate-200 p-6 rounded-2xl flex flex-col gap-2 overflow-x-auto grow items-start no-scrollbar shadow-inner">
+                                        ${lesson.scratchBlocks.map(renderScratchBlock).join('')}
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+
+            const databaseHtml = `
+                <div class="slide-up-fade" style="animation-delay: 0.2s;">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+                        <div>
+                            <h3 class="flex items-center gap-2 text-2xl font-bold text-slate-800"><span class="bg-indigo-100 text-indigo-600 p-2 rounded-xl"><i data-lucide="music-2" class="w-6 h-6"></i></span>星際通訊頻率庫</h3>
+                            <p class="text-slate-500 text-sm mt-1">選取目標頻率，觀察程式是如何逐一讀取清單中的陣列元素。</p>
+                        </div>
+                        <button id="btn-scratch-toggle" class="flex items-center gap-1.5 sm:gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all border shadow-sm bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200 whitespace-nowrap">
+                            <i data-lucide="code" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                            <span id="scratch-toggle-text">Scratch 數值 (OFF)</span>
+                        </button>
+                    </div>
+
+                    <div class="grid lg:grid-cols-4 gap-6 items-start mb-10">
+                        <div class="lg:col-span-1 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col h-[550px]">
+                            <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex flex-col gap-3">
+                                <div class="flex justify-between items-center font-semibold text-slate-700">
+                                    <span>目標頻率清單</span>
+                                    <span id="song-count" class="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-bold"></span>
+                                </div>
+                                <div class="relative">
+                                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4"></i>
+                                    <input type="text" id="search-input" placeholder="搜尋頻率名稱..." class="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200 outline-none transition-all text-sm shadow-inner bg-white">
+                                </div>
+                            </div>
+                            <div class="overflow-y-auto flex-1 custom-scrollbar">
+                                <ul id="song-list" class="divide-y divide-slate-100"></ul>
+                                <div id="no-results" class="hidden p-8 text-center text-slate-500 text-sm">找不到相關頻率</div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-3 space-y-6">
+                            <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm relative overflow-hidden h-[330px] flex flex-col">
+                                <i data-lucide="radio-tower" class="absolute right-6 top-6 text-indigo-50/70 w-32 h-32 pointer-events-none"></i>
+                                <div class="relative z-10 flex-shrink-0 mb-4 pb-4 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                    <div class="text-center sm:text-left">
+                                        <h2 id="song-title" class="text-2xl font-bold text-slate-900">載入中...</h2>
+                                        <p id="song-artist" class="text-slate-500 text-sm mt-1">...</p>
+                                    </div>
+                                    <div class="flex gap-3">
+                                        <button id="btn-play" class="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-md transition-all active:scale-95 text-sm">
+                                            <i data-lucide="play" class="w-4 h-4 fill-white"></i> 自動讀取陣列
+                                        </button>
+                                        <button id="btn-stop" class="hidden items-center gap-2 px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold shadow-md transition-all active:scale-95 text-sm">
+                                            <i data-lucide="square" class="w-4 h-4 fill-white"></i> 停止讀取
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-50 p-4 sm:p-6 rounded-xl border border-slate-100 flex-1 overflow-y-auto custom-scrollbar">
+                                    <div id="jianpu-container" class="flex flex-col gap-y-3 sm:gap-y-4 text-xl sm:text-2xl font-bold text-slate-800 leading-none items-start w-full">
+                                        <!-- JS 動態產生樂譜符號 -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-900 p-5 rounded-2xl shadow-xl border border-slate-800">
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="text-sm text-slate-400 flex items-center gap-2 font-medium">
+                                        <i data-lucide="volume-2" class="w-5 h-5 text-indigo-400"></i>
+                                        系統音階實況
+                                    </span>
+                                    <span id="playing-indicator" class="hidden text-xs px-3 py-1.5 rounded-full bg-indigo-950 text-indigo-400 animate-pulse font-bold border border-indigo-800/50">
+                                        系統演奏中...
+                                    </span>
+                                </div>
+                                <div id="auto-piano-container" class="relative h-36 w-full flex select-none bg-slate-950 p-1 rounded-lg border border-slate-800 overflow-hidden">
+                                    <!-- JS 動態產生琴鍵 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ⭐ AI 檢核系統整合區塊 (學生挑戰) -->
+                    <div class="bg-slate-900 rounded-3xl shadow-2xl border border-slate-800 p-6 md:p-8 text-slate-100 relative overflow-hidden mt-12 mb-10 slide-up-fade" style="animation-delay: 0.4s;">
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500 rounded-full mix-blend-screen filter blur-[100px] opacity-10 pointer-events-none"></div>
+                        
+                        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4 border-b border-slate-800 pb-4 relative z-10">
+                            <div>
+                                <h3 class="flex items-center gap-2 text-2xl font-bold"><span class="bg-indigo-600 p-1.5 rounded-xl"><i data-lucide="mic" class="w-6 h-6 text-white"></i></span>學生挑戰 (彈奏)：通訊頻率檢核</h3>
+                                <p class="text-slate-400 text-sm mt-2">請上傳您的彈奏或吹奏錄音，系統將自動擷取音階，並與指定的【目標頻率】進行動態規劃 (DP) 精準比對。</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10">
+                            <!-- 左側：上傳區塊 -->
+                            <div class="lg:col-span-1 bg-slate-950/60 p-6 rounded-2xl border border-slate-800 flex flex-col h-full">
+                                
+                                <!-- ✅ 新增：目標樂譜選擇器 -->
+                                <div class="mb-5 bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-sm">
+                                    <label class="block text-xs font-bold text-slate-400 mb-2">比對目標頻率 <span class="font-normal text-slate-500">(若自動辨識失準可手動指定)</span></label>
+                                    <select id="ai-target-song-select" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2.5 text-sm font-bold text-white focus:outline-none focus:border-indigo-500 transition-colors">
+                                        <option value="auto_detect" class="text-indigo-300">✨ 自動辨識 (全庫智慧比對)</option>
+                                        <!-- JS 會動態將 SONGS_DB 的歌曲塞入此處 -->
+                                    </select>
+                                </div>
+
+                                <label id="ai-upload-zone" class="border-2 border-dashed border-slate-700 bg-slate-950/80 hover:bg-slate-900 hover:border-indigo-500 p-8 rounded-xl flex flex-col items-center justify-center gap-3 cursor-pointer transition-all mb-4 text-center group min-h-[160px]">
+                                    <i data-lucide="upload-cloud" class="w-10 h-10 text-indigo-400 group-hover:scale-110 transition-transform"></i>
+                                    <span id="ai-upload-filename" class="font-bold text-slate-300 w-full truncate px-2">點擊或拖曳上傳 電腦音軌/影像樣本</span>
+                                    <span class="text-xs text-slate-500">自動抽離音頻 (支援 MP4, MP3, WAV 等)</span>
+                                    <input type="file" id="ai-file-input" accept="audio/*, video/mp4, video/quicktime, .mp4, .mov" class="hidden">
+                                </label>
+
+                                <div id="ai-preview-container" class="hidden mb-4 p-3 bg-slate-900 rounded-lg border border-slate-800">
+                                    <div class="text-xs text-slate-400 mb-2 font-bold">上傳檔案試聽：</div>
+                                    <audio id="ai-audio-player" controls class="w-full h-10 rounded"></audio>
+                                </div>
+
+                                <button id="btn-start-ai" disabled class="w-full py-4 mt-auto rounded-xl font-bold text-base shadow-sm transition-all bg-slate-800 text-slate-500 cursor-not-allowed">
+                                    上傳檔案後啟動分析
+                                </button>
+
+                                <div id="ai-progress-container" class="hidden mt-4">
+                                    <div class="flex justify-between text-xs font-bold text-slate-400 mb-2">
+                                        <span id="ai-progress-text">數位音軌解碼與對位中...</span>
+                                        <span id="ai-progress-percent">0%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-950 rounded-full h-2 border border-slate-800 overflow-hidden">
+                                        <div id="ai-progress-bar" class="bg-indigo-500 h-full rounded-full transition-all duration-100" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 右側：結果面板 -->
+                            <div id="ai-result-dashboard" class="lg:col-span-2 bg-slate-950/60 p-6 rounded-2xl border border-slate-800 flex flex-col items-center justify-center min-h-[300px]">
+                                <div class="text-slate-600 text-center flex flex-col items-center gap-4 py-12">
+                                    <i data-lucide="activity" class="w-16 h-16 opacity-30"></i>
+                                    <p class="text-sm font-bold tracking-wide">等待上傳音軌與分析結果...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 單元導覽按鈕 -->
+                    <div class="mt-8 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <a href="https://su-yung-sheng.github.io/unforte115/1150801.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 hover:text-cyan-600 transition-colors shadow-sm">
+                            <i data-lucide="arrow-left" class="w-5 h-5"></i> 上一單元
+                        </a>
+                        <a href="https://su-yung-sheng.github.io/unforte115/1150803.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-cyan-600 text-white font-bold rounded-xl hover:bg-cyan-700 transition-colors shadow-sm">
+                            下一單元 <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>`;
+                
+            return topHtml + databaseHtml;
+        }
+
+        // ================= 全域控制邏輯 =================
+        let isScratchMode = false;
+        let selectedSong = SONGS[0];
+        let isPlaying = false;
+        let currentPlayIndex = -1;
+        let playTimeout = null;
+        let audioContext = null;
+        let activePianoKey = null;
+
+        const els = {};
+        function initDOM() {
+            els.scratchToggleBtn = document.getElementById('btn-scratch-toggle');
+            els.scratchToggleText = document.getElementById('scratch-toggle-text');
+            els.searchInput = document.getElementById('search-input');
+            els.songList = document.getElementById('song-list');
+            els.songCount = document.getElementById('song-count');
+            els.noResults = document.getElementById('no-results');
+            els.songTitle = document.getElementById('song-title');
+            els.songArtist = document.getElementById('song-artist');
+            els.btnPlay = document.getElementById('btn-play');
+            els.btnStop = document.getElementById('btn-stop');
+            els.playingIndicator = document.getElementById('playing-indicator');
+            els.jianpuContainer = document.getElementById('jianpu-container');
+            els.autoPianoContainer = document.getElementById('auto-piano-container');
+
+            els.aiFileInput = document.getElementById('ai-file-input');
+            els.aiUploadFilename = document.getElementById('ai-upload-filename');
+            els.aiPreviewContainer = document.getElementById('ai-preview-container');
+            els.aiAudioPlayer = document.getElementById('ai-audio-player');
+            els.btnStartAi = document.getElementById('btn-start-ai');
+            els.aiProgressContainer = document.getElementById('ai-progress-container');
+            els.aiProgressText = document.getElementById('ai-progress-text');
+            els.aiProgressPercent = document.getElementById('ai-progress-percent');
+            els.aiProgressBar = document.getElementById('ai-progress-bar');
+            els.aiResultDashboard = document.getElementById('ai-result-dashboard');
+            
+            els.aiTargetSongSelect = document.getElementById('ai-target-song-select');
+        }
+
+        function initAudio() {
+            if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playToneByMidi(midiCode, duration = 0.6) {
+            initAudio();
+            const noteData = PIANO_NOTES[midiCode];
+            if (!noteData || !audioContext) return;
+
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(noteData.freq, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 0.02);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + duration);
+            highlightPianoKey(midiCode);
+        }
+
+        function populateAiTargetSelect() {
+            while (els.aiTargetSongSelect.options.length > 1) {
+                els.aiTargetSongSelect.remove(1);
+            }
+            const sortedSongs = [...SONGS].sort((a, b) => a.id - b.id);
+            sortedSongs.forEach(song => {
+                const option = document.createElement('option');
+                option.value = song.title;
+                option.className = "text-white bg-slate-900";
+                option.text = `${song.id}. ${song.title}`;
+                els.aiTargetSongSelect.appendChild(option);
+            });
+            els.aiTargetSongSelect.value = 'auto_detect';
+        }
+
+        function setupEventListeners() {
+            els.scratchToggleBtn.addEventListener('click', () => {
+                isScratchMode = !isScratchMode;
+                if (isScratchMode) {
+                    els.scratchToggleBtn.className = "flex items-center gap-1.5 sm:gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all border shadow-sm bg-orange-100 text-orange-700 border-orange-200 animate-pulse whitespace-nowrap";
+                    els.scratchToggleText.textContent = "Scratch 數值 (ON)";
+                } else {
+                    els.scratchToggleBtn.className = "flex items-center gap-1.5 sm:gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all border shadow-sm bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200 whitespace-nowrap";
+                    els.scratchToggleText.textContent = "Scratch 數值 (OFF)";
+                }
+                renderAll();
+            });
+            els.searchInput.addEventListener('input', (e) => renderSongList(e.target.value));
+            els.btnPlay.addEventListener('click', () => startAutoPlay(selectedSong));
+            els.btnStop.addEventListener('click', stopAutoPlay);
+
+            els.aiFileInput.addEventListener('change', handleFileUpload);
+            
+            // 下拉選單變更時重置 AI 面板
+            els.aiTargetSongSelect.addEventListener('change', () => {
+                // 如果目前檔案已經分析完畢，切換目標後應允許重新分析
+                if(currentAudioFile) {
+                    els.btnStartAi.disabled = false;
+                    els.btnStartAi.className = "w-full py-4 mt-auto rounded-xl font-bold text-base shadow-sm transition-all bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-900/50";
+                    els.btnStartAi.innerText = "⭐ 重新以新目標比對";
+                }
+            });
+        }
+
+        function renderSongList(query = '') {
+            const q = query.toLowerCase();
+            const filtered = SONGS.filter(s => s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q));
+            
+            els.songCount.textContent = filtered.length;
+            els.songList.innerHTML = '';
+            
+            if (filtered.length === 0) {
+                els.noResults.classList.remove('hidden');
+            } else {
+                els.noResults.classList.add('hidden');
+                filtered.forEach(song => {
+                    const li = document.createElement('li');
+                    const btn = document.createElement('button');
+                    const isSelected = selectedSong.id === song.id;
+                    
+                    btn.className = `w-full text-left px-4 py-3 hover:bg-indigo-50 transition-colors ${isSelected ? 'bg-indigo-50 border-l-4 border-indigo-500' : 'border-l-4 border-transparent'}`;
+                    btn.innerHTML = `<div class="text-sm font-bold ${isSelected ? 'text-indigo-700' : 'text-slate-700'}">${song.title}</div>`;
+                    btn.onclick = () => {
+                        stopAutoPlay();
+                        selectedSong = song;
+                        renderSongList(els.searchInput.value);
+                        renderJianpuDisplay();
+                        
+                        if(els.aiTargetSongSelect.value !== 'auto_detect') {
+                             els.aiTargetSongSelect.value = song.title;
+                        }
+                    };
+                    li.appendChild(btn);
+                    els.songList.appendChild(li);
+                });
+            }
+        }
+
+        function renderJianpuDisplay() {
+            if (!selectedSong) return;
+            els.songTitle.textContent = selectedSong.title;
+            els.songArtist.textContent = isScratchMode ? "讀取模式：Scratch 音階資料" : "讀取模式：標準數字簡譜";
+            
+            els.jianpuContainer.innerHTML = '';
+            const lines = selectedSong.notation.split('/');
+            let playIndex = 0;
+            
+            lines.forEach(line => {
+                const lineDiv = document.createElement('div');
+                const gapClass = isScratchMode ? "gap-x-1 sm:gap-x-1.5 gap-y-1.5" : "gap-y-2 gap-x-1.5 sm:gap-x-2";
+                lineDiv.className = `flex flex-wrap items-center justify-start ${gapClass} w-full pb-3 border-b border-slate-100/50 last:border-b-0`;
+                const tokens = line.trim().split(/\s+/).filter(t => t !== '');
+                
+                tokens.forEach((token) => {
+                    const span = document.createElement('span');
+                    const isCurrent = isPlaying && playIndex === currentPlayIndex;
+                    
+                    if (token === '|') {
+                        span.className = `mx-1 sm:mx-2 text-slate-300 font-light text-lg transition-all duration-200 flex-shrink-0 ${isCurrent ? 'text-indigo-500 scale-110' : ''}`;
+                        span.textContent = '|';
+                    } else if (token === '-' || token === '0') {
+                        span.className = `w-3 sm:w-5 border-b-2 border-slate-400 inline-block align-middle transform -translate-y-1/2 mx-0.5 flex-shrink-0 opacity-50`;
+                    } else if (token === '.') {
+                        span.className = `text-sm self-end mb-0.5 font-bold text-indigo-600 flex-shrink-0`;
+                        span.textContent = '.';
+                    } else {
+                        const normalizedToken = token.replace('.', '̇');
+                        const targetMidi = JIANPU_TO_MIDI[normalizedToken] || JIANPU_TO_MIDI[token];
+                        const displayToken = (isScratchMode && targetMidi) ? PIANO_NOTES[targetMidi].scratch : normalizedToken;
+                        const paddingClass = isScratchMode ? "px-1.5 py-1 min-w-[2.25rem] sm:min-w-[2.75rem]" : "px-2 min-w-[2rem] sm:min-w-[2.25rem]";
+                        const textSize = isScratchMode ? 'text-[10px] sm:text-xs' : 'text-base sm:text-lg';
+                        
+                        span.className = `relative inline-flex items-center justify-center h-7 sm:h-8 ${paddingClass} rounded-full transition-all duration-200 border flex-shrink-0 ${
+                            isCurrent ? 'bg-indigo-600 text-white border-indigo-600 scale-105 shadow-sm ring-2 ring-indigo-200' : 'bg-white text-slate-800 border-slate-200 hover:bg-slate-50'
+                        } ${textSize} font-bold`;
+                        span.textContent = displayToken;
+                    }
+                    span.id = `token-${playIndex}`;
+                    lineDiv.appendChild(span);
+                    playIndex++;
+                });
+                els.jianpuContainer.appendChild(lineDiv);
+            });
+        }
+
+        function createPianoHTML() {
+            const whiteKeys = Object.keys(PIANO_NOTES).filter(k => PIANO_NOTES[k].type === 'white');
+            const blackKeys = Object.keys(PIANO_NOTES).filter(k => PIANO_NOTES[k].type === 'black');
+            let html = '';
+            
+            whiteKeys.forEach(midiCode => {
+                const note = PIANO_NOTES[midiCode];
+                const displayLabel = isScratchMode ? note.scratch : note.jianpu;
+                const textSize = isScratchMode ? 'text-[10px] sm:text-xs' : 'text-sm sm:text-base';
+                html += `
+                    <div id="key-auto-${midiCode}" class="flex-1 h-full rounded-b-xl border-r last:border-r-0 border-slate-300 flex flex-col justify-end items-center pb-2 sm:pb-3 transition-all duration-100 bg-white text-slate-800">
+                        <span class="${textSize} font-bold pointer-events-none">${displayLabel}</span>
+                        <span class="text-[9px] opacity-70 uppercase pointer-events-none mt-0.5 font-medium">${note.name}</span>
+                    </div>`;
+            });
+
+            blackKeys.forEach(midiCode => {
+                const note = PIANO_NOTES[midiCode];
+                const displayLabel = isScratchMode ? note.scratch : note.jianpu;
+                const textSize = isScratchMode ? 'text-[8px] sm:text-[9px]' : 'text-[10px] sm:text-xs';
+                html += `
+                    <div id="key-auto-${midiCode}" class="absolute w-[6%] h-3/5 rounded-b-lg shadow-lg flex flex-col justify-end items-center pb-2 transition-all duration-100 bg-slate-800 border-slate-900 text-white" style="left: ${note.leftOffset}; z-index: 10;">
+                        <span class="${textSize} font-bold pointer-events-none">${displayLabel}</span>
+                        <span class="text-[8px] opacity-60 scale-90 pointer-events-none mt-0.5">${note.name}</span>
+                    </div>`;
+            });
+            return html;
+        }
+
+        function renderPianos() {
+            els.autoPianoContainer.innerHTML = createPianoHTML();
+        }
+
+        function renderAll() {
+            renderSongList(els.searchInput.value);
+            renderJianpuDisplay();
+            renderPianos();
+        }
+
+        function highlightPianoKey(midiCode) {
+            if (activePianoKey) {
+                const autoKey = document.getElementById(`key-auto-${activePianoKey}`);
+                const noteData = PIANO_NOTES[activePianoKey];
+                if (autoKey && noteData) autoKey.classList.remove('key-pressed', noteData.type==='white' ? 'key-active-white' : 'key-active-black');
+            }
+            activePianoKey = midiCode;
+            if (midiCode) {
+                const autoKey = document.getElementById(`key-auto-${midiCode}`);
+                const noteData = PIANO_NOTES[midiCode];
+                if (autoKey && noteData) {
+                    const activeClass = noteData.type === 'white' ? 'key-active-white' : 'key-active-black';
+                    autoKey.classList.add('key-pressed', activeClass);
+                    setTimeout(() => {
+                        if (activePianoKey === midiCode) {
+                            autoKey.classList.remove('key-pressed', activeClass);
+                            activePianoKey = null;
+                        }
+                    }, 200);
+                }
+            }
+        }
+
+        function updatePlayUI() {
+            if (isPlaying) {
+                els.btnPlay.classList.add('hidden');
+                els.btnStop.classList.remove('hidden', 'flex');
+                els.btnStop.classList.add('flex');
+                els.playingIndicator.classList.remove('hidden');
+            } else {
+                els.btnPlay.classList.remove('hidden');
+                els.btnStop.classList.add('hidden');
+                els.btnStop.classList.remove('flex');
+                els.playingIndicator.classList.add('hidden');
+                renderJianpuDisplay();
+            }
+        }
+
+        function stopAutoPlay() {
+            if (playTimeout) {
+                clearTimeout(playTimeout);
+                playTimeout = null;
+            }
+            isPlaying = false;
+            currentPlayIndex = -1;
+            updatePlayUI();
+        }
+
+        function startAutoPlay(song) {
+            stopAutoPlay();
+            initAudio();
+            isPlaying = true;
+            updatePlayUI();
+
+            const tokens = song.notation.replace(/\//g, ' ').split(/\s+/).filter(t => t !== '');
+            let index = 0;
+
+            const playNextStep = () => {
+                if (index >= tokens.length) {
+                    stopAutoPlay();
+                    return;
+                }
+
+                currentPlayIndex = index;
+                
+                for(let i=0; i<tokens.length; i++) {
+                    const t = document.getElementById(`token-${i}`);
+                    if(t) {
+                        if (t.textContent === '|') {
+                            t.className = "mx-1 sm:mx-2 text-slate-300 font-light text-lg transition-all duration-200 flex-shrink-0";
+                        } else if (t.textContent !== '-' && t.textContent !== '0' && t.textContent !== '.') {
+                            const textSize = isScratchMode ? 'text-[10px] sm:text-xs' : 'text-base sm:text-lg';
+                            const paddingClass = isScratchMode ? "px-1.5 py-1 min-w-[2.25rem] sm:min-w-[2.75rem]" : "px-2 min-w-[2rem] sm:min-w-[2.25rem]";
+                            t.className = `relative inline-flex flex-shrink-0 items-center justify-center h-7 sm:h-8 ${paddingClass} rounded-full transition-all duration-200 border bg-white text-slate-800 border-slate-200 ${textSize} font-bold`;
+                        }
+                    }
+                }
+                
+                const currentEl = document.getElementById(`token-${index}`);
+                const token = tokens[index];
+
+                if (currentEl) {
+                    if (token === '|') {
+                        currentEl.classList.add('text-indigo-500', 'scale-110');
+                    } else if (token !== '-' && token !== '0' && token !== '.') {
+                        currentEl.classList.remove('bg-white', 'text-slate-800', 'border-slate-200');
+                        currentEl.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600', 'scale-105', 'shadow-sm', 'ring-2', 'ring-indigo-200');
+                        currentEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                }
+
+                if (token === '|') {
+                    index++;
+                    playNextStep();
+                    return;
+                }
+
+                if (token !== '-' && token !== '0' && token !== '.') {
+                    const normalizedToken = token.replace('.', '̇');
+                    const targetMidi = JIANPU_TO_MIDI[normalizedToken] || JIANPU_TO_MIDI[token];
+                    if (targetMidi) playToneByMidi(targetMidi, 0.4);
+                }
+
+                index++;
+                playTimeout = setTimeout(playNextStep, 400);
+            };
+            playNextStep();
+        }
+
+        // ================= AI 檢核系統 =================
+        let currentAudioFile = null;
+
+        function resetAiPanel() {
+            currentAudioFile = null;
+            els.aiFileInput.value = '';
+            els.aiUploadFilename.innerText = "點擊或拖曳上傳 電腦音軌/影像樣本";
+            els.aiPreviewContainer.classList.add('hidden');
+            els.aiAudioPlayer.src = '';
+            
+            els.btnStartAi.disabled = true;
+            els.btnStartAi.className = "w-full py-4 mt-auto rounded-xl font-bold text-base shadow-sm transition-all bg-slate-800 text-slate-500 cursor-not-allowed";
+            els.btnStartAi.innerText = "上傳檔案後啟動分析";
+            
+            els.aiProgressContainer.classList.add('hidden');
+            els.aiResultDashboard.innerHTML = `
+                <div class="text-slate-600 text-center flex flex-col items-center gap-4 py-12">
+                    <i data-lucide="activity" class="w-16 h-16 opacity-30"></i>
+                    <p class="text-sm font-bold tracking-wide">等待上傳音軌與分析結果...</p>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            currentAudioFile = file;
+
+            els.aiUploadFilename.innerText = file.name;
+            els.aiAudioPlayer.src = URL.createObjectURL(file);
+            els.aiPreviewContainer.classList.remove('hidden');
+
+            els.btnStartAi.disabled = false;
+            els.btnStartAi.className = "w-full py-4 mt-auto rounded-xl font-bold text-base shadow-sm transition-all bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-900/50";
+            els.btnStartAi.innerText = "⭐ 啟動 AI 樂理比對檢核";
+            
+            els.btnStartAi.onclick = () => startAiAnalysis(file);
+            els.aiProgressContainer.classList.add('hidden');
+            els.aiResultDashboard.innerHTML = `
+                <div class="text-slate-500 text-center flex flex-col items-center gap-4 py-12">
+                    <i data-lucide="music-4" class="w-16 h-16 opacity-40"></i>
+                    <p class="text-sm font-bold tracking-wide">檔案準備就緒，點擊左側按鈕開始分析...</p>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function autoCorrelate(buffer, sampleRate, noiseThreshold) {
+            let SIZE = buffer.length;
+            let rms = 0;
+            for (let i = 0; i < SIZE; i++) rms += buffer[i] * buffer[i];
+            rms = Math.sqrt(rms / SIZE);
+            const dbThreshold = noiseThreshold / 200.0; 
+            if (rms < dbThreshold) return -1;
+
+            let r1 = 0, r2 = SIZE - 1;
+            let thres = 0.2;
+            for (let i = 0; i < SIZE / 2; i++) if (Math.abs(buffer[i]) < thres) { r1 = i; break; }
+            for (let i = SIZE - 1; i >= SIZE / 2; i--) if (Math.abs(buffer[i]) < thres) { r2 = i; break; }
+            let buf = buffer.slice(r1, r2);
+            let len = buf.length;
+            if (len < 64) return -1;
+
+            let c = new Float32Array(len);
+            for (let i = 0; i < len; i++) {
+                for (let j = 0; j < len - i; j++) {
+                    c[i] = c[i] + buf[j] * buf[j + i];
+                }
+            }
+            let d = 0; while (c[d] > c[d + 1]) d++;
+            let maxval = -1, maxpos = -1;
+            for (let i = d; i < len; i++) {
+                if (c[i] > maxval) {
+                    maxval = c[i];
+                    maxpos = i;
+                }
+            }
+            let T0 = maxpos;
+            let x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
+            let a = (x1 + x3 - 2 * x2) / 2;
+            let b = (x3 - x1) / 2;
+            if (a) T0 = T0 - b / (2 * a);
+            return sampleRate / T0;
+        }
+
+        function noteFromPitch(frequency) {
+            let noteNum = 12 * (Math.log(frequency / 440) / Math.log(2));
+            return Math.round(noteNum) + 69;
+        }
+
+        function midiToNumbered(midiNumber) {
+            const noteInOctave = midiNumber % 12;
+            const map = { 0: '1', 2: '2', 4: '3', 5: '4', 7: '5', 9: '6', 11: '7' };
+            return map[noteInOctave] || null; 
+        }
+
+        function calculateEnhancedMatch(studentEvents, templateNotation, songTitle, songArtist) {
+            const template = templateNotation.replace(/[^1-7]/g, '').split('');
+            const studentSeq = studentEvents.map(e => e.note);
+
+            const n = studentSeq.length;
+            const m = template.length;
+            
+            const dp = Array(n + 1).fill(0).map(() => Array(m + 1).fill(0));
+
+            for (let i = 1; i <= n; i++) dp[i][0] = i;
+            for (let j = 1; j <= m; j++) dp[0][j] = j;
+
+            for (let i = 1; i <= n; i++) {
+                for (let j = 1; j <= m; j++) {
+                    if (studentSeq[i - 1] === template[j - 1]) {
+                        dp[i][j] = dp[i - 1][j - 1]; 
+                    } else {
+                        dp[i][j] = Math.min(
+                            dp[i - 1][j] + 1,       // Extra 
+                            dp[i][j - 1] + 1,       // Miss 
+                            dp[i - 1][j - 1] + 1    // Wrong 
+                        );
+                    }
+                }
+            }
+
+            let i = n, j = m;
+            let alignment = [];
+            let extraCount = 0;
+            let missCount = 0;
+            let wrongCount = 0;
+            let matchCount = 0;
+
+            while (i > 0 || j > 0) {
+                if (i > 0 && j > 0 && studentSeq[i - 1] === template[j - 1]) {
+                    alignment.unshift({ templateNote: template[j - 1], studentNote: studentSeq[i - 1], status: 'match' });
+                    matchCount++;
+                    i--; j--;
+                } else if (j > 0 && (i === 0 || (dp[i][j - 1] <= dp[i - 1][j] && dp[i][j - 1] <= dp[i - 1][j - 1]))) {
+                    alignment.unshift({ templateNote: template[j - 1], studentNote: '漏', status: 'miss' });
+                    missCount++;
+                    j--;
+                } else if (i > 0 && j > 0 && (dp[i - 1][j - 1] <= dp[i - 1][j] && dp[i - 1][j - 1] <= dp[i][j - 1])) {
+                    alignment.unshift({ templateNote: template[j - 1], studentNote: studentSeq[i - 1], status: 'wrong' });
+                    wrongCount++;
+                    i--; j--;
+                } else {
+                    alignment.unshift({ templateNote: '-', studentNote: studentSeq[i - 1], status: 'extra' });
+                    extraCount++;
+                    i--;
+                }
+            }
+
+            const totalTarget = template.length;
+            const finalScore = totalTarget > 0 ? Math.round((matchCount / totalTarget) * 100) : 100;
+
+            return {
+                score: finalScore,
+                editDistance: dp[n][m], 
+                matched: matchCount,
+                missed: missCount,
+                wrong: wrongCount,
+                extra: extraCount,
+                totalSteps: totalTarget,
+                matchedSong: songTitle,
+                artist: songArtist,
+                alignment
+            };
+        }
+
+        function handleScoring(studentEvents, targetMode) {
+            if (targetMode === 'auto_detect') {
+                let bestMatch = null;
+                SONGS.forEach(song => {
+                    const res = calculateEnhancedMatch(studentEvents, song.notation, song.title, song.artist);
+                    const lengthRatio = Math.max(studentEvents.length, res.totalSteps) / Math.min(studentEvents.length, res.totalSteps);
+                    const weightedDistance = res.editDistance * (lengthRatio > 1.5 ? lengthRatio * 1.5 : 1);
+
+                    if (!bestMatch) {
+                        bestMatch = { res, weightedDistance };
+                    } else {
+                        if (weightedDistance < bestMatch.weightedDistance) {
+                            bestMatch = { res, weightedDistance };
+                        } else if (weightedDistance === bestMatch.weightedDistance && res.score > bestMatch.res.score) {
+                            bestMatch = { res, weightedDistance };
+                        }
+                    }
+                });
+
+                if (bestMatch && bestMatch.res.score !== -1) {
+                    finalizeAnalysisUI(bestMatch.res);
+                } else {
+                    showAiError("無法識別您的樂曲，請手動選擇目標頻率後再試一次！");
+                }
+            } else {
+                const targetSong = SONGS.find(s => s.title === targetMode);
+                if (targetSong) {
+                    const res = calculateEnhancedMatch(studentEvents, targetSong.notation, targetSong.title, targetSong.artist);
+                    finalizeAnalysisUI(res);
+                } else {
+                    showAiError("找不到指定的目標頻率，請重新選擇。");
+                }
+            }
+        }
+
+        async function startAiAnalysis(file) {
+            els.btnStartAi.disabled = true;
+            els.btnStartAi.className = "w-full py-4 mt-auto rounded-xl font-bold text-white bg-indigo-600 opacity-70 cursor-not-allowed shadow-sm transition-all";
+            els.btnStartAi.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 inline animate-spin mr-2"></i> 分析比對中...';
+            els.aiProgressContainer.classList.remove('hidden');
+            
+            els.aiResultDashboard.innerHTML = `
+                <div class="text-indigo-400 text-center flex flex-col items-center gap-4 py-12">
+                    <i data-lucide="loader-2" class="w-12 h-12 animate-spin"></i>
+                    <p class="font-bold tracking-wide">正在從音軌中提取陣列特徵...</p>
+                </div>
+            `;
+            lucide.createIcons();
+
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const offlineCtx = new AudioContext();
+                const fileReader = new FileReader();
+
+                fileReader.onload = async (e) => {
+                    try {
+                        els.aiProgressText.innerText = "⏳ 數位音軌解碼中...";
+                        const arrayBuffer = e.target.result;
+                        const audioBuffer = await offlineCtx.decodeAudioData(arrayBuffer);
+
+                        els.aiProgressText.innerText = "🔍 DP 陣列對位與評分中...";
+                        const sampleRate = audioBuffer.sampleRate;
+                        const channelData = audioBuffer.getChannelData(0);
+
+                        const frameSize = 2048;
+                        const hopSize = 1024;
+                        const totalSamples = channelData.length;
+
+                        let historyList = [];
+                        let lastNoteNumbered = null;
+                        let lastNoteTime = 0;
+                        let silenceDuration = 0;
+                        
+                        const stateSensitivity = 3.0; 
+                        const noiseThreshold = 15;    
+
+                        let start = 0;
+
+                        const processChunk = () => {
+                            const CHUNK_LIMIT = hopSize * 80; 
+                            const targetEnd = Math.min(start + CHUNK_LIMIT, totalSamples - frameSize);
+
+                            while (start < targetEnd) {
+                                const chunk = channelData.subarray(start, start + frameSize);
+                                const pitch = autoCorrelate(chunk, sampleRate, noiseThreshold);
+                                const currentTime = (start + frameSize / 2) / sampleRate;
+
+                                if (pitch !== -1) {
+                                    silenceDuration = 0;
+                                    const midi = noteFromPitch(pitch);
+                                    
+                                    if (midi >= 12 && midi <= 127) {
+                                        const numberedNote = midiToNumbered(midi);
+                                        if (numberedNote) {
+                                            const timeGap = currentTime - lastNoteTime;
+                                            let isNewAttack = false;
+
+                                            if (lastNoteNumbered === null) {
+                                                isNewAttack = true;
+                                            } else if (numberedNote !== lastNoteNumbered) {
+                                                if (timeGap >= (stateSensitivity * 0.05)) isNewAttack = true;
+                                            } else {
+                                                if (timeGap >= 0.45) isNewAttack = true;
+                                            }
+
+                                            if (isNewAttack && (timeGap >= 0.1 || lastNoteTime === 0)) {
+                                                historyList.push({ time: currentTime, note: numberedNote });
+                                                lastNoteNumbered = numberedNote;
+                                                lastNoteTime = currentTime;
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    silenceDuration += (hopSize / sampleRate);
+                                    if (silenceDuration >= 0.15) lastNoteNumbered = null;
+                                }
+                                start += hopSize;
+                            }
+
+                            const percent = Math.round((start / totalSamples) * 100);
+                            els.aiProgressPercent.innerText = percent + "%";
+                            els.aiProgressBar.style.width = percent + "%";
+
+                            if (start < totalSamples - frameSize) {
+                                requestAnimationFrame(processChunk); 
+                            } else {
+                                const targetMode = els.aiTargetSongSelect.value;
+                                handleScoring(historyList, targetMode);
+                            }
+                        };
+
+                        processChunk();
+
+                    } catch(err) {
+                        showAiError("音軌分離失敗：您上傳的影片可能不包含聲音，或檔案格式損壞。");
+                    }
+                };
+                
+                fileReader.readAsArrayBuffer(file);
+
+            } catch (error) {
+                showAiError("處理過程中發生系統異常，請嘗試重新操作！");
+            }
+        }
+
+        function finalizeAnalysisUI(res) {
+            els.btnStartAi.disabled = false;
+            els.btnStartAi.className = "w-full py-4 mt-auto rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-500 transition-all shadow-sm";
+            els.btnStartAi.innerHTML = '🔄 重新分析上傳的檔案';
+
+            let alignmentHtml = res.alignment.map(col => {
+                let statusColor = col.status === 'match' ? 'bg-emerald-950/60 border-emerald-900/60' :
+                                  col.status === 'miss' ? 'bg-slate-800/40 border-slate-700/60' :
+                                  col.status === 'wrong' ? 'bg-amber-950/40 border-amber-900/60' :
+                                  'bg-rose-950/40 border-rose-900/60';
+                
+                let statusTextColor = col.status === 'match' ? 'text-emerald-400' :
+                                      col.status === 'miss' ? 'text-slate-600' :
+                                      col.status === 'wrong' ? 'text-amber-400' :
+                                      'text-rose-400';
+                                      
+                let icon = col.status === 'match' ? '✅' :
+                           col.status === 'miss' ? '➖' :
+                           col.status === 'wrong' ? '⚠️' : '❌';
+
+                return `
+                    <div class="flex flex-col items-center shrink-0 w-12 border rounded-xl py-2 shadow-sm ${statusColor}">
+                        <div class="text-[10px] text-slate-500 font-bold mb-1 border-b border-slate-800/80 w-full text-center pb-1.5" title="目標陣列">${col.templateNote === '0' ? '休' : col.templateNote}</div>
+                        <div class="text-xs my-1">${icon}</div>
+                        <div class="text-base font-black ${statusTextColor}" title="您的採樣">${col.studentNote === '0' ? '休' : col.studentNote}</div>
+                    </div>`;
+            }).join('');
+
+            els.aiResultDashboard.innerHTML = `
+                <div class="w-full flex flex-col items-center animate-[popIn_0.5s_ease-out_forwards]">
+                    
+                    <div class="text-center mb-4">
+                        <div class="text-xs font-bold text-slate-500 mb-1">🎯 系統對齊目標陣列</div>
+                        <div class="text-2xl font-black text-indigo-400">【${res.matchedSong}】</div>
+                    </div>
+
+                    <div class="bg-slate-950 p-6 rounded-2xl border border-emerald-600/80 shadow-lg shadow-emerald-950/40 w-full max-w-lg mb-6 relative overflow-hidden flex flex-col items-center">
+                        <div class="absolute -right-6 -top-4 bg-emerald-600 text-white text-[10px] font-black uppercase py-1 px-8 rotate-45 transform shadow-md">
+                            達成率
+                        </div>
+                        <div class="flex justify-between items-center w-full mb-2">
+                            <span class="text-xs font-bold text-slate-400 flex items-center gap-1.5">
+                                <span>🎵 序列 DP 動態規劃分析</span>
+                                <span class="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-normal">精確捕捉漏錯音</span>
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-baseline gap-1 my-3">
+                            <span class="text-6xl font-black text-white">${res.score}</span>
+                            <span class="text-slate-400 text-lg font-bold">分</span>
+                        </div>
+
+                        <div class="text-xs text-slate-400 space-y-2 mt-4 border-t border-slate-900 pt-4 w-full">
+                            <div class="flex justify-between"><span>✅ 完全吻合 (陣列達成率)</span><span class="font-bold text-emerald-400">${res.matched} / ${res.totalSteps}</span></div>
+                            <div class="flex justify-between"><span>➖ 漏彈/漏吹</span><span class="font-bold text-slate-500">${res.missed} 次</span></div>
+                            <div class="flex justify-between"><span>⚠️ 彈錯音階 (不倒扣)</span><span class="font-bold text-amber-400">${res.wrong} 次</span></div>
+                            <div class="flex justify-between"><span>❌ 冗餘音/多彈 (不倒扣)</span><span class="font-bold text-rose-400">${res.extra} 次</span></div>
+                        </div>
+                    </div>
+
+                    <div class="w-full bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow-inner">
+                        <h5 class="text-sm font-bold text-slate-300 mb-4 flex items-center justify-between">
+                            <span class="flex items-center gap-2">
+                                <i data-lucide="bar-chart-2" class="w-4 h-4 text-indigo-400"></i>
+                                編輯距離 (Edit Distance) 視覺化對位
+                            </span>
+                            <span class="text-[10px] text-slate-500">總步數: ${res.alignment.length}</span>
+                        </h5>
+                        <div class="flex overflow-x-auto pb-4 gap-2 custom-scrollbar">
+                            ${alignmentHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function showAiError(msg) {
+            els.btnStartAi.disabled = false;
+            els.btnStartAi.className = "w-full py-4 mt-auto rounded-xl font-bold text-white bg-slate-700 hover:bg-slate-600 transition-all shadow-sm";
+            els.btnStartAi.innerHTML = '🔄 系統異常，點擊重試';
+            els.aiProgressContainer.classList.add('hidden');
+            els.aiResultDashboard.innerHTML = `
+                <div class="text-rose-400 text-center flex flex-col items-center gap-4 py-12">
+                    <i data-lucide="alert-triangle" class="w-16 h-16 opacity-70"></i>
+                    <p class="text-sm font-bold tracking-wide">${msg}</p>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function shuffleSongs() {
+            const others = SONGS.slice(1);
+            for (let i = others.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [others[i], others[j]] = [others[j], others[i]];
+            }
+            SONGS.splice(1, others.length, ...others);
+        }
+
+        // ================= 初始化執行 =================
+        window.onload = function() {
+            document.getElementById('app-container').innerHTML = renderLessonDetail(lesson);
+            initDOM();
+            populateAiTargetSelect(); 
+            shuffleSongs();
+            selectedSong = SONGS[0]; 
+            setupEventListeners();
+            renderAll();
+            lucide.createIcons();
+        };
+    </script>
+</body>
+</html>

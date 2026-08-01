@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LESSON 3 - 基礎繪圖與偷懶的藝術</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #F8F9FA; color: #333333; }
+        .slide-up-fade { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        .sim-window { position: relative; overflow: hidden; }
+        .sim-badge { position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,0.9); border: 1px solid #E2E8F0; padding: 2px 8px; border-radius: 9999px; font-size: 0.65rem; font-weight: bold; color: #64748B; display: flex; align-items: center; gap: 4px; z-index: 10; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .sim-badge::before { content: ''; display: block; width: 6px; height: 6px; background-color: #10B981; border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body class="antialiased selection:bg-slate-200 selection:text-slate-800">
+
+    <header class="bg-white border-b border-gray-100 pt-8 pb-12 slide-up-fade">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8">
+            <div class="mb-6">
+                <a href="https://su-yung-sheng.github.io/unforte115/" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> 
+                    返回網站首頁
+                </a>
+            </div>
+            <p class="text-sm font-medium text-indigo-500 mb-2 tracking-widest uppercase">演算法與程式設計</p>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight">星際防禦工程師：<br class="hidden md:block">用程式編織能量防護網</h1>
+            <p class="text-lg text-slate-500 font-light max-w-2xl">結合「IPO 思維」與「重複結構」，循序漸進建立邏輯思維與幾何繪圖能力，並透過實作防禦網任務，體驗程式設計的強大魔力。</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 lg:px-8 py-12 relative">
+        <a href="https://su-yung-sheng.github.io/unforte115/1150700.html" class="mb-8 inline-flex items-center text-sm font-medium text-slate-400 hover:text-slate-800 transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 返回課程總覽
+        </a>
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12 mb-8 slide-up-fade">
+            <span class="text-sm font-semibold text-slate-400 tracking-wider block mb-2">LESSON 3</span>
+            <h2 class="text-3xl font-bold text-slate-800 mb-4">基礎防禦單元：迴圈多邊形</h2>
+            <p class="text-slate-500 font-light text-lg mb-10">防護盾發生器需要完美的幾何圖形！我們將先學習牽引能量畫出第一條直線，接著運用「重複結構」尋找多邊形外角的共通密碼，畫出完美的基礎能量盾。</p>
+            
+            <div class="space-y-16">
+                <!-- 第一階段：互動組裝畫線積木 -->
+                <div class="border-b-2 border-dashed border-slate-100 pb-16">
+                    <div class="flex items-center mb-8">
+                        <span class="bg-emerald-100 text-emerald-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">1</span>
+                        <h3 class="text-2xl font-bold text-slate-800">第一階段：喚醒畫筆，畫出第一條直線</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-8 mb-8">
+                        <div class="bg-slate-50 rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm">
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-200 pb-3">
+                                <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">A</span> 挑戰：組裝畫筆初始化積木
+                            </h4>
+                            <p class="text-slate-600 font-light text-sm mb-6">
+                                在 Scratch 中，角色就像拿著一隻隱形的筆。請根據右側空位上的<strong>「功能說明」</strong>，將左側打亂的積木依序點擊放入。組裝正確才能解鎖動畫！
+                            </p>
+                            
+                            <div class="flex flex-col md:flex-row gap-6 mb-4">
+                                <div class="w-full md:w-1/3 bg-white border border-slate-200 rounded-xl p-4 shadow-inner min-h-[300px]" id="pen-source-container"></div>
+                                <div class="w-full md:w-2/3 bg-white border-2 border-dashed border-slate-300 rounded-xl p-4 flex flex-col justify-start min-h-[300px]" id="pen-target-container"></div>
+                            </div>
+                            <div class="flex justify-end h-6"><span id="pen-flow-msg" class="text-sm font-bold transition-all"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">B</span> 參考：程式 Pseudo Code
+                            </h4>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 overflow-x-auto h-full">
+<pre class="font-mono text-sm text-slate-600 leading-relaxed"><span class="text-slate-400 italic">// 畫布清理與角色初始化</span>
+筆跡全部清除
+筆跡顏色設為 [紅色]
+筆跡寬度設為 5
+下筆
+
+<span class="text-slate-400 italic">// 畫出第一條線</span>
+移動 100 點
+停筆</pre>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">C</span> 執行結果模擬
+                            </h4>
+                            <div class="sim-window bg-white border border-slate-200 rounded-2xl shadow-sm h-full min-h-[250px] flex items-center justify-center" id="pen-svg-container">
+                                <!-- 預設鎖定畫面 -->
+                                <div class="text-slate-400 font-bold text-sm flex flex-col items-center">
+                                    <span class="text-4xl mb-3">🔒</span>
+                                    請先完成 A 區的積木組裝以解鎖動畫
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第二階段：手動繪製正方形遊戲 -->
+                <div class="border-b-2 border-dashed border-slate-100 pb-16">
+                    <div class="flex items-center mb-8">
+                        <span class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">2</span>
+                        <h3 class="text-2xl font-bold text-slate-800">第二階段：從線條到轉彎 (手動繪製正方形)</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-8 mb-8">
+                        <div class="bg-slate-50 rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm">
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-200 pb-3">
+                                <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">A</span> 挑戰：手動串接 4 次！
+                            </h4>
+                            <p class="text-slate-600 font-light text-sm mb-6">
+                                我們已經幫你準備好最上方的<strong>「畫筆」</strong>積木了。請將左側的 8 個積木，依序點擊排入右側的空位中，完成正方形的路線！排完後你就會發現...這程式碼真的太長啦！
+                            </p>
+                            
+                            <div class="flex flex-col md:flex-row gap-6 mb-4">
+                                <div class="w-full md:w-1/2 bg-white border border-slate-200 rounded-xl p-4 shadow-inner min-h-[300px]" id="sq-source-container"></div>
+                                <div class="w-full md:w-1/2 bg-white border-2 border-dashed border-slate-300 rounded-xl p-4 flex flex-col justify-start min-h-[300px]" id="sq-target-container"></div>
+                            </div>
+                            <div class="flex justify-end h-6"><span id="sq-flow-msg" class="text-sm font-bold transition-all"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">B</span> 參考：程式 Pseudo Code
+                            </h4>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 overflow-x-auto h-full">
+<pre class="font-mono text-sm text-slate-600 leading-relaxed"><span class="text-slate-400 italic">// 初始化與畫筆準備</span>
+畫筆設定
+下筆
+
+<span class="text-slate-400 italic">// 手動重複 4 次，畫出正方形</span>
+移動 100 點
+右轉 90 度
+移動 100 點
+右轉 90 度
+移動 100 點
+右轉 90 度
+移動 100 點
+右轉 90 度
+停筆</pre>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">C</span> 執行結果模擬
+                            </h4>
+                            <div class="sim-window bg-white border border-slate-200 rounded-2xl shadow-sm h-full min-h-[250px] flex items-center justify-center" id="sq-svg-container">
+                                <!-- 預設鎖定畫面 -->
+                                <div class="text-slate-400 font-bold text-sm flex flex-col items-center">
+                                    <span class="text-4xl mb-3">🔒</span>
+                                    請先完成 A 區的積木組裝以解鎖動畫
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第三階段：偷懶的藝術 -->
+                <div>
+                    <div class="flex items-center mb-8">
+                        <span class="bg-orange-100 text-orange-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">3</span>
+                        <h3 class="text-2xl font-bold text-slate-800">第三階段：偷懶的藝術 (導入重複結構)</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3"><span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">A</span> 優化目標與流程</h4>
+                            <ul class="space-y-3 text-slate-600 font-light mt-2 mb-6">
+                                <li class="flex items-start"><span class="mr-3 text-slate-300">▪</span> 觀察規律：「移動 ➔ 右轉」組合在正方形中出現了幾次？</li>
+                                <li class="flex items-start"><span class="mr-3 text-slate-300">▪</span> 運用<strong>重複結構</strong>將落落長的指令瘦身！</li>
+                            </ul>
+                            
+                            <div class="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-600">
+                                <div class="flex items-center border-2 border-orange-100 bg-orange-50 rounded-lg p-1">
+                                    <span class="px-2 text-orange-600 font-bold">重複 N 次</span>
+                                    <span class="px-2 py-1 bg-white border border-slate-200 rounded">移動固定長度 ➔ 右轉特定角度</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3"><span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">B</span> 程式 Pseudo Code (填充挑戰)</h4>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-6">
+                                <p class="text-xs font-semibold text-slate-400 mb-4 uppercase tracking-wider">💡 請動腦想一想，並填入數值：</p>
+                                <div class="font-mono text-sm text-slate-600 leading-relaxed bg-white border border-slate-100 p-5 rounded-lg mb-4 shadow-inner">
+                                    <span class="text-slate-400 italic">// 任務：精簡畫出正方形的控制指令</span><br>
+                                    <span class="text-orange-500 font-bold">重複執行</span> 
+                                    ( <input id="fill-times" type="text" placeholder="？" class="w-10 text-center border-b-2 border-slate-300 focus:border-indigo-500 focus:outline-none font-bold text-indigo-600 bg-transparent" maxlength="3"> )次 <span class="text-slate-400 text-xs font-light">← 提示：正方形共有幾條邊？</span><br>
+                                    &nbsp;&nbsp;移動 100 點<br>
+                                    &nbsp;&nbsp;右轉 ( <input id="fill-angle" type="text" placeholder="？" class="w-12 text-center border-b-2 border-slate-300 focus:border-indigo-500 focus:outline-none font-bold text-indigo-600 bg-transparent" maxlength="3"> ) 度 <span class="text-slate-400 text-xs font-light">← 外角 360° ÷ 邊數</span><br>
+                                    停筆
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <button onclick="checkLesson3Answers()" class="text-xs font-semibold text-white bg-slate-800 px-4 py-2 rounded-full hover:bg-slate-700 transition shadow-sm">驗證答案</button>
+                                    <p id="lesson-3-feedback" class="text-xs font-medium"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 第四階段：實戰程式設計區 -->
+                    <section class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 mt-12 slide-up-fade">
+                        <h4 class="text-xl font-bold text-slate-800 mb-3 flex items-center">
+                            <span class="text-2xl mr-2">📐</span> 第四階段：實戰程式設計區 (尋找多邊形密碼)
+                        </h4>
+                        <p class="text-sm text-slate-500 font-light mb-6 leading-relaxed">
+                            現在換你來當工程師了！請透過設定迴圈的<strong class="text-orange-600">「次數」</strong>與右轉的<strong class="text-indigo-600">「角度」</strong>，引導探測車畫出完美的<strong class="text-slate-700">正三角形、正五邊形、正六邊形</strong>。如果設定錯誤，圖形將無法閉合喔！
+                        </p>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                            <!-- 左側：控制面板 -->
+                            <div class="lg:col-span-2 space-y-5">
+                                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                                    <h5 class="text-sm font-bold text-slate-700 mb-3">1. 選擇挑戰目標</h5>
+                                    <div class="flex flex-wrap gap-2 mb-6">
+                                        <button onclick="setPolygonPreset(3)" class="px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded hover:bg-emerald-100 transition text-xs font-bold shadow-sm">正三角形</button>
+                                        <button onclick="setPolygonPreset(5)" class="px-3 py-1.5 bg-sky-50 text-sky-700 border border-sky-200 rounded hover:bg-sky-100 transition text-xs font-bold shadow-sm">正五邊形</button>
+                                        <button onclick="setPolygonPreset(6)" class="px-3 py-1.5 bg-rose-50 text-rose-700 border border-rose-200 rounded hover:bg-rose-100 transition text-xs font-bold shadow-sm">正六邊形</button>
+                                        <button onclick="setPolygonPreset('')" class="px-3 py-1.5 bg-slate-100 text-slate-600 border border-slate-300 rounded hover:bg-slate-200 transition text-xs font-bold shadow-sm">自訂多邊形</button>
+                                    </div>
+
+                                    <h5 class="text-sm font-bold text-slate-700 mb-3">2. 填寫探測車積木指令</h5>
+                                    
+                                    <!-- 仿 Scratch 巢狀積木群 -->
+                                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col items-start font-bold text-sm shadow-inner">
+                                        <div class="bg-[#FFD500] border-b-[3px] border-[#CC9900] text-slate-800 px-4 py-2 rounded-t-xl rounded-b-md shadow-sm mb-1.5 w-full max-w-[260px] flex items-center gap-2">
+                                            當 🟢 綠旗被點擊
+                                        </div>
+                                        <div class="bg-[#FF6680] border-b-[3px] border-[#FF3355] text-white px-4 py-2 rounded-md shadow-sm mb-1.5 w-full max-w-[260px]">
+                                            畫筆設定
+                                        </div>
+                                        <div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-4 py-2 rounded-md shadow-sm mb-1.5 w-full max-w-[260px]">
+                                            下筆
+                                        </div>
+                                        <div class="bg-[#FFAB19] border-b-[3px] border-[#CF8B17] text-white px-4 py-2 rounded-t-md shadow-sm w-full max-w-[260px] flex items-center gap-2">
+                                            重複執行
+                                            <input type="number" id="poly-n" placeholder="N" class="w-14 text-center border border-transparent rounded-full px-2 py-0.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-300 shadow-inner"> 次
+                                        </div>
+                                        <div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-4 py-2 rounded-md shadow-sm ml-4 my-1 w-full max-w-[220px]">
+                                            移動 60 點
+                                        </div>
+                                        <div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-4 py-2 rounded-md shadow-sm ml-4 mb-1 w-full max-w-[220px] flex items-center gap-2">
+                                            右轉 ↻
+                                            <input type="number" id="poly-angle" placeholder="度數" class="w-16 text-center border border-transparent rounded-full px-2 py-0.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-inner"> 度
+                                        </div>
+                                        <div class="bg-[#FFAB19] border-b-[3px] border-[#CF8B17] h-3 rounded-b-md w-full max-w-[260px] shadow-sm mb-1.5"></div>
+                                        <div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-4 py-2 rounded-md shadow-sm mb-1.5 w-full max-w-[260px]">
+                                            停筆
+                                        </div>
+                                    </div>
+
+                                    <button onclick="runPolygonLab()" class="w-full mt-6 bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-indigo-700 shadow-md transition-all flex items-center justify-center gap-2 transform active:scale-95">
+                                        <span>🚀 啟動探測車繪圖</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 右側：繪圖與回饋區 -->
+                            <div class="lg:col-span-3 flex flex-col">
+                                <div class="sim-window bg-white border border-slate-200 rounded-t-2xl shadow-sm flex-grow min-h-[350px]">
+                                    <div class="sim-badge" style="border-color:#CBD5E1;">即時驗證畫布</div>
+                                    <svg id="poly-svg" viewBox="0 0 200 150" class="w-full h-full bg-[#F8FAFC]" preserveAspectRatio="xMidYMid meet"></svg>
+                                </div>
+                                <div id="poly-feedback" class="bg-slate-800 text-white rounded-b-2xl p-4 text-sm font-medium transition-colors duration-300 text-center shadow-md">
+                                    請從左側選擇形狀，輸入角度並點擊啟動！
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 最終公式揭曉 -->
+                        <div id="poly-formula-reveal" class="hidden mt-8 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 p-6 md:p-8 rounded-2xl shadow-md slide-up-fade relative overflow-hidden">
+                            <div class="absolute -right-10 -bottom-10 text-9xl opacity-10">💡</div>
+                            <h4 class="text-xl md:text-2xl font-bold text-amber-800 mb-3">🎉 恭喜你發現了「幾何與角度的黃金法則」！</h4>
+                            <p class="text-base text-slate-700 leading-relaxed mb-6">
+                                無論是畫哪一種正多邊形，探測車只要繞著邊緣轉完一圈回到原本的方向，它總共就轉了 <strong>360 度</strong>。<br>
+                                這就是數學上著名的「外角和定理」！所以我們可以推導出一個超級萬用的公式：
+                            </p>
+                            <div class="bg-white px-6 py-5 rounded-xl border border-amber-200 font-mono text-lg md:text-xl text-center font-bold text-slate-800 shadow-inner mb-8">
+                                <span class="text-orange-600">重複次數 (邊數 N)</span> × <span class="text-indigo-600">每次旋轉角度</span> ＝ <span class="text-rose-600 text-2xl">360°</span>
+                                <div class="w-full h-px bg-slate-200 my-4"></div>
+                                <span class="text-sm md:text-base text-slate-600 font-normal inline-block">換句話說，若想畫出任意正多邊形，每次右轉的角度就是： <strong class="text-indigo-600 text-xl ml-2">360 ÷ N</strong></span>
+                            </div>
+
+                            <!-- 最終程式碼總覽 -->
+                            <div class="bg-white/80 backdrop-blur-sm p-6 rounded-xl border border-amber-200 shadow-sm flex flex-col items-center">
+                                <h5 class="text-lg font-bold text-amber-900 mb-5 flex items-center gap-2">
+                                    <span>🧩</span> 最終完美積木組合
+                                </h5>
+                                
+                                <div class="flex flex-col items-start font-bold text-sm w-full max-w-sm">
+                                    <!-- 綠旗 -->
+                                    <div class="bg-[#FFD500] border-b-[3px] border-[#CC9900] text-slate-800 px-4 py-2 rounded-t-xl rounded-b-md shadow-sm mb-1.5 w-full flex items-center gap-2">
+                                        當 🟢 綠旗被點擊
+                                    </div>
+                                    
+                                    <!-- 輸入 N -->
+                                    <div class="bg-[#5CB1D6] border-b-[3px] border-[#2E8EB8] text-white px-4 py-2 rounded-md shadow-sm mb-1.5 w-full flex items-center gap-2">
+                                        詢問 <span class="bg-white text-slate-700 px-2 py-0.5 rounded-full text-xs shadow-inner">輸入多邊形邊數 N</span> 並等待
+                                    </div>
+                                    <div class="bg-[#FF8C1A] border-b-[3px] border-[#DB6E00] text-white px-4 py-2 rounded-md shadow-sm mb-1.5 w-full flex items-center gap-2">
+                                        變數 <span class="bg-orange-400 border border-orange-500 px-2 py-0.5 rounded-full text-xs shadow-sm">N</span> 設為 <span class="bg-[#5CB1D6] border border-[#2E8EB8] px-2 py-0.5 rounded-full text-xs shadow-sm">詢問的答案</span>
+                                    </div>
+
+                                    <!-- 畫筆設定 -->
+                                    <div class="bg-[#FF6680] border-b-[3px] border-[#FF3355] text-white px-4 py-2 rounded-md shadow-sm mb-1.5 w-full">
+                                        畫筆設定
+                                    </div>
+                                    
+                                    <!-- 下筆 -->
+                                    <div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-4 py-2 rounded-md shadow-sm mb-1.5 w-full">
+                                        下筆
+                                    </div>
+                                    
+                                    <!-- 重複執行 N 次 -->
+                                    <div class="bg-[#FFAB19] border-b-[3px] border-[#CF8B17] text-white px-4 py-2 rounded-t-md shadow-sm w-full flex items-center gap-2">
+                                        重複執行
+                                        <span class="bg-[#FF8C1A] border border-[#DB6E00] px-3 py-0.5 rounded-full shadow-sm text-white">N</span> 次
+                                    </div>
+                                    
+                                    <!-- 迴圈內 -->
+                                    <div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-4 py-2 rounded-md shadow-sm ml-4 my-1 w-[calc(100%-1rem)]">
+                                        移動 <span class="bg-white text-slate-700 px-2 py-0.5 rounded-full text-[11px] shadow-inner">60</span> 點
+                                    </div>
+                                    
+                                    <div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-4 py-2 rounded-md shadow-sm ml-4 mb-1 w-[calc(100%-1rem)] flex items-center gap-2 overflow-x-auto">
+                                        右轉 ↻
+                                        <!-- 綠色運算積木 -->
+                                        <div class="bg-[#59C059] border-b-2 border-[#389438] rounded-full px-2 py-1 flex items-center gap-1.5 shadow-inner">
+                                            <span class="bg-white text-slate-800 px-2 rounded-full text-xs shadow-sm">360</span>
+                                            <span class="font-bold text-white text-sm">/</span>
+                                            <span class="bg-[#FF8C1A] border border-[#DB6E00] text-white px-2.5 rounded-full text-xs shadow-sm">N</span>
+                                        </div>
+                                        度
+                                    </div>
+                                    
+                                    <!-- 迴圈底 -->
+                                    <div class="bg-[#FFAB19] border-b-[3px] border-[#CF8B17] h-3 rounded-b-md w-full shadow-sm mb-1.5"></div>
+                                    
+                                    <!-- 停筆 -->
+                                    <div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-4 py-2 rounded-md shadow-sm mb-1 w-full">
+                                        停筆
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </section>
+                </div>
+
+            </div>
+        </div>
+        
+        <div class="flex justify-between items-center">
+            <a href="https://su-yung-sheng.github.io/unforte115/1150702.html" class="text-sm text-slate-400 hover:text-slate-800 transition-colors">⬅ 上一個單元</a>
+            <a href="https://su-yung-sheng.github.io/unforte115/1150704.html" class="inline-block text-center text-sm font-medium text-slate-600 bg-white border border-gray-200 px-6 py-3 rounded-full hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm">下一個單元 ➔</a>
+        </div>
+    </main>
+
+    <script>
+        // ====== 第一階段：畫筆組裝遊戲 ======
+        const penData = {
+            1: '<div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-3 py-1.5 rounded-md font-bold text-sm shadow-sm w-full text-left">筆跡全部清除</div>',
+            2: '<div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-3 py-1.5 rounded-md font-bold text-sm shadow-sm flex items-center gap-1 w-full text-left">筆跡顏色設為 <span class="bg-red-500 w-4 h-4 rounded-full border border-white/50 inline-block shadow-inner mx-1"></span></div>',
+            3: '<div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-3 py-1.5 rounded-md font-bold text-sm shadow-sm flex items-center gap-1 w-full text-left">筆跡寬度設為 <span class="bg-white text-slate-800 px-2 py-0.5 rounded-full text-[11px] mx-1">5</span></div>',
+            4: '<div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-3 py-1.5 rounded-md font-bold text-sm shadow-sm w-full text-left">下筆</div>',
+            5: '<div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-3 py-1.5 rounded-md font-bold text-sm shadow-sm flex items-center gap-1 w-full text-left">移動 <span class="bg-white text-slate-800 px-2 py-0.5 rounded-full text-[11px] mx-1">100</span> 點</div>',
+            6: '<div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-3 py-1.5 rounded-md font-bold text-sm shadow-sm w-full text-left">停筆</div>'
+        };
+
+        const penDesc = {
+            1: "1. 清除畫布上的舊圖案",
+            2: "2. 決定畫筆的顏色",
+            3: "3. 決定畫筆的粗細",
+            4: "4. 將筆尖放下接觸畫布",
+            5: "5. 往前開動留下軌跡",
+            6: "6. 將筆尖抬起結束繪圖"
+        };
+
+        let cPen = [];
+        let tPen = [];
+
+        function initPenGame() {
+            cPen = [1, 2, 3, 4, 5, 6].sort(() => Math.random() - 0.5);
+            tPen = [];
+            const msgEl = document.getElementById('pen-flow-msg');
+            if(msgEl) msgEl.textContent = "";
+            renderPenGame();
+        }
+
+        function tryPlacePenItem(id) {
+            const expectedId = tPen.length + 1;
+            const msg = document.getElementById('pen-flow-msg');
+            if(!msg) return;
+            
+            if (id === expectedId) {
+                cPen = cPen.filter(x => x !== id);
+                tPen.push(id);
+                msg.textContent = "✅ 放置正確！";
+                msg.className = "text-sm font-bold text-emerald-600";
+                
+                if (tPen.length === 6) {
+                    msg.innerHTML = "🎉 組裝完成！請觀看右側動畫！ <button onclick='playPenAnimation()' class='ml-3 bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-sm transition'>重新播放 ➔</button>";
+                    playPenAnimation();
+                }
+                renderPenGame();
+            } else {
+                msg.textContent = "❌ 順序不對喔！請參考空位上的功能說明。";
+                msg.className = "text-sm font-bold text-rose-500";
+            }
+        }
+
+        function renderPenGame() {
+            const src = document.getElementById('pen-source-container');
+            const tgt = document.getElementById('pen-target-container');
+            if(!src || !tgt) return;
+            
+            src.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-4 w-full text-center border-b border-slate-100 pb-2">待排積木區</p>';
+            cPen.forEach(id => {
+                const b = document.createElement('button');
+                b.className = "w-full mb-3 transform hover:scale-[1.02] transition-transform text-left";
+                b.innerHTML = penData[id];
+                b.onclick = () => tryPlacePenItem(id);
+                src.appendChild(b);
+            });
+
+            tgt.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-4 w-full text-center border-b border-slate-100 pb-2">程式組裝區</p>';
+            
+            for (let i = 1; i <= 6; i++) {
+                const row = document.createElement('div');
+                row.className = "flex items-center gap-3 w-full mb-2";
+                
+                const desc = document.createElement('div');
+                desc.className = "text-xs font-bold text-slate-500 w-1/2 text-right tracking-wide";
+                desc.textContent = penDesc[i];
+                
+                const slot = document.createElement('div');
+                slot.className = "w-1/2";
+                
+                if (tPen.includes(i)) {
+                    slot.innerHTML = penData[i];
+                } else {
+                    slot.innerHTML = `<div class="border-2 border-dashed border-slate-300 rounded-md bg-slate-50 h-9 flex items-center justify-center text-[10px] text-slate-400 font-bold shadow-inner">等待積木...</div>`;
+                }
+                
+                row.appendChild(desc);
+                row.appendChild(slot);
+                tgt.appendChild(row);
+            }
+        }
+
+        function playPenAnimation() {
+            const svgContainer = document.getElementById('pen-svg-container');
+            if(!svgContainer) return;
+            
+            svgContainer.innerHTML = `
+                <div class="sim-badge">即時動畫</div>
+                <svg viewBox="0 0 200 150" class="w-full h-full bg-slate-50 rounded-2xl" preserveAspectRatio="xMidYMid meet">
+                    <line x1="50" y1="75" x2="150" y2="75" stroke="#CBD5E1" stroke-width="1" stroke-dasharray="2"/>
+                    <text x="50" y="90" font-size="8" fill="#94A3B8" font-family="sans-serif">起點</text>
+                    <text x="135" y="90" font-size="8" fill="#94A3B8" font-family="sans-serif">移動 100 點</text>
+                    
+                    <path d="M 50 75 L 150 75" fill="none" stroke="#EF4444" stroke-width="5" stroke-dasharray="100" stroke-dashoffset="100" stroke-linecap="round">
+                        <animate attributeName="stroke-dashoffset" values="100;0;0" keyTimes="0;0.5;1" dur="2s" fill="freeze" />
+                    </path>
+                    
+                    <g>
+                        <animateMotion path="M 50 75 L 150 75" dur="2s" keyTimes="0;0.5;1" calcMode="linear" fill="freeze" />
+                        <rect x="-6" y="-6" width="12" height="12" fill="#F59E0B" rx="2" />
+                        <circle cx="0" cy="0" r="2" fill="white" />
+                    </g>
+                </svg>
+            `;
+        }
+
+        // ====== 第二階段：手動繪製正方形遊戲 ======
+        const sqData = {
+            1: '<div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-3 py-1.5 rounded-md font-bold text-[10px] shadow-sm w-full text-left">移動 <span class="bg-white text-slate-800 px-2 py-0.5 rounded-full mx-1">100</span> 點</div>',
+            3: '<div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-3 py-1.5 rounded-md font-bold text-[10px] shadow-sm w-full text-left">移動 <span class="bg-white text-slate-800 px-2 py-0.5 rounded-full mx-1">100</span> 點</div>',
+            5: '<div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-3 py-1.5 rounded-md font-bold text-[10px] shadow-sm w-full text-left">移動 <span class="bg-white text-slate-800 px-2 py-0.5 rounded-full mx-1">100</span> 點</div>',
+            7: '<div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-3 py-1.5 rounded-md font-bold text-[10px] shadow-sm w-full text-left">移動 <span class="bg-white text-slate-800 px-2 py-0.5 rounded-full mx-1">100</span> 點</div>',
+            2: '<div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-3 py-1.5 rounded-md font-bold text-[10px] shadow-sm w-full text-left">右轉 ↻ <span class="bg-white text-slate-800 px-2 py-0.5 rounded-full mx-1">90</span> 度</div>',
+            4: '<div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-3 py-1.5 rounded-md font-bold text-[10px] shadow-sm w-full text-left">右轉 ↻ <span class="bg-white text-slate-800 px-2 py-0.5 rounded-full mx-1">90</span> 度</div>',
+            6: '<div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-3 py-1.5 rounded-md font-bold text-[10px] shadow-sm w-full text-left">右轉 ↻ <span class="bg-white text-slate-800 px-2 py-0.5 rounded-full mx-1">90</span> 度</div>',
+            8: '<div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-3 py-1.5 rounded-md font-bold text-[10px] shadow-sm w-full text-left">右轉 ↻ <span class="bg-white text-slate-800 px-2 py-0.5 rounded-full mx-1">90</span> 度</div>',
+            9: '<div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-3 py-1.5 rounded-md font-bold text-[10px] shadow-sm w-full text-left">停筆</div>'
+        };
+
+        const sqDesc = {
+            1: "第 1 條邊", 2: "轉彎", 3: "第 2 條邊", 4: "轉彎",
+            5: "第 3 條邊", 6: "轉彎", 7: "第 4 條邊", 8: "轉回方向",
+            9: "結束繪圖"
+        };
+
+        let cSq = [];
+        let tSq = [];
+        let sqInterval = null;
+
+        function initSqGame() {
+            cSq = [1, 2, 3, 4, 5, 6, 7, 8, 9].sort(() => Math.random() - 0.5);
+            tSq = [];
+            const msgEl = document.getElementById('sq-flow-msg');
+            if(msgEl) msgEl.textContent = "";
+            renderSqGame();
+        }
+
+        function tryPlaceSqItem(id) {
+            const len = tSq.length;
+            let valid = false;
+            
+            if (len < 8) {
+                const isEvenLen = len % 2 === 0;
+                const isMoveBlock = id % 2 !== 0 && id !== 9; 
+                const isTurnBlock = id % 2 === 0; 
+
+                if (isEvenLen && isMoveBlock) valid = true;
+                if (!isEvenLen && isTurnBlock) valid = true;
+            } else if (len === 8 && id === 9) {
+                valid = true;
+            }
+
+            const msg = document.getElementById('sq-flow-msg');
+            if(!msg) return;
+            
+            if (valid) {
+                cSq = cSq.filter(x => x !== id);
+                tSq.push(id);
+                msg.textContent = "✅ 放置正確！";
+                msg.className = "text-sm font-bold text-emerald-600";
+                
+                if (tSq.length === 9) {
+                    msg.innerHTML = "🎉 串接完成！真的太長啦！觀看動畫吧！ <button onclick='playSqAnimation()' class='ml-3 bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-sm transition'>重新播放 ➔</button>";
+                    playSqAnimation();
+                }
+                renderSqGame();
+            } else {
+                msg.textContent = "❌ 順序不對喔！正方形是「移動 ➔ 轉向」規律交替，最後再「停筆」。";
+                msg.className = "text-sm font-bold text-rose-500";
+            }
+        }
+
+        function renderSqGame() {
+            const src = document.getElementById('sq-source-container');
+            const tgt = document.getElementById('sq-target-container');
+            if(!src || !tgt) return;
+            
+            src.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-4 w-full text-center border-b border-slate-100 pb-2">待排積木區</p>';
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-2 gap-2';
+            cSq.forEach(id => {
+                const b = document.createElement('button');
+                b.className = "w-full transform hover:scale-[1.02] transition-transform text-left";
+                b.innerHTML = sqData[id];
+                b.onclick = () => tryPlaceSqItem(id);
+                grid.appendChild(b);
+            });
+            src.appendChild(grid);
+
+            tgt.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-4 w-full text-center border-b border-slate-100 pb-2">程式組裝區</p>';
+            
+            // 預先放好的畫筆積木
+            const preBlocks = [
+                {desc: "初始化", html: '<div class="bg-[#FF6680] border-b-[3px] border-[#FF3355] text-white px-3 py-1.5 rounded-md font-bold text-[10px] shadow-sm w-full text-center">畫筆設定</div>'},
+                {desc: "準備畫圖", html: '<div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-3 py-1.5 rounded-md font-bold text-[10px] shadow-sm w-full text-center">下筆</div>'}
+            ];
+
+            preBlocks.forEach(blk => {
+                const row = document.createElement('div');
+                row.className = "flex items-center gap-3 w-full mb-1 opacity-70";
+                row.innerHTML = `
+                    <div class="text-[11px] font-bold text-slate-500 w-1/3 text-right tracking-wide">${blk.desc}</div>
+                    <div class="w-2/3">${blk.html}</div>
+                `;
+                tgt.appendChild(row);
+            });
+
+            const arrowRow = document.createElement('div');
+            arrowRow.className = "flex items-center gap-3 w-full mb-1 opacity-70";
+            arrowRow.innerHTML = `<div class="w-1/3"></div><div class="w-2/3 flex justify-center text-[10px] font-bold text-slate-300">⬇</div>`;
+            tgt.appendChild(arrowRow);
+
+            // 動態遊戲積木
+            for (let i = 0; i < 9; i++) {
+                const row = document.createElement('div');
+                row.className = "flex items-center gap-3 w-full mb-1";
+                
+                const desc = document.createElement('div');
+                desc.className = "text-[11px] font-bold text-slate-500 w-1/3 text-right tracking-wide";
+                desc.textContent = sqDesc[i+1];
+                
+                const slot = document.createElement('div');
+                slot.className = "w-2/3";
+                
+                if (i < tSq.length) {
+                    slot.innerHTML = sqData[tSq[i]];
+                } else {
+                    slot.innerHTML = `<div class="border-2 border-dashed border-slate-300 rounded-md bg-slate-50 h-8 flex items-center justify-center text-[10px] text-slate-400 font-bold shadow-inner">等待積木...</div>`;
+                }
+                
+                row.appendChild(desc);
+                row.appendChild(slot);
+                tgt.appendChild(row);
+            }
+        }
+
+        function playSqAnimation() {
+            if (sqInterval) clearInterval(sqInterval);
+            const svgContainer = document.getElementById('sq-svg-container');
+            if(!svgContainer) return;
+            
+            svgContainer.innerHTML = `
+                <div class="sim-badge">即時動畫</div>
+                <svg id="sq-svg" viewBox="0 0 200 150" class="w-full h-full bg-slate-50 rounded-2xl" preserveAspectRatio="xMidYMid meet"></svg>
+            `;
+
+            const svg = document.getElementById('sq-svg');
+            const drawLength = 80;
+            let x = 100 - (drawLength / 2);
+            let y = 75 - (drawLength / 2);
+            let points = [
+                {x, y},
+                {x: x + drawLength, y},
+                {x: x + drawLength, y: y + drawLength},
+                {x, y: y + drawLength},
+                {x, y}
+            ];
+
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("fill", "none");
+            path.setAttribute("stroke", "#10B981");
+            path.setAttribute("stroke-width", "4");
+            path.setAttribute("stroke-linecap", "round");
+            path.setAttribute("stroke-linejoin", "round");
+            svg.appendChild(path);
+
+            const sprite = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            sprite.innerHTML = `<rect x="-6" y="-6" width="12" height="12" fill="#F59E0B" rx="2" /><circle cx="0" cy="0" r="2" fill="white" />`;
+            svg.appendChild(sprite);
+
+            let step = 0;
+            let pathString = `M ${points[0].x} ${points[0].y}`;
+            path.setAttribute("d", pathString);
+            sprite.setAttribute("transform", `translate(${points[0].x}, ${points[0].y}) rotate(0)`);
+
+            sqInterval = setInterval(() => {
+                if (step >= 4) {
+                    clearInterval(sqInterval);
+                    return;
+                }
+                step++;
+                pathString += ` L ${points[step].x} ${points[step].y}`;
+                path.setAttribute("d", pathString);
+                sprite.setAttribute("transform", `translate(${points[step].x}, ${points[step].y}) rotate(${step * 90})`);
+            }, 600);
+        }
+
+        // ====== Lesson 3 填充題 ======
+        function checkLesson3Answers() {
+            const timesInput = document.getElementById('fill-times').value.trim();
+            const angleInput = document.getElementById('fill-angle').value.trim();
+            const feedback = document.getElementById('lesson-3-feedback');
+            
+            if(!feedback) return;
+            if (!timesInput || !angleInput) {
+                feedback.textContent = "請填寫完兩個空格再驗證喔！✍️";
+                feedback.className = "text-xs font-semibold text-amber-500 self-center";
+                return;
+            }
+
+            if (timesInput === '4' && angleInput === '90') {
+                feedback.textContent = "太厲害了！回答正確！🎉 正方形共有 4 條邊，外角旋轉 360° ÷ 4 = 90°！";
+                feedback.className = "text-xs font-semibold text-emerald-600 self-center animate-pulse";
+            } else {
+                feedback.textContent = "哎呀，再想一想喔！往下方的「實戰設計區」實驗看看吧！💡";
+                feedback.className = "text-xs font-semibold text-rose-500 self-center";
+            }
+        }
+
+        // ====== 實戰程式設計區 (多邊形挑戰) ======
+        let polyInterval = null;
+
+        function setPolygonPreset(sides) {
+            const nInput = document.getElementById('poly-n');
+            const angleInput = document.getElementById('poly-angle');
+            
+            if (!sides) {
+                nInput.value = '';
+                angleInput.value = '';
+            } else {
+                nInput.value = sides;
+                angleInput.value = ''; 
+            }
+            
+            document.getElementById('poly-svg').innerHTML = '';
+            const fb = document.getElementById('poly-feedback');
+            fb.textContent = `已選擇目標：正 ${sides ? sides : 'N'} 邊形，請填寫旋轉角度！`;
+            fb.className = "bg-indigo-600 text-white rounded-b-2xl p-4 text-sm font-medium transition-colors duration-300 text-center shadow-md";
+        }
+
+        function runPolygonLab() {
+            if (polyInterval) clearInterval(polyInterval);
+            
+            const nInput = parseInt(document.getElementById('poly-n').value);
+            const angleInput = parseFloat(document.getElementById('poly-angle').value);
+            const fb = document.getElementById('poly-feedback');
+            const svg = document.getElementById('poly-svg');
+            const formulaReveal = document.getElementById('poly-formula-reveal');
+
+            if (isNaN(nInput) || nInput < 3) {
+                fb.textContent = "❌ 錯誤：多邊形最少需要 3 條邊喔！";
+                fb.className = "bg-rose-500 text-white rounded-b-2xl p-4 text-sm font-bold transition-colors duration-300 text-center shadow-md";
+                return;
+            }
+            if (isNaN(angleInput)) {
+                fb.textContent = "❌ 錯誤：請輸入每次右轉的度數！";
+                fb.className = "bg-rose-500 text-white rounded-b-2xl p-4 text-sm font-bold transition-colors duration-300 text-center shadow-md";
+                return;
+            }
+
+            svg.innerHTML = '';
+            fb.textContent = "⚙️ 探測車啟動，正在繪圖中...";
+            fb.className = "bg-slate-700 text-slate-200 rounded-b-2xl p-4 text-sm font-medium transition-colors duration-300 text-center shadow-inner";
+
+            let length = 55; 
+            if (nInput > 8) { length = 300 / nInput; }
+            
+            let x = 100 - (length/2);
+            let y = 45; 
+            
+            if (nInput === 3) { y = 55; }
+            else if (nInput === 5) { y = 35; x = 100 - (length/2); }
+            else if (nInput > 5) { y = 25; x = 100 - (length/2); }
+
+            let currentAngle = 0; 
+            let points = [{x, y, angle: 0}];
+
+            for (let i = 0; i < nInput; i++) {
+                let rad = currentAngle * Math.PI / 180;
+                x += Math.cos(rad) * length;
+                y += Math.sin(rad) * length;
+                points.push({x, y, angle: currentAngle + angleInput});
+                currentAngle += angleInput;
+            }
+
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("fill", "none");
+            path.setAttribute("stroke", "#4F46E5");
+            path.setAttribute("stroke-width", "3");
+            path.setAttribute("stroke-linecap", "round");
+            path.setAttribute("stroke-linejoin", "round");
+            svg.appendChild(path);
+
+            const sprite = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            sprite.innerHTML = `<rect x="-6" y="-6" width="12" height="12" fill="#F59E0B" rx="2" /><circle cx="0" cy="0" r="2" fill="white" />`;
+            svg.appendChild(sprite);
+
+            let step = 0;
+            let pathString = `M ${points[0].x} ${points[0].y}`;
+            path.setAttribute("d", pathString);
+            sprite.setAttribute("transform", `translate(${points[0].x}, ${points[0].y}) rotate(${points[0].angle})`);
+
+            polyInterval = setInterval(() => {
+                if (step >= nInput) {
+                    clearInterval(polyInterval);
+                    const totalRotation = nInput * angleInput;
+                    if (Math.abs(totalRotation - 360) < 0.1 || (totalRotation > 360 && totalRotation % 360 === 0)) {
+                        fb.textContent = `🎉 完美閉合！ ${nInput} 次 × ${angleInput}° 剛好轉了 ${totalRotation} 度！`;
+                        fb.className = "bg-emerald-500 text-white rounded-b-2xl p-4 text-sm font-bold transition-colors duration-300 text-center shadow-lg";
+                        if(formulaReveal) formulaReveal.classList.remove('hidden');
+                    } else {
+                        fb.textContent = `🤔 哎呀，圖形沒有接在一起！(提示: 360 ÷ ${nInput} = ?)`;
+                        fb.className = "bg-amber-500 text-white rounded-b-2xl p-4 text-sm font-bold transition-colors duration-300 text-center shadow-lg";
+                    }
+                    return;
+                }
+                step++;
+                pathString += ` L ${points[step].x} ${points[step].y}`;
+                path.setAttribute("d", pathString);
+                sprite.setAttribute("transform", `translate(${points[step].x}, ${points[step].y}) rotate(${points[step].angle})`);
+            }, 600); 
+        }
+
+        // 初始化遊戲
+        document.addEventListener("DOMContentLoaded", () => {
+            initPenGame();
+            initSqGame();
+        });
+    </script>
+</body>
+</html>

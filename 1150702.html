@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LESSON 2 - 邏輯的大腦：程式三大結構</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #F8F9FA; color: #333333; }
+        .slide-up-fade { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        .hidden-view { display: none !important; }
+    </style>
+</head>
+<body class="antialiased selection:bg-slate-200 selection:text-slate-800">
+
+    <header class="bg-white border-b border-gray-100 pt-8 pb-12 slide-up-fade">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8">
+            <!-- 返回網站首頁按鈕 -->
+            <div class="mb-6">
+                <a href="https://su-yung-sheng.github.io/unforte115/" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> 
+                    返回網站首頁
+                </a>
+            </div>
+            <p class="text-sm font-medium text-indigo-500 mb-2 tracking-widest uppercase">演算法與程式設計</p>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight">星際防禦工程師：<br class="hidden md:block">用程式編織能量防護網</h1>
+            <p class="text-lg text-slate-500 font-light max-w-2xl">結合「IPO 思維」與「重複結構」，循序漸進建立邏輯思維與幾何繪圖能力，並透過實作防禦網任務，體驗程式設計的強大魔力。</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 lg:px-8 py-12 relative">
+        <a href="https://su-yung-sheng.github.io/unforte115/1150700.html" class="mb-6 inline-flex items-center text-sm font-medium text-slate-400 hover:text-slate-800 transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 返回課程總覽
+        </a>
+        
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-10 mb-8 relative slide-up-fade">
+            <span class="text-sm font-semibold text-slate-400 tracking-wider block mb-2">LESSON 2</span>
+            <h2 class="text-3xl font-bold text-slate-800 mb-4">邏輯的大腦：程式三大結構</h2>
+            <p class="text-slate-500 font-light text-base mb-8">建構防禦網的邏輯大腦！運算思維第一步是「拆解問題」。請依序透過<strong class="text-slate-700">數值實驗</strong>、<strong class="text-slate-700">判斷 IPO</strong>，最後挑戰<strong class="text-slate-700">重組流程圖</strong>，校準防護系統。通關後會獲得系統授權標記喔！</p>
+            
+            <div class="flex border-b border-slate-200 mb-8 overflow-x-auto relative z-10">
+                <button id="l2-tab-seq" onclick="switchL2Tab('seq')" class="px-6 py-3 text-sm font-bold border-b-2 transition-all whitespace-nowrap flex items-center text-emerald-600 border-emerald-500">1. 循序結構 <span id="mark-seq" class="ml-1"></span></button>
+                <button id="l2-tab-sel" onclick="switchL2Tab('sel')" class="px-6 py-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-all whitespace-nowrap flex items-center">2. 選擇結構 <span id="mark-sel" class="ml-1"></span></button>
+                <button id="l2-tab-rep" onclick="switchL2Tab('rep')" class="px-6 py-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-all whitespace-nowrap flex items-center">3. 重複結構 <span id="mark-rep" class="ml-1"></span></button>
+            </div>
+
+            <!-- Seq Tab -->
+            <div id="l2-content-seq" class="l2-tab-content space-y-8">
+                <div class="flex items-center mb-2">
+                    <span class="bg-emerald-100 text-emerald-600 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mr-3">1</span>
+                    <h3 class="text-2xl font-bold text-slate-800">循序結構：計算 A + B 的平均數</h3>
+                </div>
+                <p class="text-slate-500 font-light mb-6">程式會按照指令的先後順序，由上而下一步一步執行。</p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- 左欄：步驟一、二 -->
+                    <div class="space-y-8">
+                        <!-- 步驟一：IPO 實驗室 -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h4 class="text-lg font-bold text-slate-700 mb-3 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">1</span> 步驟一：IPO 運算實驗室
+                            </h4>
+                            <p class="text-sm text-slate-500 mb-4 font-light">先動手輸入數字，觀察電腦計算後輸出的結果，體驗程式的運作。</p>
+                            <div class="flex items-center gap-2 mb-4 bg-slate-50 p-4 rounded-xl">
+                                <input type="number" id="seq-a" placeholder="A" class="w-16 border border-slate-300 rounded p-1.5 text-center font-bold text-sm focus:border-emerald-500 focus:outline-none"> 
+                                <span class="font-bold text-slate-400">+</span>
+                                <input type="number" id="seq-b" placeholder="B" class="w-16 border border-slate-300 rounded p-1.5 text-center font-bold text-sm focus:border-emerald-500 focus:outline-none">
+                                <button onclick="runSeqCalc()" class="ml-auto text-xs font-bold bg-slate-800 text-white px-4 py-2 rounded hover:bg-slate-700 transition shadow-sm">計算</button>
+                            </div>
+                            <div id="seq-out" class="text-sm font-medium text-slate-600 bg-emerald-50 text-emerald-800 p-4 rounded border border-emerald-100 min-h-[50px] flex items-center justify-center text-center">等待輸入數值...</div>
+                        </div>
+
+                        <!-- 步驟二：判斷 IPO -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm" id="seq-ipo-quiz">
+                            <h4 class="text-lg font-bold text-slate-700 mb-3 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">2</span> 步驟二：判斷 IPO (輸入-處理-輸出)
+                            </h4>
+                            <p class="text-sm text-slate-500 mb-4 font-light">剛剛的實驗中，哪些動作屬於 Input、Process、Output？請幫它們配對。</p>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between items-center bg-emerald-50/50 p-3 border border-emerald-100 rounded-lg">
+                                    <span class="font-bold text-emerald-700">Input (輸入):</span>
+                                    <select id="sel-seq-input" class="border border-slate-300 rounded p-1.5 bg-white focus:outline-none focus:border-emerald-500 text-slate-600 font-medium">
+                                        <option value="">請選擇...</option><option value="in">輸入 A 值, 輸入 B 值</option><option value="proc">平均數 = (A+B)/2</option><option value="out">輸出平均數</option>
+                                    </select>
+                                </div>
+                                <div class="flex justify-between items-center bg-indigo-50/50 p-3 border border-indigo-100 rounded-lg">
+                                    <span class="font-bold text-indigo-700">Process (處理):</span>
+                                    <select id="sel-seq-proc" class="border border-slate-300 rounded p-1.5 bg-white focus:outline-none focus:border-indigo-500 text-slate-600 font-medium">
+                                        <option value="">請選擇...</option><option value="in">輸入 A 值, 輸入 B 值</option><option value="proc">平均數 = (A+B)/2</option><option value="out">輸出平均數</option>
+                                    </select>
+                                </div>
+                                <div class="flex justify-between items-center bg-rose-50/50 p-3 border border-rose-100 rounded-lg">
+                                    <span class="font-bold text-rose-700">Output (輸出):</span>
+                                    <select id="sel-seq-out" class="border border-slate-300 rounded p-1.5 bg-white focus:outline-none focus:border-rose-500 text-slate-600 font-medium">
+                                        <option value="">請選擇...</option><option value="in">輸入 A 值, 輸入 B 值</option><option value="proc">平均數 = (A+B)/2</option><option value="out">輸出平均數</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-5 flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <p id="seq-ipo-msg" class="text-sm font-bold"></p>
+                                <button onclick="checkSeqIPO()" class="bg-slate-800 text-white px-5 py-2 rounded text-sm font-bold hover:bg-slate-700 transition shadow-sm ml-auto">驗證配對</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右欄：步驟三 -->
+                    <div class="space-y-8">
+                        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm h-full flex flex-col">
+                            <h4 class="text-xs font-bold text-slate-400 mb-2 tracking-wider uppercase">參考：程式 Pseudo Code</h4>
+                            <div class="bg-white border border-slate-200 rounded-xl p-4 text-xs font-mono text-slate-600 whitespace-pre-wrap leading-relaxed shadow-sm mb-8">
+[輸入 Input]
+詢問 "請輸入數字A" 並等待 ➔ 設為 變數 A
+詢問 "請輸入數字B" 並等待 ➔ 設為 變數 B
+
+[處理 Process]
+變數 平均數 設為 (變數 A + 變數 B) / 2
+
+[輸出 Output]
+說出字串組合 "平均數是 " + 變數 平均數
+                            </div>
+
+                            <h4 class="text-lg font-bold text-slate-700 mb-3 flex items-center border-b border-slate-200 pb-3">
+                                <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">3</span> 步驟三：挑戰重組流程圖
+                            </h4>
+                            <p class="text-sm text-slate-500 mb-4 font-light">依據剛才拆解好的 IPO 邏輯，把左側的積木依序排入右側流程圖中！</p>
+                            
+                            <div class="flex flex-col sm:flex-row gap-4 mb-4 flex-grow">
+                                <div class="w-full sm:w-1/3 bg-white border border-slate-200 rounded-xl p-3 min-h-[220px] shadow-inner" id="seq-source-container"></div>
+                                <div class="w-full sm:w-2/3 bg-white border-2 border-dashed border-slate-300 rounded-xl p-3 flex flex-col items-center min-h-[220px]" id="seq-target-container"></div>
+                            </div>
+                            <div class="flex justify-end h-6 mb-6"><span id="seq-flow-msg" class="text-sm font-bold transition-all"></span></div>
+
+                            <div id="seq-scratch-wrapper" class="hidden border-t border-slate-200 pt-5 mt-auto bg-white p-5 rounded-xl shadow-sm">
+                                <h4 class="text-sm font-bold text-slate-700 mb-3 flex items-center">✨ 成功！Scratch 積木對照</h4>
+                                <div id="seq-scratch-list" class="flex flex-col gap-2 overflow-x-auto pb-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sel Tab -->
+            <div id="l2-content-sel" class="l2-tab-content hidden-view space-y-8">
+                <div class="flex items-center mb-2">
+                    <span class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mr-3">2</span>
+                    <h3 class="text-2xl font-bold text-slate-800">選擇結構：判斷及格</h3>
+                </div>
+                <p class="text-slate-500 font-light mb-6">學期成績 = 作業*0.4 + 測驗*0.4 + 平時*0.2。程式會依據條件結果，走不同的分支路線。</p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- 左欄：步驟一、二 -->
+                    <div class="space-y-8">
+                        <!-- 步驟一：IPO 實驗室 -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h4 class="text-lg font-bold text-slate-700 mb-3 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">1</span> 步驟一：IPO 運算實驗室
+                            </h4>
+                            <p class="text-sm text-slate-500 mb-4 font-light">先動手輸入各項成績，觀察電腦計算後判斷及格與否的結果。</p>
+                            <div class="space-y-3 mb-4 bg-slate-50 p-4 rounded-xl text-sm font-medium text-slate-600">
+                                <div class="flex items-center justify-between"><span>作業成績 (40%)：</span><input type="number" id="sel-hw" placeholder="0-100" class="w-16 border border-slate-300 rounded p-1.5 text-center font-bold focus:border-indigo-500 focus:outline-none"></div>
+                                <div class="flex items-center justify-between"><span>測驗成績 (40%)：</span><input type="number" id="sel-test" placeholder="0-100" class="w-16 border border-slate-300 rounded p-1.5 text-center font-bold focus:border-indigo-500 focus:outline-none"></div>
+                                <div class="flex items-center justify-between"><span>平時表現 (20%)：</span><input type="number" id="sel-daily" placeholder="0-100" class="w-16 border border-slate-300 rounded p-1.5 text-center font-bold focus:border-indigo-500 focus:outline-none"></div>
+                            </div>
+                            <button onclick="runSelCalc()" class="w-full bg-slate-800 text-white px-4 py-2.5 rounded hover:bg-slate-700 transition shadow-sm text-sm font-bold mb-4">判斷成績</button>
+                            <div id="sel-out" class="text-sm font-bold text-slate-600 bg-indigo-50 text-indigo-800 p-4 rounded border border-indigo-100 min-h-[50px] flex items-center justify-center text-center">等待輸入數值...</div>
+                        </div>
+
+                        <!-- 步驟二：判斷 IPO -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm" id="sel-ipo-quiz">
+                            <h4 class="text-lg font-bold text-slate-700 mb-3 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">2</span> 步驟二：判斷 IPO (輸入-處理-輸出)
+                            </h4>
+                            <p class="text-sm text-slate-500 mb-4 font-light">回想剛才的成績計算，幫它們分類配對吧！</p>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between items-center bg-emerald-50/50 p-3 border border-emerald-100 rounded-lg">
+                                    <span class="font-bold text-emerald-700">Input (輸入):</span>
+                                    <select id="sel-sel-input" class="border border-slate-300 rounded p-1.5 bg-white focus:outline-none focus:border-emerald-500 text-slate-600 font-medium">
+                                        <option value="">請選擇...</option><option value="in">輸入各項成績</option><option value="proc">計算並判斷及格</option><option value="out">說出結果</option>
+                                    </select>
+                                </div>
+                                <div class="flex justify-between items-center bg-indigo-50/50 p-3 border border-indigo-100 rounded-lg">
+                                    <span class="font-bold text-indigo-700">Process (處理):</span>
+                                    <select id="sel-sel-proc" class="border border-slate-300 rounded p-1.5 bg-white focus:outline-none focus:border-indigo-500 text-slate-600 font-medium">
+                                        <option value="">請選擇...</option><option value="in">輸入各項成績</option><option value="proc">計算並判斷及格</option><option value="out">說出結果</option>
+                                    </select>
+                                </div>
+                                <div class="flex justify-between items-center bg-rose-50/50 p-3 border border-rose-100 rounded-lg">
+                                    <span class="font-bold text-rose-700">Output (輸出):</span>
+                                    <select id="sel-sel-out" class="border border-slate-300 rounded p-1.5 bg-white focus:outline-none focus:border-rose-500 text-slate-600 font-medium">
+                                        <option value="">請選擇...</option><option value="in">輸入各項成績</option><option value="proc">計算並判斷及格</option><option value="out">說出結果</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-5 flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <p id="sel-ipo-msg" class="text-sm font-bold"></p>
+                                <button onclick="checkSelIPO()" class="bg-slate-800 text-white px-5 py-2 rounded text-sm font-bold hover:bg-slate-700 transition shadow-sm ml-auto">驗證配對</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右欄：步驟三 -->
+                    <div class="space-y-8">
+                        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm h-full flex flex-col">
+                            <h4 class="text-xs font-bold text-slate-400 mb-2 tracking-wider uppercase">參考：程式 Pseudo Code</h4>
+                            <div class="bg-white border border-slate-200 rounded-xl p-4 text-xs font-mono text-slate-600 whitespace-pre-wrap leading-relaxed shadow-sm mb-8">
+[輸入 Input]
+詢問各項成績 ➔ 設為變數
+
+[處理 Process]
+學期成績 設為 (作業*0.4 + 測驗*0.4 + 平時*0.2)
+
+[輸出 Output]
+如果 (學期成績 < 60) 那麼：說出 "不及格"
+否則：說出 "及格"
+                            </div>
+
+                            <h4 class="text-lg font-bold text-slate-700 mb-3 flex items-center border-b border-slate-200 pb-3">
+                                <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">3</span> 步驟三：挑戰重組流程圖
+                            </h4>
+                            <p class="text-sm text-slate-500 mb-4 font-light">依據拆解好的邏輯，把左側的積木依序排入右側具有分支判斷的流程圖中！</p>
+                            
+                            <div class="flex flex-col sm:flex-row gap-4 mb-4 flex-grow">
+                                <div class="w-full sm:w-1/3 bg-white border border-slate-200 rounded-xl p-3 min-h-[220px] shadow-inner" id="sel-source-container"></div>
+                                <div class="w-full sm:w-2/3 bg-white border-2 border-dashed border-slate-300 rounded-xl p-3 flex flex-col items-center min-h-[220px]" id="sel-target-container"></div>
+                            </div>
+                            <div class="flex justify-end h-6 mb-6"><span id="sel-flow-msg" class="text-sm font-bold transition-all"></span></div>
+
+                            <div id="sel-scratch-wrapper" class="hidden border-t border-slate-200 pt-5 mt-auto bg-white p-5 rounded-xl shadow-sm">
+                                <h4 class="text-sm font-bold text-slate-700 mb-3 flex items-center">✨ 成功！Scratch 積木對照</h4>
+                                <div id="sel-scratch-list" class="flex flex-col gap-2 overflow-x-auto pb-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rep Tab -->
+            <div id="l2-content-rep" class="l2-tab-content hidden-view space-y-8">
+                <div class="flex items-center mb-2">
+                    <span class="bg-rose-100 text-rose-600 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mr-3">3</span>
+                    <h3 class="text-lg md:text-2xl font-bold text-slate-800">重複結構：計算 1加到N 的總和</h3>
+                </div>
+                <p class="text-slate-500 font-light mb-6">當程式需要多次執行類似工作時，只要設定條件並放進<strong class="text-slate-700">重複結構</strong>即可！</p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- 左欄：步驟一、二 -->
+                    <div class="space-y-8">
+                        <!-- 步驟一：IPO 實驗室 -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h4 class="text-lg font-bold text-slate-700 mb-3 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">1</span> 步驟一：IPO 運算實驗室
+                            </h4>
+                            <p class="text-sm text-slate-500 mb-4 font-light">試著輸入一個大數字，體驗電腦用重複迴圈瞬間算完累加的能力！</p>
+                            <div class="flex items-center gap-3 mb-4 bg-slate-50 p-4 rounded-xl">
+                                <span class="text-sm font-medium text-slate-600">計算 1 連續加到</span>
+                                <input type="number" id="iter-n" placeholder="N" class="w-20 border border-slate-300 rounded p-1.5 text-center font-bold text-sm focus:border-rose-500 focus:outline-none">
+                                <button onclick="runIterCalc()" class="ml-auto text-xs font-bold bg-slate-800 text-white px-4 py-2 rounded hover:bg-slate-700 transition shadow-sm">計算</button>
+                            </div>
+                            <div id="iter-out" class="text-sm font-bold text-slate-600 bg-rose-50 text-rose-800 p-4 rounded border border-rose-100 min-h-[50px] flex flex-col items-center justify-center text-center">等待輸入數值...</div>
+                        </div>
+
+                        <!-- 步驟二：判斷 IPO -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm" id="rep-ipo-quiz">
+                            <h4 class="text-lg font-bold text-slate-700 mb-3 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">2</span> 步驟二：判斷 IPO (輸入-處理-輸出)
+                            </h4>
+                            <p class="text-sm text-slate-500 mb-4 font-light">想想看，在這個累加程式中，哪些步驟屬於哪個環節？</p>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between items-center bg-emerald-50/50 p-3 border border-emerald-100 rounded-lg">
+                                    <span class="font-bold text-emerald-700">Input (輸入):</span>
+                                    <select id="sel-rep-input" class="border border-slate-300 rounded p-1.5 bg-white focus:outline-none focus:border-emerald-500 text-slate-600 font-medium">
+                                        <option value="">請選擇...</option><option value="in">變數歸零，輸入目標數字 N</option><option value="proc">重複 N 次：數字+1，和累加數字</option><option value="out">輸出最後的 和</option>
+                                    </select>
+                                </div>
+                                <div class="flex justify-between items-center bg-indigo-50/50 p-3 border border-indigo-100 rounded-lg">
+                                    <span class="font-bold text-indigo-700">Process (處理):</span>
+                                    <select id="sel-rep-proc" class="border border-slate-300 rounded p-1.5 bg-white focus:outline-none focus:border-indigo-500 text-slate-600 font-medium">
+                                        <option value="">請選擇...</option><option value="in">變數歸零，輸入目標數字 N</option><option value="proc">重複 N 次：數字+1，和累加數字</option><option value="out">輸出最後的 和</option>
+                                    </select>
+                                </div>
+                                <div class="flex justify-between items-center bg-rose-50/50 p-3 border border-rose-100 rounded-lg">
+                                    <span class="font-bold text-rose-700">Output (輸出):</span>
+                                    <select id="sel-rep-out" class="border border-slate-300 rounded p-1.5 bg-white focus:outline-none focus:border-rose-500 text-slate-600 font-medium">
+                                        <option value="">請選擇...</option><option value="in">變數歸零，輸入目標數字 N</option><option value="proc">重複 N 次：數字+1，和累加數字</option><option value="out">輸出最後的 和</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-5 flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <p id="rep-ipo-msg" class="text-sm font-bold"></p>
+                                <button onclick="checkRepIPO()" class="bg-slate-800 text-white px-5 py-2 rounded text-sm font-bold hover:bg-slate-700 transition shadow-sm ml-auto">驗證配對</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右欄：步驟三 -->
+                    <div class="space-y-8">
+                        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm h-full flex flex-col">
+                            <h4 class="text-xs font-bold text-slate-400 mb-2 tracking-wider uppercase">參考：程式 Pseudo Code</h4>
+                            <div class="bg-white border border-slate-200 rounded-xl p-4 text-xs font-mono text-slate-600 whitespace-pre-wrap leading-relaxed shadow-sm mb-8">
+[輸入與初始化 Input]
+變數 和 設為 0
+變數 數字 設為 0
+詢問 "N" 並等待 ➔ 設為變數 N
+
+[處理 Process]
+重複 (N) 次：
+  數字 = 數字 + 1
+  和 = 和 + 數字
+
+[輸出 Output]
+說出變數 和
+                            </div>
+
+                            <h4 class="text-lg font-bold text-slate-700 mb-3 flex items-center border-b border-slate-200 pb-3">
+                                <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">3</span> 步驟三：挑戰重組流程圖
+                            </h4>
+                            <p class="text-sm text-slate-500 mb-4 font-light">把剛剛拆解出來的迴圈邏輯，依序排入右側的循環流程圖中！</p>
+                            
+                            <div class="flex flex-col sm:flex-row gap-4 mb-4 flex-grow">
+                                <div class="w-full sm:w-1/3 bg-white border border-slate-200 rounded-xl p-3 min-h-[220px] shadow-inner" id="rep-source-container"></div>
+                                <div class="w-full sm:w-2/3 bg-white border-2 border-dashed border-slate-300 rounded-xl p-3 flex flex-col items-center min-h-[220px]" id="rep-target-container"></div>
+                            </div>
+                            <div class="flex justify-end h-6 mb-6"><span id="rep-flow-msg" class="text-sm font-bold transition-all"></span></div>
+
+                            <div id="rep-scratch-wrapper" class="hidden border-t border-slate-200 pt-5 mt-auto bg-white p-5 rounded-xl shadow-sm">
+                                <h4 class="text-sm font-bold text-slate-700 mb-3 flex items-center">✨ 成功！Scratch 積木對照</h4>
+                                <div id="rep-scratch-list" class="flex flex-col gap-2 overflow-x-auto pb-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+        <div class="flex justify-between items-center">
+            <a href="https://su-yung-sheng.github.io/unforte115/1150701.html" class="text-sm text-slate-400 hover:text-slate-800 transition-colors">⬅ 上一個單元</a>
+            <a href="https://su-yung-sheng.github.io/unforte115/1150703.html" class="inline-block bg-white border border-gray-200 px-6 py-3 rounded-full font-medium text-sm hover:bg-slate-50 transition-colors">下一個單元 ➔</a>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div id="cert-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-slate-900/60 backdrop-blur-sm transition-opacity opacity-0 rounded-3xl">
+        <div class="bg-white p-10 rounded-3xl shadow-2xl text-center border-4 border-amber-400 max-w-lg transform scale-90 transition-transform duration-500 mx-4" id="cert-content">
+            <div class="text-6xl mb-4">🏆</div>
+            <h2 class="text-3xl font-bold text-amber-600 mb-4">恭喜通關！</h2>
+            <h3 class="text-xl font-bold text-slate-800 mb-4">程式思維邏輯大師 證書</h3>
+            <p class="text-slate-600 mb-8 text-sm leading-relaxed">你已成功掌握「循序」、「選擇」與「重複」三大程式核心結構，並具備優異的 IPO 拆解能力！</p>
+            <button onclick="closeCertificate()" class="bg-amber-500 text-white px-8 py-3 rounded-full font-bold hover:bg-amber-600 shadow-md transition-all">繼續</button>
+        </div>
+    </div>
+
+    <script>
+        // 核心邏輯
+        let l1QuizPassed = false;
+        let l2Completed = { seq: false, sel: false, rep: false };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            try {
+                l1QuizPassed = localStorage.getItem('unforte115_l1QuizPassed') === 'true';
+                l2Completed.seq = localStorage.getItem('unforte115_l2seq') === 'true';
+                l2Completed.sel = localStorage.getItem('unforte115_l2sel') === 'true';
+                l2Completed.rep = localStorage.getItem('unforte115_l2rep') === 'true';
+
+                if(l2Completed.seq) document.getElementById('mark-seq').innerText = '✅';
+                if(l2Completed.sel) document.getElementById('mark-sel').innerText = '✅';
+                if(l2Completed.rep) document.getElementById('mark-rep').innerText = '✅';
+            } catch(e) {}
+            
+            // 初始化第一個頁籤
+            switchL2Tab('seq');
+        });
+
+        function checkAllL2Completed() {
+            if (l2Completed.seq && l2Completed.sel && l2Completed.rep && l1QuizPassed) {
+                document.getElementById('cert-modal').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('cert-modal').classList.add('opacity-100');
+                    document.getElementById('cert-content').classList.remove('scale-90');
+                }, 50);
+            }
+        }
+
+        function closeCertificate() {
+            document.getElementById('cert-modal').classList.remove('opacity-100');
+            document.getElementById('cert-content').classList.add('scale-90');
+            setTimeout(() => document.getElementById('cert-modal').classList.add('hidden'), 300);
+        }
+
+        function switchL2Tab(tab) {
+            ['seq', 'sel', 'rep'].forEach(t => {
+                const btn = document.getElementById(`l2-tab-${t}`);
+                const content = document.getElementById(`l2-content-${t}`);
+                if(!btn || !content) return;
+                if (t === tab) {
+                    btn.classList.replace('text-slate-400', t==='seq'?'text-emerald-600':t==='sel'?'text-indigo-600':'text-rose-600');
+                    btn.classList.add(t==='seq'?'border-emerald-500':t==='sel'?'border-indigo-500':'border-rose-500');
+                    btn.classList.remove('border-transparent');
+                    content.classList.remove('hidden-view');
+                } else {
+                    btn.className = "px-6 py-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-all whitespace-nowrap flex items-center";
+                    content.classList.add('hidden-view');
+                }
+            });
+            if(tab === 'seq') initSeqGame();
+            if(tab === 'sel') initSelGame();
+            if(tab === 'rep') initRepGame();
+        }
+
+        // --- Sequence Game ---
+        const seqData = { 1: "開始", 2: "輸入 A 值", 3: "輸入 B 值", 4: "平均數 = (A+B)/2", 5: "輸出平均數", 6: "結束" };
+        const scratchDataSeq = {
+            1: '<div class="bg-yellow-400 px-2 py-1 rounded-t-xl rounded-b-md shadow-sm border-b-2 border-yellow-500 text-white whitespace-nowrap font-bold">當 🟢 綠旗被點擊</div>',
+            2: '<div class="flex flex-col gap-0.5 font-bold"><div class="bg-sky-400 px-2 py-1 rounded-md shadow-sm border-b-2 border-sky-500 text-white whitespace-nowrap flex items-center gap-1">詢問 <span class="bg-white text-slate-700 px-1 rounded font-bold">請輸入數字A</span> 並等待</div><div class="bg-orange-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-orange-600 text-white whitespace-nowrap flex items-center gap-1">變數 <span class="bg-orange-400 border border-orange-500 px-1 rounded font-bold">A</span> 設為 <span class="bg-sky-400 px-1.5 rounded-full border border-sky-500 shadow-inner font-bold">詢問的答案</span></div></div>',
+            3: '<div class="flex flex-col gap-0.5 font-bold"><div class="bg-sky-400 px-2 py-1 rounded-md shadow-sm border-b-2 border-sky-500 text-white whitespace-nowrap flex items-center gap-1">詢問 <span class="bg-white text-slate-700 px-1 rounded font-bold">請輸入數字B</span> 並等待</div><div class="bg-orange-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-orange-600 text-white whitespace-nowrap flex items-center gap-1">變數 <span class="bg-orange-400 border border-orange-500 px-1 rounded font-bold">B</span> 設為 <span class="bg-sky-400 px-1.5 rounded-full border border-sky-500 shadow-inner font-bold">詢問的答案</span></div></div>',
+            4: '<div class="bg-orange-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-orange-600 text-white whitespace-nowrap flex items-center gap-1 font-bold">變數 <span class="bg-orange-400 border border-orange-500 px-1 rounded font-bold">平均數</span> 設為 <span class="bg-green-500 px-1.5 py-0.5 rounded-full border border-green-600 shadow-inner font-bold">( <span class="bg-orange-400 border border-orange-500 px-1.5 rounded-full">變數A</span> + <span class="bg-orange-400 border border-orange-500 px-1.5 rounded-full">變數B</span> ) / 2</span></div>',
+            5: '<div class="bg-purple-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-purple-600 text-white whitespace-nowrap flex items-center gap-1 font-bold">說出 <div class="bg-green-500 px-1.5 py-0.5 rounded-full border border-green-600 shadow-inner flex items-center gap-1 font-bold">字串組合 <span class="bg-white text-slate-700 px-1 rounded font-bold">平均數是</span> <span class="bg-orange-400 border border-orange-500 px-1.5 rounded-full font-bold">變數 平均數</span></div> 持續 <span class="bg-white text-slate-700 px-1 rounded font-bold">2</span> 秒</div>',
+            6: '<div class="bg-yellow-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-yellow-600 text-white whitespace-nowrap font-bold">停止 <span class="bg-yellow-400 border border-yellow-500 px-1 rounded font-bold">全部</span></div>'
+        };
+        let cSeq = []; let tSeq = [];
+        function initSeqGame() {
+            cSeq = [1,2,3,4,5,6].sort(()=>Math.random()-0.5); tSeq = [];
+            document.getElementById('seq-flow-msg').textContent = "";
+            document.getElementById('seq-scratch-wrapper').classList.add('hidden');
+            
+            // 清空舊的輸入值
+            document.getElementById('sel-seq-input').value = "";
+            document.getElementById('sel-seq-proc').value = "";
+            document.getElementById('sel-seq-out').value = "";
+            document.getElementById('seq-ipo-msg').textContent = "";
+            
+            renderSeqGame();
+        }
+        function tryPlaceSeqItem(id) {
+            let len = tSeq.length; let v = false;
+            if(len===0 && id===1) v=true;
+            else if(len===1 && (id===2||id===3)) v=true;
+            else if(len===2 && ((tSeq[1]===2&&id===3)||(tSeq[1]===3&&id===2))) v=true;
+            else if(len===3 && id===4) v=true;
+            else if(len===4 && id===5) v=true;
+            else if(len===5 && id===6) v=true;
+            
+            const msg = document.getElementById('seq-flow-msg');
+            if(v) {
+                cSeq = cSeq.filter(x=>x!==id); tSeq.push(id);
+                msg.textContent="✅ 正確！請繼續排下一個。"; msg.className="text-sm font-bold text-emerald-600";
+                if(tSeq.length===6) {
+                    msg.textContent="🎉 太棒了！循序結構排序完成！下方已解鎖程式積木！";
+                }
+                renderSeqGame();
+            } else {
+                msg.textContent="❌ 順序不對！請再想一下步驟。"; msg.className="text-sm font-bold text-rose-500";
+            }
+        }
+        function renderSeqGame() {
+            const src = document.getElementById('seq-source-container');
+            const tgt = document.getElementById('seq-target-container');
+            // 修復並補上標題
+            src.innerHTML = '<p class="text-[10px] font-bold text-slate-400 mb-2 w-full text-center">待排積木 (點擊加入)</p>';
+            tgt.innerHTML = '<p class="text-[10px] font-bold text-slate-400 mb-2 w-full text-center">直式流程圖</p>';
+            
+            cSeq.forEach(id=>{
+                const b = document.createElement('button');
+                b.className="w-full bg-white border border-slate-300 p-2 rounded-lg text-xs font-bold mb-2 shadow-sm hover:bg-emerald-50 transition-colors";
+                b.textContent = seqData[id]; b.onclick = ()=>tryPlaceSeqItem(id);
+                src.appendChild(b);
+            });
+            const list = document.getElementById('seq-scratch-list');
+            if(list) list.innerHTML = '';
+            if(tSeq.length === 6) document.getElementById('seq-scratch-wrapper').classList.remove('hidden');
+            
+            tSeq.forEach((id, i)=>{
+                let colorClass = "bg-white border-slate-300 text-slate-700";
+                if (id === 1 || id === 6) colorClass = "bg-slate-200 border-slate-300 text-slate-700 rounded-full";
+                else if (id === 2 || id === 3) colorClass = "bg-emerald-50 border-emerald-300 text-emerald-700";
+                else if (id === 4) colorClass = "bg-indigo-50 border-indigo-300 text-indigo-700";
+                else if (id === 5) colorClass = "bg-rose-50 border-rose-300 text-rose-700";
+
+                const d = document.createElement('div');
+                d.className=`w-full sm:w-3/4 text-center p-1.5 border rounded-lg text-[10px] font-bold mb-1 shadow-sm ${colorClass}`;
+                d.textContent = seqData[id]; tgt.appendChild(d);
+                if(i<tSeq.length-1 || tSeq.length<6) {
+                    const a = document.createElement('div'); a.textContent="⬇"; a.className="text-[10px] font-bold text-slate-300 mb-1"; tgt.appendChild(a);
+                }
+                if(list) {
+                    const r = document.createElement('div'); r.className="flex items-center gap-3 w-full min-w-max";
+                    r.innerHTML = `<div class="w-[100px] text-center p-1 border rounded-lg text-[9px] font-bold shadow-sm ${colorClass}">${seqData[id]}</div><div class="text-[10px] font-bold">${scratchDataSeq[id]}</div>`;
+                    list.appendChild(r);
+                }
+            });
+        }
+        function checkSeqIPO() {
+            const inEl = document.getElementById('sel-seq-input');
+            const procEl = document.getElementById('sel-seq-proc');
+            const outEl = document.getElementById('sel-seq-out');
+            const msg = document.getElementById('seq-ipo-msg');
+            
+            if(!inEl || !procEl || !outEl || !msg) return;
+
+            const inVal = inEl.value;
+            const procVal = procEl.value;
+            const outVal = outEl.value;
+
+            if (!inVal || !procVal || !outVal) {
+                msg.textContent = "請填寫所有選項喔！";
+                msg.className = "text-xs font-bold text-amber-500";
+                return;
+            }
+
+            if (inVal === 'in' && procVal === 'proc' && outVal === 'out') {
+                msg.textContent = "完全正確！你掌握了 循序 的 IPO 概念 🌟";
+                msg.className = "text-xs font-bold text-emerald-600 animate-pulse";
+                
+                if (!l2Completed.seq) {
+                    l2Completed.seq = true;
+                    try { localStorage.setItem('unforte115_l2seq', 'true'); } catch(e){}
+                    const markSeq = document.getElementById('mark-seq');
+                    if(markSeq) markSeq.innerText = '✅';
+                    checkAllL2Completed();
+                }
+            } else {
+                msg.textContent = "配對有誤，請再仔細思考！";
+                msg.className = "text-xs font-bold text-rose-500";
+            }
+        }
+
+        // --- Selection Game ---
+        const selDataGame = {1:"開始", 2:"輸入作業成績", 3:"輸入測驗成績", 4:"輸入平時表現", 5:"計算學期成績", 6:"輸出學期成績", 7:"學期成績<60", 8:"條件成立 : 輸出不及格", 9:"條件不成立:輸出及格", 10:"結束"};
+        const scratchDataSel = {
+            1: '<div class="bg-yellow-400 px-2 py-1 rounded-t-xl rounded-b-md shadow-sm border-b-2 border-yellow-500 text-white whitespace-nowrap font-bold">當 🟢 綠旗被點擊</div>',
+            2: '<div class="flex flex-col gap-0.5 font-bold"><div class="bg-sky-400 px-2 py-1 rounded-md shadow-sm border-b-2 border-sky-500 text-white text-[9px] leading-tight flex items-center gap-1">詢問 <span class="bg-white text-slate-700 px-1 rounded font-bold">輸入作業成績</span> 並等待</div><div class="bg-orange-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-orange-600 text-white whitespace-nowrap flex items-center gap-1">變數 <span class="bg-orange-400 border border-orange-500 px-1 rounded font-bold">作業成績</span> 設為 <span class="bg-sky-400 px-1.5 rounded-full border border-sky-500 shadow-inner font-bold">詢問的答案</span></div></div>',
+            3: '<div class="flex flex-col gap-0.5 font-bold"><div class="bg-sky-400 px-2 py-1 rounded-md shadow-sm border-b-2 border-sky-500 text-white text-[9px] leading-tight flex items-center gap-1">詢問 <span class="bg-white text-slate-700 px-1 rounded font-bold">輸入測驗成績</span> 並等待</div><div class="bg-orange-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-orange-600 text-white whitespace-nowrap flex items-center gap-1">變數 <span class="bg-orange-400 border border-orange-500 px-1 rounded font-bold">測驗成績</span> 設為 <span class="bg-sky-400 px-1.5 rounded-full border border-sky-500 shadow-inner font-bold">詢問的答案</span></div></div>',
+            4: '<div class="flex flex-col gap-0.5 font-bold"><div class="bg-sky-400 px-2 py-1 rounded-md shadow-sm border-b-2 border-sky-500 text-white text-[9px] leading-tight flex items-center gap-1">詢問 <span class="bg-white text-slate-700 px-1 rounded font-bold">輸入平時表現</span> 並等待</div><div class="bg-orange-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-orange-600 text-white whitespace-nowrap flex items-center gap-1">變數 <span class="bg-orange-400 border border-orange-500 px-1 rounded font-bold">平時表現</span> 設為 <span class="bg-sky-400 px-1.5 rounded-full border border-sky-500 shadow-inner font-bold">詢問的答案</span></div></div>',
+            5: '<div class="bg-orange-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-orange-600 text-white flex flex-wrap items-center gap-1 font-bold">變數 <span class="bg-orange-400 border border-orange-500 px-1 rounded font-bold">學期成績</span> 設為 <div class="bg-green-500 px-1.5 py-0.5 rounded-full border border-green-600 shadow-inner text-[8px] whitespace-nowrap font-bold">(作業成績*0.4+測驗成績*0.4+平時表現*0.2)</div></div>',
+            6: '<div class="bg-purple-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-purple-600 text-white flex flex-wrap items-center gap-1 font-bold">說出 <div class="bg-green-500 px-1.5 py-0.5 rounded-full border border-green-600 shadow-inner flex items-center gap-1 font-bold">字串組合 <span class="bg-white text-slate-700 px-1 rounded font-bold">學期成績是</span> <span class="bg-orange-400 border border-orange-500 px-1.5 rounded-full font-bold">學期成績</span></div> 持續 2 秒</div>',
+            7: '<div class="bg-fuchsia-600 px-2 py-1 rounded-t-md shadow-sm border-b border-fuchsia-700 text-white flex items-center gap-1 font-bold">如果 &lt; <span class="bg-orange-400 border border-orange-500 px-1.5 rounded-full font-bold">學期成績</span> &lt; <span class="bg-white text-slate-700 px-1 rounded font-bold">60</span> &gt; 那麼</div>',
+            8: '<div class="bg-purple-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-purple-600 text-white whitespace-nowrap ml-3 flex items-center gap-1 font-bold">說出 <span class="bg-white text-slate-700 px-1 rounded font-bold">不及格</span> 持續 2 秒</div>',
+            9: '<div class="flex flex-col gap-0.5 font-bold"><div class="bg-fuchsia-600 px-2 py-0.5 rounded-md text-white font-bold">否則</div><div class="bg-purple-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-purple-600 text-white whitespace-nowrap ml-3 flex items-center gap-1 font-bold">說出 <span class="bg-white text-slate-700 px-1 rounded font-bold">及格</span> 持續 2 秒</div><div class="bg-fuchsia-600 w-full h-1.5 rounded-b-md mt-0.5"></div></div>',
+            10: '<div class="bg-yellow-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-yellow-600 text-white whitespace-nowrap flex items-center gap-1 font-bold mt-1">停止 <span class="bg-yellow-400 border border-yellow-500 px-1 rounded font-bold">全部</span></div>'
+        };
+        let cSel = []; let tSel = [];
+        function initSelGame() {
+            cSel = [1,2,3,4,5,6,7,8,9,10].sort(()=>Math.random()-0.5); tSel = [];
+            const msgEl = document.getElementById('sel-flow-msg');
+            if(msgEl) msgEl.textContent = "";
+            const wrapper = document.getElementById('sel-scratch-wrapper');
+            if(wrapper) wrapper.classList.add('hidden');
+            
+            const inEl = document.getElementById('sel-sel-input');
+            const procEl = document.getElementById('sel-sel-proc');
+            const outEl = document.getElementById('sel-sel-out');
+            const ipoMsgEl = document.getElementById('sel-ipo-msg');
+            
+            if(inEl) inEl.value = "";
+            if(procEl) procEl.value = "";
+            if(outEl) outEl.value = "";
+            if(ipoMsgEl) ipoMsgEl.textContent = "";
+            
+            renderSelGame();
+        }
+        function tryPlaceSelItem(id) {
+            let len = tSel.length; let v = false;
+            if(len===0 && id===1) v=true;
+            else if(len>=1 && len<=3 && [2,3,4].includes(id)) v=true;
+            else if(len===4 && id===5) v=true;
+            else if(len===5 && id===6) v=true;
+            else if(len===6 && id===7) v=true;
+            else if(len===7 && id===8) v=true;
+            else if(len===8 && id===9) v=true;
+            else if(len===9 && id===10) v=true;
+            
+            const msg = document.getElementById('sel-flow-msg');
+            if(!msg) return;
+
+            if (v) {
+                cSel = cSel.filter(x=>x!==id); tSel.push(id);
+                msg.textContent="✅ 正確！請繼續排下一個。"; msg.className="text-sm font-bold text-emerald-600";
+                if(tSel.length===10) { 
+                    msg.textContent="🎉 太棒了！選擇結構排序完成！下方已解鎖程式積木！";
+                }
+                renderSelGame();
+            } else { msg.textContent="❌ 順序不對喔！別忘了要由上到下符合邏輯。"; msg.className="text-sm font-bold text-rose-500"; }
+        }
+        function renderSelGame() {
+            const src = document.getElementById('sel-source-container');
+            const tgt = document.getElementById('sel-target-container');
+            if(!src || !tgt) return;
+            
+            // 修復：每次渲染前，必須清空右側目標容器並加上標題，避免積木重複疊加
+            src.innerHTML = '<p class="text-[10px] font-bold text-slate-400 mb-2 w-full text-center">待排積木 (點擊加入)</p>';
+            tgt.innerHTML = '<p class="text-[10px] font-bold text-slate-400 mb-2 w-full text-center">直式流程圖</p>';
+            
+            cSel.forEach(id=>{
+                const b = document.createElement('button');
+                b.className="w-full bg-white border border-slate-300 p-2 rounded-lg text-xs font-bold mb-2 shadow-sm hover:bg-indigo-50 transition-colors";
+                b.textContent = selDataGame[id]; b.onclick = ()=>tryPlaceSelItem(id);
+                src.appendChild(b);
+            });
+            const list = document.getElementById('sel-scratch-list');
+            if(list) list.innerHTML = '';
+            const wrapper = document.getElementById('sel-scratch-wrapper');
+            if(tSel.length===10 && wrapper) wrapper.classList.remove('hidden');
+            
+            tSel.forEach((id, i)=>{
+                let colorClass = "bg-white border-slate-300 text-slate-700";
+                if (id === 1 || id === 10) colorClass = "bg-slate-200 border-slate-300 text-slate-700 rounded-full";
+                else if ([2, 3, 4].includes(id)) colorClass = "bg-emerald-50 border-emerald-300 text-emerald-700";
+                else if (id === 5) colorClass = "bg-indigo-50 border-indigo-300 text-indigo-700";
+                else if (id === 6 || id === 8 || id === 9) colorClass = "bg-rose-50 border-rose-300 text-rose-700";
+                else if (id === 7) colorClass = "bg-amber-50 border-amber-300 text-amber-700 rounded-lg";
+
+                const d = document.createElement('div');
+                d.className=`w-full sm:w-3/4 text-center p-1.5 border rounded-lg text-[9px] font-bold mb-0.5 shadow-sm ${colorClass}`;
+                d.textContent = selDataGame[id]; tgt.appendChild(d);
+                if(i<tSel.length-1 || tSel.length<10) {
+                    const a = document.createElement('div'); a.textContent="⬇"; a.className="text-[10px] font-bold text-slate-300 mb-0.5"; tgt.appendChild(a);
+                }
+                if(list) {
+                    const r = document.createElement('div'); r.className="flex items-center gap-3 w-full min-w-max";
+                    r.innerHTML = `<div class="w-[100px] text-center p-1 border rounded-lg text-[9px] font-bold shadow-sm ${colorClass}">${selDataGame[id]}</div><div class="text-[10px] font-bold">${scratchDataSel[id]}</div>`;
+                    list.appendChild(r);
+                }
+            });
+        }
+        function checkSelIPO() {
+            const inEl = document.getElementById('sel-sel-input');
+            const procEl = document.getElementById('sel-sel-proc');
+            const outEl = document.getElementById('sel-sel-out');
+            const msg = document.getElementById('sel-ipo-msg');
+
+            if(!inEl || !procEl || !outEl || !msg) return;
+
+            const inVal = inEl.value;
+            const procVal = procEl.value;
+            const outVal = outEl.value;
+
+            if (!inVal || !procVal || !outVal) {
+                msg.textContent = "請填寫所有選項喔！";
+                msg.className = "text-xs font-bold text-amber-500";
+                return;
+            }
+
+            if (inVal === 'in' && procVal === 'proc' && outVal === 'out') {
+                msg.textContent = "完全正確！你掌握了 選擇 的 IPO 概念 🌟";
+                msg.className = "text-xs font-bold text-emerald-600 animate-pulse";
+                
+                if (!l2Completed.sel) {
+                    l2Completed.sel = true;
+                    try { localStorage.setItem('unforte115_l2sel', 'true'); } catch(e){}
+                    const markSel = document.getElementById('mark-sel');
+                    if(markSel) markSel.innerText = '✅';
+                    checkAllL2Completed();
+                }
+            } else {
+                msg.textContent = "配對有誤，請再想想計算與輸出的關係！";
+                msg.className = "text-xs font-bold text-rose-500";
+            }
+        }
+        function runSelCalc() {
+            let hw = parseFloat(document.getElementById('sel-hw').value)||0;
+            let test = parseFloat(document.getElementById('sel-test').value)||0;
+            let daily = parseFloat(document.getElementById('sel-daily').value)||0;
+            let s = (hw*0.4) + (test*0.4) + (daily*0.2);
+            document.getElementById('sel-out').innerHTML = `計算總分：${s.toFixed(1)}分 ➔ <strong class='${s>=60?'text-emerald-600':'text-rose-600'} text-lg ml-1'>${s>=60?'及格 🎉':'不及格 😢'}</strong>`;
+        }
+
+        // --- Repetition Game ---
+        const repDataGame = {1:"開始", 2:"和=0", 3:"數字=0", 4:"輸入N", 5:"重複N次", 6:"數字=數字+1", 7:"和=和+數字", 8:"輸出和", 9:"結束"};
+        const scratchDataRep = {
+            1: '<div class="bg-yellow-400 px-2 py-1 rounded-t-xl rounded-b-md shadow-sm border-b-2 border-yellow-500 text-white whitespace-nowrap font-bold">當 🟢 綠旗被點擊</div>',
+            2: '<div class="bg-orange-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-orange-600 text-white whitespace-nowrap flex items-center gap-1 font-bold">變數 <span class="bg-orange-400 border border-orange-500 px-1 rounded font-bold">和</span> 設為 <span class="bg-white text-slate-700 px-1 rounded font-bold">0</span></div>',
+            3: '<div class="bg-orange-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-orange-600 text-white whitespace-nowrap flex items-center gap-1 font-bold">變數 <span class="bg-orange-400 border border-orange-500 px-1 rounded font-bold">數字</span> 設為 <span class="bg-white text-slate-700 px-1 rounded font-bold">0</span></div>',
+            4: '<div class="flex flex-col gap-0.5 font-bold"><div class="bg-sky-400 px-2 py-1 rounded-md shadow-sm border-b-2 border-sky-500 text-white text-[9px] leading-tight flex items-center gap-1 font-bold">詢問 <span class="bg-white text-slate-700 px-1 rounded font-bold">請輸入數字N</span> 並等待</div><div class="bg-orange-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-orange-600 text-white whitespace-nowrap flex items-center gap-1 font-bold">變數 <span class="bg-orange-400 border border-orange-500 px-1 rounded font-bold">N</span> 設為 <span class="bg-sky-400 px-1.5 rounded-full border border-sky-500 shadow-inner font-bold">詢問的答案</span></div></div>',
+            5: '<div class="bg-fuchsia-600 px-2 py-1 rounded-t-md shadow-sm border-b border-fuchsia-700 text-white flex items-center gap-1 font-bold">重複 <span class="bg-orange-400 border border-orange-500 px-1.5 rounded-full font-bold">N</span> 次</div>',
+            6: '<div class="bg-orange-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-orange-600 text-white whitespace-nowrap ml-3 flex items-center gap-1 font-bold">變數 <span class="bg-orange-400 border border-orange-500 px-1 rounded font-bold">數字</span> 設為 <span class="bg-green-500 px-1.5 py-0.5 rounded-full border border-green-600 shadow-inner font-bold"><span class="bg-orange-500 border border-orange-600 px-1 rounded-full text-white">數字</span> + 1</span></div>',
+            7: '<div class="flex flex-col gap-0.5 font-bold"><div class="bg-orange-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-orange-600 text-white whitespace-nowrap ml-3 flex items-center gap-1 font-bold">變數 <span class="bg-orange-400 border border-orange-500 px-1 rounded font-bold">和</span> 設為 <span class="bg-green-500 px-1.5 py-0.5 rounded-full border border-green-600 shadow-inner font-bold"><span class="bg-orange-500 border border-orange-600 px-1 rounded-full text-white">和</span> + <span class="bg-orange-500 px-1.5 rounded-full border border-orange-600 shadow-sm text-white">數字</span></span></div><div class="bg-fuchsia-600 w-full h-1.5 rounded-b-md mt-0.5"></div></div>',
+            8: '<div class="bg-purple-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-purple-600 text-white flex flex-wrap items-center gap-1 mt-1 font-bold">說出 <span class="bg-orange-400 border border-orange-500 px-1.5 rounded-full font-bold">和</span> 持續 <span class="bg-white text-slate-700 px-1 rounded font-bold">2</span> 秒</div>',
+            9: '<div class="bg-yellow-500 px-2 py-1 rounded-md shadow-sm border-b-2 border-yellow-600 text-white whitespace-nowrap flex items-center gap-1 mt-1 font-bold">停止 <span class="bg-yellow-400 border border-yellow-500 px-1 rounded font-bold">全部</span></div>'
+        };
+        let cRep = []; let tRep = [];
+        function initRepGame() {
+            cRep = [1,2,3,4,5,6,7,8,9].sort(()=>Math.random()-0.5); tRep = [];
+            const msgEl = document.getElementById('rep-flow-msg');
+            if(msgEl) msgEl.textContent = "";
+            const wrapper = document.getElementById('rep-scratch-wrapper');
+            if(wrapper) wrapper.classList.add('hidden');
+            
+            const inEl = document.getElementById('sel-rep-input');
+            const procEl = document.getElementById('sel-rep-proc');
+            const outEl = document.getElementById('sel-rep-out');
+            const ipoMsgEl = document.getElementById('rep-ipo-msg');
+
+            if(inEl) inEl.value = "";
+            if(procEl) procEl.value = "";
+            if(outEl) outEl.value = "";
+            if(ipoMsgEl) ipoMsgEl.textContent = "";
+
+            renderRepGame();
+        }
+        function tryPlaceRepItem(id) {
+            let len = tRep.length; let v = false;
+            if(len===0 && id===1) v=true;
+            else if(len>=1 && len<=3 && [2,3,4].includes(id)) v=true;
+            else if(len===4 && id===5) v=true;
+            else if(len===5 && id===6) v=true;
+            else if(len===6 && id===7) v=true;
+            else if(len===7 && id===8) v=true;
+            else if(len===8 && id===9) v=true;
+            
+            const msg = document.getElementById('rep-flow-msg');
+            if(!msg) return;
+
+            if (v) {
+                cRep = cRep.filter(x=>x!==id); tRep.push(id);
+                msg.textContent="✅ 正確！請繼續排下一個。"; msg.className="text-sm font-bold text-emerald-600";
+                if(tRep.length===9) { 
+                    msg.textContent="🎉 太棒了！重複結構排序完成！下方已解鎖程式積木！"; 
+                }
+                renderRepGame();
+            } else { msg.textContent="❌ 順序不對喔！請再確認設定與運算的先後次序。"; msg.className="text-sm font-bold text-rose-500"; }
+        }
+        function renderRepGame() {
+            const src = document.getElementById('rep-source-container');
+            const tgt = document.getElementById('rep-target-container');
+            if(!src || !tgt) return;
+            
+            // 修復：每次渲染前，必須清空右側目標容器並加上標題，避免積木重複疊加
+            src.innerHTML = '<p class="text-[10px] font-bold text-slate-400 mb-2 w-full text-center">待排積木 (點擊加入)</p>';
+            tgt.innerHTML = '<p class="text-[10px] font-bold text-slate-400 mb-2 w-full text-center">直式流程圖</p>';
+            
+            cRep.forEach(id=>{
+                const b = document.createElement('button');
+                b.className="w-full bg-white border border-slate-300 p-2 rounded-lg text-xs font-bold mb-2 shadow-sm hover:bg-rose-50 transition-colors";
+                b.textContent = repDataGame[id]; b.onclick = ()=>tryPlaceRepItem(id);
+                src.appendChild(b);
+            });
+            const list = document.getElementById('rep-scratch-list');
+            if(list) list.innerHTML = '';
+            const wrapper = document.getElementById('rep-scratch-wrapper');
+            if(tRep.length===9 && wrapper) wrapper.classList.remove('hidden');
+            
+            tRep.forEach((id, i)=>{
+                let colorClass = "bg-white border-slate-300 text-slate-700";
+                if (id === 1 || id === 9) colorClass = "bg-slate-200 border-slate-300 text-slate-700 rounded-full";
+                else if (id === 2 || id === 3) colorClass = "bg-orange-50 border-orange-300 text-orange-700";
+                else if (id === 4) colorClass = "bg-emerald-50 border-emerald-300 text-emerald-700";
+                else if (id === 5) colorClass = "bg-amber-50 border-amber-300 text-amber-700 rounded-lg";
+                else if (id === 6 || id === 7) colorClass = "bg-indigo-50 border-indigo-300 text-indigo-700";
+                else if (id === 8) colorClass = "bg-rose-50 border-rose-300 text-rose-700";
+
+                const d = document.createElement('div');
+                d.className=`w-full sm:w-3/4 text-center p-1.5 border rounded-lg text-[9px] font-bold mb-0.5 shadow-sm ${colorClass}`;
+                d.textContent = repDataGame[id]; tgt.appendChild(d);
+                if(i<tRep.length-1 || tRep.length<9) {
+                    const a = document.createElement('div'); a.textContent="⬇"; a.className="text-[10px] font-bold text-slate-300 mb-0.5"; tgt.appendChild(a);
+                }
+                if(list) {
+                    const r = document.createElement('div'); r.className="flex items-center gap-3 w-full min-w-max";
+                    r.innerHTML = `<div class="w-[100px] text-center p-1 border rounded-lg text-[9px] font-bold shadow-sm ${colorClass}">${repDataGame[id]}</div><div class="text-[10px] font-bold">${scratchDataRep[id]}</div>`;
+                    list.appendChild(r);
+                }
+            });
+        }
+        function checkRepIPO() {
+            const inEl = document.getElementById('sel-rep-input');
+            const procEl = document.getElementById('sel-rep-proc');
+            const outEl = document.getElementById('sel-rep-out');
+            const msg = document.getElementById('rep-ipo-msg');
+
+            if(!inEl || !procEl || !outEl || !msg) return;
+
+            const inVal = inEl.value;
+            const procVal = procEl.value;
+            const outVal = outEl.value;
+
+            if (!inVal || !procVal || !outVal) {
+                msg.textContent = "請填寫所有選項喔！";
+                msg.className = "text-xs font-bold text-amber-500";
+                return;
+            }
+
+            if (inVal === 'in' && procVal === 'proc' && outVal === 'out') {
+                msg.textContent = "完全正確！你掌握了 重複 的 IPO 概念 🌟";
+                msg.className = "text-xs font-bold text-emerald-600 animate-pulse";
+                
+                if (!l2Completed.rep) {
+                    l2Completed.rep = true;
+                    try { localStorage.setItem('unforte115_l2rep', 'true'); } catch(e){}
+                    const markRep = document.getElementById('mark-rep');
+                    if(markRep) markRep.innerText = '✅';
+                    checkAllL2Completed();
+                }
+            } else { 
+                msg.textContent = "配對有誤，請再仔細核對「處理 (Process)」！"; 
+                msg.className = "text-xs font-bold text-rose-500";
+            }
+        }
+        function runIterCalc() {
+            let nEl = document.getElementById('iter-n');
+            let outEl = document.getElementById('iter-out');
+            if(!nEl || !outEl) return;
+            
+            let n = parseInt(nEl.value)||0;
+            if(n<=0) { outEl.innerHTML="<strong class='text-rose-600'>錯誤：請輸入大於 0 的整數！</strong>"; return; }
+            outEl.innerHTML = `1加到${n}的總和: <strong class='text-rose-600 text-lg ml-1'>${(1+n)*n/2}</strong>`;
+        }
+    </script>
+</body>
+</html>

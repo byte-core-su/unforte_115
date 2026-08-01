@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LESSON 6 - 星際防禦網</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #F8F9FA; color: #333333; }
+        .slide-up-fade { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        .sim-window { position: relative; overflow: hidden; }
+        .sim-badge { position: absolute; top: 12px; left: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid #EA580C; padding: 2px 8px; border-radius: 9999px; font-size: 0.65rem; font-weight: bold; color: #FB923C; display: flex; align-items: center; gap: 4px; z-index: 10; box-shadow: 0 0 10px rgba(234, 88, 12, 0.2); }
+        .sim-badge::before { content: ''; display: block; width: 6px; height: 6px; background-color: #EA580C; border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+        
+        /* 仿 Scratch 積木樣式 */
+        .block-pink { background-color: #FF6680; border-bottom-color: #FF3355; color: white; }
+        .block-yellow { background-color: #FFAB19; border-bottom-color: #CF8B17; color: white; }
+        .block-blue { background-color: #4C97FF; border-bottom-color: #3373CC; color: white; }
+        .block-green { background-color: #0FBD8C; border-bottom-color: #0B8E69; color: white; }
+        .block-hat { background-color: #FFD500; border-bottom-color: #CC9900; color: #333; }
+        .block-cyan { background-color: #5CB1D6; border-bottom-color: #2E8EB8; color: white; }
+        
+        /* 參數與運算積木 */
+        .func-param { background-color: #FF6680; border: 1px solid #FF3355; color: white; padding: 0.1rem 0.4rem; border-radius: 9999px; font-size: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .operator-block { background-color: #59C059; border: 1px solid #42A042; color: white; padding: 0.1rem 0.5rem; border-radius: 9999px; font-size: 10px; display: inline-flex; align-items: center; gap: 4px; }
+        .operator-num { background-color: white; color: #333; padding: 0 4px; border-radius: 4px; font-size: 9px; }
+        
+        /* 橙色系能量流光與隕石特效 */
+        .glowing-orange-path { filter: drop-shadow(0 0 4px #EA580C) drop-shadow(0 0 8px #C2410C); }
+        .meteor-glow { filter: drop-shadow(0 0 5px #FBBF24) drop-shadow(0 0 10px #EA580C); }
+    </style>
+</head>
+<body class="antialiased selection:bg-orange-100 selection:text-orange-900">
+
+    <header class="bg-white border-b border-gray-100 pt-8 pb-12 slide-up-fade">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8">
+            <div class="mb-6">
+                <a href="https://su-yung-sheng.github.io/unforte115/" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-orange-600 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> 
+                    返回網站首頁
+                </a>
+            </div>
+            <p class="text-sm font-medium text-indigo-500 mb-2 tracking-widest uppercase">演算法與程式設計</p>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight">星際防禦工程師：<br class="hidden md:block">用程式編織能量防護網</h1>
+            <p class="text-lg text-slate-500 font-light max-w-2xl">結合「IPO 思維」與「重複結構」，循序漸進建立邏輯思維與幾何繪圖能力，並透過實作防禦網任務，體驗程式設計的強大魔力。</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 lg:px-8 py-12 relative">
+        <a href="https://su-yung-sheng.github.io/unforte115/1150700.html" class="mb-8 inline-flex items-center text-sm font-medium text-slate-400 hover:text-slate-800 transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 返回課程總覽
+        </a>
+        
+        <!-- Phase 0 獨立版面：危機診斷與物理動畫 -->
+        <div class="bg-slate-950 border border-slate-800 rounded-3xl p-6 md:p-8 mb-12 relative overflow-hidden slide-up-fade text-white shadow-2xl shadow-orange-950/20">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                <!-- 左側：危機診斷與任務目標說明 -->
+                <div class="lg:col-span-6 relative z-10 flex flex-col justify-center">
+                    <span class="text-xs font-bold bg-rose-500/20 text-rose-400 px-3 py-1 rounded-full uppercase tracking-wider block w-max mb-4 animate-pulse">🚨 Phase 0：危機發布與系統診斷</span>
+                    <h2 class="text-2xl md:text-3xl font-black mb-4 flex items-center text-orange-400">
+                        <span class="text-2xl mr-2">💥</span> 基地遭重創！防禦系統啟動太慢？
+                    </h2>
+                    
+                    <p class="text-slate-300 font-light text-sm leading-relaxed mb-6">
+                        「警報！密集隕石群逼近！」剛才測試時，指揮官按下啟動鍵，畫面竟跳出對話框：<br>
+                        <span class="inline-block bg-slate-800/80 px-2 py-1 rounded text-cyan-300 mt-1.5 mb-1.5 text-xs border border-cyan-800 shadow-inner">💬 「請輸入要畫正幾邊形？」、「請輸入要幾個圖形？」</span><br>
+                        就在指揮官慌忙打字輸入的幾秒鐘，隕石已經無情地砸中了基地！我們發現了系統的致命漏洞：<strong class="text-rose-400">「互動式提問」太耗時了！</strong> 在分秒必爭的危機中，根本沒時間手動輸入參數。
+                    </p>
+
+                    <!-- 三大任務目標 -->
+                    <div class="space-y-3">
+                        <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl transition hover:border-orange-500/50">
+                            <div class="font-bold text-orange-300 text-sm mb-1.5 flex items-center gap-2"><span class="text-lg">🛠️</span> 核心概念實作</div>
+                            <p class="text-xs text-slate-400 leading-relaxed">捨棄耗時的「詢問」積木，改用預先寫好的<strong class="text-slate-300">參數變數</strong>與<strong class="text-slate-300">雙層陣列迴圈</strong>，讓程式一鍵瞬間啟動全自動防禦網。</p>
+                        </div>
+                        <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl transition hover:border-emerald-500/50">
+                            <div class="font-bold text-emerald-400 text-sm mb-1.5 flex items-center gap-2"><span class="text-lg">🧠</span> 運算邏輯梳理</div>
+                            <p class="text-xs text-slate-400 leading-relaxed">重新規劃「環繞地球」的雙層防禦陣列，精準計算圖形的邊數與旋轉角度，確保防護網交織且毫無死角。</p>
+                        </div>
+                        <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl transition hover:border-orange-500/50">
+                            <div class="font-bold text-orange-400 text-sm mb-1.5 flex items-center gap-2"><span class="text-lg">🛡️</span> 能量防護網強度</div>
+                            <p class="text-xs text-slate-400 leading-relaxed">防護網不能只有形狀，還需要足夠的厚度！加入<strong class="text-orange-400">「筆跡寬度」</strong>積木設定，確保防禦網有足夠的能量強度來抵擋高能隕石的貫穿。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右側：環繞地球物理防護網即時動畫 -->
+                <div class="lg:col-span-6 relative min-h-[350px] w-full bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden shadow-inner shadow-black">
+                    <!-- 背景繁星 -->
+                    <div class="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
+                    <svg id="top-sim-svg" viewBox="0 0 300 200" class="w-full h-full absolute inset-0 z-10" preserveAspectRatio="xMidYMid slice"></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 1: 創造 (Creation) —— 代碼優化與防禦網重構 -->
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12 mb-12 slide-up-fade">
+            <div class="flex items-center mb-8">
+                <span class="bg-orange-100 text-orange-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">1</span>
+                <h3 class="text-2xl font-bold text-slate-800">Phase 1: 創造 (Creation) —— 代碼優化與防禦網重構</h3>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- 運算邏輯梳理 -->
+                <div class="bg-slate-50 rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm">
+                    <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-200 pb-3">
+                        <span class="text-2xl mr-2">🧠</span> 運算邏輯梳理
+                    </h4>
+                    <p class="text-slate-600 font-medium text-sm leading-relaxed mb-4">
+                        規定先不碰鍵盤，請工程師們先在紙上或腦中進行<strong class="text-indigo-600">「畫流程圖」</strong>的自我推演：
+                    </p>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-rose-500 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>如何把舊程式的「詢問與等待」拿掉？</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-emerald-500 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>如何改由程式內部直接給予變數數值（將 Input 從手動輸入改為宣告常數），讓防禦網能「一鍵瞬間啟動」？</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 核心概念實作 -->
+                <div class="bg-slate-50 rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm">
+                    <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-200 pb-3">
+                        <span class="text-2xl mr-2">🛠️</span> 核心概念實作
+                    </h4>
+                    <p class="text-slate-600 font-medium text-sm leading-relaxed mb-4">
+                        想通了邏輯後，請動手修改下方的主程式碼。我們必須：
+                    </p>
+                    <ol class="list-decimal list-inside space-y-2 text-sm text-slate-600 font-medium ml-1">
+                        <li>刪除「詢問」積木。</li>
+                        <li>加上<strong class="text-orange-500">「筆跡寬度設為 ( )」</strong>積木，設定防禦網的強度。</li>
+                        <li>改用「變數設定」積木，<strong class="text-rose-500">保持空白</strong>讓大家自己決定「正幾邊形」與「幾個圖形」的常數。</li>
+                        <li>一鍵呼叫函式並佈署。</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 互動積木區 -->
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 mt-12">
+                <div class="lg:col-span-3">
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                        <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
+                            <span class="text-2xl mr-2">🧩</span> 極速防禦主程式重構
+                        </h4>
+                        <div class="flex flex-col md:flex-row gap-6 mb-4">
+                            <div class="w-full md:w-5/12 bg-slate-50 border border-slate-200 rounded-xl p-4 shadow-inner min-h-[320px]" id="main-source-container"></div>
+                            <div class="w-full md:w-7/12 bg-white border-2 border-dashed border-slate-300 rounded-xl p-4 flex flex-col justify-start min-h-[320px]" id="main-target-container"></div>
+                        </div>
+                        <div class="flex justify-end h-6"><span id="main-flow-msg" class="text-sm font-bold transition-all"></span></div>
+                    </div>
+                </div>
+                
+                <div class="lg:col-span-2 flex flex-col h-full">
+                    <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
+                        <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">▶</span> 一鍵瞬間啟動模擬
+                    </h4>
+                    <div class="sim-window bg-slate-950 border border-slate-800 rounded-2xl shadow-lg flex-grow min-h-[320px] relative" id="main-sim-container">
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-orange-500/60 font-bold text-sm">
+                            <span class="text-4xl mb-3">🔒</span>
+                            請先完成左側的主程式重構<br>解鎖極速佈署模擬
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 2: 分析 (Analysis) —— 參數盲測與視覺調整 -->
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12 mb-8 slide-up-fade">
+            <div class="space-y-16">
+                <section class="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-10 text-white relative overflow-hidden">
+                    <div class="absolute right-0 top-0 w-80 h-80 bg-orange-600/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center mb-6">
+                            <span class="bg-orange-100 text-orange-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">2</span>
+                            <h3 class="text-2xl font-bold text-orange-400">Phase 2: 分析 (Analysis) —— 防禦強度與參數盲測</h3>
+                        </div>
+                        <div class="space-y-4 mb-8 text-sm text-slate-300 font-light leading-relaxed max-w-3xl">
+                            <p><strong class="text-orange-300">防禦參數盲測：</strong>程式碼重構完成後，防禦網已能瞬間啟動。請開始進行「數字組合實驗」，直接在變數欄修改數字，測試不同的「正幾邊形」與「幾個圖形」，觀察動態隕石是否會穿透孔洞。</p>
+                            <p><strong class="text-orange-300">防禦網強度測試：</strong>想一想：「如果防禦網太薄，會發生什麼情況？」請在下方測試不同的強度，並將「筆跡寬度」參數加大，體會強度對防禦效果的關鍵影響。</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                            <div class="lg:col-span-2 space-y-6">
+                                <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 shadow-inner">
+                                    <h5 class="text-sm font-bold text-orange-400 mb-4 flex items-center gap-1.5">
+                                        <span>⚙️</span> 內部變數設定面板
+                                    </h5>
+                                    
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="block text-xs font-bold text-slate-400 mb-2">變數：正幾邊形 (參數 N)</label>
+                                            <select id="shield-sides-select" onchange="updateLabBlocks()" class="w-full text-sm border border-slate-800 bg-slate-900 rounded-lg p-2 focus:outline-none focus:border-orange-500 font-bold text-orange-500">
+                                                <option value="3">正三角形 (N=3) - 高密度孔洞多</option>
+                                                <option value="4">正方形 (N=4) - 標準基地壁</option>
+                                                <option value="5" selected>正五邊形 (N=5) - 重裝合金網</option>
+                                                <option value="6">正六邊形 (N=6) - 蜂巢複合罩</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-xs font-bold text-slate-400 mb-2">變數：幾個圖形 (陣列數量 X)</label>
+                                            <input type="range" id="shield-count" min="2" max="15" value="5" oninput="updateLabBlocks()" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-orange-500">
+                                            <div class="flex justify-between text-xs text-slate-400 mt-1">
+                                                <span>2 組</span>
+                                                <span class="font-bold text-orange-400" id="count-val">5 組</span>
+                                                <span>15 組</span>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-xs font-bold text-slate-400 mb-2">防護網範圍大小 (邊長微調)</label>
+                                            <input type="range" id="shield-spacing" min="30" max="80" value="50" oninput="updateLabBlocks()" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-orange-500">
+                                            <div class="flex justify-between text-xs text-slate-400 mt-1">
+                                                <span>30 點</span>
+                                                <span class="font-bold text-orange-400" id="spacing-val">50 點</span>
+                                                <span>80 點</span>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-xs font-bold text-slate-400 mb-2">能量網強度 (筆跡寬度)</label>
+                                            <select id="shield-thickness" onchange="updateLabBlocks()" class="w-full text-sm border border-slate-800 bg-slate-900 rounded-lg p-2 focus:outline-none focus:border-orange-500 font-bold text-orange-400">
+                                                <option value="1">寬度 1 (脆弱易碎：容易被貫穿)</option>
+                                                <option value="3" selected>寬度 3 (標準防護：一般強度)</option>
+                                                <option value="5">寬度 5 (重裝絕對防禦：萬無一失)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 動態積木預覽區 -->
+                                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner overflow-x-auto min-h-[280px] flex flex-col gap-4 text-xs">
+                                    <div class="text-[10px] text-slate-500 font-bold">▼ 基地防禦核心：重構後的主程式</div>
+                                    
+                                    <div class="flex flex-col items-start font-bold">
+                                        <div class="block-hat border-b-[3px] px-3 py-1 rounded-t-lg rounded-b shadow-sm mb-1.5 w-full max-w-[260px] flex items-center gap-1.5 text-[10px]">
+                                            當 🟢 綠旗被點擊
+                                        </div>
+                                        
+                                        <!-- 動態寬度預覽 -->
+                                        <div class="block-green border-b-[3px] px-3 py-1 rounded shadow-sm mb-1.5 w-full max-w-[260px] flex items-center gap-1.5 text-[10px]">
+                                            筆跡寬度設為 <span class="bg-white text-slate-800 px-1.5 py-0.5 rounded shadow-inner" id="block-thickness-num">3</span>
+                                        </div>
+
+                                        <div class="bg-[#FF8C1A] border-b-[3px] border-[#DB6E00] text-white px-3 py-1 rounded shadow-sm mb-1 w-full max-w-[260px] flex items-center gap-1.5 text-[10px]">
+                                            變數 <span class="bg-white text-orange-600 px-1.5 py-0.5 rounded-full shadow-inner">正幾邊形</span> 設為 <span class="bg-white text-slate-800 px-1.5 py-0.5 rounded shadow-inner" id="block-sides">5</span>
+                                        </div>
+                                        
+                                        <div class="bg-[#FF8C1A] border-b-[3px] border-[#DB6E00] text-white px-3 py-1 rounded shadow-sm mb-1.5 w-full max-w-[260px] flex items-center gap-1.5 text-[10px]">
+                                            變數 <span class="bg-white text-orange-600 px-1.5 py-0.5 rounded-full shadow-inner">幾個圖形</span> 設為 <span class="bg-white text-slate-800 px-1.5 py-0.5 rounded shadow-inner" id="block-count">5</span>
+                                        </div>
+
+                                        <div class="block-green border-b-[3px] px-3 py-1 rounded shadow-sm mb-1 w-full max-w-[260px] text-[10px] text-center">下筆</div>
+                                        
+                                        <div class="block-pink border-b-[3px] px-3 py-1 rounded shadow-sm mb-1 w-full max-w-[260px] flex items-center gap-1.5 text-[10px]">
+                                            <span class="font-bold tracking-wide">畫幾個圖形</span> 
+                                            <span class="bg-[#FF8C1A] border border-[#DB6E00] text-white px-1.5 py-0.5 rounded-full shadow-sm ml-1 flex items-center gap-1">幾個圖形</span>
+                                        </div>
+                                        
+                                        <div class="block-green border-b-[3px] px-3 py-1 rounded shadow-sm w-full max-w-[260px] text-[10px] text-center">停筆</div>
+                                    </div>
+                                </div>
+
+                                <button onclick="runLabAnimation()" class="w-full mt-4 bg-orange-500 text-slate-950 py-3 rounded-xl font-black hover:bg-orange-400 shadow-[0_0_15px_rgba(234,88,12,0.3)] transition-all flex items-center justify-center gap-2 transform active:scale-95">
+                                    <span>🛡️ 一鍵瞬間啟動防禦網</span>
+                                </button>
+
+                                <!-- Padlet 任務上傳區 -->
+                                <div class="mt-6 flex flex-col sm:flex-row items-center justify-between bg-slate-800 p-4 rounded-2xl border border-slate-700 shadow-md">
+                                    <div class="text-sm text-slate-300 font-medium mb-4 sm:mb-0">
+                                        <span class="text-orange-400 font-bold block mb-1">📝 任務紀錄：</span>
+                                        測試出「無死角且強度足夠」的完美參數了嗎？請截圖上傳分享！
+                                    </div>
+                                    <a href="https://padlet.com/" target="_blank" class="shrink-0 bg-[#FF6680] hover:bg-[#FF3355] text-white text-sm font-bold px-5 py-2.5 rounded-xl transition shadow-md flex items-center gap-2">
+                                        上傳至 Padlet ➔
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- 即時星際防禦雷達畫布 -->
+                            <div class="lg:col-span-3 flex flex-col h-full">
+                                <div class="sim-window bg-slate-950 border border-slate-800 rounded-t-2xl shadow-xl flex-grow min-h-[420px] relative">
+                                    <div class="sim-badge" style="border-color:#EA580C; background: rgba(15,23,42,0.9); color: #FB923C;">阿爾法基地雷達防禦屏</div>
+                                    <svg id="lab-svg" viewBox="0 0 300 200" class="w-full h-full absolute inset-0 z-10" preserveAspectRatio="xMidYMid slice"></svg>
+                                </div>
+                                <div id="lab-feedback" class="bg-slate-800 border-t border-slate-700 text-orange-100 rounded-b-2xl p-4 text-xs font-medium transition-colors duration-300 text-center shadow-lg">
+                                    等待啟動！請留意防禦網是否存在「孔洞」讓隕石穿透，以及「筆跡寬度」的強度影響。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+        
+        <!-- Phase 3: 反思 (Reflection) —— 資源最佳化與生活對接 -->
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12 mb-8 slide-up-fade">
+            <div class="flex items-center mb-8">
+                <span class="bg-emerald-100 text-emerald-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">3</span>
+                <h3 class="text-2xl font-bold text-slate-800">Phase 3: 反思 (Reflection) —— 資源最佳化與生活對接</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- 效能最佳化思辨 -->
+                <div class="bg-emerald-50 rounded-2xl p-6 md:p-8 border border-emerald-100 shadow-sm">
+                    <h4 class="text-lg font-bold text-emerald-800 mb-4 flex items-center border-b border-emerald-200 pb-3">
+                        <span class="text-2xl mr-2">⚖️</span> 效能最佳化思辨
+                    </h4>
+                    <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
+                        <div class="bg-white p-5 rounded-xl border border-emerald-100 shadow-sm">
+                            <strong class="text-emerald-600 block mb-2 text-base">🤔 指揮官的靈魂拷問：</strong>
+                            「如果設定畫 100 個圖形，防禦網絕對最密最安全，但程式運作會變慢。如果筆跡無限加粗，雖然絕對貫不穿，但系統能量負荷極大。身為工程師，你的責任是<strong>找出能過關的最少資源</strong>，還是不計代價開到最大？」
+                        </div>
+                        <p class="font-medium pt-2">
+                            <strong class="text-slate-800 flex items-center gap-1"><span class="text-lg">🎯</span> 最佳化挑戰：</strong> 
+                            請回到上方的控制面板，找出「剛剛好能擋住隕石」的最優化變數組合（例如：最少的圖形數量、適中的寬度），學習在「絕對安全」與「系統資源」間做出權衡！
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 現實生活對接 -->
+                <div class="bg-indigo-50 rounded-2xl p-6 md:p-8 border border-indigo-100 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-lg font-bold text-indigo-800 mb-4 flex items-center border-b border-indigo-200 pb-3">
+                            <span class="text-2xl mr-2">🌍</span> 現實生活對接
+                        </h4>
+                        <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
+                            <p>
+                                在現實生活中，我們剛剛測試的「陣列排列覆蓋」與「護盾寬度（厚度）測試」，其實正運用在這些領域：
+                            </p>
+                            <ul class="space-y-3 mt-4">
+                                <li class="flex items-start bg-white p-3.5 rounded-xl border border-indigo-100 shadow-sm transition hover:shadow-md">
+                                    <span class="text-2xl mr-3">📶</span>
+                                    <div>
+                                        <strong class="text-indigo-700 block mb-0.5">基地台訊號無死角覆蓋網</strong>
+                                        如何用最少的幾何排列（如蜂巢狀六邊形），達成訊號不漏接的全面覆蓋？
+                                    </div>
+                                </li>
+                                <li class="flex items-start bg-white p-3.5 rounded-xl border border-indigo-100 shadow-sm transition hover:shadow-md">
+                                    <span class="text-2xl mr-3">🛡️</span>
+                                    <div>
+                                        <strong class="text-indigo-700 block mb-0.5">裝甲車的防護鋼板厚度計算</strong>
+                                        如同調整筆跡寬度，工程師必須在「防禦強度」與「車體重量（機動性/耗能）」之間取得完美平衡！
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Padlet 討論區 -->
+            <div class="mt-8 bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+                <div>
+                    <h5 class="text-slate-800 font-bold mb-2 flex items-center gap-2">
+                        <span class="text-xl">💬</span> 課堂反思：工程師的抉擇
+                    </h5>
+                    <p class="text-sm text-slate-600 leading-relaxed">請在 Padlet 上回答：在「絕對安全」與「節省系統資源」之間，你是如何找到平衡點的？你在現實生活中還能想到哪些類似的科技決策？</p>
+                </div>
+                <a href="https://padlet.com/" target="_blank" class="shrink-0 bg-[#FF6680] hover:bg-[#FF3355] text-white text-sm font-bold px-6 py-3 rounded-xl transition shadow-md flex items-center gap-2">
+                    前往 Padlet 發表心得 ➔
+                </a>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center mt-8">
+            <a href="https://su-yung-sheng.github.io/unforte115/1150705.html" class="text-sm text-slate-400 hover:text-slate-800 transition-colors">⬅ 上一個單元</a>
+            <a href="https://su-yung-sheng.github.io/unforte115/1150700.html" class="inline-block text-center text-sm font-semibold text-slate-950 bg-orange-400 px-6 py-3 rounded-full hover:bg-orange-300 hover:shadow-lg hover:shadow-orange-400/20 transition-all shadow-sm">🏆 完成防禦工程，回到總覽</a>
+        </div>
+    </main>
+
+    <script>
+        // 幾何共用數學：點到線段的距離 (用於精準判斷隕石是否穿透護盾孔洞)
+        function pointToSegmentDistance(px, py, x1, y1, x2, y2) {
+            let dx = x2 - x1;
+            let dy = y2 - y1;
+            if (dx === 0 && dy === 0) return Math.hypot(px - x1, py - y1);
+            let t = ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy);
+            t = Math.max(0, Math.min(1, t));
+            let projX = x1 + t * dx;
+            let projY = y1 + t * dy;
+            return Math.hypot(px - projX, py - projY);
+        }
+
+        // ====== 情境模擬任務：頂部主動式物理防禦網動畫 (全自動) ======
+        let topSimInterval = null;
+        let topMeteors = [];
+        let topRipples = [];
+
+        function initTopSimulation() {
+            const svg = document.getElementById('top-sim-svg');
+            if (!svg) return;
+
+            svg.innerHTML = `
+                <defs>
+                    <clipPath id="earth-clip-top">
+                        <circle cx="150" cy="100" r="24" />
+                    </clipPath>
+                </defs>
+                <g id="top-stars"></g>
+                <path d="M0,175 Q150,165 300,175 L300,200 L0,200 Z" fill="#334155" />
+                <circle cx="60" cy="182" r="5" fill="#1e293b" opacity="0.4"/>
+                <circle cx="140" cy="178" r="8" fill="#1e293b" opacity="0.4"/>
+                <circle cx="220" cy="184" r="6" fill="#1e293b" opacity="0.4"/>
+                <circle cx="280" cy="179" r="4" fill="#1e293b" opacity="0.4"/>
+                
+                <circle cx="150" cy="100" r="46" fill="none" stroke="#EA580C" stroke-width="3" class="glowing-orange-path" opacity="0.85" id="top-shield" />
+                <circle cx="150" cy="100" r="52" fill="none" stroke="#C2410C" stroke-width="1" stroke-dasharray="3 3" opacity="0.4" />
+                
+                <g id="top-earth-group">
+                    <circle cx="150" cy="100" r="24" fill="#0ea5e9" />
+                    <path d="M135,80 Q145,95 138,110 Q148,115 155,100 T165,85 Z" fill="#22c55e" clip-path="url(#earth-clip-top)" />
+                    <path d="M152,105 Q162,118 172,110 T162,95 Z" fill="#22c55e" clip-path="url(#earth-clip-top)" />
+                    <path d="M130,105 Q125,120 140,118 Z" fill="#22c55e" clip-path="url(#earth-clip-top)" />
+                </g>
+                
+                <g id="top-meteor-layer"></g>
+                <g id="top-ripple-layer"></g>
+            `;
+
+            const starsG = svg.querySelector('#top-stars');
+            for (let i = 0; i < 40; i++) {
+                const star = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                star.setAttribute("cx", Math.random() * 300);
+                star.setAttribute("cy", Math.random() * 200);
+                star.setAttribute("r", Math.random() * 1.5 + 0.4);
+                star.setAttribute("fill", "#FBBF24");
+                star.setAttribute("opacity", Math.random() * 0.8 + 0.2);
+                starsG.appendChild(star);
+            }
+
+            topMeteors = [];
+            topRipples = [];
+
+            if (topSimInterval) clearInterval(topSimInterval);
+            
+            let frameCount = 0;
+            topSimInterval = setInterval(() => {
+                frameCount++;
+                if (frameCount % 30 === 0) spawnTopMeteor();
+                updateTopMeteors();
+                updateTopRipples();
+            }, 30);
+        }
+
+        function spawnTopMeteor() {
+            const angle = Math.random() * Math.PI * 2;
+            const spawnDist = 200; 
+            const startX = 150 + Math.cos(angle) * spawnDist;
+            const startY = 100 + Math.sin(angle) * spawnDist;
+
+            const speed = 2 + Math.random() * 1.5;
+            const targetX = 150;
+            const targetY = 100;
+            const angleToCenter = Math.atan2(targetY - startY, targetX - startX);
+
+            const vx = Math.cos(angleToCenter) * speed;
+            const vy = Math.sin(angleToCenter) * speed;
+
+            const meteorEl = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            meteorEl.innerHTML = `
+                <circle cx="0" cy="0" r="4.5" fill="#FBBF24" class="meteor-glow" />
+                <line x1="0" y1="0" x2="${-vx*3}" y2="${-vy*3}" stroke="rgba(234,88,12,0.8)" stroke-width="2.5" stroke-linecap="round" />
+            `;
+            document.getElementById('top-meteor-layer').appendChild(meteorEl);
+
+            topMeteors.push({
+                el: meteorEl, x: startX, y: startY, vx: vx, vy: vy, bounced: false, opacity: 1
+            });
+        }
+
+        function updateTopMeteors() {
+            const cx = 150;
+            const cy = 100;
+            const shieldRadius = 46;
+
+            for (let i = topMeteors.length - 1; i >= 0; i--) {
+                const m = topMeteors[i];
+                m.x += m.vx; m.y += m.vy;
+                const dist = Math.hypot(m.x - cx, m.y - cy);
+
+                // 產生隨機的「未阻擋」來模擬一開始防護網太慢的缺點
+                if (!m.bounced && dist <= shieldRadius) {
+                    if(Math.random() < 0.2) {
+                        // 20% 機率穿透，代表防護網有漏洞
+                    } else {
+                        m.bounced = true;
+                        const nx = (m.x - cx) / dist;
+                        const ny = (m.y - cy) / dist;
+                        const dot = m.vx * nx + m.vy * ny;
+                        m.vx = m.vx - 2 * dot * nx + (Math.random() - 0.5) * 0.6;
+                        m.vy = m.vy - 2 * dot * ny + (Math.random() - 0.5) * 0.6;
+                        flashTopShield();
+                        spawnTopRipple(m.x, m.y);
+                    }
+                }
+
+                if (!m.bounced && dist <= 24) {
+                    // 砸中基地
+                    createExplosion(document.getElementById('top-meteor-layer'), m.x, m.y);
+                    m.opacity = 0;
+                }
+
+                m.el.setAttribute("transform", `translate(${m.x}, ${m.y})`);
+                
+                if (m.bounced) {
+                    m.opacity -= 0.03;
+                    m.el.setAttribute("opacity", m.opacity);
+                }
+
+                if (m.opacity <= 0 || m.x < -60 || m.x > 360 || m.y < -60 || m.y > 260) {
+                    m.el.remove();
+                    topMeteors.splice(i, 1);
+                }
+            }
+        }
+
+        function spawnTopRipple(x, y) {
+            const rippleEl = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            rippleEl.setAttribute("cx", x);
+            rippleEl.setAttribute("cy", y);
+            rippleEl.setAttribute("r", 2);
+            rippleEl.setAttribute("fill", "none");
+            rippleEl.setAttribute("stroke", "#EA580C");
+            rippleEl.setAttribute("stroke-width", "2.5");
+            document.getElementById('top-ripple-layer').appendChild(rippleEl);
+
+            topRipples.push({ el: rippleEl, r: 2, maxR: 18 + Math.random() * 8, opacity: 1 });
+        }
+
+        function updateTopRipples() {
+            for (let i = topRipples.length - 1; i >= 0; i--) {
+                const rp = topRipples[i];
+                rp.r += 1.8;
+                rp.opacity = 1 - (rp.r / rp.maxR);
+                rp.el.setAttribute("r", rp.r);
+                rp.el.setAttribute("stroke-width", 2.5 * rp.opacity);
+                rp.el.setAttribute("opacity", rp.opacity);
+
+                if (rp.r >= rp.maxR) {
+                    rp.el.remove();
+                    topRipples.splice(i, 1);
+                }
+            }
+        }
+
+        function flashTopShield() {
+            const shield = document.getElementById('top-shield');
+            if (!shield) return;
+            shield.setAttribute("stroke-width", "5.5");
+            shield.setAttribute("stroke", "#FBBF24");
+            setTimeout(() => {
+                shield.setAttribute("stroke-width", "3");
+                shield.setAttribute("stroke", "#EA580C");
+            }, 120);
+        }
+
+        // ====== Phase 1: 創造 (主程式重構積木) ======
+        const mainData = {
+            1: '<div class="block-green border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left flex items-center gap-1">筆跡寬度設為 <span class="bg-white border border-slate-300 w-6 h-4 inline-block rounded shadow-inner align-middle"></span></div>',
+            2: '<div class="bg-[#FF8C1A] border-b-[3px] border-[#DB6E00] text-white px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left flex items-center gap-2">變數 <span class="bg-white text-orange-600 font-bold px-1.5 py-0.5 rounded-full shadow-inner text-[10px]">正幾邊形</span> 設為 <span class="bg-white border border-slate-300 w-6 h-4 inline-block rounded shadow-inner align-middle"></span></div>',
+            3: '<div class="bg-[#FF8C1A] border-b-[3px] border-[#DB6E00] text-white px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left flex items-center gap-2">變數 <span class="bg-white text-orange-600 font-bold px-1.5 py-0.5 rounded-full shadow-inner text-[10px]">幾個圖形</span> 設為 <span class="bg-white border border-slate-300 w-6 h-4 inline-block rounded shadow-inner align-middle"></span></div>',
+            4: '<div class="block-green border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-center">下筆</div>',
+            5: '<div class="block-pink border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left flex items-center gap-1"><span class="font-bold tracking-wide">呼叫 畫幾個圖形</span> <span class="bg-[#FF8C1A] border border-[#DB6E00] text-white px-1.5 py-0.5 rounded-full text-[9px] shadow-sm ml-1 flex items-center gap-1">幾個圖形</span></div>',
+            6: '<div class="block-green border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-center">停筆</div>'
+        };
+        const mainDesc = {
+            1: "設定防禦強度：加強筆跡寬度避免貫穿", 
+            2: "宣告常數：直接設定圖形邊數(空白處自己決定)", 
+            3: "宣告常數：直接設定陣列數量(空白處自己決定)", 
+            4: "準備：落下筆尖",
+            5: "一鍵啟動：呼叫第二層函式並傳入變數",
+            6: "結束：抬起筆尖"
+        };
+        let cMain = []; let tMain = [];
+
+        function initMainGame() {
+            cMain = [1, 2, 3, 4, 5, 6].sort(() => Math.random() - 0.5);
+            tMain = [];
+            if(document.getElementById('main-flow-msg')) document.getElementById('main-flow-msg').textContent = "";
+            renderMainGame();
+        }
+
+        function tryPlaceMainItem(id) {
+            const expectedId = tMain.length + 1;
+            const msg = document.getElementById('main-flow-msg');
+            if (id === expectedId) {
+                cMain = cMain.filter(x => x !== id);
+                tMain.push(id);
+                msg.textContent = "✅ 放置正確！";
+                msg.className = "text-sm font-bold text-emerald-600";
+                
+                if (tMain.length === 6) {
+                    msg.innerHTML = "🎉 重構完成！再也不用等待詢問，防禦網已準備好極速佈署！ <button onclick='playFastDeploymentAnimation()' class='ml-2 bg-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-orange-700 shadow-sm transition'>觀看一鍵啟動 ➔</button>";
+                    playFastDeploymentAnimation();
+                }
+                renderMainGame();
+            } else {
+                msg.textContent = "❌ 順序不對！請先設定寬度 ➔ 宣告兩個變數 ➔ 下筆 ➔ 呼叫函式 ➔ 停筆。";
+                msg.className = "text-sm font-bold text-rose-500";
+            }
+        }
+
+        function renderMainGame() {
+            const src = document.getElementById('main-source-container');
+            const tgt = document.getElementById('main-target-container');
+            if(!src || !tgt) return;
+            
+            src.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-4 w-full text-center border-b border-slate-200 pb-2">待排積木區</p>';
+            cMain.forEach(id => {
+                const b = document.createElement('button');
+                b.className = "w-full mb-2 transform hover:scale-[1.01] transition-transform text-left";
+                b.innerHTML = mainData[id];
+                b.onclick = () => tryPlaceMainItem(id);
+                src.appendChild(b);
+            });
+
+            tgt.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-2 w-full text-center border-b border-slate-200 pb-2">重構主程式組裝區</p>';
+            for (let i = 1; i <= 6; i++) {
+                const row = document.createElement('div');
+                row.className = `flex items-center gap-2 w-full mb-1.5`;
+                const desc = document.createElement('div');
+                desc.className = "text-[10px] font-bold text-slate-500 w-2/5 text-right tracking-wide";
+                desc.textContent = mainDesc[i];
+                const slot = document.createElement('div');
+                slot.className = "w-3/5";
+                
+                if (tMain.includes(i)) slot.innerHTML = mainData[i];
+                else slot.innerHTML = `<div class="border-2 border-dashed border-slate-300 rounded-md bg-slate-50 h-8 flex items-center justify-center text-[10px] text-slate-400 font-bold shadow-inner">等待積木...</div>`;
+                
+                row.appendChild(desc); row.appendChild(slot); tgt.appendChild(row);
+            }
+        }
+
+        // 極速啟動動畫 (Phase 1)
+        let fastDeployInterval = null;
+        function playFastDeploymentAnimation() {
+            const svgContainer = document.getElementById('main-sim-container');
+            if(!svgContainer) return;
+            
+            svgContainer.innerHTML = `
+                <div class="sim-badge" style="border-color:#EA580C; background: rgba(15,23,42,0.9); color: #FB923C;">極速圓形護盾佈署</div>
+                <svg id="fast-deploy-svg" viewBox="0 0 300 200" class="w-full h-full absolute inset-0 z-10" preserveAspectRatio="xMidYMid slice"></svg>
+            `;
+            
+            const svg = document.getElementById('fast-deploy-svg');
+            startDrawingGenericShield(svg, '#EA580C', 150, 100, 15); 
+        }
+
+        // 繪製與標題相同的圓形防護罩 (避免透露具體多邊形參數)
+        function startDrawingGenericShield(svgElement, color, cx = 150, cy = 100, drawSpeed = 20) {
+            if (fastDeployInterval) clearInterval(fastDeployInterval);
+            
+            svgElement.innerHTML = `
+                <rect x="0" y="0" width="300" height="110" fill="#020617" />
+                <g id="stars-layer-fast"></g>
+                <path d="M0 110 Q 150 105 300 110 L 300 200 L 0 200 Z" fill="#475569" />
+                <path d="M0 120 Q 150 115 300 120 L 300 200 L 0 200 Z" fill="#334155" />
+                <g transform="translate(${cx}, ${cy})">
+                    <circle cx="0" cy="0" r="22" fill="#0ea5e9" />
+                    <path d="M -10 -10 Q 0 -15 5 -5 T 15 0 Q 10 10 0 10 T -15 0 Z" fill="#22c55e" />
+                    <path d="M -5 10 Q 5 20 15 15 T 10 5 Z" fill="#22c55e" />
+                </g>
+            `;
+
+            const starsLayer = svgElement.querySelector('#stars-layer-fast');
+            for(let i=0; i<30; i++) {
+                const star = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                star.setAttribute("cx", Math.random() * 300);
+                star.setAttribute("cy", Math.random() * 110);
+                star.setAttribute("r", Math.random() * 1.5 + 0.5);
+                star.setAttribute("fill", "#FBBF24");
+                star.setAttribute("opacity", Math.random() * 0.8 + 0.2);
+                starsLayer.appendChild(star);
+            }
+
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("fill", "none");
+            path.setAttribute("stroke-width", "3");
+            path.setAttribute("stroke", color);
+            path.setAttribute("class", "glowing-orange-path");
+            path.setAttribute("stroke-linecap", "round");
+            svgElement.appendChild(path);
+
+            const sprite = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            sprite.innerHTML = `<polygon points="6,0 -4,-3.5 -2,0 -4,3.5" fill="#EF4444" stroke="#FFFFFF" stroke-width="0.5" transform="scale(1.2)" />`;
+            svgElement.appendChild(sprite);
+
+            let angle = -90;
+            const radius = 46; 
+            
+            fastDeployInterval = setInterval(() => {
+                angle += 4;
+                let rad = angle * Math.PI / 180;
+                let px = cx + Math.cos(rad) * radius;
+                let py = cy + Math.sin(rad) * radius;
+                
+                let startRad = -90 * Math.PI / 180;
+                let startX = cx + Math.cos(startRad) * radius;
+                let startY = cy + Math.sin(startRad) * radius;
+                let largeArcFlag = angle - (-90) <= 180 ? "0" : "1";
+                
+                if (angle < 270) {
+                    path.setAttribute("d", `M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${px} ${py}`);
+                }
+                
+                sprite.setAttribute("transform", `translate(${px}, ${py}) rotate(${angle + 90})`);
+
+                if (angle >= 270) {
+                    clearInterval(fastDeployInterval);
+                    path.setAttribute("d", `M ${startX} ${startY} A ${radius} ${radius} 0 1 1 ${startX - 0.01} ${startY}`);
+                    sprite.remove();
+                }
+            }, drawSpeed);
+        }
+
+        // ====== Phase 2: 幾何防禦參數盲測與物理視覺實驗室 ======
+        let labInterval = null;
+        let asteroidIntervals = [];
+        
+        window.meteorsHitHole = 0;      // 從孔洞穿透
+        window.meteorsPenetrated = 0;   // 強度太低被擊穿
+        window.meteorsBlocked = 0;
+
+        function updateLabBlocks() {
+            const count = parseInt(document.getElementById('shield-count').value) || 5;
+            const spacing = parseInt(document.getElementById('shield-spacing').value) || 50;
+            const shapeSides = parseInt(document.getElementById('shield-sides-select').value) || 5;
+            const thickness = parseInt(document.getElementById('shield-thickness').value) || 3;
+
+            document.getElementById('count-val').textContent = `${count} 組`;
+            document.getElementById('spacing-val').textContent = `${spacing} 點`;
+
+            document.getElementById('block-count').textContent = count;
+            document.getElementById('block-sides').textContent = shapeSides;
+
+            const thicknessBlockNum = document.getElementById('block-thickness-num');
+            thicknessBlockNum.textContent = thickness;
+
+            const fb = document.getElementById('lab-feedback');
+            fb.innerHTML = `參數設定更新：即將佈署 <strong>${count}</strong> 組 <strong>正${shapeSides}邊形</strong> 防禦網，筆跡強度為 <strong>${thickness}</strong>。點擊啟動進行盲測！`;
+            fb.className = "bg-slate-800 text-orange-300 border-t border-slate-700 rounded-b-2xl p-4 text-xs font-semibold text-center";
+        }
+
+        function runLabAnimation() {
+            if (labInterval) clearInterval(labInterval);
+            asteroidIntervals.forEach(id => clearInterval(id));
+            asteroidIntervals = [];
+            
+            window.meteorsHitHole = 0;
+            window.meteorsPenetrated = 0;
+            window.meteorsBlocked = 0;
+
+            const svg = document.getElementById('lab-svg');
+            const fb = document.getElementById('lab-feedback');
+            const count = parseInt(document.getElementById('shield-count').value) || 5;
+            const shieldSize = parseInt(document.getElementById('shield-spacing').value) || 50;
+            const shapeSides = parseInt(document.getElementById('shield-sides-select').value) || 5;
+            const thickness = parseInt(document.getElementById('shield-thickness').value) || 3;
+            
+            let hexColor = '#EA580C'; 
+            let pathClass = 'glowing-orange-path';
+
+            const cx = 150, cy = 110;
+
+            svg.innerHTML = `
+                <!-- 宇宙背景 -->
+                <rect x="0" y="0" width="300" height="110" fill="#020617" />
+                <g id="stars-layer-lab"></g>
+                <path d="M0 110 Q 150 105 300 110 L 300 200 L 0 200 Z" fill="#475569" />
+                <path d="M0 120 Q 150 115 300 120 L 300 200 L 0 200 Z" fill="#334155" />
+                <g transform="translate(${cx}, ${cy})">
+                    <circle cx="0" cy="0" r="22" fill="#0ea5e9" />
+                    <path d="M -10 -10 Q 0 -15 5 -5 T 15 0 Q 10 10 0 10 T -15 0 Z" fill="#22c55e" />
+                    <path d="M -5 10 Q 5 20 15 15 T 10 5 Z" fill="#22c55e" />
+                </g>
+                <g id="meteor-layer"></g>
+            `;
+
+            const starsLayer = svg.querySelector('#stars-layer-lab');
+            for(let i=0; i<40; i++) {
+                const star = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                star.setAttribute("cx", Math.random() * 300);
+                star.setAttribute("cy", Math.random() * 110);
+                star.setAttribute("r", Math.random() * 2 + 1);
+                star.setAttribute("fill", "#FBBF24");
+                star.setAttribute("class", "meteor-glow");
+                star.setAttribute("opacity", Math.random() * 0.8 + 0.2);
+                starsLayer.appendChild(star);
+            }
+
+            fb.textContent = `🛡️ 防禦罩極速環繞建構中... 變數自動帶入，無需等待回答！`;
+            fb.className = "bg-orange-600 text-slate-950 font-bold rounded-b-2xl p-4 text-xs text-center animate-pulse";
+
+            const L = shieldSize;
+            const extAngle = 360 / shapeSides;
+            const turnAngle = 360 / count;
+
+            let arrayPoints = [];
+            let startAngle = -90; 
+            for (let k = 0; k < count; k++) {
+                let px = cx, py = cy;
+                let currentAngle = startAngle + (k * turnAngle);
+                let vertices = [{x: px, y: py, angle: currentAngle}];
+                for (let j = 0; j < shapeSides; j++) {
+                    let rad = currentAngle * Math.PI / 180;
+                    px += Math.cos(rad) * L;
+                    py += Math.sin(rad) * L;
+                    currentAngle += extAngle;
+                    vertices.push({x: px, y: py, angle: currentAngle});
+                }
+                arrayPoints.push(vertices);
+            }
+
+            const finishedGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            svg.insertBefore(finishedGroup, svg.querySelector('#meteor-layer')); 
+
+            const activePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            activePath.setAttribute("fill", "none");
+            activePath.setAttribute("stroke-width", thickness);
+            activePath.setAttribute("stroke", hexColor);
+            activePath.setAttribute("class", pathClass);
+            activePath.setAttribute("stroke-linecap", "round");
+            activePath.setAttribute("stroke-linejoin", "round");
+            finishedGroup.appendChild(activePath);
+
+            const sprite = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            sprite.innerHTML = `<polygon points="6,0 -4,-3.5 -2,0 -4,3.5" fill="#EF4444" stroke="#FFFFFF" stroke-width="0.5" transform="scale(1.2)" />`;
+            svg.appendChild(sprite);
+
+            let s = 0;
+            const totalSteps = count * shapeSides;
+            let currentPathData = '';
+
+            const drawStep = () => {
+                const shapeIdx = Math.floor(s / shapeSides);
+                const edgeIdx = s % shapeSides;
+                const currVertex = arrayPoints[shapeIdx][edgeIdx + 1];
+
+                if (edgeIdx === 0) {
+                    if (s > 0) {
+                        const clone = activePath.cloneNode(true);
+                        finishedGroup.appendChild(clone);
+                    }
+                    currentPathData = `M ${cx} ${cy}`;
+                }
+
+                currentPathData += ` L ${currVertex.x} ${currVertex.y}`;
+                activePath.setAttribute("d", currentPathData);
+                sprite.setAttribute("transform", `translate(${currVertex.x}, ${currVertex.y}) rotate(${currVertex.angle})`);
+
+                s++;
+                if (s >= totalSteps) {
+                    clearInterval(labInterval);
+                    const clone = activePath.cloneNode(true);
+                    finishedGroup.appendChild(clone);
+                    activePath.setAttribute("d", ""); 
+                    sprite.remove(); 
+                    
+                    fb.innerHTML = `🟢 陣列部署完畢！<br>準備迎擊隕石，請觀察防護網是否能承受衝擊！`;
+                    fb.className = "bg-slate-700 text-white font-bold rounded-b-2xl p-4 text-xs text-center shadow-md";
+
+                    triggerAsteroidAttack(svg.querySelector('#meteor-layer'), arrayPoints, hexColor, cx, cy, thickness);
+                }
+            };
+
+            const stepSpeed = Math.max(5, 60 - (count * shapeSides) / 4);
+            drawStep();
+            labInterval = setInterval(drawStep, stepSpeed);
+        }
+
+        // 精準隕石物理攻擊模擬 (包含防禦強度擊穿判定)
+        function triggerAsteroidAttack(layer, shields, shieldColor, cx, cy, thickness) {
+            window.totalMeteors = 15;
+            for (let i = 0; i < window.totalMeteors; i++) {
+                setTimeout(() => {
+                    createPrecisionMeteor(layer, shields, shieldColor, cx, cy, thickness);
+                }, i * 350);
+            }
+        }
+
+        function createPrecisionMeteor(layer, shields, shieldColor, cx, cy, thickness) {
+            const meteor = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            const startX = Math.random() * 300;
+            const startY = -10; 
+            meteor.innerHTML = `
+                <circle cx="0" cy="0" r="3.5" fill="#FBBF24" class="meteor-glow" />
+                <line x1="0" y1="-3" x2="0" y2="-12" stroke="rgba(251,191,36,0.6)" stroke-width="2.5" stroke-linecap="round" />
+            `;
+            layer.appendChild(meteor);
+
+            let px = startX, py = startY;
+            const angleToCenter = Math.atan2(cy - startY, cx - startX);
+            const speed = 2.5 + Math.random() * 1.5;
+            const vx = Math.cos(angleToCenter) * speed;
+            const vy = Math.sin(angleToCenter) * speed;
+            
+            const asteroidInterval = setInterval(() => {
+                px += vx;
+                py += vy;
+                const rot = (angleToCenter * 180 / Math.PI) + 90;
+                meteor.setAttribute("transform", `translate(${px}, ${py}) rotate(${rot})`);
+
+                // 物理碰撞偵測
+                let hitShield = false;
+                let broken = false; // 是否被貫穿
+                
+                // 動態碰撞範圍：寬度越寬越容易判定撞擊
+                const collisionThreshold = 3 + (thickness / 2);
+
+                for (let k = 0; k < shields.length; k++) {
+                    let poly = shields[k];
+                    for (let j = 0; j < poly.length - 1; j++) {
+                        let p1 = poly[j];
+                        let p2 = poly[j+1];
+                        if (pointToSegmentDistance(px, py, p1.x, p1.y, p2.x, p2.y) < collisionThreshold) {
+                            hitShield = true;
+                            break;
+                        }
+                    }
+                    if (hitShield) break;
+                }
+
+                // 強度判定：如果寬度只有 1，有 70% 的機率被高能隕石貫穿
+                if (hitShield) {
+                    if (thickness === 1 && Math.random() < 0.7) {
+                        broken = true;
+                        hitShield = false; // 取消撞擊反彈，讓它繼續掉落
+                        createShieldRipple(layer, px, py, shieldColor); // 產生微弱漣漪表示穿透
+                    }
+                }
+
+                const distToCenter = Math.hypot(px - cx, py - cy);
+
+                if (hitShield) {
+                    clearInterval(asteroidInterval);
+                    createShieldRipple(layer, px, py, shieldColor);
+                    bounceAndDestroy(meteor, px, py, angleToCenter);
+                    window.meteorsBlocked++;
+                    checkMeteorStatus(thickness);
+                } else if (distToCenter <= 22) { // 漏網之魚碰到地球半徑
+                    clearInterval(asteroidInterval);
+                    createExplosion(layer, px, py);
+                    meteor.remove();
+                    
+                    if (broken) {
+                        window.meteorsPenetrated++;
+                    } else {
+                        window.meteorsHitHole++;
+                    }
+                    
+                    const fb = document.getElementById('lab-feedback');
+                    if (broken) {
+                        fb.innerHTML = `💥 警告！防禦網太薄 (強度不足)，被高能隕石輕易貫穿了！請增加筆跡寬度。`;
+                    } else {
+                        fb.innerHTML = `💥 警告！防禦網存在幾何孔洞，隕石從死角穿透！請增加陣列圖形數量。`;
+                    }
+                    fb.className = "bg-rose-600 text-white font-bold rounded-b-2xl p-4 text-xs text-center shadow-md animate-pulse";
+                    
+                    checkMeteorStatus(thickness);
+                }
+            }, 30);
+            
+            asteroidIntervals.push(asteroidInterval);
+        }
+
+        function checkMeteorStatus(thickness) {
+            if (window.meteorsHitHole + window.meteorsPenetrated + window.meteorsBlocked === window.totalMeteors) {
+                const fb = document.getElementById('lab-feedback');
+                let totalHits = window.meteorsHitHole + window.meteorsPenetrated;
+                
+                if (totalHits > 0) {
+                    if (window.meteorsPenetrated > 0) {
+                        fb.innerHTML = `💥 盲測結束：基地遭受 <strong>${totalHits}</strong> 次撞擊！<br>主因：【強度太弱被貫穿】。請加大筆跡寬度！`;
+                    } else {
+                        fb.innerHTML = `💥 盲測結束：基地遭受 <strong>${totalHits}</strong> 次撞擊！<br>主因：【陣列孔洞死角】。請增加形狀數量或變更邊數！`;
+                    }
+                    fb.className = "bg-rose-600 text-white font-bold rounded-b-2xl p-4 text-sm text-center shadow-md";
+                } else {
+                    fb.innerHTML = `🎉 盲測結束：完美防禦！毫無死角且強度足夠！<br>基地安全無虞！任務大成功！`;
+                    fb.className = "bg-emerald-600 text-white font-bold rounded-b-2xl p-4 text-sm text-center shadow-md";
+                }
+            }
+        }
+
+        function createShieldRipple(layer, x, y, color) {
+            const ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            ring.setAttribute("cx", x);
+            ring.setAttribute("cy", y);
+            ring.setAttribute("r", "2");
+            ring.setAttribute("fill", "none");
+            ring.setAttribute("stroke", color);
+            ring.setAttribute("stroke-width", "2");
+            layer.appendChild(ring);
+
+            let r = 2;
+            const ripInterval = setInterval(() => {
+                r += 2;
+                ring.setAttribute("r", r);
+                ring.setAttribute("stroke-width", 2 * (1 - r/18));
+                if (r >= 18) {
+                    clearInterval(ripInterval);
+                    ring.remove();
+                }
+            }, 30);
+        }
+
+        function bounceAndDestroy(meteor, x, y, incomingAngle) {
+            let px = x, py = y;
+            const bounceAngle = incomingAngle + Math.PI + (Math.random() - 0.5) * 1;
+            const vx = Math.cos(bounceAngle) * 4;
+            const vy = Math.sin(bounceAngle) * 4;
+
+            const bounceInterval = setInterval(() => {
+                px += vx;
+                py += vy;
+                meteor.setAttribute("transform", `translate(${px}, ${py}) rotate(${px*5})`);
+                meteor.setAttribute("opacity", Math.max(0, 1 - Math.hypot(px-x, py-y)/50));
+
+                if (Math.hypot(px-x, py-y) > 50 || px < -20 || px > 320 || py < -20 || py > 220) {
+                    clearInterval(bounceInterval);
+                    meteor.remove();
+                }
+            }, 30);
+        }
+
+        function createExplosion(layer, x, y) {
+            const exp = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            exp.setAttribute("cx", x);
+            exp.setAttribute("cy", y);
+            exp.setAttribute("r", "1");
+            exp.setAttribute("fill", "#EF4444");
+            layer.appendChild(exp);
+
+            let r = 1;
+            const expInterval = setInterval(() => {
+                r += 1.5;
+                exp.setAttribute("r", r);
+                exp.setAttribute("fill", r % 2 === 0 ? "#EA580C" : "#EF4444");
+                exp.setAttribute("opacity", 1 - r/15);
+                if (r >= 15) {
+                    clearInterval(expInterval);
+                    exp.remove();
+                }
+            }, 30);
+            
+            const radarContainer = document.getElementById('lab-svg').parentNode;
+            radarContainer.classList.add('translate-y-1');
+            setTimeout(() => radarContainer.classList.remove('translate-y-1'), 100);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initTopSimulation(); 
+            initMainGame();
+            updateLabBlocks();
+        });
+    </script>
+</body>
+</html>

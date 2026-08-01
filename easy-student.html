@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch AI 助教 - 學生自我測試站</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .spinner { border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #10b981; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #a7f3d0; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-emerald-50 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-xl overflow-hidden flex flex-col border border-emerald-100 relative">
+        
+        <!-- 標題列 -->
+        <div class="bg-emerald-600 p-6 text-center text-white relative z-10">
+            <i class="fa-solid fa-microscope text-5xl mb-3 opacity-90"></i>
+            <h1 class="text-3xl font-black tracking-wide">Scratch AI 助教測試站</h1>
+            <p class="text-emerald-100 mt-2 text-sm">繳交作業前，先讓 AI 幫你檢查邏輯對不對吧！</p>
+        </div>
+
+        <div class="p-6 md:p-8 flex flex-col gap-6 relative z-10 min-h-[300px] justify-center">
+
+            <!-- 狀態 1：未開放 / 伺服器斷線警告 (防呆設計) -->
+            <div id="lockedWarning" class="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-xl p-8 text-center shadow-sm flex flex-col items-center justify-center transition-all">
+                <i class="fa-solid fa-spinner fa-spin text-4xl mb-4 text-yellow-500" id="lockedIcon"></i>
+                <strong class="text-xl" id="lockedTitle">正在連線伺服器...</strong>
+                <p class="mt-2 text-sm" id="lockedDesc">請稍候，系統正在檢查老師是否已發佈作業標準。</p>
+                <button onclick="checkRoomStatus()" id="recheckBtn" class="mt-6 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-6 py-2 rounded-lg font-bold transition shadow-sm border border-yellow-300 hidden">
+                    <i class="fa-solid fa-rotate-right mr-1"></i> 重新檢查
+                </button>
+            </div>
+
+            <!-- 狀態 2：正常開放上傳區 (預設隱藏) -->
+            <div id="activeArea" class="hidden flex-col gap-6 w-full">
+                <!-- 上傳檔案 -->
+                <div id="uploadArea" class="border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl flex flex-col items-center justify-center p-10 hover:bg-emerald-50 hover:border-emerald-400 transition cursor-pointer group shadow-sm" onclick="triggerUpload()">
+                    <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-md mb-4 group-hover:scale-110 transition-transform duration-300 border border-gray-100">
+                        <i class="fa-solid fa-cloud-arrow-up text-4xl text-emerald-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-700 mb-2" id="fileNameDisplay">點擊上傳你的 .sb3 檔案</h3>
+                    <p class="text-sm text-gray-400 text-center">選擇檔案後，點擊下方按鈕開始批改</p>
+                    <input type="file" id="studentFileInput" accept=".sb3" class="hidden" onchange="handleFileUpload()">
+                </div>
+
+                <!-- 執行測試按鈕 -->
+                <button id="submitBtn" onclick="runTest()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xl py-4 rounded-xl shadow-lg transition transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-rocket"></i> 開始 AI 測試
+                </button>
+            </div>
+
+            <!-- Loading 狀態 -->
+            <div id="loadingArea" class="hidden flex-col items-center justify-center py-6 w-full">
+                <div class="spinner mb-4"></div>
+                <span class="font-bold text-emerald-700" id="loadingText">AI 助教正在分析你的程式...</span>
+            </div>
+
+            <!-- 結果顯示區 -->
+            <div id="resultArea" class="hidden flex-col bg-white rounded-xl border-2 border-emerald-200 overflow-hidden shadow-inner mt-2 w-full">
+                <div class="flex justify-between items-center p-4 border-b border-emerald-100 bg-emerald-50">
+                    <h3 class="font-bold text-emerald-800 text-lg flex items-center">
+                        <i class="fa-solid fa-clipboard-check mr-2"></i>測試結果報告
+                    </h3>
+                    <div class="bg-white px-4 py-1.5 rounded-lg shadow-sm border border-emerald-200 flex items-center">
+                        <span class="text-emerald-700 font-black text-2xl" id="scoreDisplay">0</span>
+                        <span class="text-emerald-600 font-bold ml-1 mt-1">分</span>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50">
+                    <pre id="feedbackDisplay" class="text-sm text-gray-800 whitespace-pre-wrap font-mono bg-white p-4 rounded-lg border border-gray-200 shadow-sm leading-relaxed min-h-[150px] custom-scrollbar overflow-y-auto"></pre>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 🟢 固定寫死後端 API 網址
+        const API_URL = "https://flanking-snort-cyclic.ngrok-free.dev"; 
+        const ROOM_CODE = "scratch"; // 固定代碼
+        let studentFile = null;
+
+        // 🟢 網頁載入時，自動向伺服器探測房間是否開放
+        window.addEventListener('DOMContentLoaded', checkRoomStatus);
+
+        async function checkRoomStatus() {
+            const lockedWarning = document.getElementById('lockedWarning');
+            const activeArea = document.getElementById('activeArea');
+            const lockedIcon = document.getElementById('lockedIcon');
+            const lockedTitle = document.getElementById('lockedTitle');
+            const lockedDesc = document.getElementById('lockedDesc');
+            const recheckBtn = document.getElementById('recheckBtn');
+
+            // 恢復載入中狀態
+            lockedWarning.className = "bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-xl p-8 text-center shadow-sm flex flex-col items-center justify-center transition-all";
+            lockedIcon.className = "fa-solid fa-spinner fa-spin text-4xl mb-4 text-yellow-500";
+            lockedTitle.innerText = "正在連線伺服器...";
+            lockedDesc.innerText = "請稍候，系統正在檢查老師是否已發佈作業標準。";
+            recheckBtn.classList.add('hidden');
+            activeArea.classList.add('hidden');
+            activeArea.classList.remove('flex');
+            
+            try {
+                // 呼叫 check_room API
+                const response = await fetch(`${API_URL}/check_room?room_code=${ROOM_CODE}`, {
+                    method: 'GET',
+                    headers: {'ngrok-skip-browser-warning': 'true'}
+                });
+                
+                if (response.ok) {
+                    // 🎉 成功連線且房間已開放
+                    lockedWarning.classList.add('hidden');
+                    lockedWarning.classList.remove('flex');
+                    activeArea.classList.remove('hidden');
+                    activeArea.classList.add('flex');
+                } else {
+                    throw new Error('未開放');
+                }
+            } catch(e) {
+                // ❌ 無法連線或房間未開放
+                lockedWarning.className = "bg-red-50 border border-red-200 text-red-800 rounded-xl p-8 text-center shadow-sm flex flex-col items-center justify-center transition-all";
+                lockedIcon.className = "fa-solid fa-lock text-5xl mb-4 text-red-400";
+                lockedTitle.innerText = "測試站尚未開放";
+                lockedDesc.innerHTML = "老師尚未發佈本次作業的測試標準！<br>請等待老師發佈後，點擊下方按鈕重新檢查。";
+                recheckBtn.classList.remove('hidden');
+            }
+        }
+
+        function triggerUpload() { document.getElementById('studentFileInput').click(); }
+
+        function handleFileUpload() {
+            const input = document.getElementById('studentFileInput');
+            if (input.files.length > 0) {
+                studentFile = input.files[0];
+                document.getElementById('fileNameDisplay').innerHTML = `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check-circle mr-1"></i> 已選擇：${studentFile.name}</span>`;
+                document.getElementById('uploadArea').classList.add('border-emerald-400', 'bg-emerald-50');
+            }
+        }
+
+        async function runTest() {
+            if (!studentFile) return alert("請先點擊上方虛線框，上傳你的 .sb3 作業檔案！");
+
+            const btn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loadingArea');
+            const resultArea = document.getElementById('resultArea');
+            
+            btn.classList.add('hidden');
+            resultArea.classList.add('hidden');
+            loading.classList.remove('hidden');
+            loading.classList.add('flex');
+
+            try {
+                const formData = new FormData();
+                formData.append('room_code', ROOM_CODE);
+                formData.append('student_file', studentFile);
+
+                const response = await fetch(`${API_URL}/student_test`, { 
+                    method: 'POST', 
+                    headers: {'ngrok-skip-browser-warning': 'true'}, 
+                    body: formData 
+                });
+                
+                if (!response.ok) {
+                    // 🚦 針對塞車 (429) 或未開放 (404) 給予友善提示
+                    if (response.status === 404) throw new Error("老師尚未開放本次作業測試，請稍後再試！");
+                    if (response.status === 429) throw new Error("🚦 塞車啦！目前太多同學同時上傳，請等 5 秒後再重新按一次喔！");
+                    
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.error || `伺服器回應異常 (狀態碼: ${response.status})`);
+                }
+
+                const result = await response.json();
+                if (result.error) throw new Error(result.error);
+
+                document.getElementById('scoreDisplay').innerText = result.score;
+                document.getElementById('feedbackDisplay').innerText = result.feedback;
+                
+                const scoreBox = document.getElementById('scoreDisplay').parentElement;
+                if (result.score >= 60) {
+                    scoreBox.className = "bg-emerald-100 px-4 py-1.5 rounded-lg shadow-sm border border-emerald-300 flex items-center";
+                    document.getElementById('scoreDisplay').className = "text-emerald-700 font-black text-2xl";
+                } else {
+                    scoreBox.className = "bg-orange-50 px-4 py-1.5 rounded-lg shadow-sm border border-orange-200 flex items-center";
+                    document.getElementById('scoreDisplay').className = "text-orange-600 font-black text-2xl";
+                }
+
+                resultArea.classList.remove('hidden');
+                resultArea.classList.add('flex');
+
+            } catch (err) {
+                // 🚦 針對完全斷線給予友善提示
+                if (err.message === 'Failed to fetch') {
+                    alert(`測試失敗：\n連線不到伺服器，可能老師的系統暫時中斷了，請稍後再試！`);
+                } else {
+                    alert(`測試失敗：\n${err.message}`);
+                }
+                checkRoomStatus(); // 若測試失敗可能代表伺服器斷了，自動重查狀態
+            } finally {
+                loading.classList.add('hidden');
+                loading.classList.remove('flex');
+                btn.classList.remove('hidden');
+                btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> 重新測試一次';
+            }
+        }
+    </script>
+</body>
+</html>

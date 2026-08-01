@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LESSON 4 - 魔法變數：螺旋圖騰</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght=300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #F8F9FA; color: #333333; }
+        .slide-up-fade { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        .sim-window { position: relative; overflow: hidden; }
+        .sim-badge { position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,0.9); border: 1px solid #E2E8F0; padding: 2px 8px; border-radius: 9999px; font-size: 0.65rem; font-weight: bold; color: #64748B; display: flex; align-items: center; gap: 4px; z-index: 10; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .sim-badge::before { content: ''; display: block; width: 6px; height: 6px; background-color: #10B981; border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body class="antialiased selection:bg-slate-200 selection:text-slate-800">
+
+    <header class="bg-white border-b border-gray-100 pt-8 pb-12 slide-up-fade">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8">
+            <div class="mb-6">
+                <a href="https://su-yung-sheng.github.io/unforte115/" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> 
+                    返回網站首頁
+                </a>
+            </div>
+            <p class="text-sm font-medium text-indigo-500 mb-2 tracking-widest uppercase">演算法與程式設計</p>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight">星際防禦工程師：<br class="hidden md:block">用程式編織能量防護網</h1>
+            <p class="text-lg text-slate-500 font-light max-w-2xl">結合「IPO 思維」與「重複結構」，循序漸進建立邏輯思維與幾何繪圖能力，並透過實作防禦網任務，體驗程式設計的強大魔力。</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 lg:px-8 py-12 relative">
+        <a href="https://su-yung-sheng.github.io/unforte115/1150700.html" class="mb-8 inline-flex items-center text-sm font-medium text-slate-400 hover:text-slate-800 transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 返回課程總覽
+        </a>
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12 mb-8 slide-up-fade">
+            <span class="text-sm font-semibold text-slate-400 tracking-wider block mb-2">LESSON 4</span>
+            <h2 class="text-3xl font-bold text-slate-800 mb-4">魔法變數：螺旋圖騰</h2>
+            <p class="text-slate-500 font-light text-lg mb-10">電腦不僅能做重複的事，還能透過「變數」記住不斷變化的數值。讓我們結合變數與重複結構，畫出向外擴散的漸變螺旋！</p>
+            
+            <div class="space-y-16">
+                
+                <!-- 第一階段：手動螺旋 (不用迴圈) -->
+                <div class="border-b-2 border-dashed border-slate-100 pb-16">
+                    <div class="flex items-center mb-8">
+                        <span class="bg-emerald-100 text-emerald-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">1</span>
+                        <h3 class="text-2xl font-bold text-slate-800">第一階段：挑戰手動繪製螺旋方形</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-8 mb-8">
+                        <div class="bg-slate-50 rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm">
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-200 pb-3">
+                                <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">A</span> 挑戰：組裝手動螺旋積木 (不使用重複迴圈)
+                            </h4>
+                            <p class="text-slate-600 font-light text-sm mb-6">
+                                螺旋的特性是「每一次畫的邊都要比上一次更長」。在不使用重複執行積木的情況下，我們必須手動依序增加長度！請將下方 7 塊積木拖曳或點選排列，由小到大（10 ➔ 20 ➔ 30 ➔ 40 點）組裝好我們的探測車路線！
+                            </p>
+                            
+                            <div class="flex flex-col md:flex-row gap-6 mb-4">
+                                <div class="w-full md:w-1/3 bg-white border border-slate-200 rounded-xl p-4 shadow-inner min-h-[280px]" id="var-source-container"></div>
+                                <div class="w-full md:w-2/3 bg-white border-2 border-dashed border-slate-300 rounded-xl p-4 flex flex-col justify-start min-h-[280px]" id="var-target-container"></div>
+                            </div>
+                            <div class="flex justify-end h-6"><span id="var-flow-msg" class="text-sm font-bold transition-all"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">B</span> 參考：程式 Pseudo Code
+                            </h4>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 overflow-x-auto h-full">
+<pre class="font-mono text-sm text-slate-600 leading-relaxed"><span class="text-slate-400 italic">// 手動繪製四邊螺旋方形，每一步都在長大</span>
+畫筆設定
+下筆
+前進 10 點 ➔ 右轉 90 度
+前進 20 點 ➔ 右轉 90 度
+前進 30 點 ➔ 右轉 90 度
+前進 40 點
+停筆</pre>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">C</span> 執行結果模擬
+                            </h4>
+                            <div class="sim-window bg-white border border-slate-200 rounded-2xl shadow-sm h-full min-h-[180px] flex flex-col items-center justify-center" id="var-sim-container">
+                                <div class="text-slate-400 font-bold text-sm flex flex-col items-center">
+                                    <span class="text-4xl mb-3">🔒</span>
+                                    請先完成 A 區的積木組裝
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第二階段：螺旋迴圈 (用變數與迴圈) -->
+                <div class="border-b-2 border-dashed border-slate-100 pb-16">
+                    <div class="flex items-center mb-8">
+                        <span class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">2</span>
+                        <h3 class="text-2xl font-bold text-slate-800">第二階段：變數與重複結構的魔法</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-8 mb-8">
+                        <div class="bg-slate-50 rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm">
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-200 pb-3">
+                                <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">A</span> 挑戰：用「變數與迴圈」簡化並畫出無限螺旋
+                            </h4>
+                            <p class="text-slate-600 font-light text-sm mb-6">
+                                剛剛手動寫了好多行程式碼，如果要畫 40 個邊，程式碼會長到看不完！這時就是<strong>「重複迴圈」</strong>搭配<strong>「變數」</strong>登場的完美時機！請將 4 塊核心積木排入重複框中，讓線條利用變數自動長大，最後停筆。
+                            </p>
+                            
+                            <div class="flex flex-col md:flex-row gap-6 mb-4">
+                                <div class="w-full md:w-1/3 bg-white border border-slate-200 rounded-xl p-4 shadow-inner min-h-[200px]" id="loop-source-container"></div>
+                                <div class="w-full md:w-2/3 bg-white border-2 border-dashed border-slate-300 rounded-xl p-4 flex flex-col justify-start min-h-[200px]" id="loop-target-container"></div>
+                            </div>
+                            <div class="flex justify-end h-6"><span id="loop-flow-msg" class="text-sm font-bold transition-all"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">B</span> 參考：程式 Pseudo Code
+                            </h4>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 overflow-x-auto h-full">
+<pre class="font-mono text-sm text-slate-600 leading-relaxed"><span class="text-slate-400 italic">// 變數初始化</span>
+下筆
+變數 長度 設為 0
+
+<span class="text-slate-400 italic">// 螺旋核心邏輯 (使用重複執行簡化代碼)</span>
+<span class="text-orange-500 font-bold">重複執行</span> ( 40 ) 次：
+  變數 長度 <span class="text-sky-600 font-bold">改變 10</span>
+  移動 變數 長度 點
+  右轉 90 度
+停筆</pre>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">C</span> 執行結果模擬
+                            </h4>
+                            <div class="sim-window bg-white border border-slate-200 rounded-2xl shadow-sm h-full min-h-[250px] flex items-center justify-center" id="loop-svg-container">
+                                <div class="text-slate-400 font-bold text-sm flex flex-col items-center">
+                                    <span class="text-4xl mb-3">🔒</span>
+                                    請先完成 A 區的積木組裝以解鎖動畫
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第三階段：實戰區 -->
+                <section class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 mt-12 slide-up-fade">
+                    <h4 class="text-xl font-bold text-slate-800 mb-3 flex items-center">
+                        <span class="text-2xl mr-2">🌀</span> 第三階段：實戰程式設計區 (旋轉角度的魔力)
+                    </h4>
+                    <p class="text-sm text-slate-500 font-light mb-6 leading-relaxed">
+                        只要更改迴圈中每次右轉的<strong class="text-indigo-600">「角度」</strong>，就能用同一組程式碼，畫出完全不同的螺旋圖騰！快來試試看改變旋轉角度吧！
+                    </p>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <div class="lg:col-span-2 space-y-5">
+                            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                                <h5 class="text-sm font-bold text-slate-700 mb-3">1. 選擇特殊角度</h5>
+                                <div class="flex flex-wrap gap-2 mb-6">
+                                    <button onclick="setSpiral(90)" class="px-3 py-1.5 bg-slate-100 text-slate-700 border border-slate-300 rounded hover:bg-slate-200 transition text-xs font-bold shadow-sm">方形螺旋 (90°)</button>
+                                    <button onclick="setSpiral(120)" class="px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded hover:bg-emerald-100 transition text-xs font-bold shadow-sm">三角螺旋 (120°)</button>
+                                    <button onclick="setSpiral(72)" class="px-3 py-1.5 bg-sky-50 text-sky-700 border border-sky-200 rounded hover:bg-sky-100 transition text-xs font-bold shadow-sm">五角星螺旋 (72°)</button>
+                                    <button onclick="setSpiral(95)" class="px-3 py-1.5 bg-fuchsia-50 text-fuchsia-700 border border-fuchsia-200 rounded hover:bg-fuchsia-100 transition text-xs font-bold shadow-sm">魔法螺旋 (95°)</button>
+                                </div>
+
+                                <h5 class="text-sm font-bold text-slate-700 mb-3">2. 設定探測車指令</h5>
+                                <!-- 仿 Scratch 巢狀積木群 -->
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col items-start font-bold text-sm shadow-inner overflow-x-auto">
+                                    <div class="bg-[#FFD500] border-b-[3px] border-[#CC9900] text-slate-800 px-4 py-2 rounded-t-xl rounded-b-md shadow-sm mb-1.5 w-full max-w-[260px] flex items-center gap-2">
+                                        當 🟢 綠旗被點擊
+                                    </div>
+                                    <div class="bg-[#FF6680] border-b-[3px] border-[#FF3355] text-white px-4 py-2 rounded-md shadow-sm mb-1.5 w-full max-w-[260px]">
+                                        畫筆設定
+                                    </div>
+                                    <div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-4 py-2 rounded-md shadow-sm mb-1.5 w-full max-w-[260px]">
+                                        下筆
+                                    </div>
+                                    <div class="bg-[#FF8C1A] border-b-[3px] border-[#DB6E00] text-white px-4 py-2 rounded-md shadow-sm mb-1.5 w-full max-w-[260px] flex items-center gap-2">
+                                        變數 <span class="bg-white text-orange-600 px-2 py-0.5 rounded-full text-xs shadow-inner">長度</span> 設為 <span class="bg-white text-slate-700 px-2 py-0.5 rounded-full text-xs shadow-inner">0</span>
+                                    </div>
+                                    
+                                    <div class="bg-[#FFAB19] border-b-[3px] border-[#CF8B17] text-white px-4 py-2 rounded-t-md shadow-sm w-full max-w-[260px] flex items-center gap-2">
+                                        重複執行 40 次
+                                    </div>
+                                    <div class="bg-[#FF8C1A] border-b-[3px] border-[#DB6E00] text-white px-4 py-2 rounded-md shadow-sm ml-4 my-1 w-[calc(100%-1rem)] max-w-[220px] flex items-center gap-2">
+                                        變數 <span class="bg-white text-orange-600 px-2 py-0.5 rounded-full text-xs shadow-inner">長度</span> 改變 10
+                                    </div>
+                                    <div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-4 py-2 rounded-md shadow-sm ml-4 mb-1 w-[calc(100%-1rem)] max-w-[220px] flex items-center gap-2">
+                                        移動 <span class="bg-[#FF8C1A] border border-[#DB6E00] px-3 py-0.5 rounded-full shadow-sm text-white text-[11px]">長度</span> 點
+                                    </div>
+                                    <div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-4 py-2 rounded-md shadow-sm ml-4 mb-1 w-[calc(100%-1rem)] max-w-[220px] flex items-center gap-2">
+                                        右轉 ↻
+                                        <input type="number" id="spiral-angle" value="90" class="w-14 text-center border border-transparent rounded-full px-1.5 py-0.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-inner"> 度
+                                    </div>
+                                    <div class="bg-[#FFAB19] border-b-[3px] border-[#CF8B17] h-3 rounded-b-md w-full max-w-[260px] shadow-sm mb-1.5"></div>
+                                    
+                                    <div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-4 py-2 rounded-md shadow-sm w-full max-w-[260px]">
+                                        停筆
+                                    </div>
+                                </div>
+
+                                <button onclick="runSpiralLab()" class="w-full mt-6 bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-indigo-700 shadow-md transition-all flex items-center justify-center gap-2 transform active:scale-95">
+                                    <span>🚀 啟動螺旋繪圖</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-3 flex flex-col">
+                            <div class="sim-window bg-slate-900 border border-slate-800 rounded-t-2xl shadow-sm flex-grow min-h-[350px]">
+                                <div class="sim-badge" style="border-color:#475569; background: rgba(15,23,42,0.9); color: #94A3B8;">即時模擬畫布</div>
+                                <svg id="spiral-svg" viewBox="0 0 200 150" class="w-full h-full" preserveAspectRatio="xMidYMid meet"></svg>
+                            </div>
+                            <div id="spiral-feedback" class="bg-slate-800 text-white rounded-b-2xl p-4 text-sm font-medium transition-colors duration-300 text-center shadow-md">
+                                點擊上方不同角度，觀賞螺旋的神奇變化！
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 最終完美積木組合 -->
+                    <div id="spiral-formula-reveal" class="hidden mt-8 slide-up-fade">
+                        <div class="bg-white/90 backdrop-blur-sm p-6 rounded-2xl border-2 border-indigo-200 shadow-lg flex flex-col items-center">
+                            <h5 class="text-xl font-bold text-indigo-900 mb-5 flex items-center gap-2">
+                                <span>🧩</span> 最終完美積木組合：千變萬化的螺旋圖騰
+                            </h5>
+                            <p class="text-sm text-slate-600 mb-6 text-center max-w-lg">我們將剛才組裝的所有積木合而為一，加上「詢問」與「變數」，這就是一個完整的螺旋繪圖程式碼！</p>
+                            
+                            <div class="flex flex-col items-start font-bold text-sm w-full max-w-sm">
+                                <div class="bg-[#FFD500] border-b-[3px] border-[#CC9900] text-slate-800 px-4 py-2 rounded-t-xl rounded-b-md shadow-sm mb-1.5 w-full flex items-center gap-2">
+                                    當 🟢 綠旗被點擊
+                                </div>
+                                
+                                <div class="bg-[#FF6680] border-b-[3px] border-[#FF3355] text-white px-4 py-2 rounded-md shadow-sm mb-1.5 w-full">
+                                    畫筆設定
+                                </div>
+                                
+                                <div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-4 py-2 rounded-md shadow-sm mb-1.5 w-full">
+                                    下筆
+                                </div>
+                                
+                                <div class="bg-[#FF8C1A] border-b-[3px] border-[#DB6E00] text-white px-4 py-2 rounded-md shadow-sm mb-1.5 w-full flex items-center gap-2">
+                                    變數 <span class="bg-white text-orange-600 px-2 py-0.5 rounded-full text-xs shadow-inner">長度</span> 設為 <span class="bg-white text-slate-700 px-2 py-0.5 rounded-full text-xs shadow-inner">0</span>
+                                </div>
+
+                                <div class="bg-[#5CB1D6] border-b-[3px] border-[#2E8EB8] text-white px-4 py-2 rounded-md shadow-sm mb-1.5 w-full flex items-center gap-2">
+                                    詢問 <span class="bg-white text-slate-700 px-2 py-0.5 rounded-full text-xs shadow-inner">輸入螺旋旋轉角度</span> 並等待
+                                </div>
+                                
+                                <div class="bg-[#FFAB19] border-b-[3px] border-[#CF8B17] text-white px-4 py-2 rounded-t-md shadow-sm w-full flex items-center gap-2">
+                                    重複執行 <span class="bg-white text-slate-700 px-2 py-0.5 rounded-full text-xs shadow-inner">40</span> 次
+                                </div>
+                                
+                                <div class="bg-[#FF8C1A] border-b-[3px] border-[#DB6E00] text-white px-4 py-2 rounded-md shadow-sm ml-4 my-1 w-[calc(100%-1rem)] flex items-center gap-2">
+                                    變數 <span class="bg-white text-orange-600 px-2 py-0.5 rounded-full text-xs shadow-inner">長度</span> 改變 <span class="bg-white text-slate-700 px-2 py-0.5 rounded-full text-xs shadow-inner">10</span>
+                                </div>
+
+                                <div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-4 py-2 rounded-md shadow-sm ml-4 mb-1 w-[calc(100%-1rem)] flex items-center gap-2">
+                                    移動 <span class="bg-[#FF8C1A] border border-[#DB6E00] px-3 py-0.5 rounded-full shadow-sm text-white text-[11px]">長度</span> 點
+                                </div>
+                                
+                                <div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-4 py-2 rounded-md shadow-sm ml-4 mb-1 w-[calc(100%-1rem)] flex items-center gap-2">
+                                    右轉 ↻ <span class="bg-[#5CB1D6] border border-[#2E8EB8] px-2 py-0.5 rounded-full text-xs shadow-sm">詢問的答案</span> 度
+                                </div>
+                                
+                                <div class="bg-[#FFAB19] border-b-[3px] border-[#CF8B17] h-3 rounded-b-md w-full shadow-sm mb-1.5"></div>
+                                
+                                <div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-4 py-2 rounded-md shadow-sm mb-1 w-full">
+                                    停筆
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+            </div>
+        </div>
+        <div class="flex justify-between items-center">
+            <a href="https://su-yung-sheng.github.io/unforte115/1150703.html" class="text-sm text-slate-400 hover:text-slate-800 transition-colors">⬅ 上一個單元</a>
+            <a href="https://su-yung-sheng.github.io/unforte115/1150705.html" class="inline-block text-center text-sm font-medium text-slate-600 bg-white border border-gray-200 px-6 py-3 rounded-full hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm">下一個單元 ➔</a>
+        </div>
+    </main>
+
+    <script>
+        // ====== 第一階段：手動螺旋挑戰組裝 ======
+        const varData = {
+            1: '<div class="bg-[#FF6680] border-b-[3px] border-[#FF3355] text-white px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-center">畫筆設定</div>',
+            2: '<div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-center">下筆</div>',
+            3: '<div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left">前進 10 點 ➔ 右轉 90 度</div>',
+            4: '<div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left">前進 20 點 ➔ 右轉 90 度</div>',
+            5: '<div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left">前進 30 點 ➔ 右轉 90 度</div>',
+            6: '<div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left">前進 40 點</div>',
+            7: '<div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-center">停筆</div>'
+        };
+        const varDesc = {
+            1: "起點：設定畫筆", 
+            2: "步驟：放下畫筆準備畫線", 
+            3: "第1邊：移動10點並右轉90度", 
+            4: "第2邊：邊長增加！移動20點並右轉90度", 
+            5: "第3邊：邊長再增加！移動30點並右轉90度", 
+            6: "第4邊：移動40點完成最後的邊長",
+            7: "終點：抬筆結束繪圖"
+        };
+        let cVar = []; let tVar = [];
+
+        function initVarGame() {
+            cVar = [1, 2, 3, 4, 5, 6, 7].sort(() => Math.random() - 0.5);
+            tVar = [];
+            if(document.getElementById('var-flow-msg')) document.getElementById('var-flow-msg').textContent = "";
+            renderVarGame();
+        }
+
+        function tryPlaceVarItem(id) {
+            const expectedId = tVar.length + 1;
+            const msg = document.getElementById('var-flow-msg');
+            if (id === expectedId) {
+                cVar = cVar.filter(x => x !== id);
+                tVar.push(id);
+                msg.textContent = "✅ 放置正確！";
+                msg.className = "text-sm font-bold text-emerald-600";
+                
+                if (tVar.length === 7) {
+                    msg.innerHTML = "🎉 挑戰成功！成功手動拼出四邊螺旋！準備解鎖右側模擬圖 ➔";
+                    document.getElementById('var-sim-container').innerHTML = `
+                        <div class="sim-badge">手動四邊螺旋模擬</div>
+                        <svg viewBox="0 0 200 150" class="w-full h-full bg-slate-50 rounded-2xl" preserveAspectRatio="xMidYMid meet">
+                            <!-- 精確繪製 10 -> 20 -> 30 -> 40 漸變螺旋路徑 -->
+                            <path d="M 100 75 L 110 75 L 110 95 L 80 95 L 80 55" fill="none" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="200" stroke-dashoffset="200">
+                                <animate attributeName="stroke-dashoffset" values="200;0;0" keyTimes="0;0.7;1" dur="2.5s" repeatCount="indefinite" />
+                            </path>
+                            <g>
+                                <animateMotion path="M 100 75 L 110 75 L 110 95 L 80 95 L 80 55" dur="2.5s" keyTimes="0;0.7;1" calcMode="linear" repeatCount="indefinite" />
+                                <polygon points="6,0 -4,-3.5 -2,0 -4,3.5" fill="#047857" transform="scale(1.3)" />
+                            </g>
+                        </svg>
+                    `;
+                }
+                renderVarGame();
+            } else {
+                msg.textContent = "❌ 順序不對喔！要從小到大(10➔20➔30➔40)依序轉彎畫出來。";
+                msg.className = "text-sm font-bold text-rose-500";
+            }
+        }
+
+        function renderVarGame() {
+            const src = document.getElementById('var-source-container');
+            const tgt = document.getElementById('var-target-container');
+            if(!src || !tgt) return;
+            
+            src.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-4 w-full text-center border-b border-slate-100 pb-2">待排積木區</p>';
+            cVar.forEach(id => {
+                const b = document.createElement('button');
+                b.className = "w-full mb-2 transform hover:scale-[1.01] transition-transform text-left";
+                b.innerHTML = varData[id];
+                b.onclick = () => tryPlaceVarItem(id);
+                src.appendChild(b);
+            });
+
+            tgt.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-4 w-full text-center border-b border-slate-100 pb-2">程式組裝區</p>';
+            for (let i = 1; i <= 7; i++) {
+                const row = document.createElement('div');
+                row.className = "flex items-center gap-3 w-full mb-1.5";
+                
+                const desc = document.createElement('div');
+                desc.className = "text-[10px] font-bold text-slate-500 w-2/5 text-right tracking-wide";
+                desc.textContent = varDesc[i];
+                
+                const slot = document.createElement('div');
+                slot.className = "w-3/5";
+                
+                if (tVar.includes(i)) slot.innerHTML = varData[i];
+                else slot.innerHTML = `<div class="border-2 border-dashed border-slate-300 rounded-md bg-slate-50 h-7 flex items-center justify-center text-[10px] text-slate-400 font-bold shadow-inner">等待積木...</div>`;
+                
+                row.appendChild(desc); row.appendChild(slot); tgt.appendChild(row);
+            }
+        }
+
+        // ====== 第二階段：螺旋迴圈挑戰組裝 ======
+        const loopData = {
+            1: '<div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-center">下筆</div>',
+            2: '<div class="bg-[#FF8C1A] border-b-[3px] border-[#DB6E00] text-white px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left flex items-center gap-1">變數 <span class="bg-white text-orange-600 px-1.5 py-0.5 rounded-full text-[10px]">長度</span> 設為 0</div>',
+            3: '<div class="bg-[#FF8C1A] border-b-[3px] border-[#DB6E00] text-white px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left flex items-center gap-1">變數 <span class="bg-white text-orange-600 px-1.5 py-0.5 rounded-full text-[10px]">長度</span> 改變 10</div>',
+            4: '<div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left flex items-center gap-1">移動 <span class="bg-[#FF8C1A] border border-[#DB6E00] px-2 py-0.5 rounded-full text-[10px]">長度</span> 點</div>',
+            5: '<div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left">右轉 ↻ <span class="bg-white text-slate-800 px-1.5 py-0.5 rounded-full text-[10px]">90</span> 度</div>',
+            6: '<div class="bg-[#0FBD8C] border-b-[3px] border-[#0B8E69] text-white px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-center">停筆</div>'
+        };
+        const loopDesc = {
+            1: "準備：落下畫筆", 
+            2: "準備：設定初始長度", 
+            3: "迴圈：先增加長度", 
+            4: "迴圈：依長度畫線", 
+            5: "迴圈：固定轉向", 
+            6: "結束：抬起畫筆"
+        };
+        let cLoop = []; let tLoop = [];
+
+        function initLoopGame() {
+            cLoop = [1, 2, 3, 4, 5, 6].sort(() => Math.random() - 0.5);
+            tLoop = [];
+            if(document.getElementById('loop-flow-msg')) document.getElementById('loop-flow-msg').textContent = "";
+            renderLoopGame();
+        }
+
+        function tryPlaceLoopItem(id) {
+            const expectedId = tLoop.length + 1;
+            const msg = document.getElementById('loop-flow-msg');
+            if (id === expectedId) {
+                cLoop = cLoop.filter(x => x !== id);
+                tLoop.push(id);
+                msg.textContent = "✅ 放置正確！";
+                msg.className = "text-sm font-bold text-emerald-600";
+                
+                if (tLoop.length === 6) {
+                    msg.innerHTML = "🎉 變數與重複執行組裝完成！這就是自動化！ <button onclick='playLoopAnimation()' class='ml-3 bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-sm transition'>播放預覽動畫 ➔</button>";
+                    playLoopAnimation();
+                }
+                renderLoopGame();
+            } else {
+                msg.textContent = "❌ 順序不對喔！請依序：下筆 ➔ 設為0 ➔ (改變長度 ➔ 移動 ➔ 右轉) ➔ 停筆。";
+                msg.className = "text-sm font-bold text-rose-500";
+            }
+        }
+
+        function renderLoopGame() {
+            const src = document.getElementById('loop-source-container');
+            const tgt = document.getElementById('loop-target-container');
+            if(!src || !tgt) return;
+            
+            src.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-4 w-full text-center border-b border-slate-100 pb-2">待排積木區</p>';
+            cLoop.forEach(id => {
+                const b = document.createElement('button');
+                b.className = "w-full mb-2 transform hover:scale-[1.02] transition-transform text-left";
+                b.innerHTML = loopData[id];
+                b.onclick = () => tryPlaceLoopItem(id);
+                src.appendChild(b);
+            });
+
+            tgt.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-2 w-full text-center border-b border-slate-100 pb-2">程式組裝區</p>';
+            
+            const renderRow = (i) => {
+                const row = document.createElement('div');
+                row.className = "flex items-center gap-2 w-full mb-1";
+                const desc = document.createElement('div');
+                desc.className = "text-[10px] font-bold text-slate-500 w-2/5 text-right";
+                desc.textContent = loopDesc[i];
+                const slot = document.createElement('div');
+                slot.className = "w-3/5";
+                
+                if (tLoop.includes(i)) slot.innerHTML = loopData[i];
+                else slot.innerHTML = `<div class="border-2 border-dashed border-slate-300 rounded-md bg-slate-50 h-7 flex items-center justify-center text-[10px] text-slate-400 font-bold shadow-inner"></div>`;
+                
+                row.appendChild(desc); row.appendChild(slot);
+                return row;
+            };
+
+            // 迴圈外上方
+            tgt.appendChild(renderRow(1));
+            tgt.appendChild(renderRow(2));
+
+            // 預置外框
+            const topLoop = document.createElement('div');
+            topLoop.className = "bg-[#FFAB19] text-white px-3 py-1.5 rounded-t-md font-bold text-[11px] w-full mt-1";
+            topLoop.textContent = "重複執行 40 次";
+            tgt.appendChild(topLoop);
+
+            const innerContainer = document.createElement('div');
+            innerContainer.className = "border-l-4 border-[#FFAB19] pl-3 py-1 w-full space-y-1";
+            innerContainer.appendChild(renderRow(3));
+            innerContainer.appendChild(renderRow(4));
+            innerContainer.appendChild(renderRow(5));
+            tgt.appendChild(innerContainer);
+
+            const bottomLoop = document.createElement('div');
+            bottomLoop.className = "bg-[#FFAB19] h-2 rounded-b-md w-full mb-1";
+            tgt.appendChild(bottomLoop);
+
+            // 迴圈外下方
+            tgt.appendChild(renderRow(6));
+        }
+
+        function playLoopAnimation() {
+            const svgContainer = document.getElementById('loop-svg-container');
+            if(!svgContainer) return;
+            
+            svgContainer.innerHTML = `
+                <div class="sim-badge">變數遞增模擬 (迴圈無限放大)</div>
+                <svg viewBox="0 0 200 150" class="w-full h-full bg-slate-50 rounded-2xl" preserveAspectRatio="xMidYMid meet">
+                    <!-- 繪製更多次數 (一路畫到長度 120) 展示迴圈明顯的漸變螺旋效果 -->
+                    <path id="spiral-path" d="M 100 75 L 110 75 L 110 95 L 80 95 L 80 55 L 130 55 L 130 115 L 60 115 L 60 35 L 150 35 L 150 135 L 40 135 L 40 15" fill="none" stroke="#06B6D4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="800" stroke-dashoffset="800">
+                        <animate attributeName="stroke-dashoffset" values="800;0;0" keyTimes="0;0.85;1" dur="6s" repeatCount="indefinite" />
+                    </path>
+                    <g>
+                        <animateMotion path="M 100 75 L 110 75 L 110 95 L 80 95 L 80 55 L 130 55 L 130 115 L 60 115 L 60 35 L 150 35 L 150 135 L 40 135 L 40 15" dur="6s" keyTimes="0;0.85;1" calcMode="linear" repeatCount="indefinite" />
+                        <polygon points="6,0 -4,-3.5 -2,0 -4,3.5" fill="#0891B2" transform="scale(1.3)" />
+                    </g>
+                </svg>
+            `;
+        }
+
+        // ====== 第三階段：螺旋實戰區 ======
+        let spiralInterval = null;
+
+        function setSpiral(angle) {
+            const angleEl = document.getElementById('spiral-angle');
+            if(angleEl) {
+                angleEl.value = angle;
+            }
+        }
+
+        function runSpiralLab() {
+            if (spiralInterval) clearInterval(spiralInterval);
+
+            const angleEl = document.getElementById('spiral-angle');
+            const svg = document.getElementById('spiral-svg');
+            const fb = document.getElementById('spiral-feedback');
+            const reveal = document.getElementById('spiral-formula-reveal');
+            
+            if(!angleEl || !svg) return;
+
+            const angle = parseFloat(angleEl.value) || 90;
+            svg.innerHTML = '';
+            
+            fb.textContent = `🚀 正在繪製旋轉 ${angle}° 的漸變螺旋...`;
+            fb.className = "bg-indigo-600 text-white rounded-b-2xl p-4 text-sm font-medium transition-colors duration-300 text-center shadow-md";
+
+            if (reveal) {
+                reveal.classList.remove('hidden');
+            }
+
+            let x = 100, y = 75;
+            let currentAngle = 0; 
+            let length = 0; // 初始變數長度改為 0
+            let points = [{ x, y, angle: 0 }];
+
+            for (let i = 0; i < 40; i++) {
+                length += 2; // 在畫線前先遞增長度 (為符合顯示比例的簡化數值)
+                let rad = currentAngle * Math.PI / 180;
+                x += Math.cos(rad) * length;
+                y += Math.sin(rad) * length;
+                points.push({ x, y, angle: currentAngle });
+                currentAngle += angle;
+            }
+
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("fill", "none");
+            path.setAttribute("stroke", "#06B6D4");
+            path.setAttribute("stroke-width", "2");
+            path.setAttribute("stroke-linecap", "round");
+            path.setAttribute("stroke-linejoin", "round");
+            svg.appendChild(path);
+
+            const sprite = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            sprite.innerHTML = `
+                <polygon points="6,0 -4,-3.5 -2,0 -4,3.5" fill="#38BDF8" stroke="#0ea5e9" stroke-width="0.5" transform="scale(1.3)" />
+            `;
+            svg.appendChild(sprite);
+
+            let step = 0;
+            let pathString = `M ${points[0].x} ${points[0].y}`;
+            path.setAttribute("d", pathString);
+            sprite.setAttribute("transform", `translate(${points[0].x}, ${points[0].y}) rotate(${points[0].angle})`);
+
+            const delayTime = 70;
+            spiralInterval = setInterval(() => {
+                if (step >= points.length - 1) {
+                    clearInterval(spiralInterval);
+                    fb.textContent = `🎉 繪圖完成！使用 ${angle}° 畫出來的圖案是不是很特別呢？`;
+                    fb.className = "bg-emerald-600 text-white rounded-b-2xl p-4 text-sm font-bold transition-colors duration-300 text-center shadow-lg";
+                    return;
+                }
+                
+                step++;
+                pathString += ` L ${points[step].x} ${points[step].y}`;
+                path.setAttribute("d", pathString);
+
+                const prev = points[step - 1];
+                const curr = points[step];
+                const angleRad = Math.atan2(curr.y - prev.y, curr.x - prev.x);
+                const angleDeg = angleRad * 180 / Math.PI;
+
+                sprite.setAttribute("transform", `translate(${curr.x}, ${curr.y}) rotate(${angleDeg})`);
+            }, delayTime);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initVarGame();
+            initLoopGame();
+        });
+    </script>
+</body>
+</html>

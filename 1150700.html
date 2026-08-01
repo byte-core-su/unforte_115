@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課程首頁 - 星際防禦工程師</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #F8F9FA; color: #333333; }
+        .slide-up-fade { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        @keyframes slideUpFade { 
+            0% { opacity: 0; transform: translateY(20px); } 
+            100% { opacity: 1; transform: translateY(0); } 
+        }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+    </style>
+</head>
+<body class="antialiased selection:bg-slate-200 selection:text-slate-800">
+
+    <header class="bg-white border-b border-gray-100 pt-12 pb-12 slide-up-fade">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8 relative z-10">
+            <p class="text-sm font-bold text-indigo-500 mb-3 tracking-widest uppercase">演算法與程式設計</p>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight">星際防禦工程師：<br class="hidden md:block">用程式編織能量防護網</h1>
+            <p class="text-lg text-slate-500 font-light max-w-2xl">結合「IPO 思維」與「重複結構」，循序漸進建立邏輯思維與幾何繪圖能力，並透過實作防禦網任務，體驗程式設計的強大魔力。</p>
+        </div>
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-indigo-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+        <div class="absolute bottom-0 right-40 w-72 h-72 bg-sky-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 lg:px-8 py-12 relative">
+        
+        <!-- 🚀 情境模擬任務區塊 開始 -->
+        <div class="bg-white rounded-3xl shadow-sm border border-amber-100 p-8 md:p-12 mb-16 slide-up-fade delay-100 relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500"></div>
+
+            <div class="flex items-center mb-5">
+                <span class="bg-amber-50 text-amber-600 border border-amber-200 px-3 py-1 rounded-full text-xs font-bold tracking-widest shadow-sm">
+                    MISSION BRIEFING
+                </span>
+            </div>
+
+            <h2 class="text-3xl font-bold text-slate-800 mb-4 flex items-center gap-3">
+                <span class="text-4xl group-hover:-translate-y-1 transition-transform duration-300">🚀</span> 
+                情境模擬任務：星際隕石防禦網建設
+            </h2>
+
+            <p class="text-slate-600 font-medium text-lg mb-8 leading-relaxed">
+                地球總部發出緊急警報！密集的星際隕石群正朝著我們的核心基地襲來。為了保護基地，我們必須立刻啟動「防護網發生器」，在隕石墜落前，利用幾何陣列編織出毫無死角的能量防禦罩。
+            </p>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-10 flex items-center gap-4 shadow-inner">
+                <div class="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-3xl shadow-sm">
+                    👤
+                </div>
+                <div>
+                    <div class="text-xs text-slate-400 font-bold mb-1 tracking-wider">你的角色</div>
+                    <div class="text-xl font-bold text-slate-700">首席防禦系統工程師</div>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-bold text-slate-800 mb-5 flex items-center gap-2">
+                <span>🎯</span> 任務目標
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:border-amber-300 hover:shadow-md transition-all">
+                    <div class="bg-amber-100 text-amber-700 w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold mb-4">1</div>
+                    <h4 class="font-bold text-slate-800 mb-3 text-lg">核心概念實作</h4>
+                    <p class="text-sm text-slate-500 leading-relaxed font-light">運用 IPO 思維（輸入、處理、輸出）與「重複結構」積木，寫出能產生多個正方形（或正多邊形）陣列的控制程式，建構出堅堅防護網。</p>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:border-amber-300 hover:shadow-md transition-all">
+                    <div class="bg-amber-100 text-amber-700 w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold mb-4">2</div>
+                    <h4 class="font-bold text-slate-800 mb-3 text-lg">運算邏輯梳理</h4>
+                    <p class="text-sm text-slate-500 leading-relaxed font-light">在動手寫程式前，請先進行「畫流程圖」，釐清所設定的圖形邊數與旋轉角度邏輯。確認思考過程沒有破洞或盲點後，再開始上機實作。</p>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:border-amber-300 hover:shadow-md transition-all">
+                    <div class="bg-amber-100 text-amber-700 w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold mb-4">3</div>
+                    <h4 class="font-bold text-slate-800 mb-3 text-lg">視覺心理防護</h4>
+                    <p class="text-sm text-slate-500 leading-relaxed font-light">為了安定基地內部人員的心情，請修改畫筆參數，將防護網設定為暖琥珀色和橙色系，透過色彩向夥伴傳達出溫暖且安全的庇護感。</p>
+                </div>
+            </div>
+
+            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-sm">
+                <div class="bg-emerald-100 text-emerald-600 w-12 h-12 flex-shrink-0 rounded-full flex items-center justify-center text-2xl">
+                    🌍
+                </div>
+                <div>
+                    <h3 class="text-emerald-800 font-bold mb-1 text-lg">現實生活應用</h3>
+                    <p class="text-emerald-600 text-sm font-medium">雷達掃描涵蓋範圍、基地台訊號無死角覆蓋網、參數化與幾何演算法設計。</p>
+                </div>
+            </div>
+        </div>
+        <!-- 🚀 情境模擬任務區塊 結束 -->
+
+        <hr class="border-slate-200 mb-16 slide-up-fade delay-200">
+
+        <!-- 課程單元導覽 -->
+        <div class="slide-up-fade delay-200">
+            <!-- 加上 flex justify-between 讓左右兩側自動推開 -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                
+                <!-- 左側群組：標題與下載按鈕 -->
+                <div class="flex flex-wrap items-center gap-4">
+                    <h2 class="text-2xl font-bold text-slate-800">課程單元導覽</h2>
+                    <!-- 📥 範例程式下載按鈕 (套用您指定的樣式與圖示) -->
+                    <a href="https://su-yung-sheng.github.io/unforte115/11507.zip" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700 rounded-lg text-sm font-bold transition-colors border border-indigo-200 shadow-sm group active:scale-95">
+                        <i data-lucide="download-cloud" class="w-4 h-4 group-hover:-translate-y-0.5 transition-transform"></i>
+                        <span>範例程式下載</span>
+                    </a>
+                </div>
+
+                <!-- 右側群組：副標題強制靠右 -->
+                <p class="text-sm font-medium text-slate-400 whitespace-nowrap text-left md:text-right">共 6 個核心關卡</p>
+                
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Lesson 1 -->
+                <a href="1150701.html" class="block bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:border-indigo-300 transition-all group">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">LESSON 1</span>
+                        <svg class="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">資格認證：Scratch 積木大考驗</h3>
+                    <p class="text-slate-500 text-sm font-light">星際防禦工程師資格考驗！完成 10 題核心與進階測驗，取得啟動防護網發生器的專屬憑證與操作權限。</p>
+                </a>
+
+                <!-- Lesson 2 -->
+                <a href="1150702.html" class="block bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:border-indigo-300 transition-all group">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">LESSON 2</span>
+                        <svg class="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">邏輯的大腦：程式三大結構</h3>
+                    <p class="text-slate-500 text-sm font-light">防護網系統校準：透過數值實驗與重組流程圖，精準掌握循序、選擇與重複三大邏輯結構，建立堅不可摧的系統大腦。</p>
+                </a>
+
+                <!-- Lesson 3 -->
+                <a href="1150703.html" class="block bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:border-indigo-300 transition-all group">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">LESSON 3</span>
+                        <svg class="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">基礎防禦單元：迴圈多邊形</h3>
+                    <p class="text-slate-500 text-sm font-light">透過「重複結構」，了解邊長與外角（360度法則）的數學關係，畫出完美對稱的基礎能量盾圖形。</p>
+                </a>
+
+                <!-- Lesson 4 -->
+                <a href="1150704.html" class="block bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:border-indigo-300 transition-all group relative overflow-hidden">
+                    <div class="absolute right-0 top-0 w-16 h-16 bg-indigo-50 rounded-bl-full flex items-start justify-end p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span class="text-xl">✨</span>
+                    </div>
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">LESSON 4</span>
+                        <svg class="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">魔法變數：擴張型螺旋力場</h3>
+                    <p class="text-slate-500 text-sm font-light">導入「變數」概念，讓電腦記住會隨時間長大的數值，畫出能彈開隕石、無限延伸的漸變螺旋力場。</p>
+                </a>
+
+                <!-- Lesson 5 -->
+                <a href="1150705.html" class="block bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:border-indigo-300 transition-all group">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">LESSON 5</span>
+                        <svg class="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">高階防禦：終極曼陀羅陣</h3>
+                    <p class="text-slate-500 text-sm font-light">結合變數變化與雙層重複結構，編織出如藝術品般複雜且華麗的高階多邊形曼陀羅防禦圖騰。</p>
+                </a>
+
+                <!-- Lesson 6 -->
+                <a href="1150706.html" class="block bg-indigo-50 border-2 border-indigo-200 rounded-2xl p-6 hover:shadow-lg hover:border-indigo-400 transition-all group">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full group-hover:bg-indigo-200 transition-colors">LESSON 6 (最終挑戰)</span>
+                        <svg class="w-5 h-5 text-indigo-400 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-indigo-900 mb-2">終極挑戰：星際防禦網陣列</h3>
+                    <p class="text-indigo-700 text-sm font-light">綜合應用：陣列繪圖與座標位移，指揮探測車完成終極防禦網大面積的自動架設任務！</p>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-50 border-t border-slate-200 mt-20 py-8">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8 text-center">
+            <p class="text-sm font-medium text-slate-400">© 演算法與程式設計 - 星際防禦工程師</p>
+        </div>
+    </footer>
+
+    <!-- 啟動 Lucide Icons -->
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

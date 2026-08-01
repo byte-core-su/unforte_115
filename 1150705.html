@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LESSON 5 - 幾何曼陀羅</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #F8F9FA; color: #333333; }
+        .slide-up-fade { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        .sim-window { position: relative; overflow: hidden; }
+        .sim-badge { position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,0.9); border: 1px solid #E2E8F0; padding: 2px 8px; border-radius: 9999px; font-size: 0.65rem; font-weight: bold; color: #64748B; display: flex; align-items: center; gap: 4px; z-index: 10; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .sim-badge::before { content: ''; display: block; width: 6px; height: 6px; background-color: #10B981; border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+        
+        /* 積木樣式輔助 */
+        .block-pink { background-color: #FF6680; border-bottom-color: #FF3355; color: white; }
+        .block-yellow { background-color: #FFAB19; border-bottom-color: #CF8B17; color: white; }
+        .block-blue { background-color: #4C97FF; border-bottom-color: #3373CC; color: white; }
+        .block-green { background-color: #0FBD8C; border-bottom-color: #0B8E69; color: white; }
+        .block-hat { background-color: #FFD500; border-bottom-color: #CC9900; color: #333; }
+        .block-teal { background-color: #14B8A6; border-bottom-color: #0F766E; color: white; }
+        
+        .var-param { background-color: #FF8C1A; border: 1px solid #DB6E00; color: white; padding: 0.1rem 0.4rem; border-radius: 9999px; font-size: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .func-param { background-color: #FF6680; border: 1px solid #FF3355; color: white; padding: 0.1rem 0.4rem; border-radius: 9999px; font-size: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body class="antialiased selection:bg-slate-200 selection:text-slate-800">
+
+    <header class="bg-white border-b border-gray-100 pt-8 pb-12 slide-up-fade">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8">
+            <div class="mb-6">
+                <a href="https://su-yung-sheng.github.io/unforte115/" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> 
+                    返回網站首頁
+                </a>
+            </div>
+            <p class="text-sm font-medium text-indigo-500 mb-2 tracking-widest uppercase">演算法與程式設計</p>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight">星際防禦工程師：<br class="hidden md:block">用程式編織能量防護網</h1>
+            <p class="text-lg text-slate-500 font-light max-w-2xl">結合「IPO 思維」與「重複結構」，循序漸進建立邏輯思維與幾何繪圖能力，並透過實作防禦網任務，體驗程式設計的強大魔力。</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 lg:px-8 py-12 relative">
+        <a href="https://su-yung-sheng.github.io/unforte115/1150704.html" class="mb-8 inline-flex items-center text-sm font-medium text-slate-400 hover:text-slate-800 transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 返回課程總覽
+        </a>
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12 mb-8 slide-up-fade">
+            <span class="text-sm font-semibold text-slate-400 tracking-wider block mb-2">LESSON 5</span>
+            <h2 class="text-3xl font-bold text-slate-800 mb-4">幾何曼陀羅 (進階參數函式)</h2>
+            <p class="text-slate-500 font-light text-lg mb-10">如果我們為函式加上一個「參數 N」，這個函式就能像變魔術一樣，你給它數字 3 它就畫三角形，給它 5 它就畫五邊形！讓我們逐步將繪圖邏輯打包，最終讓主程式變得極度簡潔！</p>
+            
+            <div class="space-y-16">
+                
+                <!-- 第一階段：自訂函式組裝與測試 -->
+                <div class="border-b-2 border-dashed border-slate-100 pb-16">
+                    <div class="flex items-center mb-8">
+                        <span class="bg-pink-100 text-pink-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">1</span>
+                        <h3 class="text-2xl font-bold text-slate-800">第一階段：定義「畫一個正N邊形」函式積木</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-8 mb-8">
+                        <div class="bg-slate-50 rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm">
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-200 pb-3">
+                                <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">A</span> 挑戰：封裝多邊形繪製邏輯
+                            </h4>
+                            <p class="text-slate-600 font-light text-sm mb-6">
+                                請將含有<strong class="text-pink-600">參數 N</strong>的積木正確組合起來，創造出一個能動態決定「邊數」與「轉角」的 <strong>「定義畫一個正N邊形 (N)」</strong> 萬用函式！
+                            </p>
+                            
+                            <div class="flex flex-col md:flex-row gap-6 mb-4">
+                                <div class="w-full md:w-1/3 bg-white border border-slate-200 rounded-xl p-4 shadow-inner min-h-[250px]" id="func-source-container"></div>
+                                <div class="w-full md:w-2/3 bg-white border-2 border-dashed border-slate-300 rounded-xl p-4 flex flex-col justify-start min-h-[250px]" id="func-target-container"></div>
+                            </div>
+                            <div class="flex justify-end h-6"><span id="func-flow-msg" class="text-sm font-bold transition-all"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">B</span> 參考：參數化函式定義
+                            </h4>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 overflow-x-auto h-full">
+<pre class="font-mono text-sm text-slate-600 leading-relaxed"><span class="text-slate-400 italic">// 定義一個吃「參數 N」的萬用函式</span>
+<span class="text-pink-500 font-bold">定義</span> <span class="text-pink-600">畫一個正N邊形( <span class="text-pink-500">N</span> )</span>: 
+  重複執行 ( <span class="text-pink-500">N</span> ) 次:
+    移動 50 點
+    右轉 <span class="text-pink-500">360 / N</span> 度</pre>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">C</span> 函式威力測試機
+                            </h4>
+                            <div class="sim-window bg-white border border-slate-200 rounded-2xl shadow-sm h-full min-h-[220px] flex flex-col items-center justify-center" id="single-sim-container">
+                                <div class="text-slate-400 font-bold text-sm flex flex-col items-center">
+                                    <span class="text-4xl mb-3">🔒</span>
+                                    請先完成 A 區的函式定義，即可解鎖測試機！
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第二階段：主程式積木組裝 -->
+                <div class="border-b-2 border-dashed border-slate-100 pb-16">
+                    <div class="flex items-center mb-8">
+                        <span class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">2</span>
+                        <h3 class="text-2xl font-bold text-slate-800">第二階段：呼叫函式！組裝曼陀羅主程式</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-8 mb-8">
+                        <div class="bg-slate-50 rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm">
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-200 pb-3">
+                                <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">A</span> 挑戰：曼陀羅主程式組合
+                            </h4>
+                            <p class="text-slate-600 font-light text-sm mb-6">
+                                現在我們有了 <code>畫一個正N邊形 (N)</code> 這個強大的工具！請將下方的 5 塊積木排好，透過<strong>下筆</strong>、<strong>重複迴圈</strong>與<strong>呼叫函式 (傳入參數 5)</strong>，並加上<strong>旋轉</strong>，最後<strong>停筆</strong>，畫出一個完美的五邊形曼陀羅！
+                            </p>
+                            
+                            <div class="flex flex-col md:flex-row gap-6 mb-4">
+                                <div class="w-full md:w-1/3 bg-white border border-slate-200 rounded-xl p-4 shadow-inner min-h-[280px]" id="main-source-container"></div>
+                                <div class="w-full md:w-2/3 bg-white border-2 border-dashed border-slate-300 rounded-xl p-4 flex flex-col justify-start min-h-[280px]" id="main-target-container"></div>
+                            </div>
+                            <div class="flex justify-end h-6"><span id="main-flow-msg" class="text-sm font-bold transition-all"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">B</span> 參考：主程式 Pseudo Code
+                            </h4>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 overflow-x-auto h-full">
+<pre class="font-mono text-sm text-slate-600 leading-relaxed"><span class="text-slate-400 italic">// 只要改變呼叫時的參數，就能畫出曼陀羅</span>
+下筆
+<span class="text-orange-500 font-bold">重複執行</span> ( <span class="text-indigo-600 font-bold">12</span> ) 次: 
+  <span class="text-pink-500 font-bold">呼叫</span> <span class="text-pink-600">畫一個正N邊形( <span class="text-orange-500">5</span> )</span>
+  右轉 ( <span class="text-indigo-600 font-bold">30</span> ) 度
+停筆</pre>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">C</span> 主程式執行模擬
+                            </h4>
+                            <div class="sim-window bg-white border border-slate-200 rounded-2xl shadow-sm h-full min-h-[220px] flex flex-col items-center justify-center" id="main-sim-container">
+                                <div class="text-slate-400 font-bold text-sm flex flex-col items-center">
+                                    <span class="text-4xl mb-3">🔒</span>
+                                    請先完成 A 區的曼陀羅主程式
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第三階段：定義第二層函式 -->
+                <div class="border-b-2 border-dashed border-slate-100 pb-16">
+                    <div class="flex items-center mb-8">
+                        <span class="bg-pink-100 text-pink-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">3</span>
+                        <h3 class="text-2xl font-bold text-slate-800">第三階段：再進化！定義「畫幾個圖形 (X)」函式</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-8 mb-8">
+                        <div class="bg-slate-50 rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm">
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-200 pb-3">
+                                <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">A</span> 挑戰：封裝曼陀羅的旋轉迴圈
+                            </h4>
+                            <p class="text-slate-600 font-light text-sm mb-6">
+                                剛才在主程式中「重複呼叫與旋轉」的動作，其實也可以打包成一個新函式！請組裝帶有<strong class="text-pink-600">參數 X</strong>的函式積木，專門用來畫出由 X 個正方形（傳入參數 4）所組成的圖騰。
+                            </p>
+                            
+                            <div class="flex flex-col md:flex-row gap-6 mb-4">
+                                <div class="w-full md:w-1/3 bg-white border border-slate-200 rounded-xl p-4 shadow-inner min-h-[250px]" id="func2-source-container"></div>
+                                <div class="w-full md:w-2/3 bg-white border-2 border-dashed border-slate-300 rounded-xl p-4 flex flex-col justify-start min-h-[250px]" id="func2-target-container"></div>
+                            </div>
+                            <div class="flex justify-end h-6"><span id="func2-flow-msg" class="text-sm font-bold transition-all"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">B</span> 參考：雙層函式的威力
+                            </h4>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 overflow-x-auto h-full">
+<pre class="font-mono text-sm text-slate-600 leading-relaxed"><span class="text-slate-400 italic">// 定義負責畫出 X 個圖形的第二層函式</span>
+<span class="text-pink-500 font-bold">定義</span> <span class="text-pink-600">畫幾個圖形( <span class="text-pink-500">X</span> )</span>: 
+  重複執行 ( <span class="text-pink-500">X</span> ) 次:
+    <span class="text-pink-500 font-bold">呼叫</span> <span class="text-pink-600">畫一個正N邊形( <span class="text-orange-500">4</span> )</span>
+    右轉 <span class="text-pink-500">360 / X</span> 度
+
+<span class="text-slate-400 italic">---------------------------------</span>
+<span class="text-slate-400 italic">// 主程式現在只需要簡單的三行！</span>
+下筆
+<span class="text-pink-500 font-bold">呼叫</span> <span class="text-pink-600">畫幾個圖形( <span class="text-indigo-600">12</span> )</span>
+停筆</pre>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
+                                <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">C</span> 雙層函式執行模擬
+                            </h4>
+                            <div class="sim-window bg-white border border-slate-200 rounded-2xl shadow-sm h-full min-h-[220px] flex flex-col items-center justify-center" id="func2-sim-container">
+                                <div class="text-slate-400 font-bold text-sm flex flex-col items-center">
+                                    <span class="text-4xl mb-3">🔒</span>
+                                    請先完成 A 區的新函式定義
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第四階段：實戰區 -->
+                <section class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 mt-12 slide-up-fade">
+                    <h4 class="text-xl font-bold text-slate-800 mb-3 flex items-center">
+                        <span class="text-2xl mr-2">🌀</span> 第四階段：曼陀羅實戰實驗室
+                    </h4>
+                    <p class="text-sm text-slate-500 font-light mb-6 leading-relaxed">
+                        現在程式架構結合了「變數」與「詢問」。請觀察下方積木：主程式透過詢問使用者取得數值，並存入變數中，最後再將變數當作參數傳遞給函式！這就是動態程式的最高境界！請改變參數，體驗完美的互動模組！
+                    </p>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <div class="lg:col-span-2 space-y-5">
+                            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                                <h5 class="text-sm font-bold text-slate-700 mb-3">1. 模擬使用者輸入</h5>
+                                
+                                <div class="space-y-4 mb-6 bg-slate-50 p-4 rounded-lg border border-slate-100">
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-xs font-bold text-slate-600">變數：正幾邊形</label>
+                                        <div class="flex items-center">
+                                            <select id="mandala-shape-select" onchange="handleShapeChange()" class="text-sm border border-slate-300 bg-white rounded p-1.5 focus:outline-none focus:border-indigo-500 font-bold text-orange-600 w-32 shadow-sm">
+                                                <option value="3">輸入 3 (三角形)</option>
+                                                <option value="4" selected>輸入 4 (方形)</option>
+                                                <option value="5">輸入 5 (五邊形)</option>
+                                                <option value="6">輸入 6 (六邊形)</option>
+                                                <option value="custom">自訂...</option>
+                                            </select>
+                                            <input type="number" id="mandala-shape-custom" value="7" min="3" max="36" onchange="updateMandala()" class="hidden ml-2 w-16 text-center text-sm border border-slate-300 bg-white rounded p-1.5 focus:outline-none focus:border-orange-500 font-bold text-orange-600 shadow-sm" placeholder="邊數">
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-xs font-bold text-slate-600">變數：幾個圖形</label>
+                                        <div class="flex items-center">
+                                            <input type="number" id="mandala-count" value="12" min="3" max="36" onchange="updateMandala()" class="w-16 text-center text-sm border border-slate-300 bg-white rounded p-1.5 focus:outline-none focus:border-orange-500 font-bold text-orange-600 shadow-sm mr-2">
+                                            <span class="text-xs text-slate-500">個</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h5 class="text-sm font-bold text-slate-700 mb-3">2. 動態變數架構預覽</h5>
+                                
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-inner overflow-x-auto min-h-[400px] flex flex-col gap-5">
+                                    
+                                    <!-- 函式1：畫一個正N邊形 (固定) -->
+                                    <div class="flex flex-col items-start font-bold text-sm opacity-90">
+                                        <div class="text-[10px] text-slate-400 mb-1 ml-1 font-bold">▼ 第一層：形狀函式</div>
+                                        <div class="block-pink border-b-[3px] px-4 py-1.5 rounded-t-xl rounded-b-md shadow-sm mb-1 w-full max-w-[280px] flex items-center gap-2 text-[11px]">
+                                            定義 <span class="bg-white text-pink-600 px-2 py-0.5 rounded-full text-xs shadow-inner ml-1">畫一個正N邊形 (<span class="func-param shadow-none">N</span>)</span>
+                                        </div>
+                                        <div class="block-yellow border-b-[3px] px-3 py-1 rounded-t-md shadow-sm w-full max-w-[280px] flex items-center gap-2 mt-1 text-[10px]">
+                                            重複執行 <span class="func-param scale-90">N</span> 次
+                                        </div>
+                                        <div class="border-l-4 border-[#FFAB19] w-[calc(100%-0.5rem)] max-w-[276px] space-y-1 my-1">
+                                            <div class="block-blue border-b-[3px] px-3 py-1 rounded-md shadow-sm ml-2 text-[10px]">移動 40 點</div>
+                                            <div class="block-blue border-b-[3px] px-3 py-1 rounded-md shadow-sm ml-2 flex items-center gap-2 text-[10px]">
+                                                右轉 ↻ <span class="bg-[#59C059] border border-[#42A042] rounded-full px-1.5 py-0.5 flex items-center gap-1 text-[10px] shadow-sm text-white"><span class="bg-white text-slate-800 px-1.5 rounded-full shadow-inner">360</span> / <span class="func-param shadow-none scale-90 m-0">N</span></span> 度
+                                            </div>
+                                        </div>
+                                        <div class="bg-[#FFAB19] h-2 rounded-b-md w-full max-w-[280px] shadow-sm"></div>
+                                    </div>
+
+                                    <div class="border-t-2 border-dashed border-slate-300"></div>
+
+                                    <!-- 函式2：畫幾個圖形 (動態呼叫N) -->
+                                    <div class="flex flex-col items-start font-bold text-sm">
+                                        <div class="text-[10px] text-slate-400 mb-1 ml-1 font-bold">▼ 第二層：旋轉數量函式</div>
+                                        <div class="block-pink border-b-[3px] px-4 py-1.5 rounded-t-xl rounded-b-md shadow-sm mb-1 w-full max-w-[280px] flex items-center gap-2 text-[11px]">
+                                            定義 <span class="bg-white text-pink-600 px-2 py-0.5 rounded-full text-xs shadow-inner ml-1">畫幾個圖形 (<span class="func-param shadow-none">X</span>)</span>
+                                        </div>
+                                        
+                                        <div class="block-yellow border-b-[3px] px-3 py-1.5 rounded-t-md shadow-sm w-full max-w-[280px] flex items-center gap-2 mt-1 text-[11px]">
+                                            重複執行 <span class="func-param">X</span> 次
+                                        </div>
+                                        
+                                        <div class="border-l-4 border-[#FFAB19] w-[calc(100%-0.5rem)] max-w-[276px] space-y-1 my-1">
+                                            
+                                            <!-- 進階題型：彩虹積木 (預設隱藏) -->
+                                            <div id="preview-color-block" class="hidden block-pink border-b-[3px] px-3 py-1 rounded-md shadow-sm ml-2 items-center gap-2 text-[10px]">
+                                                筆跡顏色設為 <span class="bg-gradient-to-r from-red-400 via-green-400 to-blue-400 text-white px-2 rounded-full shadow-inner border border-white/50">隨機</span>
+                                            </div>
+
+                                            <div class="block-pink border-b-[3px] px-3 py-1.5 rounded-md shadow-sm ml-2 flex items-center gap-2 text-[11px]">
+                                                <span class="font-bold tracking-wide">畫一個正N邊形</span> 
+                                                <!-- 修改為變數積木 -->
+                                                <span class="bg-[#FF8C1A] border border-[#DB6E00] text-white px-2 py-0.5 rounded-full text-[10px] shadow-sm ml-1 flex items-center gap-1">正幾邊形 <span id="v-func-call" class="text-white/80 scale-90">4</span></span>
+                                            </div>
+                                            <div class="block-blue border-b-[3px] px-3 py-1.5 rounded-md shadow-sm ml-2 flex items-center gap-2 text-[11px]">
+                                                右轉 ↻ <span class="bg-[#59C059] border border-[#42A042] rounded-full px-1.5 py-0.5 flex items-center gap-1 text-[10px] shadow-sm text-white"><span class="bg-white text-slate-800 px-1.5 rounded-full shadow-inner">360</span> / <span class="func-param shadow-none scale-90 m-0">X</span></span> 度
+                                            </div>
+                                        </div>
+                                        <div class="bg-[#FFAB19] h-2 rounded-b-md w-full max-w-[280px] shadow-sm"></div>
+                                    </div>
+
+                                    <div class="border-t-2 border-dashed border-slate-300"></div>
+
+                                    <!-- 主程式 (結合詢問與變數) -->
+                                    <div class="flex flex-col items-start font-bold text-sm">
+                                        <div class="text-[10px] text-slate-400 mb-1 ml-1 font-bold">▼ 曼陀羅主程式 (動態詢問)</div>
+                                        <div class="block-hat border-b-[3px] px-4 py-1.5 rounded-t-xl rounded-b-md shadow-sm mb-1.5 w-full max-w-[280px] flex items-center gap-2 text-[11px]">
+                                            當 🟢 綠旗被點擊
+                                        </div>
+                                        
+                                        <!-- 詢問正幾邊形 -->
+                                        <div class="bg-[#5CB1D6] border-b-[3px] border-[#2E8EB8] text-white px-3 py-1.5 rounded-md shadow-sm mb-1 w-full max-w-[280px] flex items-center gap-2 text-[11px]">
+                                            詢問 <span class="bg-white text-slate-700 px-1.5 py-0.5 rounded-full shadow-inner">請輸入要畫正幾邊形</span> 並等待
+                                        </div>
+                                        <div class="bg-[#FF8C1A] border-b-[3px] border-[#DB6E00] text-white px-3 py-1.5 rounded-md shadow-sm mb-1.5 w-full max-w-[280px] flex items-center gap-2 text-[11px]">
+                                            變數 <span class="bg-white text-orange-600 font-bold px-1.5 py-0.5 rounded-full shadow-inner">正幾邊形</span> 設為 <span class="bg-[#5CB1D6] border border-[#2E8EB8] px-1.5 py-0.5 rounded-full shadow-sm text-white">詢問的答案</span>
+                                        </div>
+
+                                        <!-- 詢問幾個圖形 -->
+                                        <div class="bg-[#5CB1D6] border-b-[3px] border-[#2E8EB8] text-white px-3 py-1.5 rounded-md shadow-sm mb-1 w-full max-w-[280px] flex items-center gap-2 text-[11px]">
+                                            詢問 <span class="bg-white text-slate-700 px-1.5 py-0.5 rounded-full shadow-inner">請輸入要幾個圖形</span> 並等待
+                                        </div>
+                                        <div class="bg-[#FF8C1A] border-b-[3px] border-[#DB6E00] text-white px-3 py-1.5 rounded-md shadow-sm mb-1.5 w-full max-w-[280px] flex items-center gap-2 text-[11px]">
+                                            變數 <span class="bg-white text-orange-600 font-bold px-1.5 py-0.5 rounded-full shadow-inner">幾個圖形</span> 設為 <span class="bg-[#5CB1D6] border border-[#2E8EB8] px-1.5 py-0.5 rounded-full shadow-sm text-white">詢問的答案</span>
+                                        </div>
+
+                                        <div class="block-green border-b-[3px] px-4 py-1.5 rounded-md shadow-sm mb-1 w-full max-w-[280px] text-[11px]">下筆</div>
+                                        
+                                        <!-- 呼叫第二層函式 (傳入變數) -->
+                                        <div class="block-pink border-b-[3px] px-4 py-1.5 rounded-md shadow-sm mb-1 w-full max-w-[280px] flex items-center gap-2 text-[11px]">
+                                            <span class="font-bold tracking-wide">畫幾個圖形</span> 
+                                            <span class="bg-[#FF8C1A] border border-[#DB6E00] text-white px-2 py-0.5 rounded-full text-[10px] shadow-sm ml-1 flex items-center gap-1">幾個圖形 <span id="v-count" class="text-white/80 scale-90">12</span></span>
+                                        </div>
+                                        
+                                        <div class="block-green border-b-[3px] px-4 py-1.5 rounded-md shadow-sm w-full max-w-[280px] text-[11px]">停筆</div>
+                                    </div>
+                                </div>
+
+                                <button onclick="runLabAnimation()" class="w-full mt-6 bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-indigo-700 shadow-md transition-all flex items-center justify-center gap-2 transform active:scale-95">
+                                    <span>🚀 傳遞變數並執行</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-3 flex flex-col">
+                            <div class="sim-window bg-slate-900 border border-slate-800 rounded-t-2xl shadow-sm flex-grow min-h-[400px]">
+                                <div class="p-2 border-b border-slate-800 flex justify-end gap-2 bg-slate-950 z-10 relative">
+                                   <button onclick="setMandalaPreset(3, 12)" class="text-[10px] font-medium bg-slate-800 text-slate-300 border border-slate-700 px-2 py-1 rounded hover:bg-emerald-950 hover:text-emerald-400 transition">傳入 N=3, X=12</button>
+                                   <button onclick="setMandalaPreset(4, 18)" class="text-[10px] font-medium bg-slate-800 text-slate-300 border border-slate-700 px-2 py-1 rounded hover:bg-sky-950 hover:text-sky-400 transition">傳入 N=4, X=18</button>
+                                   <button onclick="setMandalaPreset(5, 10)" class="text-[10px] font-medium bg-slate-800 text-slate-300 border border-slate-700 px-2 py-1 rounded hover:bg-fuchsia-950 hover:text-fuchsia-400 transition">傳入 N=5, X=10</button>
+                                </div>
+                                <div class="relative w-full h-[calc(100%-40px)]">
+                                    <div class="sim-badge" style="border-color:#475569; background: rgba(15,23,42,0.9); color: #94A3B8; top: 12px;">即時模擬畫布</div>
+                                    <svg id="mandala-svg" viewBox="0 0 200 150" class="w-full h-full absolute inset-0" preserveAspectRatio="xMidYMid meet"></svg>
+                                </div>
+                            </div>
+                            <div id="mandala-feedback" class="bg-slate-800 text-white rounded-b-2xl p-4 text-sm font-medium transition-colors duration-300 text-center shadow-md">
+                                調整左側的參數，然後點擊「執行」觀賞雙層函式積木的威力！
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 第五階段：進階題型 (彩虹模式) -->
+                <section class="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 rounded-2xl p-6 md:p-8 mt-12 slide-up-fade">
+                    <div class="flex items-start gap-4">
+                        <div class="text-4xl">🌟</div>
+                        <div>
+                            <h4 class="text-xl font-bold text-indigo-900 mb-2">第五階段：進階彩虹曼陀羅</h4>
+                            <p class="text-sm text-indigo-800 font-light mb-4 leading-relaxed max-w-2xl">
+                                既然我們已經有了層層分明的函式結構，如果想讓曼陀羅變色，該把「筆跡顏色設為隨機」積木放在哪裡呢？沒錯！就放在「畫幾個圖形(X)」這個第二層函式的迴圈內！這樣每次畫新圖形前就會變色。
+                            </p>
+                            <label class="inline-flex items-center cursor-pointer bg-white px-5 py-2.5 rounded-xl border border-indigo-200 shadow-sm hover:shadow-md hover:border-purple-300 transition-all">
+                                <input type="checkbox" id="rainbow-toggle" onchange="toggleRainbowMode()" class="w-5 h-5 text-purple-600 rounded focus:ring-purple-500 mr-3">
+                                <span class="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 via-green-500 to-blue-500">開啟進階彩虹模式 ➔</span>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+        <div class="flex justify-between items-center">
+            <a href="https://su-yung-sheng.github.io/unforte115/1150704.html" class="text-sm text-slate-400 hover:text-slate-800 transition-colors">⬅ 上一個單元</a>
+            <a href="https://su-yung-sheng.github.io/unforte115/1150706.html" class="inline-block text-center text-sm font-medium text-slate-600 bg-white border border-gray-200 px-6 py-3 rounded-full hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm">下一個單元 ➔</a>
+        </div>
+    </main>
+
+    <script>
+        // ====== 第一階段：定義函式積木挑戰 ======
+        const funcData = {
+            1: '<div class="block-pink border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left flex items-center gap-1">定義 <span class="bg-white text-pink-600 px-2 py-0.5 rounded-full flex items-center gap-1">畫一個正N邊形 (<span class="func-param shadow-none">N</span>)</span></div>',
+            2: '<div class="block-yellow border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left flex items-center gap-1">重複執行 <span class="func-param">N</span> 次</div>',
+            3: '<div class="block-blue border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left">移動 50 點</div>',
+            4: '<div class="block-blue border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left flex items-center gap-1">右轉 ↻ <span class="bg-[#59C059] border border-[#42A042] rounded-full px-1.5 py-0.5 flex items-center gap-1 text-[10px] shadow-sm text-white"><span class="bg-white text-slate-800 px-1.5 rounded-full shadow-inner">360</span> / <span class="func-param shadow-none scale-90 m-0">N</span></span> 度</div>'
+        };
+        const funcDesc = {
+            1: "函式開頭：帶著參數N的萬用積木", 
+            2: "內層邏輯：根據參數N決定畫幾次", 
+            3: "內層邏輯：畫出固定的邊長", 
+            4: "內層邏輯：動態計算正確的轉角"
+        };
+        let cFunc = []; let tFunc = [];
+
+        function initFuncGame() {
+            cFunc = [1, 2, 3, 4].sort(() => Math.random() - 0.5);
+            tFunc = [];
+            if(document.getElementById('func-flow-msg')) document.getElementById('func-flow-msg').textContent = "";
+            renderFuncGame();
+        }
+
+        function tryPlaceFuncItem(id) {
+            const expectedId = tFunc.length + 1;
+            const msg = document.getElementById('func-flow-msg');
+            if (id === expectedId) {
+                cFunc = cFunc.filter(x => x !== id);
+                tFunc.push(id);
+                msg.textContent = "✅ 放置正確！";
+                msg.className = "text-sm font-bold text-emerald-600";
+                
+                if (tFunc.length === 4) {
+                    msg.innerHTML = "🎉 函式完成！在右側輸入不同參數，測試你的「畫一個正N邊形」函式吧！";
+                    unlockSinglePolygonTester();
+                }
+                renderFuncGame();
+            } else {
+                msg.textContent = "❌ 順序不對喔！請依照：定義函式 ➔ 迴圈N次 ➔ 移動 ➔ 轉向(360/N)。";
+                msg.className = "text-sm font-bold text-rose-500";
+            }
+        }
+
+        function renderFuncGame() {
+            const src = document.getElementById('func-source-container');
+            const tgt = document.getElementById('func-target-container');
+            if(!src || !tgt) return;
+            
+            src.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-4 w-full text-center border-b border-slate-100 pb-2">待排積木區</p>';
+            cFunc.forEach(id => {
+                const b = document.createElement('button');
+                b.className = "w-full mb-2 transform hover:scale-[1.01] transition-transform text-left";
+                b.innerHTML = funcData[id];
+                b.onclick = () => tryPlaceFuncItem(id);
+                src.appendChild(b);
+            });
+
+            tgt.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-2 w-full text-center border-b border-slate-100 pb-2">函式定義組裝區</p>';
+            
+            const innerContainer = document.createElement('div');
+            innerContainer.className = "w-full space-y-1.5";
+            
+            for (let i = 1; i <= 4; i++) {
+                const row = document.createElement('div');
+                const isInner = (i === 3 || i === 4);
+                row.className = `flex items-center gap-2 w-full ${isInner ? 'ml-6 border-l-2 border-[#FFAB19] pl-2' : ''}`;
+                
+                const desc = document.createElement('div');
+                desc.className = "text-[10px] font-bold text-slate-500 w-2/5 text-right tracking-wide";
+                desc.textContent = funcDesc[i];
+                
+                const slot = document.createElement('div');
+                slot.className = "w-3/5";
+                
+                if (tFunc.includes(i)) {
+                    slot.innerHTML = funcData[i];
+                } else {
+                    slot.innerHTML = `<div class="border-2 border-dashed border-slate-300 rounded-md bg-slate-50 h-7 flex items-center justify-center text-[10px] text-slate-400 font-bold shadow-inner">等待積木...</div>`;
+                }
+                
+                row.appendChild(desc); 
+                row.appendChild(slot); 
+                innerContainer.appendChild(row);
+                
+                if(i === 1) innerContainer.appendChild(document.createElement('div')).className = "h-1";
+            }
+            tgt.appendChild(innerContainer);
+        }
+
+        // 單一圖形測試機 (第一階段)
+        let singleInterval = null;
+        function unlockSinglePolygonTester() {
+            const container = document.getElementById('single-sim-container');
+            if(!container) return;
+            
+            container.innerHTML = `
+                <div class="sim-badge" style="border-color:#F472B6; background: rgba(253,242,248,0.9); color: #DB2777;">函式威力測試機</div>
+                <div class="absolute top-12 flex gap-2 z-10">
+                    <button onclick="drawSingleShape(3)" class="bg-white border border-pink-200 text-pink-600 text-xs font-bold px-3 py-1 rounded shadow-sm hover:bg-pink-50 transition">傳入 N=3</button>
+                    <button onclick="drawSingleShape(4)" class="bg-white border border-pink-200 text-pink-600 text-xs font-bold px-3 py-1 rounded shadow-sm hover:bg-pink-50 transition">傳入 N=4</button>
+                    <button onclick="drawSingleShape(5)" class="bg-white border border-pink-200 text-pink-600 text-xs font-bold px-3 py-1 rounded shadow-sm hover:bg-pink-50 transition">傳入 N=5</button>
+                    <button onclick="drawSingleShape(6)" class="bg-white border border-pink-200 text-pink-600 text-xs font-bold px-3 py-1 rounded shadow-sm hover:bg-pink-50 transition">傳入 N=6</button>
+                </div>
+                <svg id="single-sim-svg" viewBox="0 0 200 150" class="w-full h-full bg-slate-50 rounded-2xl pt-8" preserveAspectRatio="xMidYMid meet"></svg>
+            `;
+        }
+
+        function drawSingleShape(N) {
+            if (singleInterval) clearInterval(singleInterval);
+            const svg = document.getElementById('single-sim-svg');
+            if (!svg) return;
+            svg.innerHTML = '';
+
+            const L = 50; 
+            const extAngle = 360 / N;
+            const R = L / (2 * Math.sin(Math.PI / N));
+            const cx = 100 - (L/2); 
+            const cy = 75 - R/1.5; 
+
+            let px = cx, py = cy;
+            let currentAngle = 0;
+            let vertices = [{x: px, y: py, angle: 0}];
+
+            for(let i=0; i<N; i++) {
+                let rad = currentAngle * Math.PI / 180;
+                px += Math.cos(rad) * L;
+                py += Math.sin(rad) * L;
+                currentAngle += extAngle; 
+                vertices.push({x: px, y: py, angle: currentAngle});
+            }
+
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("fill", "none");
+            path.setAttribute("stroke", "#EC4899");
+            path.setAttribute("stroke-width", "3");
+            path.setAttribute("stroke-linecap", "round");
+            path.setAttribute("stroke-linejoin", "round");
+            svg.appendChild(path);
+
+            const sprite = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            sprite.innerHTML = `<polygon points="6,0 -4,-3.5 -2,0 -4,3.5" fill="#F59E0B" stroke="#FFFFFF" stroke-width="0.5" transform="scale(1.2)" />`;
+            svg.appendChild(sprite);
+
+            let s = 0;
+            let currentPathData = `M ${cx} ${cy}`;
+            path.setAttribute("d", currentPathData);
+            sprite.setAttribute("transform", `translate(${cx}, ${cy}) rotate(0)`);
+
+            singleInterval = setInterval(() => {
+                if (s >= N) {
+                    clearInterval(singleInterval);
+                    return;
+                }
+                const nextV = vertices[s + 1];
+                currentPathData += ` L ${nextV.x} ${nextV.y}`;
+                path.setAttribute("d", currentPathData);
+                sprite.setAttribute("transform", `translate(${nextV.x}, ${nextV.y}) rotate(${nextV.angle})`);
+                s++;
+            }, 300);
+        }
+
+        // ====== 第二階段：主程式積木挑戰 ======
+        const mainData = {
+            1: '<div class="block-green border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-center">下筆</div>',
+            2: '<div class="block-yellow border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left">重複執行 ( 12 ) 次</div>',
+            3: '<div class="block-pink border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left flex items-center gap-1"><span class="font-bold tracking-wide">畫一個正N邊形</span> <span class="bg-white text-slate-800 px-2 py-0.5 rounded-full text-[10px] shadow-inner ml-1 border border-pink-200">5</span></div>',
+            4: '<div class="block-blue border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left">右轉 ↻ 30 度</div>',
+            5: '<div class="block-green border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-center">停筆</div>'
+        };
+        const mainDesc = {
+            1: "準備：落下畫筆", 
+            2: "外層邏輯：控制曼陀羅圖形個數", 
+            3: "呼叫函式：畫出一個五邊形", 
+            4: "外層邏輯：旋轉角度接續畫下一個",
+            5: "結束：抬起畫筆"
+        };
+        let cMain = []; let tMain = [];
+
+        function initMainGame() {
+            cMain = [1, 2, 3, 4, 5].sort(() => Math.random() - 0.5);
+            tMain = [];
+            if(document.getElementById('main-flow-msg')) document.getElementById('main-flow-msg').textContent = "";
+            renderMainGame();
+        }
+
+        function tryPlaceMainItem(id) {
+            const expectedId = tMain.length + 1;
+            const msg = document.getElementById('main-flow-msg');
+            if (id === expectedId) {
+                cMain = cMain.filter(x => x !== id);
+                tMain.push(id);
+                msg.textContent = "✅ 放置正確！";
+                msg.className = "text-sm font-bold text-emerald-600";
+                
+                if (tMain.length === 5) {
+                    msg.innerHTML = "🎉 主程式組合完成！我們將函式與主程式結合了！ <button onclick='playMainMandalaAnimation()' class='ml-2 bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-sm transition'>觀看曼陀羅繪製 ➔</button>";
+                    playMainMandalaAnimation();
+                }
+                renderMainGame();
+            } else {
+                msg.textContent = "❌ 順序不對喔！請依照：下筆 ➔ 重複迴圈 ➔ 呼叫函式 ➔ 轉向 ➔ 停筆。";
+                msg.className = "text-sm font-bold text-rose-500";
+            }
+        }
+
+        function renderMainGame() {
+            const src = document.getElementById('main-source-container');
+            const tgt = document.getElementById('main-target-container');
+            if(!src || !tgt) return;
+            
+            src.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-4 w-full text-center border-b border-slate-100 pb-2">待排積木區</p>';
+            cMain.forEach(id => {
+                const b = document.createElement('button');
+                b.className = "w-full mb-2 transform hover:scale-[1.01] transition-transform text-left";
+                b.innerHTML = mainData[id];
+                b.onclick = () => tryPlaceMainItem(id);
+                src.appendChild(b);
+            });
+
+            tgt.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-2 w-full text-center border-b border-slate-100 pb-2">主程式組裝區</p>';
+            
+            const outerContainer = document.createElement('div');
+            outerContainer.className = "w-full space-y-1.5";
+            
+            for (let i = 1; i <= 5; i++) {
+                const row = document.createElement('div');
+                const isInner = (i === 3 || i === 4);
+                row.className = `flex items-center gap-2 w-full ${isInner ? 'ml-6 border-l-2 border-[#FFAB19] pl-2' : ''}`;
+                
+                const desc = document.createElement('div');
+                desc.className = "text-[10px] font-bold text-slate-500 w-2/5 text-right tracking-wide";
+                desc.textContent = mainDesc[i];
+                
+                const slot = document.createElement('div');
+                slot.className = "w-3/5";
+                
+                if (tMain.includes(i)) {
+                    slot.innerHTML = mainData[i];
+                } else {
+                    slot.innerHTML = `<div class="border-2 border-dashed border-slate-300 rounded-md bg-slate-50 h-7 flex items-center justify-center text-[10px] text-slate-400 font-bold shadow-inner">等待積木...</div>`;
+                }
+                
+                row.appendChild(desc); 
+                row.appendChild(slot); 
+                outerContainer.appendChild(row);
+                
+                if(i === 1) outerContainer.appendChild(document.createElement('div')).className = "h-1";
+            }
+            tgt.appendChild(outerContainer);
+        }
+
+        // 主程式曼陀羅動畫 (第二階段)
+        let mainPuzzleInterval = null;
+        function playMainMandalaAnimation() {
+            const svgContainer = document.getElementById('main-sim-container');
+            if(!svgContainer) return;
+            
+            svgContainer.innerHTML = `
+                <div class="sim-badge" style="border-color:#818CF8; background: rgba(238,242,255,0.9); color: #4F46E5;">主程式繪製曼陀羅</div>
+                <svg id="main-puzzle-svg" viewBox="0 0 200 150" class="w-full h-full bg-slate-50 rounded-2xl" preserveAspectRatio="xMidYMid meet"></svg>
+            `;
+            
+            const svg = document.getElementById('main-puzzle-svg');
+            startDrawingMandala(svg, 5, 12, null, true, '#4F46E5'); 
+        }
+
+        // ====== 第三階段：定義第二層函式挑戰 ======
+        const func2Data = {
+            1: '<div class="block-pink border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left flex items-center gap-1">定義 <span class="bg-white text-pink-600 px-2 py-0.5 rounded-full flex items-center gap-1">畫幾個圖形 (<span class="func-param shadow-none">X</span>)</span></div>',
+            2: '<div class="block-yellow border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left flex items-center gap-1">重複執行 <span class="func-param">X</span> 次</div>',
+            3: '<div class="block-pink border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left flex items-center gap-1"><span class="font-bold tracking-wide">畫一個正N邊形</span> <span class="bg-white text-slate-800 px-2 py-0.5 rounded-full text-[10px] shadow-inner ml-1 border border-pink-200">4</span></div>',
+            4: '<div class="block-blue border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left flex items-center gap-1">右轉 ↻ <span class="bg-[#59C059] border border-[#42A042] rounded-full px-1.5 py-0.5 flex items-center gap-1 text-[10px] shadow-sm text-white"><span class="bg-white text-slate-800 px-1.5 rounded-full shadow-inner">360</span> / <span class="func-param shadow-none scale-90 m-0">X</span></span> 度</div>'
+        };
+        const func2Desc = {
+            1: "第二層函式：帶著參數 X 控制圖形數量", 
+            2: "迴圈：根據參數 X 決定畫幾個", 
+            3: "呼叫第一層函式：畫出正方形(4)", 
+            4: "動態計算：每次畫完旋轉 360/X 度"
+        };
+        let cFunc2 = []; let tFunc2 = [];
+
+        function initFunc2Game() {
+            cFunc2 = [1, 2, 3, 4].sort(() => Math.random() - 0.5);
+            tFunc2 = [];
+            if(document.getElementById('func2-flow-msg')) document.getElementById('func2-flow-msg').textContent = "";
+            renderFunc2Game();
+        }
+
+        function tryPlaceFunc2Item(id) {
+            const expectedId = tFunc2.length + 1;
+            const msg = document.getElementById('func2-flow-msg');
+            if (id === expectedId) {
+                cFunc2 = cFunc2.filter(x => x !== id);
+                tFunc2.push(id);
+                msg.textContent = "✅ 放置正確！";
+                msg.className = "text-sm font-bold text-emerald-600";
+                
+                if (tFunc2.length === 4) {
+                    msg.innerHTML = "🎉 雙層函式完成！主程式只要呼叫它就能畫出完整的曼陀羅！ <button onclick='playFunc2Animation()' class='ml-2 bg-teal-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-teal-700 shadow-sm transition'>觀看傳入 X=12 的模擬 ➔</button>";
+                    playFunc2Animation();
+                }
+                renderFunc2Game();
+            } else {
+                msg.textContent = "❌ 順序不對喔！請依照：定義函式 ➔ 迴圈X次 ➔ 呼叫第一層函式 ➔ 轉向(360/X)。";
+                msg.className = "text-sm font-bold text-rose-500";
+            }
+        }
+
+        function renderFunc2Game() {
+            const src = document.getElementById('func2-source-container');
+            const tgt = document.getElementById('func2-target-container');
+            if(!src || !tgt) return;
+            
+            src.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-4 w-full text-center border-b border-slate-100 pb-2">待排積木區</p>';
+            cFunc2.forEach(id => {
+                const b = document.createElement('button');
+                b.className = "w-full mb-2 transform hover:scale-[1.01] transition-transform text-left";
+                b.innerHTML = func2Data[id];
+                b.onclick = () => tryPlaceFunc2Item(id);
+                src.appendChild(b);
+            });
+
+            tgt.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-2 w-full text-center border-b border-slate-100 pb-2">第二層函式組裝區</p>';
+            
+            const innerContainer = document.createElement('div');
+            innerContainer.className = "w-full space-y-1.5";
+            
+            for (let i = 1; i <= 4; i++) {
+                const row = document.createElement('div');
+                const isInner = (i === 3 || i === 4);
+                row.className = `flex items-center gap-2 w-full ${isInner ? 'ml-6 border-l-2 border-[#FFAB19] pl-2' : ''}`;
+                
+                const desc = document.createElement('div');
+                desc.className = "text-[10px] font-bold text-slate-500 w-2/5 text-right tracking-wide";
+                desc.textContent = func2Desc[i];
+                
+                const slot = document.createElement('div');
+                slot.className = "w-3/5";
+                
+                if (tFunc2.includes(i)) {
+                    slot.innerHTML = func2Data[i];
+                } else {
+                    slot.innerHTML = `<div class="border-2 border-dashed border-slate-300 rounded-md bg-slate-50 h-7 flex items-center justify-center text-[10px] text-slate-400 font-bold shadow-inner">等待積木...</div>`;
+                }
+                
+                row.appendChild(desc); 
+                row.appendChild(slot); 
+                innerContainer.appendChild(row);
+                
+                if(i === 1) innerContainer.appendChild(document.createElement('div')).className = "h-1";
+            }
+            tgt.appendChild(innerContainer);
+        }
+
+        let func2PuzzleInterval = null;
+        function playFunc2Animation() {
+            const svgContainer = document.getElementById('func2-sim-container');
+            if(!svgContainer) return;
+            
+            svgContainer.innerHTML = `
+                <div class="sim-badge" style="border-color:#5EEAD4; background: rgba(240,253,250,0.9); color: #0F766E;">雙層函式呼叫模擬 (X=12)</div>
+                <svg id="func2-puzzle-svg" viewBox="0 0 200 150" class="w-full h-full bg-slate-50 rounded-2xl" preserveAspectRatio="xMidYMid meet"></svg>
+            `;
+            
+            const svg = document.getElementById('func2-puzzle-svg');
+            startDrawingMandala(svg, 4, 12, null, true, '#0D9488'); // true = belongs to puzzle
+        }
+
+        // ====== 第四階段：曼陀羅實戰 ======
+        let mandalaInterval = null;
+        const shapeNameMap = { 3: '三角形', 4: '方形', 5: '五邊形', 6: '六邊形' };
+
+        function getMandalaShape() {
+            const select = document.getElementById('mandala-shape-select');
+            if (select && select.value === 'custom') {
+                return parseInt(document.getElementById('mandala-shape-custom').value) || 4;
+            }
+            return parseInt(select?.value) || 4;
+        }
+
+        function setMandalaShapeUI(val) {
+            const select = document.getElementById('mandala-shape-select');
+            const customInput = document.getElementById('mandala-shape-custom');
+            if (!select || !customInput) return;
+            
+            let optionExists = false;
+            for(let i=0; i<select.options.length; i++) {
+                if(select.options[i].value == val) {
+                    optionExists = true;
+                    break;
+                }
+            }
+            
+            if(optionExists && val !== 'custom') {
+                select.value = val;
+                customInput.classList.add('hidden');
+            } else {
+                select.value = 'custom';
+                customInput.value = val;
+                customInput.classList.remove('hidden');
+            }
+        }
+
+        function handleShapeChange() {
+            const select = document.getElementById('mandala-shape-select');
+            const customInput = document.getElementById('mandala-shape-custom');
+            if (select.value === 'custom') {
+                customInput.classList.remove('hidden');
+                customInput.focus();
+            } else {
+                customInput.classList.add('hidden');
+            }
+            updateMandala();
+        }
+
+        function setMandalaPreset(shapeSides, count) {
+            const countEl = document.getElementById('mandala-count');
+            if(countEl) {
+                setMandalaShapeUI(shapeSides);
+                countEl.value = count;
+                updateMandala();
+            }
+        }
+
+        // ====== 第五階段：進階彩虹模式切換 ======
+        function toggleRainbowMode() {
+            const block = document.getElementById('preview-color-block');
+            const toggle = document.getElementById('rainbow-toggle');
+            if(toggle && block) {
+                if(toggle.checked) {
+                    block.classList.remove('hidden');
+                    block.classList.add('flex');
+                } else {
+                    block.classList.add('hidden');
+                    block.classList.remove('flex');
+                }
+                runLabAnimation(); 
+            }
+        }
+
+        // 更新實驗室積木畫面數值
+        function updateMandala() {
+            const countEl = document.getElementById('mandala-count');
+            
+            if(!countEl) return;
+
+            const count = parseInt(countEl.value) || 12;
+            const shapeSides = getMandalaShape();
+
+            document.getElementById('v-func-call').textContent = shapeSides;
+            document.getElementById('v-count').textContent = count;
+            
+            const fb = document.getElementById('mandala-feedback');
+            if(fb) {
+                fb.textContent = `參數設定完畢！主程式將傳遞「正${shapeSides}邊形」與「X=${count}」給函式，準備執行！`;
+                fb.className = "bg-slate-700 text-white rounded-b-2xl p-4 text-sm font-medium transition-colors duration-300 text-center shadow-md";
+            }
+        }
+
+        function runLabAnimation() {
+            const countEl = document.getElementById('mandala-count');
+            const svg = document.getElementById('mandala-svg');
+            const fb = document.getElementById('mandala-feedback');
+            
+            if(!countEl || !svg) return;
+
+            const count = parseInt(countEl.value) || 12;
+            const shapeSides = getMandalaShape();
+            
+            const isRainbow = document.getElementById('rainbow-toggle')?.checked;
+            
+            fb.textContent = isRainbow 
+                ? `🌈 主程式傳入 X=${count}，雙層函式正在繪製彩色的曼陀羅...`
+                : `🚀 主程式傳入 X=${count}，雙層函式正在繪製單色的曼陀羅...`;
+            fb.className = isRainbow
+                ? "bg-gradient-to-r from-red-500 via-green-500 to-blue-500 text-white rounded-b-2xl p-4 text-sm font-bold transition-all duration-300 text-center shadow-md"
+                : "bg-indigo-600 text-white rounded-b-2xl p-4 text-sm font-medium transition-colors duration-300 text-center shadow-md";
+
+            startDrawingMandala(svg, shapeSides, count, fb, false);
+        }
+
+        // 共用的繪製邏輯
+        function startDrawingMandala(svgElement, shapeSides, count, feedbackElement, isPuzzle, overrideColor = null) {
+            if (isPuzzle && overrideColor) {
+                if(overrideColor === '#4F46E5' && mainPuzzleInterval) clearInterval(mainPuzzleInterval);
+                if(overrideColor === '#0D9488' && func2PuzzleInterval) clearInterval(func2PuzzleInterval);
+            }
+            if (!isPuzzle && mandalaInterval) clearInterval(mandalaInterval);
+            
+            const isRainbow = !isPuzzle && (document.getElementById('rainbow-toggle')?.checked || false);
+
+            svgElement.innerHTML = '';
+
+            const cx = 100, cy = 75;
+            // 透過公式防止自訂圖形超出畫布
+            const sizeMap = { 3: 45, 4: 38, 5: 30, 6: 25 };
+            const L = sizeMap[shapeSides] || Math.max(10, Math.floor(150 / shapeSides));
+            
+            const turnAngle = 360 / count;
+            const extAngle = 360 / shapeSides;
+
+            let shapePoints = [];
+            for (let k = 0; k < count; k++) {
+                let baseAngle = k * turnAngle;
+                let px = cx, py = cy;
+                let vertices = [{ x: px, y: py, angle: baseAngle }];
+                for (let j = 0; j < shapeSides; j++) {
+                    let edgeAngle = baseAngle + j * extAngle;
+                    let rad = edgeAngle * Math.PI / 180;
+                    px += Math.cos(rad) * L;
+                    py += Math.sin(rad) * L;
+                    vertices.push({ x: px, y: py, angle: edgeAngle + extAngle });
+                }
+                shapePoints.push(vertices);
+            }
+
+            const finishedGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            svgElement.appendChild(finishedGroup);
+
+            const activePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            activePath.setAttribute("fill", "none");
+            activePath.setAttribute("stroke-width", "2");
+            activePath.setAttribute("stroke-linecap", "round");
+            activePath.setAttribute("stroke-linejoin", "round");
+            svgElement.appendChild(activePath);
+
+            const sprite = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            sprite.innerHTML = `<polygon points="6,0 -4,-3.5 -2,0 -4,3.5" fill="#F59E0B" stroke="#FFFFFF" stroke-width="0.5" transform="scale(1.2)" />`;
+            svgElement.appendChild(sprite);
+
+            let s = 0;
+            const totalSteps = count * shapeSides;
+            let currentPathData = '';
+
+            const getColor = (shapeIdx) => {
+                if (overrideColor) return overrideColor; 
+                if (!isRainbow) return '#06B6D4'; 
+                const hue = (shapeIdx * (360 / count)) % 360;
+                return `hsl(${hue}, 85%, 60%)`;
+            };
+
+            const drawStep = () => {
+                const shapeIdx = Math.floor(s / shapeSides);
+                const edgeIdx = s % shapeSides;
+                const currVertex = shapePoints[shapeIdx][edgeIdx + 1];
+
+                if (edgeIdx === 0) {
+                    if (s > 0) {
+                        const clone = activePath.cloneNode(true);
+                        finishedGroup.appendChild(clone);
+                    }
+                    currentPathData = `M ${cx} ${cy}`;
+                    activePath.setAttribute("stroke", getColor(shapeIdx));
+                }
+
+                currentPathData += ` L ${currVertex.x} ${currVertex.y}`;
+                activePath.setAttribute("d", currentPathData);
+                sprite.setAttribute("transform", `translate(${currVertex.x}, ${currVertex.y}) rotate(${currVertex.angle})`);
+
+                s++;
+                if (s >= totalSteps) {
+                    if (isPuzzle && overrideColor) {
+                        if (overrideColor === '#4F46E5') clearInterval(mainPuzzleInterval);
+                        if (overrideColor === '#0D9488') clearInterval(func2PuzzleInterval);
+                    }
+                    else if (!isPuzzle) {
+                        clearInterval(mandalaInterval);
+                        if(feedbackElement) {
+                            if (isRainbow) {
+                                feedbackElement.textContent = `🎉 雙層函式執行完畢！充滿魔力的彩虹曼陀羅誕生了！`;
+                                feedbackElement.className = "bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-b-2xl p-4 text-sm font-bold transition-all duration-300 text-center shadow-lg";
+                            } else {
+                                feedbackElement.textContent = `🎉 雙層函式執行完畢！主程式超級乾淨！想試試看下方的彩虹模式嗎？`;
+                                feedbackElement.className = "bg-emerald-600 text-white rounded-b-2xl p-4 text-sm font-bold transition-colors duration-300 text-center shadow-lg";
+                            }
+                        }
+                    }
+                    const clone = activePath.cloneNode(true);
+                    finishedGroup.appendChild(clone);
+                    activePath.setAttribute("d", ""); 
+                    sprite.setAttribute("transform", `translate(${cx}, ${cy}) rotate(${count * turnAngle})`);
+                }
+            };
+
+            const stepInterval = isPuzzle ? 30 : Math.max(15, 120 - (count * shapeSides) / 4); 
+            drawStep(); 
+            
+            if (isPuzzle && overrideColor) {
+                if(overrideColor === '#4F46E5') mainPuzzleInterval = setInterval(drawStep, stepInterval);
+                if(overrideColor === '#0D9488') func2PuzzleInterval = setInterval(drawStep, stepInterval);
+            }
+            else if (!isPuzzle) mandalaInterval = setInterval(drawStep, stepInterval);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initFuncGame();
+            initMainGame();
+            initFunc2Game();
+            updateMandala(); 
+        });
+    </script>
+</body>
+</html>

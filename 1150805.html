@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用清單打造星際任務 - LESSON 5</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #F8F9FA; color: #333333; }
+        .slide-up-fade { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes pulse-highlight { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .value-changed { animation: pulse-highlight 0.4s ease-out; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+    </style>
+</head>
+<body class="antialiased selection:bg-cyan-100 selection:text-cyan-900">
+
+    <!-- Header -->
+    <header id="main-header" class="bg-white border-b border-gray-100 pt-12 pb-12 slide-up-fade relative overflow-hidden">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8 relative z-10">
+            <div class="mb-6">
+                <a href="https://su-yung-sheng.github.io/unforte115/" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+                    <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> 返回網站首頁
+                </a>
+            </div>
+            <p class="text-sm font-bold text-cyan-600 mb-3 tracking-widest uppercase">演算法與程式設計</p>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight">星際陣列指揮官：<br class="hidden md:block">用清單打造星際任務</h1>
+            <p class="text-lg text-slate-500 font-light max-w-2xl leading-relaxed">
+                化身星際指揮官，透過六大任務關卡，循序漸進建立邏輯思維，完整掌握 <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span> 的強大威力！
+            </p>
+        </div>
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-cyan-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+        <div class="absolute bottom-0 right-40 w-72 h-72 bg-sky-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+    </header>
+
+    <main id="app-container" class="max-w-5xl mx-auto px-6 lg:px-8 py-12 relative min-h-[50vh]"></main>
+
+    <footer class="bg-slate-50 border-t border-slate-200 mt-10 py-8">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8 text-center">
+            <p class="text-sm font-medium text-slate-400">© 演算法與程式設計 - 星際陣列指揮官</p>
+        </div>
+    </footer>
+
+    <script>
+        // ==========================================
+        // 虛擬碼拼圖挑戰邏輯 (階段一)
+        // ==========================================
+        const correctPuzzle1Filtered_EN = [
+            'DELETE ALL OF "洗牌"',
+            'REPEAT LENGTH("牌堆") TIMES:',
+            '    SET 第幾張牌 TO RANDOM(1, LENGTH("牌堆"))',
+            '    ADD GET_ITEM(第幾張牌) FROM "牌堆" TO "洗牌"',
+            '    DELETE ITEM(第幾張牌) FROM "牌堆"'
+        ];
+
+        const correctPuzzle1Filtered_ZH = [
+            '刪除 "洗牌" 的所有項目',
+            '重複 (清單"牌堆"的長度) 次:',
+            '    設定 第幾張牌 = 隨機取數 1 到 "牌堆"的長度',
+            '    添加 "牌堆" 的第 (第幾張牌) 項 到 "洗牌"',
+            '    刪除 "牌堆" 的第 (第幾張牌) 項'
+        ];
+        
+        let puz1Source = [];
+        let puz1Target = [];
+        let puz1Solved = false;
+        let isPuzzle1ZH = false; 
+
+        function getCorrectPuzzleArray1() { return isPuzzle1ZH ? correctPuzzle1Filtered_ZH : correctPuzzle1Filtered_EN; }
+
+        function updateIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        function initPuzzle1() {
+            puz1Source = [...getCorrectPuzzleArray1()].sort(() => Math.random() - 0.5);
+            puz1Target = [];
+            puz1Solved = false;
+        }
+
+        window.togglePuzzle1Lang = function() {
+            if (puz1Solved) return; 
+            isPuzzle1ZH = !isPuzzle1ZH;
+            initPuzzle1();
+            renderPuzzle1();
+            const langText = document.getElementById('puzzle-lang-text1');
+            if (langText) langText.innerText = isPuzzle1ZH ? '切換為英文' : '切換為中文';
+            updateIcons();
+        }
+
+        window.movePuzzle1Item = function(index, fromSource) {
+            if (puz1Solved) return; 
+            if (fromSource) puz1Target.push(puz1Source.splice(index, 1)[0]);
+            else puz1Source.push(puz1Target.splice(index, 1)[0]);
+            renderPuzzle1();
+        }
+
+        window.checkPuzzle1 = function() {
+            if (puz1Solved) return;
+            const fb = document.getElementById('puzzle1-feedback');
+            const currentCorrectArray = getCorrectPuzzleArray1();
+            
+            if (puz1Target.length < currentCorrectArray.length) {
+                fb.innerHTML = '<span class="text-amber-400">⚠️ 請先將所有片段放入組合區！</span>';
+                fb.classList.remove('hidden');
+                setTimeout(() => fb.classList.add('hidden'), 3000);
+                return;
+            }
+
+            const isCorrect = puz1Target.every((val, index) => val === currentCorrectArray[index]);
+            
+            if (isCorrect) {
+                puz1Solved = true;
+                fb.innerHTML = '<span class="text-emerald-400">🎉 拼圖正確！已解鎖下方的積木碎片！</span>';
+                fb.classList.remove('hidden');
+                document.getElementById('btn-check-puzzle1').classList.add('hidden');
+                const btnLangToggle = document.getElementById('btn-toggle-puzzle-lang1');
+                if (btnLangToggle) btnLangToggle.classList.add('hidden');
+                
+                renderPuzzle1(); 
+                renderScratchPuzzle2();
+            } else {
+                fb.innerHTML = '<span class="text-rose-400">❌ 順序似乎不對喔，再檢查看看邏輯！</span>';
+                fb.classList.remove('hidden');
+                setTimeout(() => fb.classList.add('hidden'), 3000);
+            }
+        }
+
+        function renderPuzzle1() {
+            const srcEl = document.getElementById('puzzle1-source');
+            const tgtEl = document.getElementById('puzzle1-target');
+            if(!srcEl || !tgtEl) return;
+            
+            if (puz1Solved) {
+                srcEl.innerHTML = '<div class="text-slate-500 text-sm w-full text-center py-3 font-bold tracking-widest border border-slate-800 border-dashed rounded-lg bg-slate-900/50">🎉 片段已全數移至組合區</div>';
+                tgtEl.innerHTML = puz1Target.map((item, idx) => `
+                    <div class="bg-emerald-900/30 text-emerald-200 px-4 py-2.5 rounded-lg font-mono text-sm sm:text-base border border-emerald-700/50 whitespace-pre flex items-center shadow-sm w-full max-w-full overflow-hidden">
+                        <span class="opacity-50 text-xs w-5 shrink-0 text-left font-sans">${idx + 1}.</span>
+                        <span class="ml-2 truncate max-w-full block">${item}</span>
+                    </div>
+                `).join('');
+                return;
+            }
+
+            srcEl.innerHTML = puz1Source.map((item, idx) => `
+                <div onclick="movePuzzle1Item(${idx}, true)" class="bg-slate-700 text-slate-200 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-600 hover:-translate-y-0.5 font-mono text-sm shadow-sm transition-all border border-slate-600 select-none">
+                    ${item.trim()}
+                </div>
+            `).join('');
+            
+            tgtEl.innerHTML = puz1Target.map((item, idx) => `
+                <div onclick="movePuzzle1Item(${idx}, false)" class="bg-indigo-900/80 text-indigo-100 px-4 py-2.5 rounded-lg cursor-pointer hover:bg-rose-900/80 hover:text-rose-200 font-mono text-sm sm:text-base shadow-sm transition-all border border-indigo-700 select-none flex items-center group w-full max-w-full overflow-hidden">
+                    <span class="opacity-50 text-xs w-5 shrink-0 text-left font-sans group-hover:hidden">${idx + 1}.</span>
+                    <svg class="w-5 h-5 text-rose-400 shrink-0 hidden group-hover:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <span class="ml-2 whitespace-pre truncate max-w-full block">${item}</span>
+                </div>
+            `).join('');
+        }
+
+        // ==========================================
+        // ⭐ 階段二：Scratch 積木引導式提問挑戰
+        // ==========================================
+        const notchTop = `<div class="absolute top-[-4px] left-4 w-8 h-2 bg-black/20 rounded-b-full z-30"></div>`;
+        const notchBottom = `<div class="absolute -bottom-1 left-4 w-8 h-2 bg-black/20 rounded-b-full z-30"></div>`;
+        
+        const P_HTML = {
+            0: `<div class="bg-[#FFAB19] text-white px-4 py-2.5 rounded-t-lg rounded-br-lg rounded-bl-sm shadow-sm font-bold flex items-center gap-2 w-max text-sm relative border-b-4 border-r-2 border-[#CF8B17] z-20">${notchTop}重複 <span class="bg-[#FF661A] text-white px-3 py-1 rounded-full border-b-2 border-[#CC5214] shadow-sm flex items-center gap-1 mx-1">清單 <span class="bg-black/10 px-1 rounded shadow-inner mx-0.5 text-[11px]">牌堆 ▼</span> 的長度</span> 次${notchBottom}</div>`,
+            1: `<span class="bg-[#59C059] text-white px-3 py-1.5 rounded-full border-b-2 border-[#389438] shadow-sm font-bold inline-flex items-center gap-1 leading-none text-sm w-max">隨機取數 <span class="bg-white text-slate-800 px-2 py-0.5 rounded-full shadow-inner text-sm mx-0.5 border border-black/10 font-normal">1</span> 到 <span class="bg-[#FF661A] text-white px-2 py-0.5 rounded-full border-b-2 border-[#CC5214] shadow-sm text-sm inline-flex items-center mx-0.5">清單 <span class="bg-black/10 px-1 rounded shadow-inner mx-1 text-[11px]">牌堆 ▼</span> 的長度</span></span>`,
+            2: `<div class="bg-[#FF8C1A] text-white px-4 py-2.5 rounded-lg border-b-4 border-r-2 border-[#DB6E00] shadow-sm font-bold flex items-center gap-2 w-max text-sm relative z-20">${notchTop}變數 <span class="bg-black/15 px-2 py-1 rounded shadow-inner text-[11px] leading-none inline-flex items-center">第幾張牌 ▼</span> 設為 __INNER__${notchBottom}</div>`,
+            3: `<div class="bg-[#FF661A] text-white px-4 py-2.5 rounded-lg border-b-4 border-r-2 border-[#CC5214] shadow-sm font-bold flex items-center gap-2 w-max text-sm relative z-20">${notchTop}添加 <span class="bg-[#FF661A] text-white px-2 py-1 rounded-full border-b-2 border-[#CC5214] shadow-sm inline-flex items-center"><span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner mr-1 text-[11px] leading-none inline-flex items-center">牌堆 ▼</span> 的第 <span class="bg-[#FF8C1A] px-2 py-0.5 rounded-full shadow-sm text-[11px] mx-1 border-b-2 border-[#DB6E00]">第幾張牌</span> 項</span> 到 <span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner text-[11px] inline-flex items-center ml-1">洗牌 ▼</span>${notchBottom}</div>`,
+            4: `<div class="bg-[#FF661A] text-white px-4 py-2.5 rounded-lg border-b-4 border-r-2 border-[#CC5214] shadow-sm font-bold flex items-center gap-2 w-max text-sm relative z-20">${notchTop}刪除 <span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner text-[11px] leading-none inline-flex items-center mr-1">牌堆 ▼</span> 的第 <span class="bg-[#FF8C1A] px-2 py-0.5 rounded-full shadow-sm text-[11px] mx-1">第幾張牌</span> 項${notchBottom}</div>`
+        };
+
+        const P_POOL_HTML = {
+            ...P_HTML,
+            2: P_HTML[2].replace('__INNER__', `<span class="inline-block w-12 h-6 bg-black/20 rounded-full shadow-inner z-10 relative"></span>`)
+        };
+
+        const Q_FLOW = [
+            {
+                title: "Q1：決定洗牌的次數！",
+                desc: "A：依據「牌堆」目前的長度，重複執行對應的次數。",
+                note: "💡 提示：有多少張牌就要洗幾次，請選出包含「清單長度」的橘色重複迴圈積木。",
+                expectedPieceId: 0,
+                action: (html) => { spLines[0] = html; }
+            },
+            {
+                title: "Q2：決定要抽哪一張牌？",
+                desc: "A：從 1 到「牌堆」目前的長度，隨機決定一個數字。",
+                note: "💡 提示：用綠色的運算積木產生隨機數字，注意最大值要是牌堆長度喔！",
+                expectedPieceId: 1,
+                action: (html) => { spStaging = html; }
+            },
+            {
+                title: "Q3：把抽到的牌記在變數裡！",
+                desc: "A：將變數 [第幾張牌] 設為剛剛決定的隨機數字。",
+                note: "💡 提示：把 Q2 的隨機數字存進變數中，確保等一下拿牌和刪除牌時都是同一張！",
+                expectedPieceId: 2,
+                action: (html) => { 
+                    spLines[1] = html.replace('__INNER__', spStaging); 
+                    spStaging = null; 
+                }
+            },
+            {
+                title: "Q4：把這張牌放到「洗牌」的新牌堆！",
+                desc: "A：將「牌堆」第 [第幾張牌] 項的內容，加到「洗牌」中。",
+                note: "💡 提示：這是轉移資料的關鍵步驟，原本整齊的牌被我們轉移放到新牌堆了！",
+                expectedPieceId: 3,
+                action: (html) => { spLines[2] = html; }
+            },
+            {
+                title: "Q5：把原本的牌丟掉（防重複）",
+                desc: "A：刪除「牌堆」的第 [第幾張牌] 項。",
+                note: "💡 提示：轉移後一定要從原牌堆刪除它，才不會重複抽到同一張喔！",
+                expectedPieceId: 4,
+                action: (html) => { spLines[3] = html; }
+            }
+        ];
+
+        let spStep = 0;
+        let spStaging = null;
+        let spLines = [null, null, null, null];
+        let spPool = [];
+
+        function initScratchPuzzle2() {
+            spStep = 0;
+            spStaging = null;
+            spLines = [null, null, null, null];
+            spPool = [0, 1, 2, 3, 4].sort(() => Math.random() - 0.5);
+            renderScratchPuzzle2();
+        }
+
+        window.clickScratchPoolItem = function(pieceId) {
+            if(spStep >= Q_FLOW.length) return;
+            const currentQ = Q_FLOW[spStep];
+            const fb = document.getElementById('sp-feedback');
+            
+            if(pieceId === currentQ.expectedPieceId) {
+                spPool = spPool.filter(id => id !== pieceId);
+                currentQ.action(P_HTML[pieceId]);
+                spStep++;
+                renderScratchPuzzle2();
+                
+                fb.innerHTML = '<span class="text-emerald-400 font-bold animate-[popIn_0.2s_ease-out]"><i data-lucide="check-circle-2" class="w-5 h-5 inline mr-1"></i> 選擇正確，組合成功！</span>';
+                lucide.createIcons();
+                setTimeout(() => { if(fb) fb.innerHTML = ''; }, 1500);
+            } else {
+                fb.innerHTML = '<span class="text-rose-400 font-bold animate-pulse"><i data-lucide="alert-circle" class="w-5 h-5 inline mr-1"></i> 不對喔，請再看一次上方的 A (解答提示)。</span>';
+                lucide.createIcons();
+                setTimeout(() => { if(fb) fb.innerHTML = ''; }, 2500);
+            }
+        }
+
+        function renderScratchPuzzle2() {
+            const container = document.getElementById('scratch-puzzle-container');
+            if (!container) return;
+
+            if (spStep >= Q_FLOW.length) {
+                container.innerHTML = `
+                    <div class="flex flex-col w-full animate-[slideUpFade_0.5s_ease-out]">
+                        <div class="bg-emerald-900/40 border border-emerald-500 p-6 rounded-xl text-center mb-6 shadow-inner relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500 rounded-full mix-blend-screen filter blur-[50px] opacity-20 pointer-events-none"></div>
+                            <i data-lucide="party-popper" class="w-12 h-12 text-emerald-400 mx-auto mb-3 animate-bounce"></i>
+                            <h4 class="text-emerald-400 font-bold text-2xl mb-2">挑戰成功！</h4>
+                            <p class="text-emerald-200 text-sm">您已透過 Q&A 完美還原了「陣列洗牌」的核心精神！</p>
+                        </div>
+                        <div class="text-slate-400 text-xs font-bold mb-2 flex items-center gap-1.5"><i data-lucide="code-2" class="w-4 h-4"></i> 完整程式積木：</div>
+                        <div class="bg-[#F9F9F9] p-6 rounded-xl border border-slate-200 shadow-inner overflow-x-auto custom-scrollbar w-full">
+                            <div class="flex flex-col items-start font-bold text-sm md:text-base w-max relative group min-w-full pt-1">
+                                ${spLines[0]}
+                                <div class="ml-4 pl-3 border-l-[6px] border-[#CF8B17] py-3 bg-[#FFAB19]/10 relative z-10 flex flex-col gap-2 w-max min-h-[100px]">
+                                    ${spLines[1]}
+                                    ${spLines[2]}
+                                    ${spLines[3]}
+                                </div>
+                                <div class="h-8 w-32 rounded-b-xl border-b-4 border-r-2 shadow-sm bg-[#FFAB19] border-[#CF8B17] relative z-20 flex items-center"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            const currentQ = Q_FLOW[spStep];
+
+            container.innerHTML = `
+                <!-- 上半部：Q&A 提問與零件區 -->
+                <div class="flex flex-col lg:flex-row gap-6 w-full shrink-0">
+                    <!-- 左側：Step & Q&A -->
+                    <div class="w-full lg:w-5/12 flex flex-col">
+                        <div class="bg-indigo-950/60 border border-indigo-800 p-6 rounded-xl shadow-inner relative overflow-hidden h-full flex flex-col justify-center">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500 rounded-full mix-blend-screen filter blur-[40px] opacity-20 pointer-events-none"></div>
+                            <div class="text-indigo-300 font-bold mb-3 tracking-widest text-[11px] uppercase bg-indigo-900/80 w-max px-3 py-1 rounded-md border border-indigo-700 shadow-sm">Step ${spStep + 1} / 5</div>
+                            <h5 class="text-white font-extrabold text-xl mb-3 relative z-10 leading-snug">${currentQ.title}</h5>
+                            <div class="text-emerald-400 text-sm font-bold mb-4 relative z-10 bg-emerald-950/40 p-3.5 rounded-lg border border-emerald-900/50 leading-relaxed">${currentQ.desc}</div>
+                            ${currentQ.note ? `<div class="bg-indigo-900/40 p-4 rounded-lg text-indigo-200 text-sm leading-relaxed border border-indigo-700/50 relative z-10">${currentQ.note}</div>` : ''}
+                        </div>
+                    </div>
+
+                    <!-- 右側：零件區 (受第一關解鎖控制) -->
+                    <div class="w-full lg:w-7/12 flex flex-col">
+                        <div class="text-slate-400 text-xs font-bold mb-2 flex items-center gap-1.5"><i data-lucide="mouse-pointer-click" class="w-4 h-4"></i> 請從下方點擊選出對應的積木碎片：</div>
+                        <div class="relative flex flex-wrap gap-4 p-5 sm:p-6 bg-slate-900 rounded-xl border border-slate-700 min-h-[200px] content-start shadow-inner flex-1 overflow-hidden">
+                            ${!puz1Solved ? `
+                            <div class="absolute inset-0 z-[100] flex flex-col items-center justify-center bg-slate-900/80 backdrop-blur-md">
+                                <div class="bg-slate-800 p-4 rounded-full shadow-lg mb-3 border border-slate-700 shadow-black/50">
+                                    <i data-lucide="lock" class="w-8 h-8 text-slate-400"></i>
+                                </div>
+                                <span class="text-slate-300 font-bold text-sm text-center px-4">請先完成第一關<br>解鎖積木碎片</span>
+                            </div>
+                            ` : ''}
+                            ${spPool.map(id => `
+                                <div onclick="${!puz1Solved ? '' : `clickScratchPoolItem(${id})`}" class="${!puz1Solved ? 'opacity-30 pointer-events-none' : 'cursor-pointer hover:scale-[1.03] hover:-translate-y-0.5 active:scale-95'} transition-all shadow-md w-max">
+                                    ${P_POOL_HTML[id]}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div id="sp-feedback" class="h-6 mt-3 text-sm text-center"></div>
+                    </div>
+                </div>
+
+                <!-- 下半部：動態組裝區 (全寬) -->
+                <div class="flex flex-col w-full overflow-hidden border-t border-slate-700 pt-6 mt-2">
+                    <div class="text-slate-400 text-xs font-bold mb-2 flex items-center gap-1.5"><i data-lucide="package-plus" class="w-4 h-4"></i> 積木組裝區：</div>
+                    <div class="bg-[#F9F9F9] p-5 sm:p-6 rounded-xl border border-slate-200 shadow-inner overflow-x-auto custom-scrollbar flex flex-col relative w-full min-h-[220px]">
+                        
+                        ${spStaging ? `
+                        <div class="mb-5 p-5 bg-indigo-50/50 rounded-xl border-2 border-dashed border-indigo-300 shadow-sm animate-[popIn_0.3s_ease-out] w-max max-w-full">
+                            <div class="text-xs text-indigo-500 font-bold mb-3 flex items-center gap-1.5"><i data-lucide="loader" class="w-4 h-4 animate-spin"></i> 目前正在組裝中的積木：</div>
+                            ${spStaging}
+                        </div>
+                        ` : ''}
+                        
+                        <div class="flex flex-col items-start font-bold text-sm md:text-base w-max relative group min-w-full pt-1">
+                            ${spLines[0] ? spLines[0] : `<div class="${spStep === 0 ? 'border-indigo-400 bg-indigo-50 text-indigo-600 shadow-sm' : 'border-slate-300 bg-white/50 text-slate-400'} h-10 border-2 border-dashed rounded-lg flex items-center px-4 text-sm transition-colors font-bold mb-1 relative z-10">等待放入迴圈積木...</div>`}
+                            
+                            ${spStep > 0 ? `
+                            <div class="ml-4 pl-3 border-l-[6px] border-[#CF8B17] py-3 bg-[#FFAB19]/10 relative z-10 flex flex-col gap-2 w-max min-h-[100px]">
+                                ${spLines[1] ? spLines[1] : `<div class="${(spStep === 1 || spStep === 2) ? 'border-indigo-400 bg-indigo-50 text-indigo-600 shadow-sm' : 'border-slate-300 bg-white/50 text-slate-400'} h-10 border-2 border-dashed rounded-lg flex items-center px-4 text-sm transition-colors font-bold relative z-10">等待放入第 1 行積木...</div>`}
+                                ${spLines[2] ? spLines[2] : `<div class="${spStep === 3 ? 'border-indigo-400 bg-indigo-50 text-indigo-600 shadow-sm' : 'border-slate-300 bg-white/50 text-slate-400'} h-10 border-2 border-dashed rounded-lg flex items-center px-4 text-sm transition-colors font-bold relative z-10">等待放入第 2 行積木...</div>`}
+                                ${spLines[3] ? spLines[3] : `<div class="${spStep === 4 ? 'border-indigo-400 bg-indigo-50 text-indigo-600 shadow-sm' : 'border-slate-300 bg-white/50 text-slate-400'} h-10 border-2 border-dashed rounded-lg flex items-center px-4 text-sm transition-colors font-bold relative z-10">等待放入第 3 行積木...</div>`}
+                            </div>
+                            <div class="h-8 w-32 rounded-b-xl border-b-4 border-r-2 shadow-sm bg-[#FFAB19] border-[#CF8B17] relative z-20 flex items-center"></div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        // 洗牌模擬器互動邏輯 (Plain JS)
+        // ==========================================
+        let simOrigList = [1, 2, 3, 4, 5];
+        let simShufList = [];
+        let isSimAnimating = false;
+        let simHighlightIndex = -1;
+
+        function renderSimLists(isHighlighting = false) {
+            const origContainer = document.getElementById('sim-orig-list');
+            const shufContainer = document.getElementById('sim-shuf-list');
+            
+            origContainer.innerHTML = simOrigList.map((val, idx) => `
+                <div class="w-10 h-12 flex items-center justify-center rounded-lg font-bold text-lg transition-all duration-300 ${idx === simHighlightIndex ? 'bg-amber-400 text-amber-900 scale-110 shadow-lg ring-2 ring-amber-200' : 'bg-slate-700 text-white shadow-sm'}">
+                    ${val}
+                </div>
+            `).join('');
+            
+            if (simOrigList.length === 0) origContainer.innerHTML = '<div class="text-slate-500 text-sm font-bold w-full text-center py-3">原牌堆已空</div>';
+            document.getElementById('sim-orig-len').innerText = simOrigList.length;
+
+            if (!isHighlighting) {
+                shufContainer.innerHTML = simShufList.map((val, idx) => `
+                    <div class="w-10 h-12 flex items-center justify-center rounded-lg font-bold text-lg bg-emerald-500 text-white shadow-md ${idx === simShufList.length - 1 ? 'animate-[popIn_0.3s_ease-out]' : ''}">
+                        ${val}
+                    </div>
+                `).join('');
+                
+                if (simShufList.length === 0) shufContainer.innerHTML = '<div class="text-slate-500 text-sm font-bold w-full text-center py-3">尚未洗牌</div>';
+                document.getElementById('sim-shuf-len').innerText = simShufList.length;
+            }
+        }
+
+        async function doShuffleStep() {
+            if(isSimAnimating || simOrigList.length === 0) return;
+            isSimAnimating = true;
+
+            const btn = document.getElementById('btn-sim-shuffle');
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            const randIndex = Math.floor(Math.random() * simOrigList.length);
+            
+            const jumps = 10;
+            for(let i=0; i<jumps; i++) {
+                simHighlightIndex = Math.floor(Math.random() * simOrigList.length);
+                renderSimLists(true); 
+                await new Promise(r => setTimeout(r, 50 + i*10));
+            }
+            
+            simHighlightIndex = randIndex;
+            renderSimLists(true);
+            
+            document.getElementById('sim-status').innerHTML = `從牌堆抽出位置：<span class="text-amber-400 font-bold ml-1">第 ${randIndex + 1} 項</span> (數值 ${simOrigList[randIndex]})`;
+            await new Promise(r => setTimeout(r, 600));
+
+            const item = simOrigList[randIndex];
+            simOrigList.splice(randIndex, 1);
+            simShufList.push(item);
+            simHighlightIndex = -1;
+            
+            renderSimLists(false); 
+            document.getElementById('sim-status').innerHTML = `成功將數值 <span class="text-emerald-400 font-bold">${item}</span> 轉移至洗牌清單！`;
+            
+            if(simOrigList.length === 0) {
+                document.getElementById('sim-status').innerHTML = `<span class="text-emerald-400 font-bold">🎉 洗牌完成！所有陣列元素已打亂順序。</span>`;
+            } else {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+            isSimAnimating = false;
+        }
+
+        function resetShuffle() {
+            if(isSimAnimating) return;
+            simOrigList = [1, 2, 3, 4, 5];
+            simShufList = [];
+            simHighlightIndex = -1;
+            renderSimLists(false);
+            document.getElementById('sim-status').innerHTML = '點擊「執行洗牌步驟」觀察陣列資料的轉移。';
+            const btn = document.getElementById('btn-sim-shuffle');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        function initSimulator() {
+            renderSimLists(false);
+        }
+
+        function renderSimulatorHTML() {
+            return `
+                <div class="bg-slate-900 rounded-2xl border border-slate-700 p-6 md:p-8 shadow-xl relative overflow-hidden flex flex-col gap-6">
+                    <div class="absolute top-0 right-0 w-48 h-48 bg-cyan-500 rounded-full mix-blend-screen filter blur-[70px] opacity-10 pointer-events-none"></div>
+
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <!-- 左邊：牌堆 -->
+                        <div class="flex-1 bg-slate-950/50 rounded-xl p-5 border border-slate-800 shadow-inner">
+                            <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
+                                <h4 class="text-orange-400 font-bold flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4"></i> 牌堆</h4>
+                                <div class="text-xs text-slate-400">長度: <span id="sim-orig-len" class="text-white font-bold">5</span></div>
+                            </div>
+                            <div id="sim-orig-list" class="flex flex-wrap gap-2 min-h-[60px]"></div>
+                        </div>
+
+                        <div class="flex items-center justify-center">
+                            <i data-lucide="arrow-right" class="w-6 h-6 text-slate-500 hidden md:block"></i>
+                            <i data-lucide="arrow-down" class="w-6 h-6 text-slate-500 block md:hidden"></i>
+                        </div>
+
+                        <!-- 右邊：洗牌清單 -->
+                        <div class="flex-1 bg-slate-950/50 rounded-xl p-5 border border-slate-800 shadow-inner">
+                            <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
+                                <h4 class="text-emerald-400 font-bold flex items-center gap-2"><i data-lucide="shuffle" class="w-4 h-4"></i> 洗牌</h4>
+                                <div class="text-xs text-slate-400">長度: <span id="sim-shuf-len" class="text-white font-bold">0</span></div>
+                            </div>
+                            <div id="sim-shuf-list" class="flex flex-wrap gap-2 min-h-[60px]"></div>
+                        </div>
+                    </div>
+
+                    <!-- 控制台 -->
+                    <div class="flex flex-col sm:flex-row items-center justify-between bg-slate-800 p-4 rounded-xl border border-slate-700 gap-4 relative z-10">
+                        <div id="sim-status" class="text-sm text-slate-300 font-bold w-full sm:w-auto">點擊「執行洗牌步驟」觀察陣列資料的轉移。</div>
+                        <div class="flex gap-2 w-full sm:w-auto shrink-0">
+                            <button id="btn-sim-shuffle" onclick="doShuffleStep()" class="flex-1 sm:flex-none bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 px-4 rounded-lg transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm">
+                                <i data-lucide="play" class="w-4 h-4"></i> 執行洗牌步驟
+                            </button>
+                            <button onclick="resetShuffle()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 px-3 rounded-lg transition-all shadow-md active:scale-95" title="重置">
+                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // ==========================================
+        // 🌟 進階挑戰：發放手牌 (Plain JS)
+        // ==========================================
+        let advSourceDeck = []; // 洗牌清單
+        let advPlayerHand = []; // 分牌清單
+        let advVarSelect = 0;   // 選牌變數
+        let isAdvAnimating = false;
+
+        function renderAdvLists() {
+            const sourceEl = document.getElementById('adv-source-list');
+            if(sourceEl) {
+                sourceEl.innerHTML = advSourceDeck.map((num, idx) => `
+                    <div class="w-7 h-9 flex items-center justify-center bg-slate-700 text-slate-200 text-xs font-bold rounded shadow-sm border border-slate-600 ${idx === advVarSelect - 1 && isAdvAnimating ? 'ring-2 ring-emerald-400 scale-110 z-10' : ''}">${num}</div>
+                `).join('');
+                if(advSourceDeck.length === 0) sourceEl.innerHTML = '<div class="text-slate-500 text-xs font-bold w-full text-center py-4">目前沒有待發放裝備</div>';
+                document.getElementById('adv-source-len').innerText = advSourceDeck.length;
+            }
+
+            const handEl = document.getElementById('adv-player-hand');
+            if(handEl) {
+                handEl.innerHTML = advPlayerHand.map(num => `
+                    <div class="w-8 h-10 flex items-center justify-center text-xs font-bold rounded shadow-sm animate-[popIn_0.2s_ease-out] bg-indigo-500 text-white border border-indigo-400">${num}</div>
+                `).join('');
+                if(advPlayerHand.length === 0) handEl.innerHTML = '<div class="text-slate-500 text-xs font-bold w-full text-center py-4 opacity-50">尚未取得手牌</div>';
+                document.getElementById('adv-hand-len').innerText = advPlayerHand.length;
+            }
+            
+            // 更新狀態列中的「選牌」變數
+            const targetEl = document.getElementById('adv-target-var');
+            if(targetEl) {
+                targetEl.innerText = advVarSelect;
+            }
+        }
+
+        async function doAdvBuildAndShuffle() {
+            if (isAdvAnimating) return;
+            isAdvAnimating = true;
+            
+            const btnBuild = document.getElementById('btn-adv-build');
+            btnBuild.classList.add('hidden');
+            document.getElementById('adv-status').innerHTML = '<span class="text-cyan-400 font-bold">正在建立 52 張牌並進行洗牌...</span>';
+
+            // 快速建立並洗牌
+            advSourceDeck = Array.from({length: 52}, (_, i) => i + 1);
+            advPlayerHand = [];
+            advVarSelect = 0;
+            renderAdvLists();
+            
+            await new Promise(r => setTimeout(r, 400));
+            
+            for(let k=0; k<5; k++) {
+                advSourceDeck.sort(() => Math.random() - 0.5);
+                renderAdvLists();
+                await new Promise(r => setTimeout(r, 80));
+            }
+
+            document.getElementById('adv-status').innerHTML = '<span class="text-emerald-400 font-bold">✅ 洗牌完成！請點擊「進行發牌」。</span>';
+            document.getElementById('btn-adv-deal').classList.remove('hidden');
+            isAdvAnimating = false;
+        }
+
+        async function doAdvDeal() {
+            if (isAdvAnimating || advSourceDeck.length === 0) return;
+            isAdvAnimating = true;
+            
+            const btn = document.getElementById('btn-adv-deal');
+            if(btn) {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+
+            // 執行圖片上的邏輯：重複 13 次 -> 選牌改變 1 -> 拿走洗牌的第 [選牌] 項
+            for(let i=0; i<13; i++) {
+                advVarSelect++;
+                renderAdvLists(); // 為了高光顯示要拿的牌
+                document.getElementById('adv-status').innerHTML = `正在抽取「洗牌清單」的第 <span class="text-emerald-400 font-bold">${advVarSelect}</span> 項 ...`;
+                
+                await new Promise(r => setTimeout(r, 400));
+                
+                // 這裡模擬 Scratch 的邏輯，因為陣列會縮短，所以要拿第 advVarSelect 項，在 JS 裡 index 是 advVarSelect - 1
+                if (advVarSelect - 1 < advSourceDeck.length) {
+                    const item = advSourceDeck[advVarSelect - 1];
+                    advPlayerHand.push(item);
+                    advSourceDeck.splice(advVarSelect - 1, 1);
+                } else {
+                    // 如果越界了
+                    document.getElementById('adv-status').innerHTML = `<span class="text-rose-400 font-bold">⚠️ 錯誤！找不到第 ${advVarSelect} 項了！</span>`;
+                    break;
+                }
+                
+                renderAdvLists();
+                await new Promise(r => setTimeout(r, 200));
+            }
+            
+            document.getElementById('adv-status').innerHTML = `<span class="text-emerald-400 font-bold">🎊 發牌結束！成功取得 13 張隨機手牌。</span>`;
+            isAdvAnimating = false;
+        }
+
+        function resetAdvDistribution() {
+            if (isAdvAnimating) return;
+            advSourceDeck = [];
+            advPlayerHand = [];
+            advVarSelect = 0;
+            renderAdvLists();
+            document.getElementById('adv-status').innerHTML = '點擊「建立 52 張牌並洗牌」開始。';
+            
+            const btnBuild = document.getElementById('btn-adv-build');
+            const btnDeal = document.getElementById('btn-adv-deal');
+            
+            if(btnBuild) {
+                btnBuild.classList.remove('hidden');
+                btnBuild.disabled = false;
+                btnBuild.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+            if(btnDeal) {
+                btnDeal.classList.add('hidden');
+                btnDeal.disabled = false;
+                btnDeal.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        function initAdvSimulator() {
+            resetAdvDistribution();
+        }
+
+        // ==========================================
+        // 教學內容資料庫
+        // ==========================================
+        const lesson = {
+            id: 5, 
+            icon: "shuffle", 
+            title: "武器庫洗牌", 
+            subtitle: "(陣列隨機洗牌演算法)",
+            description: "指揮官！為了防止外星生物預測我們的武器發放順序，我們必須將武器卡牌（牌堆）完全打亂，轉移到「洗牌」新清單中，並完成武裝發放程序！",
+            objective: "學習清單（陣列）的動態操作與資料移轉。透過模擬發牌過程，練習使用迴圈進行隨機抽取洗牌，實作動態刪除項次的完整洗牌邏輯。",
+            learningPointsSummary: "本單元將帶領指揮官實作完整的「洗牌」演算法：",
+            learningPoints: [
+                { title: "雙清單應用", desc: "準備一個「牌堆」與一個空的「洗牌」，用於存放打亂後的結果。" },
+                { title: "迴圈控制", desc: "使用「重複 (清單長度) 次」積木，動態依據牌的數量執行洗牌動作。" },
+                { title: "隨機抽取", desc: "每次從牌堆目前剩下的長度中，隨機產生一個位置編號。" },
+                { title: "轉移與刪除", desc: "將抽中的項目「添加」到新清單，並從原清單中「刪除」，達成不重複洗牌。" }
+            ],
+            scratchBlocks1: [
+                { type: "list", text: '刪除 <span class="bg-black/10 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center mx-1">洗牌 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 的所有項目' },
+                { type: "control", text: '重複 <span class="bg-[#FF661A] text-white px-3 py-1 rounded-full border-b-2 border-[#CC5214] shadow-sm inline-flex items-center font-bold leading-none mx-1">清單 <span class="bg-black/10 px-1 rounded shadow-inner mx-0.5 text-[11px]">牌堆 ▼</span> 的長度</span> 次', nested: [
+                    { type: "variable", text: '變數 <span class="bg-black/15 px-2 py-1 rounded shadow-inner text-[11px] leading-none inline-flex items-center mx-1">第幾張牌 ▼</span> 設為 <span class="bg-[#59C059] text-white px-3 py-1 rounded-full border-b-2 border-[#389438] shadow-sm font-bold inline-flex items-center gap-1 leading-none text-sm w-max mx-1">隨機取數 <span class="bg-white text-slate-800 px-2 py-0.5 rounded-full shadow-inner text-sm mx-0.5 border border-black/10 font-normal">1</span> 到 <span class="bg-[#FF661A] text-white px-2 py-0.5 rounded-full border-b-2 border-[#CC5214] shadow-sm text-sm inline-flex items-center mx-0.5">清單 <span class="bg-black/10 px-1 rounded shadow-inner mx-1 text-[11px]">牌堆 ▼</span>的長度</span></span>' },
+                    { type: "list", text: '添加 <span class="bg-[#FF661A] text-white px-2 py-1 rounded-full border-b-2 border-[#CC5214] shadow-sm inline-flex items-center mx-1"><span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner mr-1 text-[11px] leading-none inline-flex items-center">牌堆 ▼</span> 的第 <span class="bg-[#FF8C1A] px-2 py-0.5 rounded-full shadow-sm text-[11px] mx-1 border-b-2 border-[#DB6E00]">第幾張牌</span> 項</span> 到 <span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner text-[11px] inline-flex items-center ml-1">洗牌 ▼</span>' },
+                    { type: "list", text: '刪除 <span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner text-[11px] leading-none inline-flex items-center mx-1">牌堆 ▼</span> 的第 <span class="bg-[#FF8C1A] px-2 py-0.5 rounded-full shadow-sm text-[11px] mx-1">第幾張牌</span> 項' }
+                ]}
+            ],
+            pseudoCodeReview: `DELETE ALL OF "牌堆"\nDELETE ALL OF "洗牌"\nSET 第幾張牌 = 0\nSET 點數 = 0\n\nREPEAT 13 TIMES:\n    CHANGE 點數 BY 1\n    ADD 點數 TO "牌堆"`,
+            scratchBlocksReview: [
+                { type: "list", text: '刪除 <span class="bg-black/10 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center mx-1">牌堆 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 的所有項目' },
+                { type: "list", text: '刪除 <span class="bg-black/10 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center mx-1">洗牌 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 的所有項目' },
+                { type: "variable", text: '變數 <span class="bg-black/15 px-2 py-1 rounded shadow-inner text-[11px] leading-none inline-flex items-center mx-1">第幾張牌 ▼</span> 設為 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">0</span>' },
+                { type: "variable", text: '變數 <span class="bg-black/15 px-2 py-1 rounded shadow-inner text-[11px] leading-none inline-flex items-center mx-1">點數 ▼</span> 設為 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">0</span>' },
+                { type: "control", text: '重複 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">13</span> 次', nested: [
+                    { type: "variable", text: '變數 <span class="bg-black/15 px-2 py-1 rounded shadow-inner text-[11px] leading-none inline-flex items-center mx-1">點數 ▼</span> 改變 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">1</span>' },
+                    { type: "list", text: '添加 <span class="bg-[#FF8C1A] px-2 py-0.5 rounded-full shadow-sm text-[11px] mx-1 border-b-2 border-[#DB6E00]">點數</span> 到 <span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner text-[11px] inline-flex items-center ml-1">牌堆 ▼</span>' }
+                ]}
+            ],
+            // 進階挑戰的積木 - 分牌邏輯
+            scratchBlocksAdvDeal1: [
+                { type: "list", text: '刪除 <span class="bg-black/10 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center mx-1">分牌 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 的所有項目' },
+                { type: "variable", text: '變數 <span class="bg-black/15 px-2 py-1 rounded shadow-inner text-[11px] leading-none inline-flex items-center mx-1">選牌 ▼</span> 設為 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">0</span>' }
+            ],
+            scratchBlocksAdvDeal2: [
+                { type: "control", text: '重複 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">13</span> 次', nested: [
+                    { type: "variable", text: '變數 <span class="bg-black/15 px-2 py-1 rounded shadow-inner text-[11px] leading-none inline-flex items-center mx-1">選牌 ▼</span> 改變 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">1</span>' },
+                    { type: "list", text: '添加 <span class="bg-[#FF661A] text-white px-2 py-1 rounded-full border-b-2 border-[#CC5214] shadow-sm inline-flex items-center mx-1"><span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner mr-1 text-[11px] leading-none inline-flex items-center">洗牌 ▼</span> 的第 <span class="bg-[#FF8C1A] px-2 py-0.5 rounded-full shadow-sm text-[11px] mx-1 border-b-2 border-[#DB6E00]">選牌</span> 項</span> 到 <span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner text-[11px] inline-flex items-center ml-1">分牌 ▼</span>' },
+                    { type: "list", text: '刪除 <span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner text-[11px] leading-none inline-flex items-center mx-1">洗牌 ▼</span> 的第 <span class="bg-[#FF8C1A] px-2 py-0.5 rounded-full shadow-sm text-[11px] mx-1">選牌</span> 項' }
+                ]}
+            ]
+        };
+
+        function getBlockColorClass(type) {
+            switch(type) {
+                case 'event': return 'bg-[#FFBF00] text-slate-800 border-[#CC9900]';
+                case 'list': return 'bg-[#FF661A] text-white border-[#CC5214]';
+                case 'looks': return 'bg-[#9966FF] text-white border-[#774DCC]';
+                case 'variable': return 'bg-[#FF8C1A] text-white border-[#DB6E00]';
+                case 'control': return 'bg-[#FFAB19] text-white border-[#CF8B17]';
+                case 'operator': return 'bg-[#59C059] text-white border-[#389438]';
+                case 'sensing': return 'bg-[#5CB1D6] text-white border-[#478AA6]';
+                default: return 'bg-slate-400 text-white border-slate-500';
+            }
+        }
+
+        function renderScratchBlock(block, isFirst = false) {
+            let nestedHtml = '';
+            let bottomHtml = '';
+            
+            if (block.nested && block.nested.length > 0) {
+                const nestedBlocks = block.nested.map((b, i) => renderScratchBlock(b, i === 0)).join('');
+                nestedHtml = `<div class="ml-4 pl-3 border-l-[6px] border-[#CF8B17] py-0.5 bg-[#FFAB19]/10 relative z-10 flex flex-col">${nestedBlocks}</div>`;
+                bottomHtml = `<div class="h-8 w-32 rounded-b-xl border-b-4 border-r-2 shadow-sm ${getBlockColorClass(block.type)} relative z-20 flex items-center"><div class="absolute -bottom-1 left-4 w-8 h-2 bg-black/20 rounded-b-full z-30"></div></div>`;
+            }
+
+            const isHat = block.isHat === true;
+            const hatTop = isHat ? 'rounded-t-3xl pt-4' : 'rounded-t-lg';
+            const notchTop = !isHat ? `<div class="absolute top-[-4px] left-4 w-8 h-2 bg-black/20 rounded-b-full"></div>` : '';
+            const notchBottom = `<div class="absolute -bottom-1 left-4 w-8 h-2 bg-black/20 rounded-b-full z-30"></div>`;
+
+            return `
+                <div class="flex flex-col items-start font-bold text-sm md:text-base w-max relative mb-[-4px] ${isFirst ? '' : 'mt-1'} group z-20">
+                    <div class="px-4 py-2.5 ${hatTop} rounded-br-lg rounded-bl-sm border-b-4 border-r-2 shadow-md flex items-center gap-1 whitespace-nowrap ${getBlockColorClass(block.type)} relative z-20 hover:brightness-110 transition-all cursor-default w-max">
+                        ${notchTop}
+                        ${block.text}
+                        ${!block.nested ? notchBottom : ''}
+                    </div>
+                    ${nestedHtml}${bottomHtml}
+                </div>`;
+        }
+
+        function renderLessonDetail(lesson) {
+            const dt = { iconBg: 'bg-cyan-100 text-cyan-600', tagText: 'text-cyan-500' };
+            const learningPointsHtml = lesson.learningPoints.map(pt => `
+                <div class="bg-white border border-teal-100 p-4 rounded-xl shadow-sm flex items-start gap-3 hover:shadow-md transition-shadow">
+                    <div class="bg-teal-50 text-teal-600 p-2 rounded-lg shrink-0 mt-0.5 border border-teal-100"><i data-lucide="check-circle-2" class="w-4 h-4"></i></div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-sm mb-1">${pt.title}</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed">${pt.desc}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="slide-up-fade">
+                    <button onclick="window.location.href='https://su-yung-sheng.github.io/unforte115/1150800.html'" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors px-4 py-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm mb-6">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回任務儀表板
+                    </button>
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="p-8 md:p-10 border-b border-slate-100 bg-slate-50/50 flex flex-col items-start gap-4">
+                            <div class="flex items-center gap-5">
+                                <div class="w-14 h-14 ${dt.iconBg} rounded-2xl flex items-center justify-center shrink-0 shadow-sm">
+                                    <i data-lucide="${lesson.icon}" class="w-7 h-7"></i>
+                                </div>
+                                <div>
+                                    <span class="${dt.tagText} font-bold text-sm tracking-widest uppercase mb-1 block">LESSON ${lesson.id}</span>
+                                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">${lesson.title} <span class="text-slate-400 font-medium text-2xl">${lesson.subtitle}</span></h2>
+                                </div>
+                            </div>
+                            <p class="text-slate-600 font-light text-lg leading-relaxed mt-2 max-w-3xl">${lesson.description}</p>
+                        </div>
+                        
+                        <div class="p-8 md:p-10 flex flex-col gap-10">
+                            <!-- 任務目標 -->
+                            <section>
+                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-indigo-100 text-indigo-600 p-1.5 rounded-lg"><i data-lucide="target" class="w-5 h-5"></i></span>任務目標</h3>
+                                <div class="bg-indigo-50 text-indigo-900 p-5 rounded-2xl border border-indigo-100/50 leading-relaxed font-medium">${lesson.objective}</div>
+                            </section>
+
+                            <!-- 單元學習重點 -->
+                            <section>
+                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-teal-100 text-teal-600 p-1.5 rounded-lg"><i data-lucide="book-open" class="w-5 h-5"></i></span>單元學習重點</h3>
+                                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                                    <p class="text-slate-600 font-medium mb-6 leading-relaxed">${lesson.learningPointsSummary}</p>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        ${learningPointsHtml}
+                                    </div>
+                                </div>
+                            </section>
+                            
+                            <!-- 🚀 洗牌模擬器 -->
+                            <section>
+                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-emerald-100 text-emerald-600 p-1.5 rounded-lg"><i data-lucide="play" class="w-5 h-5"></i></span>⚡ 洗牌演算法模擬器</h3>
+                                ${renderSimulatorHTML()}
+                            </section>
+
+                            <!-- ⭐ 虛擬碼拼圖挑戰 (階段一：改為左右並排) -->
+                            <section class="mb-4">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-black text-sm shadow-sm">1</span>
+                                    <h3 class="text-xl font-bold text-slate-800">建立洗牌邏輯</h3>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h4 class="flex items-center gap-2 text-base font-bold text-slate-600"><i data-lucide="puzzle" class="w-4 h-4"></i>第一關：虛擬碼拼圖挑戰</h4>
+                                        <button onclick="togglePuzzle1Lang()" id="btn-toggle-puzzle-lang1" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border shadow-sm bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200">
+                                            <i data-lucide="languages" class="w-3.5 h-3.5"></i>
+                                            <span id="puzzle-lang-text1">切換為中文</span>
+                                        </button>
+                                    </div>
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 bg-slate-800 p-5 sm:p-6 rounded-2xl shadow-inner border border-slate-700 relative overflow-hidden">
+                                        <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500 rounded-full mix-blend-screen filter blur-[50px] opacity-10 pointer-events-none"></div>
+                                        
+                                        <!-- 左半：Source Box -->
+                                        <div class="flex flex-col gap-2 relative z-10">
+                                            <div class="text-slate-300 text-sm mb-1">請點擊下方片段，把它們依序放入右側的「組裝區」：</div>
+                                            <div id="puzzle1-source" class="flex flex-wrap gap-2 min-h-[60px] p-4 bg-slate-900 rounded-xl border border-slate-700 shadow-inner"></div>
+                                        </div>
+                                        
+                                        <!-- 右半：Target Box -->
+                                        <div class="flex flex-col gap-2 relative z-10">
+                                            <div class="text-slate-400 text-xs font-bold uppercase tracking-widest flex items-center gap-1.5 mb-1"><i data-lucide="wrench" class="w-4 h-4"></i> 您的組合區域 (點擊可退回)：</div>
+                                            <div id="puzzle1-target" class="flex flex-col gap-2 min-h-[180px] p-4 bg-slate-950/80 rounded-xl border-2 border-dashed border-slate-600"></div>
+                                            
+                                            <div class="mt-auto pt-4 flex flex-col items-center gap-3">
+                                                <button id="btn-check-puzzle1" onclick="checkPuzzle1()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-base">
+                                                    <i data-lucide="check-circle-2" class="w-5 h-5"></i> 檢查順序並解鎖第二關
+                                                </button>
+                                                <div id="puzzle1-feedback" class="text-sm font-bold text-center hidden min-h-[1.25rem]"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- ⭐ 雙重闖關挑戰 (階段二) -->
+                            <section>
+                                <div class="flex items-center gap-3 mb-6">
+                                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-700 font-black text-sm shadow-sm">2</span>
+                                    <h3 class="text-xl font-bold text-slate-800">進階：洗牌積木組裝</h3>
+                                </div>
+                                
+                                <div class="flex flex-col gap-8">
+                                    <!-- ================= 第二關：Scratch 積木組裝 ================= -->
+                                    <div class="flex flex-col relative mt-2 w-full">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <h4 class="flex items-center gap-2 text-base font-bold text-slate-600"><i data-lucide="blocks" class="w-4 h-4"></i>第二關：引導式 Scratch 積木組裝挑戰</h4>
+                                        </div>
+
+                                        <div class="relative w-full">
+                                            <div id="scratch-puzzle-container" class="bg-slate-800 p-5 sm:p-6 rounded-2xl flex flex-col gap-4 sm:gap-6 shadow-inner border border-slate-700 relative overflow-hidden transition-all duration-700 w-full">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- ⭐ 複習：建立初始資料 -->
+                            <section class="mt-8 border-t border-slate-200 pt-10">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-black text-sm shadow-sm"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></span>
+                                    <h3 class="text-xl font-bold text-slate-800">最後複習：如何建立初始牌堆？</h3>
+                                </div>
+                                <p class="text-slate-600 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100 font-medium">在成功學會「洗牌」之後，別忘了回顧一下！在洗牌程式執行前，我們必須先清空舊的清單，並利用變數與重複迴圈，自動生成 1 到 13 的點數牌放進「牌堆」中喔。請看下方的逐行積木解析：</p>
+                                
+                                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col gap-6">
+                                    
+                                    <!-- 註解 1：清單初始化 -->
+                                    <div class="flex flex-col md:flex-row items-center gap-6 w-full">
+                                        <div class="flex-shrink-0 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 flex flex-col items-center md:items-start min-w-[250px]">
+                                            <div class="bg-[#F9F9F9] border border-slate-200 p-4 rounded-xl shadow-inner w-max">
+                                                ${renderScratchBlock(lesson.scratchBlocksReview[0], true)}
+                                                ${renderScratchBlock(lesson.scratchBlocksReview[1])}
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 w-full bg-blue-50/50 p-5 rounded-xl border border-blue-100 relative">
+                                            <h5 class="font-bold text-blue-800 text-base mb-2 flex items-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i> 1. 清空舊資料 (初始化清單)</h5>
+                                            <p class="text-blue-900/70 text-sm leading-relaxed">非常重要的第一步！確保每次執行程式時，兩個清單都是乾淨空的狀態，避免上一次殘留的舊牌跟新牌混在一起。</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- 註解 2：變數歸零 -->
+                                    <div class="flex flex-col md:flex-row items-center gap-6 w-full">
+                                        <div class="flex-shrink-0 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 flex flex-col items-center md:items-start min-w-[250px]">
+                                            <div class="bg-[#F9F9F9] border border-slate-200 p-4 rounded-xl shadow-inner w-max">
+                                                ${renderScratchBlock(lesson.scratchBlocksReview[2], true)}
+                                                ${renderScratchBlock(lesson.scratchBlocksReview[3])}
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 w-full bg-amber-50/50 p-5 rounded-xl border border-amber-100 relative">
+                                            <h5 class="font-bold text-amber-800 text-base mb-2 flex items-center gap-2"><i data-lucide="rotate-ccw" class="w-4 h-4"></i> 2. 變數歸零 (初始化變數)</h5>
+                                            <p class="text-amber-900/70 text-sm leading-relaxed">將準備用來記錄狀態的變數歸零。<strong>[第幾張牌]</strong> 用於之後的洗牌流程，而 <strong>[點數]</strong> 則用來配合接下來的迴圈自動累加生成牌組數值。</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- 註解 3：迴圈生成 -->
+                                    <div class="flex flex-col md:flex-row items-start gap-6 w-full">
+                                        <div class="flex-shrink-0 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 flex flex-col items-center md:items-start min-w-[250px]">
+                                            <div class="bg-[#F9F9F9] border border-slate-200 p-4 rounded-xl shadow-inner w-max">
+                                                ${renderScratchBlock(lesson.scratchBlocksReview[4], true)}
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 w-full bg-emerald-50/50 p-5 rounded-xl border border-emerald-100 relative">
+                                            <h5 class="font-bold text-emerald-800 text-base mb-2 flex items-center gap-2"><i data-lucide="repeat" class="w-4 h-4"></i> 3. 迴圈自動生成牌組</h5>
+                                            <p class="text-emerald-900/70 text-sm leading-relaxed mb-2">這裡利用了「變數累加」的技巧：</p>
+                                            <ul class="text-emerald-900/70 text-sm leading-relaxed list-disc list-inside ml-4 space-y-1">
+                                                <li>迴圈重複 13 次，每次都將 <strong>[點數]</strong> 變數改變 1 (即 +1)。</li>
+                                                <li>接著馬上將這個點數 <strong>添加</strong> 到 <strong>[牌堆]</strong> 中。</li>
+                                                <li>如此一來，程式就會自動把 1, 2, 3 ... 一直加到 13 放進清單裡，省去手動新增的麻煩！</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </section>
+
+                            <!-- ⭐ 進階挑戰：發放手牌 (分牌邏輯) -->
+                            <section class="mt-8 border-t border-slate-200 pt-10">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-black text-sm shadow-sm"><i data-lucide="star" class="w-4 h-4"></i></span>
+                                    <h3 class="text-xl font-bold text-slate-800">進階挑戰：發放手牌 (分牌邏輯) <span class="text-slate-500 font-medium text-lg ml-1">(實作加分題)</span></h3>
+                                </div>
+                                <p class="text-slate-600 mb-6 bg-indigo-50 p-4 rounded-xl border border-indigo-100 font-medium leading-relaxed">
+                                    在 Scratch 中開發撲克牌遊戲時，我們最常用<strong>「造型編號」</strong>來顯示牌面。因此，陣列裡只需要儲存 1 到 52 的數字！<br>
+                                    現在牌已經洗好了，請試著把「洗牌」清單裡的前 13 張牌發放到玩家手上的「分牌」清單中。
+                                </p>
+                                
+                                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col gap-8">
+                                    
+                                    <!-- 互動模擬區 -->
+                                    <div class="bg-slate-900 rounded-2xl border border-slate-700 p-6 shadow-xl relative overflow-hidden flex flex-col gap-6">
+                                        <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500 rounded-full mix-blend-screen filter blur-[60px] opacity-20 pointer-events-none"></div>
+                                        
+                                        <!-- 上方：洗牌後的武器庫 -->
+                                        <div class="bg-slate-950/50 rounded-xl p-4 border border-slate-800 shadow-inner relative z-10 min-h-[120px]">
+                                            <div class="flex justify-between items-center mb-3 border-b border-slate-700 pb-2">
+                                                <h4 class="text-indigo-400 font-bold flex items-center gap-2"><i data-lucide="package-open" class="w-4 h-4"></i> 牌堆 / 洗牌清單 (待發放裝備)</h4>
+                                                <div class="text-xs text-slate-400">剩餘數量: <span id="adv-source-len" class="text-white font-bold">0</span></div>
+                                            </div>
+                                            <div id="adv-source-list" class="flex flex-wrap items-start content-start min-h-[80px]"></div>
+                                        </div>
+
+                                        <div class="flex items-center justify-center -my-2 relative z-10">
+                                            <i data-lucide="arrow-down" class="w-6 h-6 text-slate-500"></i>
+                                        </div>
+
+                                        <!-- 下方：玩家手牌 -->
+                                        <div class="bg-slate-800 rounded-xl p-4 border border-slate-700 shadow-inner flex flex-col items-center min-h-[120px] relative z-10">
+                                            <div class="flex justify-between items-center w-full mb-3 border-b border-slate-600 pb-2">
+                                                <h4 class="text-emerald-400 font-bold flex items-center gap-2"><i data-lucide="user" class="w-4 h-4"></i> 分牌清單 (玩家手牌)</h4>
+                                                <div class="text-xs text-slate-400">已發放: <span id="adv-hand-len" class="text-white font-bold">0</span></div>
+                                            </div>
+                                            <div id="adv-player-hand" class="flex flex-wrap gap-2 w-full flex-1"></div>
+                                        </div>
+
+                                        <!-- 控制台 -->
+                                        <div class="flex flex-col sm:flex-row items-center justify-between bg-slate-800 p-4 rounded-xl border border-slate-700 gap-4 relative z-10 mt-2">
+                                            <div class="flex items-center gap-4 w-full sm:w-auto">
+                                                <div class="bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-2">
+                                                    <span class="text-xs text-slate-400 font-bold">變數 [ 選牌 ] = </span>
+                                                    <span id="adv-target-var" class="text-lg font-black text-indigo-400 font-mono">0</span>
+                                                </div>
+                                            </div>
+                                            <div id="adv-status" class="text-xs text-emerald-300 font-bold w-full sm:w-auto text-center sm:text-left flex-1 hidden md:block">點擊「建立 52 張牌並洗牌」開始。</div>
+                                            <div class="flex gap-2 w-full sm:w-auto shrink-0">
+                                                <button id="btn-adv-build" onclick="doAdvBuildAndShuffle()" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-3 rounded-lg transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm">
+                                                    <i data-lucide="layers" class="w-4 h-4"></i> 1. 建立 52 張牌並洗牌
+                                                </button>
+                                                <button id="btn-adv-deal" onclick="doAdvDeal()" class="hidden flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-3 rounded-lg transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm">
+                                                    <i data-lucide="play" class="w-4 h-4"></i> 2. 進行發牌
+                                                </button>
+                                                <button onclick="resetAdvDistribution()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-3 rounded-lg transition-all shadow-md active:scale-95" title="重置">
+                                                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 程式邏輯解說 (逐段拆解) -->
+                                    <div class="flex flex-col gap-6 w-full mt-2 pt-6">
+                                        <h4 class="text-lg font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3"><i data-lucide="code-2" class="w-5 h-5 text-indigo-500"></i> 進階積木解析 (分牌邏輯)</h4>
+                                        
+                                        <!-- Chunk 1: 清單初始化與變數 -->
+                                        <div class="flex flex-col lg:flex-row items-center lg:items-start gap-6 w-full">
+                                            <div class="flex-shrink-0 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 flex flex-col items-center lg:items-start min-w-[250px] lg:max-w-[55%]">
+                                                <div class="bg-[#F9F9F9] border border-slate-200 p-4 rounded-xl shadow-inner w-max flex flex-col gap-0 items-start custom-scrollbar">
+                                                    ${lesson.scratchBlocksAdvDeal1.map((b, i) => renderScratchBlock(b, i === 0)).join('')}
+                                                </div>
+                                            </div>
+                                            <div class="flex-1 w-full bg-indigo-50/50 p-5 rounded-xl border border-indigo-100 relative">
+                                                <h5 class="font-bold text-indigo-800 text-base mb-2 flex items-center gap-2"><i data-lucide="list-restart" class="w-4 h-4"></i> 1. 初始化手牌清單</h5>
+                                                <p class="text-indigo-900/70 text-sm leading-relaxed">在發牌前，一定要先將玩家手上的「分牌」清單清空，並把用來負責挑牌的變數 <strong>[選牌]</strong> 設為 0，作為發牌準備。</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Chunk 2: 迴圈發牌與動態索引 -->
+                                        <div class="flex flex-col lg:flex-row items-center lg:items-start gap-6 w-full">
+                                            <div class="flex-shrink-0 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 flex flex-col items-center lg:items-start min-w-[250px] lg:max-w-[55%]">
+                                                <div class="bg-[#F9F9F9] border border-slate-200 p-4 rounded-xl shadow-inner w-max flex flex-col gap-0 items-start custom-scrollbar">
+                                                    ${lesson.scratchBlocksAdvDeal2.map((b, i) => renderScratchBlock(b, i === 0)).join('')}
+                                                </div>
+                                            </div>
+                                            <div class="flex-1 w-full bg-blue-50/50 p-5 rounded-xl border border-blue-100 relative">
+                                                <h5 class="font-bold text-blue-800 text-base mb-2 flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4"></i> 2. 迴圈發放手牌</h5>
+                                                <p class="text-blue-900/70 text-sm leading-relaxed mb-4">我們重複 13 次，每次讓 <strong>[選牌]</strong> 變數改變 1，接著把「洗牌」清單的該項存入「分牌」中，並將其從原清單刪除。</p>
+                                                
+                                                <div class="bg-white/60 p-4 rounded-xl border border-blue-200 text-sm text-slate-700 leading-relaxed font-medium">
+                                                    💡 <strong>進階除錯小教室：跳著拿的錯覺？</strong><br>
+                                                    當你執行這段程式時，模擬器會呈現「跳著抽牌」的現象！<br>
+                                                    這是因為 Scratch 陣列的特性：當你刪除第 1 項時，後面的牌會往前遞補。所以當迴圈跑到第 2 次要抽「第 2 項」時，其實抽到的是原本的「第 3 項」喔！<br><br>
+                                                    <span class="text-blue-600">（雖然因為牌已經洗亂了，抽到的還是亂數，但最標準的「發牌」寫法應該是永遠拿「洗牌」的第 1 項，這樣才不會漏牌喔！）</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </section>
+
+                            <!-- 單元導覽按鈕 -->
+                            <div class="mt-8 pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <a href="https://su-yung-sheng.github.io/unforte115/1150804.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 hover:text-cyan-600 transition-colors shadow-sm">
+                                    <i data-lucide="arrow-left" class="w-5 h-5"></i> 上一單元
+                                </a>
+                                <a href="https://su-yung-sheng.github.io/unforte115/1150806.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-cyan-600 text-white font-bold rounded-xl hover:bg-cyan-700 transition-colors shadow-sm">
+                                    下一單元 <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        window.onload = function() {
+            document.getElementById('app-container').innerHTML = renderLessonDetail(lesson);
+            initSimulator();
+            initPuzzle1();
+            renderPuzzle1();
+            initScratchPuzzle2();
+            initAdvSimulator();
+            lucide.createIcons();
+        };
+    </script>
+</body>
+</html>

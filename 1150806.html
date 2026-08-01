@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用清單打造星際任務 - LESSON 6</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #F8F9FA; color: #333333; }
+        .slide-up-fade { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes pulse-highlight { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .value-changed { animation: pulse-highlight 0.4s ease-out; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+    </style>
+</head>
+<body class="antialiased selection:bg-purple-100 selection:text-purple-900">
+
+    <!-- Header -->
+    <header id="main-header" class="bg-white border-b border-gray-100 pt-12 pb-12 slide-up-fade relative overflow-hidden">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8 relative z-10">
+            <div class="mb-6">
+                <a href="https://su-yung-sheng.github.io/unforte115/" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-purple-600 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> 
+                    返回網站首頁
+                </a>
+            </div>
+            <p class="text-sm font-bold text-purple-600 mb-3 tracking-widest uppercase">演算法與程式設計</p>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight">星際陣列指揮官：<br class="hidden md:block">用清單打造星際任務</h1>
+            <p class="text-lg text-slate-500 font-light max-w-2xl leading-relaxed">
+                化身星際指揮官，透過六大任務關卡，循序漸進建立邏輯思維，完整掌握 <span class="font-bold text-purple-700 bg-purple-50 px-2 py-1 rounded-lg border border-purple-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span> 的強大威力！
+            </p>
+        </div>
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-purple-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+        <div class="absolute bottom-0 right-40 w-72 h-72 bg-indigo-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+    </header>
+
+    <main id="app-container" class="max-w-5xl mx-auto px-6 lg:px-8 py-12 relative min-h-[50vh]"></main>
+
+    <footer class="bg-slate-50 border-t border-slate-200 mt-10 py-8">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8 text-center">
+            <p class="text-sm font-medium text-slate-400">© 演算法與程式設計 - 星際陣列指揮官</p>
+        </div>
+    </footer>
+
+    <script>
+        // ==========================================
+        // ⚡ 星際爭霸戰：雙陣列對決模擬器 (Plain JS)
+        // ==========================================
+        let simSquadWeapons = [];
+        let simEnemyFleet = [];
+        let simBattleLog = [];
+        let simBattleIndex = 0;
+        let isSimAnimating = false;
+        
+        // Modal 控制變數
+        let prepPool = [];
+
+        function renderBattleArena() {
+            const squadEl = document.getElementById('arena-squad');
+            const enemyEl = document.getElementById('arena-enemy');
+            const logEl = document.getElementById('arena-log');
+
+            if (squadEl) {
+                squadEl.innerHTML = simSquadWeapons.map((item, idx) => {
+                    const isFighting = idx === simBattleIndex && isSimAnimating;
+                    const isFought = idx < simBattleIndex;
+                    let cls = "bg-slate-800 text-slate-400 border-slate-700";
+                    if(isFighting) cls = "bg-indigo-600 text-white border-indigo-400 ring-2 ring-indigo-300 scale-105 shadow-lg z-10";
+                    else if(isFought) cls = "bg-indigo-900/50 text-indigo-300 border-indigo-800 opacity-60";
+                    return `
+                        <div class="px-2 py-1.5 border rounded-lg font-bold text-xs flex justify-between items-center transition-all ${cls} group">
+                            <div class="flex items-center gap-1.5 overflow-hidden">
+                                <span class="text-[9px] font-mono w-3 text-right opacity-50 shrink-0">${idx+1}</span>
+                                <span class="truncate">${item.text}</span>
+                            </div>
+                            <span class="bg-black/30 px-1.5 py-0.5 rounded text-[10px] font-mono group-hover:bg-black/40 shrink-0">戰力 ${item.power}</span>
+                        </div>
+                    `;
+                }).join('');
+                if(simSquadWeapons.length === 0) squadEl.innerHTML = '<div class="text-xs text-slate-500 w-full text-center py-2">尚未取得裝備</div>';
+            }
+
+            if (enemyEl) {
+                enemyEl.innerHTML = simEnemyFleet.map((item, idx) => {
+                    const isFighting = idx === simBattleIndex && isSimAnimating;
+                    const isFought = idx < simBattleIndex;
+                    let cls = "bg-slate-800 text-slate-400 border-slate-700";
+                    if(isFighting) cls = "bg-purple-600 text-white border-purple-400 ring-2 ring-purple-300 scale-105 shadow-lg z-10";
+                    else if(isFought) cls = "bg-purple-900/50 text-purple-300 border-purple-800 opacity-60";
+                    return `
+                        <div class="px-2 py-1.5 border rounded-lg font-bold text-xs flex justify-between items-center transition-all ${cls} group">
+                            <div class="flex items-center gap-1.5 overflow-hidden">
+                                <span class="text-[9px] font-mono w-3 text-right opacity-50 shrink-0">${idx+1}</span>
+                                <span class="truncate">${item.text}</span>
+                            </div>
+                            <span class="bg-black/30 px-1.5 py-0.5 rounded text-[10px] font-mono group-hover:bg-black/40 shrink-0">戰力 ${item.power}</span>
+                        </div>
+                    `;
+                }).join('');
+                if(simEnemyFleet.length === 0) enemyEl.innerHTML = '<div class="text-xs text-slate-500 w-full text-center py-2">尚未遭遇敵軍</div>';
+            }
+
+            if (logEl) {
+                logEl.innerHTML = simBattleLog.map((result, idx) => {
+                    if (result === '勝') return `<div class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded text-xs font-bold text-center animate-[popIn_0.2s_ease-out]">第 ${idx+1} 回合：🏆 勝</div>`;
+                    if (result === '敗') return `<div class="bg-purple-500/20 text-purple-400 border border-purple-500/30 px-2 py-1 rounded text-xs font-bold text-center animate-[popIn_0.2s_ease-out]">第 ${idx+1} 回合：💥 敗</div>`;
+                    return `<div class="bg-slate-500/20 text-slate-400 border border-slate-500/30 px-2 py-1 rounded text-xs font-bold text-center animate-[popIn_0.2s_ease-out]">第 ${idx+1} 回合：平手</div>`;
+                }).join('');
+            }
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // ================== Modal 分段邏輯 (嵌入模擬器內) ==================
+        function openPrepModal() {
+            if(isSimAnimating) return;
+            const btn = document.getElementById('btn-sim-prep');
+            if(btn) btn.disabled = true;
+
+            const modal = document.getElementById('prep-modal-overlay');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // 重置面板狀態
+            document.getElementById('prep-modal-deck').innerHTML = '';
+            document.getElementById('prep-squad-box').innerHTML = '';
+            
+            showPrepStep1();
+        }
+
+        function showPrepStep1() {
+            document.getElementById('prep-modal-title').innerHTML = '1. 建立初始裝備庫存';
+            document.getElementById('prep-modal-desc').innerHTML = '首先，我們依序建立 24 件裝備，每件裝備都會對應一個不同的戰鬥力數值！';
+            
+            const btn = document.getElementById('prep-modal-btn');
+            btn.innerHTML = '<i data-lucide="play" class="w-4 h-4"></i> 建立裝備陣列';
+            btn.className = "w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-6 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm shrink-0";
+            btn.onclick = prepGenerate;
+            btn.disabled = false;
+            lucide.createIcons();
+        }
+
+        async function prepGenerate() {
+            const btn = document.getElementById('prep-modal-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 建立中...';
+            btn.className = "w-full sm:w-auto bg-slate-700 text-slate-400 font-bold py-2.5 px-6 rounded-xl transition-all shadow-inner flex items-center justify-center gap-2 text-sm shrink-0 cursor-not-allowed";
+            
+            const types = ["🛡️能量盾", "🔫雷射槍", "🚀追蹤彈", "⚔️激光劍"];
+            const grades = ["F", "E", "D", "C", "B", "A"];
+            prepPool = [];
+            let p = 1;
+            const deckEl = document.getElementById('prep-modal-deck');
+            
+            for (let i = 0; i < types.length; i++) {
+                for (let j = 0; j < grades.length; j++) {
+                    prepPool.push({ text: `${types[i]} ${grades[j]}`, power: p });
+                    deckEl.innerHTML = prepPool.map((item, idx) => `
+                        <div class="flex items-center justify-between bg-white border border-slate-300 shadow-sm rounded px-1.5 py-1 animate-[popIn_0.1s_ease-out] w-full">
+                            <span class="text-[10px] font-bold text-slate-700 truncate flex-1">${item.text}</span>
+                            <span class="bg-slate-900 text-cyan-300 text-[10px] px-1 rounded font-mono font-bold shrink-0 ml-1">戰力 ${item.power}</span>
+                        </div>
+                    `).join('');
+                    
+                    p++;
+                    deckEl.scrollTop = deckEl.scrollHeight;
+                    await new Promise(r => setTimeout(r, 40));
+                }
+            }
+            
+            btn.innerHTML = '下一步：洗牌打散 <i data-lucide="arrow-right" class="w-4 h-4"></i>';
+            btn.className = "w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-6 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm shrink-0 animate-bounce";
+            btn.onclick = showPrepStep2;
+            btn.disabled = false;
+            lucide.createIcons();
+        }
+
+        function showPrepStep2() {
+            document.getElementById('prep-modal-title').innerHTML = '2. 亂數洗牌打散';
+            document.getElementById('prep-modal-desc').innerHTML = '裝備庫依序排好了！接下來使用洗牌演算法將這 24 個裝備完全打散至「裝備分配」清單中。';
+            
+            const btn = document.getElementById('prep-modal-btn');
+            btn.innerHTML = '<i data-lucide="shuffle" class="w-4 h-4"></i> 洗牌演算法';
+            btn.className = "w-full sm:w-auto bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 px-6 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm shrink-0";
+            btn.onclick = prepShuffle;
+            btn.disabled = false;
+            lucide.createIcons();
+        }
+
+        async function prepShuffle() {
+            const btn = document.getElementById('prep-modal-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 洗牌中...';
+            btn.className = "w-full sm:w-auto bg-slate-700 text-slate-400 font-bold py-2.5 px-6 rounded-xl transition-all shadow-inner flex items-center justify-center gap-2 text-sm shrink-0 cursor-not-allowed";
+            
+            const deckEl = document.getElementById('prep-modal-deck');
+
+            for(let k=0; k<8; k++) { 
+                prepPool.sort(() => Math.random() - 0.5);
+                deckEl.innerHTML = prepPool.map((item, idx) => `
+                    <div class="flex items-center justify-between bg-amber-50 border border-amber-300 shadow-sm rounded px-1.5 py-1 animate-[popIn_0.1s_ease-out] w-full ring-1 ring-amber-300">
+                        <span class="text-[10px] font-bold text-amber-700 truncate flex-1">${item.text}</span>
+                        <span class="bg-slate-900 text-amber-300 text-[10px] px-1 rounded font-mono font-bold shrink-0 ml-1">戰力 ${item.power}</span>
+                    </div>
+                `).join('');
+                await new Promise(r => setTimeout(r, 450)); 
+            }
+            deckEl.innerHTML = prepPool.map((item, idx) => `
+                <div class="flex items-center justify-between bg-white border border-slate-300 shadow-sm rounded px-1.5 py-1 w-full animate-[popIn_0.2s_ease-out]">
+                    <span class="text-[10px] font-bold text-slate-700 truncate flex-1">${item.text}</span>
+                    <span class="bg-slate-900 text-cyan-300 text-[10px] px-1 rounded font-mono font-bold shrink-0 ml-1">戰力 ${item.power}</span>
+                </div>
+            `).join('');
+
+            btn.innerHTML = '下一步：提取先遣隊裝備 <i data-lucide="arrow-right" class="w-4 h-4"></i>';
+            btn.className = "w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-6 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm shrink-0 animate-bounce";
+            btn.onclick = showPrepStep3;
+            btn.disabled = false;
+            lucide.createIcons();
+        }
+
+        function showPrepStep3() {
+            document.getElementById('prep-modal-title').innerHTML = '3. 提取先遣隊裝備';
+            document.getElementById('prep-modal-desc').innerHTML = '重複 6 次，將洗好牌的「第 1 項」轉移到先遣隊的「小隊裝備」中！';
+            
+            const btn = document.getElementById('prep-modal-btn');
+            btn.innerHTML = '<i data-lucide="users" class="w-4 h-4"></i> 取出前 6 項裝備';
+            btn.className = "w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-6 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm shrink-0";
+            btn.onclick = prepExtract;
+            btn.disabled = false;
+            lucide.createIcons();
+        }
+
+        async function prepExtract() {
+            const btn = document.getElementById('prep-modal-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 提取裝備中...';
+            btn.className = "w-full sm:w-auto bg-slate-700 text-slate-400 font-bold py-2.5 px-6 rounded-xl transition-all shadow-inner flex items-center justify-center gap-2 text-sm shrink-0 cursor-not-allowed";
+            
+            simSquadWeapons = [];
+            const deckEl = document.getElementById('prep-modal-deck');
+            const squadEl = document.getElementById('prep-squad-box');
+            
+            for (let i = 0; i < 6; i++) {
+                const extracted = prepPool.shift();
+                simSquadWeapons.push(extracted);
+                
+                deckEl.innerHTML = prepPool.map((item, idx) => `
+                    <div class="flex items-center justify-between bg-white border border-slate-300 shadow-sm rounded px-1.5 py-1 w-full">
+                        <span class="text-[10px] font-bold text-slate-700 truncate flex-1">${item.text}</span>
+                        <span class="bg-slate-900 text-cyan-300 text-[10px] px-1 rounded font-mono font-bold shrink-0 ml-1">戰力 ${item.power}</span>
+                    </div>
+                `).join('');
+                
+                squadEl.innerHTML = simSquadWeapons.map((item, idx) => `
+                    <div class="flex items-center justify-between bg-indigo-600 border border-indigo-400 shadow-sm rounded px-1.5 py-1 animate-[popIn_0.2s_ease-out] w-[48%] sm:w-[31%] shrink-0">
+                        <span class="text-[10px] font-bold text-white truncate flex-1">${item.text}</span>
+                        <span class="bg-slate-900 text-cyan-300 text-[10px] px-1 rounded font-mono font-bold shrink-0 ml-1">${item.power}</span>
+                    </div>
+                `).join('');
+                
+                await new Promise(r => setTimeout(r, 250));
+            }
+
+            btn.innerHTML = '<i data-lucide="swords" class="w-4 h-4"></i> 完成！進入戰場';
+            btn.className = "w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-6 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm shrink-0 animate-bounce";
+            btn.onclick = prepFinish;
+            btn.disabled = false;
+            lucide.createIcons();
+        }
+
+        function prepFinish() {
+            const modal = document.getElementById('prep-modal-overlay');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            
+            simEnemyFleet = [];
+            simBattleLog = [];
+            simBattleIndex = 0;
+            
+            renderBattleArena();
+
+            document.getElementById('arena-status').innerHTML = `<span class="text-emerald-400 font-bold">✅ 裝備提取完成！先遣小隊已就緒，請點擊「遭遇敵軍」。</span>`;
+            document.getElementById('btn-sim-prep').classList.add('hidden');
+            document.getElementById('btn-sim-enemy').classList.remove('hidden');
+            
+            isSimAnimating = false;
+        }
+
+        // ================== 主舞台邏輯 ==================
+        async function doGenerateEnemies() {
+            if(isSimAnimating) return;
+            document.getElementById('btn-sim-enemy').classList.add('hidden');
+            document.getElementById('arena-status').innerHTML = '<span class="text-purple-400 font-bold">偵測到敵方訊號！隨機產生 6 艘敵軍戰艦與戰鬥力...</span>';
+            
+            // 秘密由後端從剩餘的洗牌清單中取出 6 個，確保不會有重複數字
+            simEnemyFleet = [];
+            for (let i = 0; i < 6; i++) {
+                if (prepPool.length > 0) {
+                    simEnemyFleet.push(prepPool.shift());
+                } else {
+                    let r = Math.floor(Math.random() * 24) + 1;
+                    while (simEnemyFleet.find(item => item.power === r)) r = Math.floor(Math.random() * 24) + 1;
+                    simEnemyFleet.push({ text: `👾 未知戰艦`, power: r });
+                }
+            }
+            
+            renderBattleArena();
+
+            setTimeout(() => {
+                document.getElementById('arena-status').innerHTML = '<span class="text-rose-400 font-bold">🚨 敵軍已進入射程範圍！請點擊「逐一對決」。</span>';
+                document.getElementById('btn-sim-battle').classList.remove('hidden');
+            }, 800);
+        }
+
+        async function doBattle() {
+            if(isSimAnimating || simBattleIndex >= simSquadWeapons.length) return;
+            isSimAnimating = true;
+            document.getElementById('btn-sim-battle').classList.add('hidden');
+
+            for (let i = 0; i < simSquadWeapons.length; i++) {
+                simBattleIndex = i;
+                renderBattleArena();
+                
+                let myPower = simSquadWeapons[i].power;
+                let enPower = simEnemyFleet[i].power;
+                
+                document.getElementById('arena-status').innerHTML = `回合 ${i+1}：讀取清單第 ${i+1} 項比較 <span class="text-indigo-400 font-bold">我方(${myPower})</span> vs <span class="text-purple-400 font-bold">敵軍(${enPower})</span>`;
+                await new Promise(r => setTimeout(r, 800));
+
+                if (myPower > enPower) {
+                    document.getElementById('arena-status').innerHTML = `👉 <span class="text-emerald-400 font-bold">我方戰力 (${myPower}) 大於敵方 (${enPower})，戰鬥勝利！</span>`;
+                    simBattleLog.push('勝');
+                } else if (myPower < enPower) {
+                    document.getElementById('arena-status').innerHTML = `👉 <span class="text-purple-400 font-bold">我方戰力 (${myPower}) 不及敵方 (${enPower})，戰鬥失敗...</span>`;
+                    simBattleLog.push('敗');
+                } else {
+                    document.getElementById('arena-status').innerHTML = `👉 <span class="text-amber-400 font-bold">雙方戰力 (${myPower}) 相等，平手！</span>`;
+                    simBattleLog.push('平');
+                }
+
+                renderBattleArena();
+                await new Promise(r => setTimeout(r, 1000));
+            }
+            
+            simBattleIndex = 99; // 結束標記
+            renderBattleArena();
+            
+            const wins = simBattleLog.filter(x => x === '勝').length;
+            if(wins >= 3) {
+                document.getElementById('arena-status').innerHTML = `🎉 戰鬥結算：共取得 <span class="text-emerald-400 font-bold">${wins} 勝</span>，成功擊退外星艦隊！`;
+            } else {
+                document.getElementById('arena-status').innerHTML = `⚠️ 戰鬥結算：僅取得 <span class="text-purple-400 font-bold">${wins} 勝</span>，必須撤退重新整備。`;
+            }
+
+            isSimAnimating = false;
+        }
+
+        function resetSim() {
+            if (isSimAnimating) return;
+            simSquadWeapons = [];
+            simEnemyFleet = [];
+            simBattleLog = [];
+            simBattleIndex = 0;
+
+            renderBattleArena();
+            document.getElementById('arena-status').innerHTML = '點擊「整備清單」開始執行任務前置作業。';
+            
+            document.getElementById('btn-sim-prep').classList.remove('hidden');
+            document.getElementById('btn-sim-prep').disabled = false;
+            document.getElementById('btn-sim-enemy').classList.add('hidden');
+            document.getElementById('btn-sim-battle').classList.add('hidden');
+        }
+
+        function renderSimulatorArea() {
+            return `
+                <div class="bg-slate-900 rounded-2xl border border-slate-700 p-6 md:p-8 shadow-xl relative overflow-hidden flex flex-col gap-6 min-h-[500px]">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500 rounded-full mix-blend-screen filter blur-[80px] opacity-10 pointer-events-none"></div>
+
+                    <!-- Overlay Modal inside Simulator (嵌入式整備面板) -->
+                    <div id="prep-modal-overlay" class="absolute inset-0 bg-slate-900/95 backdrop-blur-sm z-50 hidden flex-col p-4 sm:p-6 items-center justify-start overflow-y-auto custom-scrollbar">
+                        <div class="w-full max-w-3xl flex flex-col gap-4 h-full max-h-full">
+                            <!-- 頂部解說 -->
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center shrink-0 border-b border-slate-700 pb-3 gap-2">
+                                <h3 id="prep-modal-title" class="text-base sm:text-lg text-emerald-400 font-bold">準備中...</h3>
+                                <p id="prep-modal-desc" class="text-[11px] sm:text-xs text-slate-300 sm:max-w-[70%] sm:text-right leading-relaxed">載入說明...</p>
+                            </div>
+                            
+                            <!-- 中間兩塊清單區 (Flex-1) -->
+                            <div class="flex-1 min-h-0 flex flex-col gap-4">
+                                <!-- 裝備庫區 (1~24) 圖文網格排列 -->
+                                <div class="bg-slate-200 rounded-xl p-3 sm:p-4 border border-slate-300 flex-1 relative shadow-inner flex flex-col overflow-hidden min-h-[190px]">
+                                    <div class="absolute top-0 left-0 bg-slate-800 text-slate-300 text-[10px] px-2 py-1 rounded-br-lg border-b border-r border-slate-700 shadow-sm font-bold tracking-widest z-10">
+                                        清單：裝備分配 (1 ~ 24 洗牌後)
+                                    </div>
+                                    <div id="prep-modal-deck" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1.5 sm:gap-2 content-start w-full overflow-y-auto custom-scrollbar pt-6 pb-2 px-1 flex-1">
+                                    </div>
+                                </div>
+                                
+                                <!-- 提取區 -->
+                                <div class="bg-indigo-50 rounded-xl p-3 sm:p-4 border border-indigo-200 h-[100px] sm:h-[120px] relative shadow-inner shrink-0 flex flex-col overflow-hidden">
+                                    <div class="absolute top-0 left-0 bg-indigo-600 text-white text-[10px] px-2 py-1 rounded-br-lg border-b border-r border-indigo-700 shadow-sm font-bold tracking-widest z-10">
+                                        清單：小隊裝備 (前 6 項)
+                                    </div>
+                                    <div id="prep-squad-box" class="flex flex-wrap gap-1.5 sm:gap-2 content-start w-full overflow-y-auto custom-scrollbar pt-6 pb-1 px-1 flex-1">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 下一步按鈕區 -->
+                            <div class="flex justify-center border-t border-slate-700 pt-3 shrink-0">
+                                <button id="prep-modal-btn" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-8 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm">
+                                    <i data-lucide="play" class="w-4 h-4"></i> 開始執行
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 戰鬥舞台 -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10 flex-1">
+                        <!-- 我方小隊 -->
+                        <div class="bg-slate-950/50 rounded-xl p-4 border border-slate-800 shadow-inner flex flex-col">
+                            <div class="flex justify-between items-center mb-3 border-b border-slate-700 pb-2 shrink-0">
+                                <h4 id="arena-squad-title" class="text-indigo-400 font-bold flex items-center gap-2 text-sm"><i data-lucide="shield" class="w-4 h-4"></i> 清單：小隊裝備</h4>
+                            </div>
+                            <div id="arena-squad" class="flex flex-col gap-2 flex-1 overflow-y-auto custom-scrollbar">
+                                <div class="text-xs text-slate-500 w-full text-center py-2">尚未整備裝備</div>
+                            </div>
+                        </div>
+
+                        <!-- 戰鬥紀錄 -->
+                        <div class="bg-slate-950/50 rounded-xl p-4 border border-slate-800 shadow-inner flex flex-col">
+                            <div class="flex justify-between items-center mb-3 border-b border-slate-700 pb-2 shrink-0">
+                                <h4 class="text-emerald-400 font-bold flex items-center gap-2 text-sm"><i data-lucide="clipboard-list" class="w-4 h-4"></i> 清單：戰鬥紀錄</h4>
+                            </div>
+                            <div id="arena-log" class="flex flex-col gap-2 flex-1 overflow-y-auto custom-scrollbar pr-1"></div>
+                        </div>
+
+                        <!-- 敵方艦隊 -->
+                        <div class="bg-slate-950/50 rounded-xl p-4 border border-slate-800 shadow-inner flex flex-col">
+                            <div class="flex justify-between items-center mb-3 border-b border-slate-700 pb-2 shrink-0">
+                                <h4 class="text-purple-400 font-bold flex items-center gap-2 text-sm"><i data-lucide="rocket" class="w-4 h-4"></i> 清單：外星裝備</h4>
+                            </div>
+                            <div id="arena-enemy" class="flex flex-col gap-2 flex-1 overflow-y-auto custom-scrollbar">
+                                <div class="text-xs text-slate-500 w-full text-center py-2">尚未遭遇敵軍</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 狀態列與控制按鈕 -->
+                    <div class="flex flex-col sm:flex-row items-center justify-between bg-slate-800 p-4 rounded-xl border border-slate-700 gap-4 relative z-10 shrink-0 mt-2">
+                        <div id="arena-status" class="text-sm font-bold text-slate-300 flex-1 text-center sm:text-left min-h-[2.5rem] flex flex-col justify-center">
+                            點擊「整備清單」開始執行任務前置作業。
+                        </div>
+                        <div class="flex gap-2 w-full sm:w-auto shrink-0 flex-wrap justify-center">
+                            <button id="btn-sim-prep" onclick="openPrepModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm">
+                                <i data-lucide="package-open" class="w-4 h-4"></i> 1. 整備清單
+                            </button>
+                            <button id="btn-sim-enemy" onclick="doGenerateEnemies()" class="hidden bg-orange-600 hover:bg-orange-500 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm">
+                                <i data-lucide="radar" class="w-4 h-4"></i> 2. 遭遇敵軍
+                            </button>
+                            <button id="btn-sim-battle" onclick="doBattle()" class="hidden bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm">
+                                <i data-lucide="swords" class="w-4 h-4"></i> 3. 逐一對決
+                            </button>
+                            <button id="btn-sim-reset" onclick="resetSim()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 px-3 rounded-xl transition-all shadow-md active:scale-95" title="重置">
+                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // 隱藏密技 Quiz 控制邏輯
+        // ==========================================
+        const quizPool = [
+            { q: "為什麼我們要在「洗牌」之前，先建立一個包含 1 到 24 的初始裝備庫清單？", opts: ["讓畫面看起來比較好看", "對應 Scratch 中 24 個武器的造型編號", "用來隨機選擇武器名稱"], ans: 1 },
+            { q: "當我們從「裝備分配」清單提取裝備給小隊時，為什麼取出「第 1 項」後要立刻將它「刪除」？", opts: ["為了避免敵人拿到重複的裝備", "因為系統規定小隊只能有 6 個裝備", "為了節省電腦記憶體空間"], ans: 0 },
+            { q: "在陣列走訪進行「火力對決」時，我們用了哪個變數來同步讀取我方與敵方的清單？", opts: ["對決回合", "戰鬥力", "戰鬥紀錄"], ans: 0 },
+            { q: "在 Scratch 中，如果要將一個原本整齊的陣列完全打散，我們最常使用哪種方法？", opts: ["將所有數字按照大小重新排序", "將數字隨機加減乘除", "隨機抽取項目後轉移到另一個新清單"], ans: 2 },
+            { q: "在抽籤程式中，我們透過變數一直 +1 來拿取資料，為什麼在『刪除』項目後依然能順利拿到所有資料？", opts: ["因為 Scratch 陣列會自動將後方資料往前遞補空位", "因為有隱藏的積木幫我們處理", "因為迴圈會自動跳過已經刪除的資料"], ans: 0 }
+        ];
+
+        let activeQuizIndices = [];
+
+        function initQuiz() {
+            // 隨機挑選 3 題
+            const shuffledIndices = [0, 1, 2, 3, 4].sort(() => 0.5 - Math.random());
+            activeQuizIndices = shuffledIndices.slice(0, 3);
+            renderQuiz();
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-questions-container');
+            if(!container) return;
+            
+            container.innerHTML = activeQuizIndices.map((quizIdx, i) => {
+                const quiz = quizPool[quizIdx];
+                return `
+                    <div class="mb-4 bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-inner">
+                        <p class="font-bold text-slate-200 mb-3 text-sm leading-relaxed"><span class="text-indigo-400 mr-1">Q${i+1}:</span> ${quiz.q}</p>
+                        <div class="flex flex-col gap-2">
+                            ${quiz.opts.map((opt, optIdx) => `
+                                <label class="flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200 cursor-pointer bg-slate-900/50 hover:bg-slate-700 p-2.5 rounded-lg border border-slate-800 transition-colors">
+                                    <input type="radio" name="quiz-${i}" value="${optIdx}" class="accent-indigo-500 w-4 h-4">
+                                    <span>${opt}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function checkSecretQuiz() {
+            let allCorrect = true;
+            for(let i = 0; i < 3; i++) {
+                const selected = document.querySelector(`input[name="quiz-${i}"]:checked`);
+                if(!selected || parseInt(selected.value) !== quizPool[activeQuizIndices[i]].ans) {
+                    allCorrect = false;
+                    break;
+                }
+            }
+
+            const feedback = document.getElementById('quiz-feedback');
+            if(allCorrect) {
+                feedback.innerHTML = '<span class="text-emerald-400 font-bold"><i data-lucide="unlock" class="w-4 h-4 inline mr-1"></i> 解鎖成功！密技面板已開啟。</span>';
+                lucide.createIcons();
+                
+                setTimeout(() => {
+                    document.getElementById('secret-lock-screen').classList.add('hidden');
+                    const secretContent = document.getElementById('secret-content-screen');
+                    secretContent.classList.remove('hidden');
+                    secretContent.classList.add('animate-[slideUpFade_0.5s_ease-out]');
+                }, 1000);
+            } else {
+                feedback.innerHTML = '<span class="text-rose-400 font-bold"><i data-lucide="lock" class="w-4 h-4 inline mr-1"></i> 答案有誤或未填寫完整，請再試一次！</span>';
+                lucide.createIcons();
+            }
+        }
+
+        // ==========================================
+        // 教學內容資料庫 (總複習積木設計)
+        // ==========================================
+        const lesson = {
+            id: 6, 
+            icon: "swords", 
+            title: "星際爭霸戰", 
+            subtitle: "(陣列綜合應用：總複習與對決)",
+            description: "指揮官，最終考驗來了！我們將把前面學過的技巧大結合：建立連續數字的武裝清單、洗牌打散，然後取出前 6 項作為先遣隊的裝備。最後，利用迴圈將我們的裝備與敵方艦隊逐一比對，展開最終的星際決戰！",
+            objectives: [
+                { title: "建立武裝清單", desc: "自動生成 1 到 24 的連續數字陣列。在 Scratch 中，這剛好能對應到 24 種不同戰鬥力的武器造型！(模擬器以圖文輔助呈現)" },
+                { title: "亂數洗牌打散", desc: "將「裝備庫存」內的 24 個數字徹底打散，確保我們拿到的武器是完全隨機的。" },
+                { title: "提取對決裝備", desc: "從洗好的裝備分配中取出前 6 項存入「小隊裝備」；接著偵測雷達，隨機生成 6 個「外星裝備」。" },
+                { title: "陣列火力對決", desc: "利用迴圈，逐一讀取兩個清單的對應數值，比較大小並顯示每回合的戰鬥結果！" }
+            ],
+            learningPointsSummary: "本單元是陣列 (清單) 技巧的終極總複習：",
+            learningPoints: [
+                { title: "清單初始化", desc: "使用迴圈與變數累加，快速建立 1 到 24 的陣列資料。" },
+                { title: "陣列洗牌", desc: "透過隨機取數與項目交換，實作陣列資料的無序打散。" },
+                { title: "資料提取", desc: "利用迴圈將大陣列中的部分資料（前 6 項）搬移到新的清單中。" },
+                { title: "雙陣列走訪比對", desc: "使用單一指標變數，同步讀取兩個戰力清單中對應的數值，進行大小比較並記錄結果。" }
+            ],
+            // 程式教學積木 (依圖片內容拆解)
+            scratchBlocksPart1: [
+                { type: "list", text: '刪除 <span class="bg-black/10 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center mx-1">裝備庫存 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 的所有項目' },
+                { type: "list", text: '刪除 <span class="bg-black/10 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center mx-1">裝備分配 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 的所有項目' },
+                { type: "variable", text: '變數 <span class="bg-black/15 px-2 py-1 rounded shadow-inner text-[11px] leading-none inline-flex items-center mx-1">戰鬥力 ▼</span> 設為 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">0</span>' },
+                { type: "control", text: '重複 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">24</span> 次', nested: [
+                    { type: "variable", text: '變數 <span class="bg-black/15 px-2 py-1 rounded shadow-inner text-[11px] leading-none inline-flex items-center mx-1">戰鬥力 ▼</span> 改變 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">1</span>' },
+                    { type: "list", text: '添加 <span class="bg-[#FF8C1A] px-2 py-0.5 rounded-full shadow-sm text-[11px] mx-1 border-b-2 border-[#DB6E00]">戰鬥力</span> 到 <span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner text-[11px] inline-flex items-center ml-1">裝備庫存 ▼</span>' }
+                ]}
+            ],
+            scratchBlocksPart2: [
+                { type: "control", text: '重複 <span class="bg-[#FF661A] text-white px-3 py-1 rounded-full border-b-2 border-[#CC5214] shadow-sm inline-flex items-center font-bold leading-none mx-1">清單 <span class="bg-black/10 px-1 rounded shadow-inner mx-0.5 text-[11px]">裝備庫存 ▼</span> 的長度</span> 次', nested: [
+                    { type: "variable", text: '變數 <span class="bg-black/15 px-2 py-1 rounded shadow-inner text-[11px] leading-none inline-flex items-center mx-1">戰鬥力 ▼</span> 設為 <span class="bg-[#59C059] text-white px-3 py-1 rounded-full border-b-2 border-[#389438] shadow-sm font-bold inline-flex items-center gap-1 leading-none text-sm w-max mx-1">隨機取數 <span class="bg-white text-slate-800 px-2 py-0.5 rounded-full shadow-inner text-sm mx-0.5 border border-black/10 font-normal">1</span> 到 <span class="bg-[#FF661A] text-white px-2 py-0.5 rounded-full border-b-2 border-[#CC5214] shadow-sm text-[11px] inline-flex items-center mx-0.5">清單 <span class="bg-black/10 px-1 rounded shadow-inner mx-1 text-[11px]">裝備庫存 ▼</span>的長度</span></span>' },
+                    { type: "list", text: '添加 <span class="bg-[#FF661A] text-white px-2 py-1 rounded-full border-b-2 border-[#CC5214] shadow-sm inline-flex items-center mx-1"><span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner mr-1 text-[11px] leading-none inline-flex items-center">裝備庫存 ▼</span> 的第 <span class="bg-[#FF8C1A] px-2 py-0.5 rounded-full shadow-sm text-[11px] mx-1 border-b-2 border-[#DB6E00]">戰鬥力</span> 項</span> 到 <span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner text-[11px] inline-flex items-center ml-1">裝備分配 ▼</span>' },
+                    { type: "list", text: '刪除 <span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner text-[11px] leading-none inline-flex items-center mr-1">裝備庫存 ▼</span> 的第 <span class="bg-[#FF8C1A] px-2 py-0.5 rounded-full shadow-sm text-[11px] mx-1 border-b-2 border-[#DB6E00]">戰鬥力</span> 項' }
+                ]}
+            ],
+            scratchBlocksPart3: [
+                { type: "list", text: '刪除 <span class="bg-black/10 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center mx-1">小隊裝備 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 的所有項目' },
+                { type: "variable", text: '變數 <span class="bg-black/15 px-2 py-1 rounded shadow-inner text-[11px] leading-none inline-flex items-center mx-1">戰鬥力 ▼</span> 設為 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">0</span>' },
+                { type: "control", text: '重複 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">6</span> 次', nested: [
+                    { type: "variable", text: '變數 <span class="bg-black/15 px-2 py-1 rounded shadow-inner text-[11px] leading-none inline-flex items-center mx-1">戰鬥力 ▼</span> 改變 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">1</span>' },
+                    { type: "list", text: '添加 <span class="bg-[#FF661A] text-white px-2 py-1 rounded-full border-b-2 border-[#CC5214] shadow-sm inline-flex items-center mx-1"><span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner mr-1 text-[11px] leading-none inline-flex items-center">裝備分配 ▼</span> 的第 <span class="bg-[#FF8C1A] px-2 py-0.5 rounded-full shadow-sm text-[11px] mx-1 border-b-2 border-[#DB6E00]">戰鬥力</span> 項</span> 到 <span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner text-[11px] inline-flex items-center ml-1">小隊裝備 ▼</span>' },
+                    { type: "list", text: '刪除 <span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner text-[11px] leading-none inline-flex items-center mr-1">裝備分配 ▼</span> 的第 <span class="bg-[#FF8C1A] px-2 py-0.5 rounded-full shadow-sm text-[11px] mx-1 border-b-2 border-[#DB6E00]">戰鬥力</span> 項' }
+                ]}
+            ],
+            scratchBlocksSecret: [
+                { type: "control", text: '等待 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1 leading-none">0.5</span> 秒' },
+                { type: "list", text: '刪除 <span class="bg-black/10 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center mx-1">外星裝備 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 的所有項目' },
+                { type: "variable", text: '變數 <span class="bg-black/15 px-2 py-1 rounded shadow-inner text-[11px] leading-none inline-flex items-center mx-1">戰鬥力 ▼</span> 設為 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">0</span>' },
+                { type: "control", text: '重複 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">6</span> 次', nested: [
+                    { type: "variable", text: '變數 <span class="bg-black/15 px-2 py-1 rounded shadow-inner text-[11px] leading-none inline-flex items-center mx-1">戰鬥力 ▼</span> 改變 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">1</span>' },
+                    { type: "list", text: '添加 <span class="bg-[#FF661A] text-white px-2 py-1 rounded-full border-b-2 border-[#CC5214] shadow-sm inline-flex items-center mx-1"><span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner mr-1 text-[11px] leading-none inline-flex items-center">裝備分配 ▼</span> 的第 <span class="bg-[#FF8C1A] px-2 py-0.5 rounded-full shadow-sm text-[11px] mx-1 border-b-2 border-[#DB6E00]">戰鬥力</span> 項</span> 到 <span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner text-[11px] inline-flex items-center ml-1">外星裝備 ▼</span>' },
+                    { type: "list", text: '刪除 <span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner text-[11px] leading-none inline-flex items-center mr-1">裝備分配 ▼</span> 的第 <span class="bg-[#FF8C1A] px-2 py-0.5 rounded-full shadow-sm text-[11px] mx-1 border-b-2 border-[#DB6E00]">戰鬥力</span> 項' }
+                ]}
+            ]
+        };
+
+        function getBlockColorClass(type) {
+            switch(type) {
+                case 'event': return 'bg-[#FFBF00] text-slate-800 border-[#CC9900]';
+                case 'list': return 'bg-[#FF661A] text-white border-[#CC5214]';
+                case 'looks': return 'bg-[#9966FF] text-white border-[#774DCC]';
+                case 'variable': return 'bg-[#FF8C1A] text-white border-[#DB6E00]';
+                case 'control': return 'bg-[#FFAB19] text-white border-[#CF8B17]';
+                case 'operator': return 'bg-[#59C059] text-white border-[#389438]';
+                case 'sensing': return 'bg-[#5CB1D6] text-white border-[#478AA6]';
+                default: return 'bg-slate-400 text-white border-slate-500';
+            }
+        }
+
+        function renderScratchBlock(block, isFirst = false) {
+            let nestedHtml = '';
+            let bottomHtml = '';
+            
+            const notchTop = `<div class="absolute top-[-4px] left-4 w-8 h-2 bg-black/20 rounded-b-full"></div>`;
+            const notchBottom = `<div class="absolute -bottom-1 left-4 w-8 h-2 bg-black/20 rounded-b-full z-30"></div>`;
+
+            if (block.nested && block.nested.length > 0) {
+                const nestedBlocks = block.nested.map((b, i) => renderScratchBlock(b, i === 0)).join('');
+                nestedHtml += `<div class="ml-4 pl-3 border-l-[6px] border-[#CF8B17] py-0.5 bg-[#FFAB19]/10 relative z-10 flex flex-col w-max">${nestedBlocks}</div>`;
+            }
+
+            if (block.elseNested && block.elseNested.length > 0) {
+                const elseBlocks = block.elseNested.map((b, i) => renderScratchBlock(b, i === 0)).join('');
+                nestedHtml += `
+                    <div class="px-4 py-1.5 border-b-4 border-r-2 shadow-md flex items-center gap-1 whitespace-nowrap bg-[#FFAB19] text-white border-[#CF8B17] relative z-20 w-max rounded-br-lg rounded-bl-sm mt-0">
+                        ${notchTop}
+                        否則
+                        ${notchBottom}
+                    </div>
+                    <div class="ml-4 pl-3 border-l-[6px] border-[#CF8B17] py-0.5 bg-[#FFAB19]/10 relative z-10 flex flex-col w-max">${elseBlocks}</div>
+                `;
+            }
+
+            if (block.nested && block.nested.length > 0) {
+                bottomHtml = `<div class="h-8 w-32 rounded-b-xl border-b-4 border-r-2 shadow-sm ${getBlockColorClass(block.type)} relative z-20 flex items-center">${notchBottom}</div>`;
+            }
+
+            const isHat = block.isHat === true;
+            const hatTop = isHat ? 'rounded-t-3xl pt-4' : 'rounded-t-lg';
+            const showTopNotch = !isHat && !(block.elseNested && isFirst === false);
+
+            return `
+                <div class="flex flex-col items-start font-bold text-sm md:text-base w-max relative mb-[-4px] ${isFirst ? '' : 'mt-1'} group z-20">
+                    <div class="px-4 py-2.5 ${hatTop} rounded-br-lg rounded-bl-sm border-b-4 border-r-2 shadow-md flex items-center gap-1 whitespace-nowrap ${getBlockColorClass(block.type)} relative z-20 hover:brightness-110 transition-all cursor-default w-max">
+                        ${showTopNotch ? notchTop : ''}
+                        ${block.text}
+                        ${!block.nested ? notchBottom : ''}
+                    </div>
+                    ${nestedHtml}${bottomHtml}
+                </div>`;
+        }
+
+        function renderTutorialHTML() {
+            return `
+                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col gap-8">
+                    <div class="text-center w-full pb-4 border-b border-slate-100">
+                        <h4 class="text-2xl font-black text-purple-600 mb-2">程式實作教學：陣列總複習</h4>
+                        <p class="text-slate-500 font-medium">我們將利用三個清單與單一變數，完整實作「建立、洗牌、提取」的陣列經典操作！</p>
+                    </div>
+
+                    <!-- Step 1: 建立初始裝備庫存 -->
+                    <div class="flex flex-col lg:flex-row items-center lg:items-start gap-6 w-full">
+                        <div class="flex-shrink-0 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 flex flex-col items-center lg:items-start min-w-[250px] lg:max-w-[55%] custom-scrollbar">
+                            <div class="bg-[#F9F9F9] border border-slate-200 p-4 rounded-xl shadow-inner w-max flex flex-col gap-0 items-start">
+                                ${lesson.scratchBlocksPart1.map((b, i) => renderScratchBlock(b, i === 0)).join('')}
+                            </div>
+                        </div>
+                        <div class="flex-1 w-full bg-indigo-50 p-5 sm:p-6 rounded-2xl border border-indigo-200 relative shadow-sm h-full">
+                            <h5 class="font-bold text-indigo-800 text-lg mb-3 flex items-center gap-2">
+                                <span class="bg-indigo-200 text-indigo-800 w-7 h-7 rounded-full flex items-center justify-center font-black text-sm">1</span> 建立初始裝備庫存
+                            </h5>
+                            <p class="text-indigo-900/80 text-sm leading-relaxed mb-4">清空舊資料後，我們利用重複迴圈與 <strong>[戰鬥力]</strong> 變數的累加，依序將 1 到 24 放入「裝備庫存」清單中。</p>
+                            <div class="bg-white/60 p-3 rounded-xl border border-indigo-100 text-xs text-slate-700 leading-relaxed font-medium">
+                                💡 <strong>提示：</strong> 這 24 個數字，剛好可以對應 Scratch 裡面的 24 種不同武器造型編號喔！
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: 陣列隨機洗牌 -->
+                    <div class="flex flex-col lg:flex-row items-center lg:items-start gap-6 w-full">
+                        <div class="flex-shrink-0 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 flex flex-col items-center lg:items-start min-w-[250px] lg:max-w-[55%] custom-scrollbar">
+                            <div class="bg-[#F9F9F9] border border-slate-200 p-4 rounded-xl shadow-inner w-max flex flex-col gap-0 items-start">
+                                ${lesson.scratchBlocksPart2.map((b, i) => renderScratchBlock(b, i === 0)).join('')}
+                            </div>
+                        </div>
+                        <div class="flex-1 w-full bg-amber-50 p-5 sm:p-6 rounded-2xl border border-amber-200 relative shadow-sm h-full">
+                            <h5 class="font-bold text-amber-800 text-lg mb-3 flex items-center gap-2">
+                                <span class="bg-amber-200 text-amber-800 w-7 h-7 rounded-full flex items-center justify-center font-black text-sm">2</span> 陣列隨機洗牌
+                            </h5>
+                            <p class="text-amber-900/80 text-sm leading-relaxed mb-4">接著，我們將裝備庫存的數字徹底打散！</p>
+                            <ul class="list-disc list-inside text-amber-900/80 text-sm space-y-2.5 font-medium ml-1">
+                                <li>讓迴圈執行 <strong>「裝備庫存的長度」</strong> 次。</li>
+                                <li>每次隨機抽出一個位置，存入 <strong>[戰鬥力]</strong> 變數。</li>
+                                <li>把抽到的項目放進「裝備分配」清單，並從原來的清單中刪除，完成不重複洗牌。</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: 提取小隊裝備 -->
+                    <div class="flex flex-col lg:flex-row items-center lg:items-start gap-6 w-full">
+                        <div class="flex-shrink-0 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 flex flex-col items-center lg:items-start min-w-[250px] lg:max-w-[55%] custom-scrollbar">
+                            <div class="bg-[#F9F9F9] border border-slate-200 p-4 rounded-xl shadow-inner w-max flex flex-col gap-0 items-start">
+                                ${lesson.scratchBlocksPart3.map((b, i) => renderScratchBlock(b, i === 0)).join('')}
+                            </div>
+                        </div>
+                        <div class="flex-1 w-full bg-emerald-50 p-5 sm:p-6 rounded-2xl border border-emerald-200 relative shadow-sm h-full">
+                            <h5 class="font-bold text-emerald-800 text-lg mb-3 flex items-center gap-2">
+                                <span class="bg-emerald-200 text-emerald-800 w-7 h-7 rounded-full flex items-center justify-center font-black text-sm">3</span> 提取小隊裝備
+                            </h5>
+                            <p class="text-emerald-900/80 text-sm leading-relaxed mb-4">洗牌完成後，我們要從「裝備分配」清單中，挑選 6 個裝備給先遣隊。</p>
+                            
+                            <div class="bg-white/60 p-4 rounded-xl border border-emerald-200 text-sm text-slate-700 leading-relaxed font-medium">
+                                💡 <strong>程式彩蛋：動態遞補效應！</strong><br>
+                                注意看程式碼！變數從 1 開始遞增，每次都 <strong>「添加第 N 項」然後「刪除第 N 項」</strong>。當刪除第 1 項後，後面的資料會往前遞補！<br>
+                                所以當變數變成 2 時，拿到的其實是原本的第 3 項！<br><br>
+                                <span class="text-emerald-700">這代表系統實際上是抽出原本陣列裡的第 1, 3, 5, 7, 9, 11 項。不過別擔心，因為陣列已經洗亂過了，這樣跳著拿，結果依然是完全隨機的喔！這就是 Scratch 陣列特有的有趣現象！</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderLessonDetail(lesson) {
+            const dt = { iconBg: 'bg-purple-100 text-purple-600', tagText: 'text-purple-500' };
+            
+            const learningPointsHtml = lesson.learningPoints.map(pt => `
+                <div class="bg-white border border-purple-100 p-4 rounded-xl shadow-sm flex items-start gap-3 hover:shadow-md transition-shadow h-full">
+                    <div class="bg-purple-50 text-purple-600 p-2 rounded-lg shrink-0 mt-0.5 border border-purple-100"><i data-lucide="check-circle-2" class="w-4 h-4"></i></div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-sm mb-1">${pt.title}</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed">${pt.desc}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            const objectivesHtml = lesson.objectives.map((obj, idx) => `
+                <div class="bg-white border border-purple-100 p-4 rounded-xl shadow-sm flex items-start gap-3 hover:shadow-md transition-shadow h-full">
+                    <div class="bg-purple-50 text-purple-600 w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 border border-purple-100 font-black">
+                        ${idx + 1}
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-sm mb-1">${obj.title}</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed">${obj.desc}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="slide-up-fade">
+                    <button onclick="window.location.href='https://su-yung-sheng.github.io/unforte115/1150800.html'" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-purple-600 transition-colors px-4 py-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm mb-6">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回任務儀表板
+                    </button>
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="p-8 md:p-10 border-b border-slate-100 bg-slate-50/50 flex flex-col items-start gap-4">
+                            <div class="flex items-center gap-5">
+                                <div class="w-14 h-14 ${dt.iconBg} rounded-2xl flex items-center justify-center shrink-0 shadow-sm">
+                                    <i data-lucide="${lesson.icon}" class="w-7 h-7"></i>
+                                </div>
+                                <div>
+                                    <span class="${dt.tagText} font-bold text-sm tracking-widest uppercase mb-1 block">LESSON ${lesson.id}</span>
+                                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">${lesson.title} <span class="text-slate-400 font-medium text-2xl">${lesson.subtitle}</span></h2>
+                                </div>
+                            </div>
+                            <p class="text-slate-600 font-light text-lg leading-relaxed mt-2 max-w-3xl">${lesson.description}</p>
+                        </div>
+                        
+                        <div class="p-8 md:p-10 flex flex-col gap-10">
+                            <section>
+                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-purple-100 text-purple-600 p-1.5 rounded-lg"><i data-lucide="target" class="w-5 h-5"></i></span>任務目標</h3>
+                                <div class="bg-purple-50 p-6 rounded-2xl border border-purple-100/50">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
+                                        ${objectivesHtml}
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section>
+                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-orange-100 text-orange-600 p-1.5 rounded-lg"><i data-lucide="book-open" class="w-5 h-5"></i></span>單元學習重點</h3>
+                                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                                    <p class="text-slate-600 font-medium mb-6 leading-relaxed">${lesson.learningPointsSummary}</p>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
+                                        ${learningPointsHtml}
+                                    </div>
+                                </div>
+                            </section>
+                            
+                            <!-- ⭐ 星際爭霸戰模擬器 -->
+                            <section>
+                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-purple-100 text-purple-600 p-1.5 rounded-lg"><i data-lucide="swords" class="w-5 h-5"></i></span>⚡ 星際對決模擬器 (陣列總複習)</h3>
+                                ${renderSimulatorArea()}
+                            </section>
+
+                            <!-- ⭐ 程式實作教學 -->
+                            <section>
+                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-purple-100 text-purple-600 p-1.5 rounded-lg"><i data-lucide="code-2" class="w-5 h-5"></i></span>⚡ 程式教學：由零開始實作對決系統</h3>
+                                ${renderTutorialHTML()}
+                            </section>
+                            
+                            <!-- ⭐ 隱藏密技解鎖區塊 -->
+                            <section class="mt-4 pt-10 border-t border-slate-200">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-rose-100 text-rose-700 font-black text-sm shadow-sm"><i data-lucide="key" class="w-4 h-4"></i></span>
+                                    <h3 class="text-xl font-bold text-slate-800">隱藏密技：防止敵軍裝備重複 (通關解鎖)</h3>
+                                </div>
+
+                                <!-- 鎖定狀態畫面 (答題區) -->
+                                <div id="secret-lock-screen" class="bg-slate-900 rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden border border-slate-800">
+                                    <div class="absolute top-0 left-0 w-64 h-64 bg-indigo-500 rounded-full mix-blend-screen filter blur-[80px] opacity-10 pointer-events-none"></div>
+                                    <div class="absolute bottom-0 right-0 w-64 h-64 bg-rose-500 rounded-full mix-blend-screen filter blur-[80px] opacity-10 pointer-events-none"></div>
+                                    
+                                    <div class="relative z-10 flex flex-col items-center">
+                                        <div class="bg-slate-800/80 p-4 rounded-full shadow-lg mb-6 border border-slate-700">
+                                            <i data-lucide="lock" class="w-10 h-10 text-indigo-400"></i>
+                                        </div>
+                                        <h4 class="text-2xl font-black text-white mb-2">系統已鎖定密技模組</h4>
+                                        <p class="text-slate-400 mb-8 text-center max-w-lg">為了確保指揮官已完全掌握陣列原理，請完成下方的隨機測驗，全對即可解鎖這段隱藏的程式代碼！</p>
+                                        
+                                        <div class="w-full max-w-2xl bg-slate-950/80 p-6 sm:p-8 rounded-2xl border border-slate-700 shadow-inner">
+                                            <div id="quiz-questions-container" class="flex flex-col w-full">
+                                                <!-- JS 動態生成隨機題目 -->
+                                            </div>
+                                            
+                                            <div class="mt-6 flex flex-col items-center gap-3 border-t border-slate-800 pt-6">
+                                                <button onclick="checkSecretQuiz()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 px-8 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-base">
+                                                    <i data-lucide="unlock" class="w-5 h-5"></i> 驗證答案解鎖
+                                                </button>
+                                                <div id="quiz-feedback" class="text-sm text-center h-5 mt-1"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 解鎖後畫面 (隱藏內容) -->
+                                <div id="secret-content-screen" class="hidden bg-slate-900 rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden border-2 border-indigo-500 shadow-indigo-900/50">
+                                    <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-500 rounded-full mix-blend-screen filter blur-[80px] opacity-10 pointer-events-none"></div>
+                                    
+                                    <div class="relative z-10">
+                                        <div class="flex items-center gap-3 border-b border-slate-700 pb-4 mb-6">
+                                            <i data-lucide="unlock" class="w-8 h-8 text-emerald-400"></i>
+                                            <div>
+                                                <h4 class="text-2xl font-black text-white">解鎖成功！外星裝備防重複陣列</h4>
+                                                <p class="text-emerald-400 text-sm mt-1">這就是模擬器背後確保敵人裝備不重複的隱藏寫法！</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex flex-col lg:flex-row items-center lg:items-start gap-8 w-full">
+                                            <div class="flex-shrink-0 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 flex flex-col items-center lg:items-start min-w-[250px] lg:max-w-[55%] custom-scrollbar">
+                                                <div class="bg-slate-800 border border-slate-700 p-4 sm:p-6 rounded-2xl shadow-inner w-max flex flex-col gap-0 items-start">
+                                                    ${lesson.scratchBlocksSecret.map((b, i) => renderScratchBlock(b, i === 0)).join('')}
+                                                </div>
+                                            </div>
+                                            <div class="flex-1 w-full bg-slate-800/80 p-5 sm:p-6 rounded-2xl border border-slate-700 relative shadow-sm h-full">
+                                                <h5 class="font-bold text-indigo-400 text-lg mb-3 flex items-center gap-2">
+                                                    <i data-lucide="lightbulb" class="w-5 h-5"></i> 密技解說
+                                                </h5>
+                                                <p class="text-slate-300 text-sm leading-relaxed mb-4">
+                                                    有沒有想過，為什麼外星敵軍的裝備絕對不會和我們先遣隊拿到的裝備重複呢？
+                                                </p>
+                                                <ul class="list-disc list-inside text-slate-300 text-sm space-y-3 font-medium ml-1">
+                                                    <li>這段程式其實是接在「提取小隊裝備」的後面。</li>
+                                                    <li>此時，「裝備分配」清單中，已經移除了先遣隊拿走的前 6 項，裡面剩下的是還沒被抽走的 18 個隨機裝備。</li>
+                                                    <li>所以，我們只要繼續使用一樣的「提取邏輯」：<strong class="text-indigo-400 mx-1">從剩餘的「裝備分配」清單裡，再拿 6 個給「外星裝備」</strong>，保證絕對不會拿到重複的！</li>
+                                                </ul>
+                                                <div class="mt-5 p-4 bg-emerald-950/40 rounded-xl border border-emerald-900/50 text-emerald-300 text-xs leading-relaxed">
+                                                    🎉 這就是陣列（清單）最迷人的地方：只要管理好源頭的「洗牌陣列」，後續不論怎麼抽取分發，都能完美維持資料的不重複性！
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 單元導覽按鈕 -->
+                <div class="mt-8 pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <a href="https://su-yung-sheng.github.io/unforte115/1150805.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 hover:text-indigo-600 transition-colors shadow-sm">
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i> 返回上一單元
+                    </a>
+                    <a href="https://su-yung-sheng.github.io/unforte115/1150800.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-sm">
+                        返回首頁 <i data-lucide="home" class="w-5 h-5"></i>
+                    </a>
+                </div>`;
+        }
+
+        window.onload = function() {
+            document.getElementById('app-container').innerHTML = renderLessonDetail(lesson);
+            initQuiz();
+            renderBattleArena(); 
+            lucide.createIcons();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用清單打造星際任務 - LESSON 4</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #F8F9FA; color: #333333; }
+        .slide-up-fade { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes pulse-highlight { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .value-changed { animation: pulse-highlight 0.4s ease-out; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+        
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-cyan-100 selection:text-cyan-900">
+
+    <!-- Header -->
+    <header id="main-header" class="bg-white border-b border-gray-100 pt-12 pb-12 slide-up-fade relative overflow-hidden">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8 relative z-10">
+            <div class="mb-6">
+                <a href="https://su-yung-sheng.github.io/unforte115/" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> 
+                    返回網站首頁
+                </a>
+            </div>
+            <p class="text-sm font-bold text-cyan-600 mb-3 tracking-widest uppercase">演算法與程式設計</p>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight">星際陣列指揮官：<br class="hidden md:block">用清單打造星際任務</h1>
+            <p class="text-lg text-slate-500 font-light max-w-2xl leading-relaxed">
+                化身星際指揮官，透過六大任務關卡，循序漸進建立邏輯思維，完整掌握 <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span> 的強大威力！
+            </p>
+        </div>
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-cyan-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+        <div class="absolute bottom-0 right-40 w-72 h-72 bg-sky-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
+    </header>
+
+    <main id="app-container" class="max-w-5xl mx-auto px-6 lg:px-8 py-12 relative min-h-[50vh]"></main>
+
+    <footer class="bg-slate-50 border-t border-slate-200 mt-10 py-8">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8 text-center">
+            <p class="text-sm font-medium text-slate-400">© 演算法與程式設計 - 星際陣列指揮官</p>
+        </div>
+    </footer>
+
+    <script>
+        // ==========================================
+        // 虛擬碼拼圖挑戰邏輯 (階段一與階段二)
+        // ==========================================
+        const correctPuzzle1Filtered_EN = [
+            'DELETE ALL OF "全班同學"',
+            'SET 座號 = 0',
+            'REPEAT 30 TIMES:',
+            '    CHANGE 座號 BY 1',
+            '    ADD 座號 TO "全班同學"',
+            'SAY "按我，抽出4位同學" FOR 2 SECS'
+        ];
+
+        const correctPuzzle1Filtered_ZH = [
+            '刪除 "全班同學" 的所有項目',
+            '設定 座號 = 0',
+            '重複 30 次:',
+            '    將 座號 改變 1',
+            '    添加 座號 到 "全班同學"',
+            '說出 "按我，抽出4位同學" 持續 2 秒'
+        ];
+
+        const correctPuzzle2Filtered_EN = [
+            'REPEAT 4 TIMES:',
+            '    SET 抽出座號 TO GET_ITEM(RANDOM(1, LENGTH("全班同學"))) FROM "全班同學"',
+            '    DELETE ITEM (INDEX_OF(抽出座號) IN "全班同學") FROM "全班同學"',
+            '    BROADCAST "抽獎"',
+            '    SAY 抽出座號 FOR 2 SECS'
+        ];
+
+        const correctPuzzle2Filtered_ZH = [
+            '重複 4 次:',
+            '    設定 抽出座號 = 取出 "全班同學" 的第 (隨機 1 到 "全班同學"長度) 項',
+            '    刪除 "全班同學" 裡的第 (找出 抽出座號 在 "全班同學"的項目編號) 項',
+            '    廣播訊息 "抽獎"',
+            '    說出 抽出座號 持續 2 秒'
+        ];
+
+        // 階段一狀態
+        let puz1Source = [];
+        let puz1Target = [];
+        let puz1Solved = false;
+        let isPuzzle1ZH = false; 
+
+        function getCorrectPuzzleArray1() {
+            return isPuzzle1ZH ? correctPuzzle1Filtered_ZH : correctPuzzle1Filtered_EN;
+        }
+
+        function initPuzzle1() {
+            puz1Source = [...getCorrectPuzzleArray1()].sort(() => Math.random() - 0.5);
+            puz1Target = [];
+            puz1Solved = false;
+        }
+
+        window.togglePuzzle1Lang = function() {
+            if (puz1Solved) return; 
+            isPuzzle1ZH = !isPuzzle1ZH;
+            initPuzzle1();
+            renderPuzzle1();
+            
+            const langText = document.getElementById('puzzle-lang-text1');
+            if (langText) langText.innerText = isPuzzle1ZH ? '切換為英文' : '切換為中文';
+            updateIcons();
+        }
+
+        window.movePuzzle1Item = function(index, fromSource) {
+            if (puz1Solved) return; 
+            if (fromSource) {
+                puz1Target.push(puz1Source.splice(index, 1)[0]);
+            } else {
+                puz1Source.push(puz1Target.splice(index, 1)[0]);
+            }
+            renderPuzzle1();
+        }
+
+        window.checkPuzzle1 = function() {
+            if (puz1Solved) return;
+            const fb = document.getElementById('puzzle1-feedback');
+            const currentCorrectArray = getCorrectPuzzleArray1();
+            
+            if (puz1Target.length < currentCorrectArray.length) {
+                fb.innerHTML = '<span class="text-amber-400">⚠️ 請先將所有片段放入組合區！</span>';
+                fb.classList.remove('hidden');
+                setTimeout(() => fb.classList.add('hidden'), 3000);
+                return;
+            }
+
+            const isCorrect = puz1Target.every((val, index) => val === currentCorrectArray[index]);
+            
+            if (isCorrect) {
+                puz1Solved = true;
+                fb.innerHTML = '<span class="text-emerald-400">🎉 拼圖正確！已解鎖 Scratch 積木！</span>';
+                fb.classList.remove('hidden');
+                document.getElementById('btn-check-puzzle1').classList.add('hidden');
+                const btnLangToggle = document.getElementById('btn-toggle-puzzle-lang1');
+                if (btnLangToggle) btnLangToggle.classList.add('hidden');
+
+                const overlay = document.getElementById('scratch-locked-overlay1');
+                const blocks = document.getElementById('scratch-blocks-container1');
+                if(overlay) overlay.style.opacity = '0';
+                if(blocks) blocks.classList.remove('opacity-0', 'blur-sm', 'pointer-events-none');
+                setTimeout(() => { if(overlay) overlay.classList.add('hidden'); }, 500);
+                
+                renderPuzzle1(); 
+            } else {
+                fb.innerHTML = '<span class="text-rose-400">❌ 順序似乎不對喔，再檢查看看邏輯！</span>';
+                fb.classList.remove('hidden');
+                setTimeout(() => fb.classList.add('hidden'), 3000);
+            }
+        }
+
+        function renderPuzzle1() {
+            const srcEl = document.getElementById('puzzle1-source');
+            const tgtEl = document.getElementById('puzzle1-target');
+            if(!srcEl || !tgtEl) return;
+            
+            if (puz1Solved) {
+                srcEl.innerHTML = '<div class="text-slate-500 text-sm w-full text-center py-3 font-bold tracking-widest border border-slate-800 border-dashed rounded-lg bg-slate-900/50">🎉 片段已全數移至組合區</div>';
+                tgtEl.innerHTML = puz1Target.map((item, idx) => `
+                    <div class="bg-emerald-900/30 text-emerald-200 px-4 py-2.5 rounded-lg font-mono text-sm sm:text-base border border-emerald-700/50 whitespace-pre flex items-center shadow-sm w-full max-w-full overflow-hidden">
+                        <span class="opacity-50 text-xs w-5 shrink-0 text-left font-sans">${idx + 1}.</span>
+                        <span class="ml-2 truncate max-w-full block">${item}</span>
+                    </div>
+                `).join('');
+                return;
+            }
+
+            srcEl.innerHTML = puz1Source.map((item, idx) => `
+                <div onclick="movePuzzle1Item(${idx}, true)" class="bg-slate-700 text-slate-200 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-600 hover:-translate-y-0.5 font-mono text-sm shadow-sm transition-all border border-slate-600 select-none">
+                    ${item.trim()}
+                </div>
+            `).join('');
+            
+            tgtEl.innerHTML = puz1Target.map((item, idx) => `
+                <div onclick="movePuzzle1Item(${idx}, false)" class="bg-indigo-900/80 text-indigo-100 px-4 py-2.5 rounded-lg cursor-pointer hover:bg-rose-900/80 hover:text-rose-200 font-mono text-sm sm:text-base shadow-sm transition-all border border-indigo-700 select-none flex items-center group w-full max-w-full overflow-hidden">
+                    <span class="opacity-50 text-xs w-5 shrink-0 text-left font-sans group-hover:hidden">${idx + 1}.</span>
+                    <svg class="w-5 h-5 text-rose-400 shrink-0 hidden group-hover:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <span class="ml-2 whitespace-pre truncate max-w-full block">${item}</span>
+                </div>
+            `).join('');
+        }
+        
+        let puz2Source = [];
+        let puz2Target = [];
+        let puz2Solved = false;
+        let isPuzzle2ZH = false; 
+
+        function getCorrectPuzzleArray2() {
+            return isPuzzle2ZH ? correctPuzzle2Filtered_ZH : correctPuzzle2Filtered_EN;
+        }
+
+        function initPuzzle2() {
+            puz2Source = [...getCorrectPuzzleArray2()].sort(() => Math.random() - 0.5);
+            puz2Target = [];
+            puz2Solved = false;
+        }
+
+        window.togglePuzzle2Lang = function() {
+            if (puz2Solved) return; 
+            isPuzzle2ZH = !isPuzzle2ZH;
+            initPuzzle2();
+            renderPuzzle2();
+            
+            const langText = document.getElementById('puzzle-lang-text2');
+            if (langText) langText.innerText = isPuzzle2ZH ? '切換為英文' : '切換為中文';
+            updateIcons();
+        }
+
+        window.movePuzzle2Item = function(index, fromSource) {
+            if (puz2Solved) return; 
+            if (fromSource) {
+                puz2Target.push(puz2Source.splice(index, 1)[0]);
+            } else {
+                puz2Source.push(puz2Target.splice(index, 1)[0]);
+            }
+            renderPuzzle2();
+        }
+
+        window.checkPuzzle2 = function() {
+            if (puz2Solved) return;
+            const fb = document.getElementById('puzzle2-feedback');
+            const currentCorrectArray = getCorrectPuzzleArray2();
+            
+            if (puz2Target.length < currentCorrectArray.length) {
+                fb.innerHTML = '<span class="text-amber-400">⚠️ 請先將所有片段放入組合區！</span>';
+                fb.classList.remove('hidden');
+                setTimeout(() => fb.classList.add('hidden'), 3000);
+                return;
+            }
+
+            const isCorrect = puz2Target.every((val, index) => val === currentCorrectArray[index]);
+            
+            if (isCorrect) {
+                puz2Solved = true;
+                fb.innerHTML = '<span class="text-emerald-400">🎉 拼圖正確！已解鎖下方的積木組裝挑戰！</span>';
+                fb.classList.remove('hidden');
+                document.getElementById('btn-check-puzzle2').classList.add('hidden');
+                const btnLangToggle = document.getElementById('btn-toggle-puzzle-lang2');
+                if (btnLangToggle) btnLangToggle.classList.add('hidden');
+
+                // 解鎖 Scratch 拼圖
+                const overlay = document.getElementById('scratch-locked-overlay2');
+                const container = document.getElementById('scratch-puzzle-container');
+                if(overlay) overlay.style.opacity = '0';
+                if(container) container.classList.remove('opacity-0', 'blur-sm', 'pointer-events-none');
+                setTimeout(() => { if(overlay) overlay.classList.add('hidden'); }, 500);
+                
+                renderPuzzle2(); 
+            } else {
+                fb.innerHTML = '<span class="text-rose-400">❌ 順序似乎不對喔，再檢查看看邏輯！</span>';
+                fb.classList.remove('hidden');
+                setTimeout(() => fb.classList.add('hidden'), 3000);
+            }
+        }
+
+        function renderPuzzle2() {
+            const srcEl = document.getElementById('puzzle2-source');
+            const tgtEl = document.getElementById('puzzle2-target');
+            if(!srcEl || !tgtEl) return;
+            
+            if (puz2Solved) {
+                srcEl.innerHTML = '<div class="text-slate-500 text-sm w-full text-center py-3 font-bold tracking-widest border border-slate-800 border-dashed rounded-lg bg-slate-900/50">🎉 片段已全數移至組合區</div>';
+                tgtEl.innerHTML = puz2Target.map((item, idx) => `
+                    <div class="bg-emerald-900/30 text-emerald-200 px-4 py-2.5 rounded-lg font-mono text-sm sm:text-base border border-emerald-700/50 whitespace-pre flex items-center shadow-sm w-full max-w-full overflow-hidden">
+                        <span class="opacity-50 text-xs w-5 shrink-0 text-left font-sans">${idx + 1}.</span>
+                        <span class="ml-2 truncate max-w-full block">${item}</span>
+                    </div>
+                `).join('');
+                return;
+            }
+
+            srcEl.innerHTML = puz2Source.map((item, idx) => `
+                <div onclick="movePuzzle2Item(${idx}, true)" class="bg-slate-700 text-slate-200 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-600 hover:-translate-y-0.5 font-mono text-sm shadow-sm transition-all border border-slate-600 select-none">
+                    ${item.trim()}
+                </div>
+            `).join('');
+            
+            tgtEl.innerHTML = puz2Target.map((item, idx) => `
+                <div onclick="movePuzzle2Item(${idx}, false)" class="bg-indigo-900/80 text-indigo-100 px-4 py-2.5 rounded-lg cursor-pointer hover:bg-rose-900/80 hover:text-rose-200 font-mono text-sm sm:text-base shadow-sm transition-all border border-indigo-700 select-none flex items-center group w-full max-w-full overflow-hidden">
+                    <span class="opacity-50 text-xs w-5 shrink-0 text-left font-sans group-hover:hidden">${idx + 1}.</span>
+                    <svg class="w-5 h-5 text-rose-400 shrink-0 hidden group-hover:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <span class="ml-2 whitespace-pre truncate max-w-full block">${item}</span>
+                </div>
+            `).join('');
+        }
+
+        // ==========================================
+        // ⭐ 階段二：Scratch 積木引導式提問挑戰
+        // ==========================================
+        const notchTop = `<div class="absolute top-[-4px] left-4 w-8 h-2 bg-black/20 rounded-b-full"></div>`;
+        const notchBottom = `<div class="absolute -bottom-1 left-4 w-8 h-2 bg-black/20 rounded-b-full z-30"></div>`;
+        
+        // 定義所有積木碎片的完整 HTML (含精美樣式與凹槽)
+        const P_HTML = {
+            0: `<span class="bg-[#59C059] text-white px-3 py-1 rounded-full border-b-2 border-[#389438] shadow-sm font-bold inline-flex items-center gap-1 leading-none text-sm w-max">隨機取數 <span class="bg-white text-slate-800 px-2 py-0.5 rounded-full shadow-inner text-sm mx-0.5 border border-black/10">1</span> 到 <span class="bg-[#FF661A] text-white px-2 py-0.5 rounded-full border-b-2 border-[#CC5214] shadow-sm text-sm inline-flex items-center"><span class="bg-black/10 px-1 rounded shadow-inner mr-1 text-[11px]">全班同學 ▼</span>的長度</span></span>`,
+            1: `<span class="bg-[#FF661A] text-white px-3 py-1.5 rounded-full border-b-2 border-[#CC5214] shadow-sm font-bold inline-flex items-center gap-1 leading-none text-sm w-max"><span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner text-[11px] mr-0.5 inline-flex items-center">全班同學 ▼</span> 的第 __INNER__ 項</span>`,
+            2: `<div class="bg-[#FF8C1A] text-white px-4 py-2.5 rounded-lg border-b-4 border-r-2 border-[#DB6E00] shadow-sm font-bold flex items-center gap-2 w-max text-sm relative">${notchTop}變數 <span class="bg-black/15 px-2 py-1 rounded shadow-inner text-[11px] leading-none inline-flex items-center">抽出座號 ▼</span> 設為 __INNER__${notchBottom}</div>`,
+            3: `<span class="bg-[#FF661A] text-white px-3 py-1.5 rounded-full border-b-2 border-[#CC5214] shadow-sm font-bold inline-flex items-center gap-1 leading-none text-sm w-max"><span class="bg-[#FF8C1A] text-white px-2 py-0.5 rounded-full shadow-sm border-b-2 border-[#DB6E00] text-sm mr-0.5">抽出座號</span> 在 <span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner text-[11px] mx-0.5 inline-flex items-center">全班同學 ▼</span> 裡的項目編號</span>`,
+            4: `<div class="bg-[#FF661A] text-white px-4 py-2.5 rounded-lg border-b-4 border-r-2 border-[#CC5214] shadow-sm font-bold flex items-center gap-2 w-max text-sm relative">${notchTop}刪除 第 __INNER__ 項 <span class="bg-black/10 px-1.5 py-0.5 rounded shadow-inner text-[11px] leading-none inline-flex items-center">全班同學 ▼</span>${notchBottom}</div>`,
+            5: `<div class="bg-[#FFBF00] text-slate-800 px-4 py-2.5 rounded-lg border-b-4 border-r-2 border-[#CC9900] shadow-sm font-bold flex items-center gap-2 w-max text-sm relative">${notchTop}廣播訊息 <span class="bg-black/10 text-white px-2 py-1 rounded shadow-inner text-[11px] leading-none inline-flex items-center">抽獎 ▼</span>${notchBottom}</div>`,
+            6: `<div class="bg-[#9966FF] text-white px-4 py-2.5 rounded-lg border-b-4 border-r-2 border-[#774DCC] shadow-sm font-bold flex items-center gap-2 w-max text-sm relative">${notchTop}說出 <span class="bg-[#FF8C1A] text-white px-3 py-1 rounded-full shadow-sm border-b-2 border-[#DB6E00] text-sm leading-none mx-0.5">抽出座號</span> 持續 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 font-normal text-sm leading-none mx-0.5">2</span> 秒${notchBottom}</div>`
+        };
+
+        // 為零件池準備帶有「空槽視覺」的 HTML
+        const P_POOL_HTML = {
+            ...P_HTML,
+            1: P_HTML[1].replace('__INNER__', `<span class="inline-block w-8 h-4 bg-black/20 rounded shadow-inner"></span>`),
+            2: P_HTML[2].replace('__INNER__', `<span class="inline-block w-12 h-6 bg-black/20 rounded-full shadow-inner z-10 relative"></span>`),
+            4: P_HTML[4].replace('__INNER__', `<span class="inline-block w-10 h-6 bg-black/20 rounded-full shadow-inner z-10 relative"></span>`)
+        };
+
+        // 定義 Q&A 流程與邏輯
+        const Q_FLOW = [
+            {
+                title: "Q1：決定要抽出「籤筒」裡的第幾支籤？",
+                desc: "A：從 1 到籤筒（全班同學清單）的總長度中，閉著眼睛隨機挑一個數字！",
+                note: "💡 提示：這就像是決定我們要摸出第幾個籤，但還沒看到籤上面寫的號碼喔！",
+                expectedPieceId: 0,
+                action: (html) => { spStaging = html; }
+            },
+            {
+                title: "Q2：看看這支幸運籤上面寫了什麼座號？",
+                desc: "A：把籤筒（全班同學）裡「剛剛決定好的那個位置」的籤拿出來看！",
+                note: "💡 提示：使用深橘色的清單讀取積木，把剛剛 Q1 的隨機數字裝進去。",
+                expectedPieceId: 1,
+                action: (html) => { spStaging = html.replace('__INNER__', spStaging); }
+            },
+            {
+                title: "Q3：把抽到的座號抄在黑板上（記進變數）！",
+                desc: "A：把變數 [抽出座號] 的值，設定為剛剛拿出來的那支籤的號碼。",
+                note: "💡 提示：使用橘色的變數設定積木，把找到的幸運座號存起來，不然等一下就忘記啦！",
+                expectedPieceId: 2,
+                action: (html) => { 
+                    spLines[0] = html.replace('__INNER__', spStaging); 
+                    spStaging = null; 
+                }
+            },
+            {
+                title: "Q4：找出剛剛黑板上的號碼，原本是在籤筒的哪個位置？",
+                desc: "A：找出 [抽出座號] 在全班同學清單裡的「項目編號」（也就是第幾個位置）。",
+                note: "💡 提問釐清：你可能會想，位置不是在 Q1 就抽出來了嗎？\n沒錯！但因為 Q1 只是「隨機閃過一個數字」，電腦並沒有把它記下來。\n所以我們得拿著黑板上的號碼回去對照：「欸，這支籤本來排在第幾個啊？」\n<span class='text-emerald-400'>(當然，如果你一開始就多做一個變數把 Q1 的位置存起來也是可以的，這是不一樣的寫法喔！)</span>",
+                expectedPieceId: 3,
+                action: (html) => { spStaging = html; }
+            },
+            {
+                title: "Q5：把這支籤丟掉！這樣下次就不會重複抽到了！",
+                desc: "A：刪除籤筒（全班同學）裡的第 [剛才找出的那個位置] 項。",
+                note: "💡 提示：把 Q4 組合進 Q5 裡，這就是我們常說的「不重複抽籤法」（抽出後移除）的核心秘密喔！",
+                expectedPieceId: 4,
+                action: (html) => {
+                    spLines[1] = html.replace('__INNER__', spStaging);
+                    spStaging = null;
+                }
+            },
+            {
+                title: "Q6：大聲宣布，準備開獎動畫！",
+                desc: "A：發送廣播訊息 [抽獎]，讓其他舞台角色開始放煙火。",
+                note: "💡 提示：使用黃色的事件積木。在大型專案中，我們常透過「廣播」來通知其他角色做事。",
+                expectedPieceId: 5,
+                action: (html) => { spLines[2] = html; }
+            },
+            {
+                title: "Q7：大聲唸出幸運兒的座號！",
+                desc: "A：讓電腦說出黑板上 [抽出座號] 的號碼。",
+                note: "💡 提示：最後一步囉！用紫色的外觀積木，讓主角把變數裡的值說出來。",
+                expectedPieceId: 6,
+                action: (html) => { spLines[3] = html; }
+            }
+        ];
+
+        let spStep = 0;
+        let spStaging = null;
+        let spLines = [null, null, null, null];
+        let spPool = [];
+
+        function initScratchPuzzle2() {
+            spStep = 0;
+            spStaging = null;
+            spLines = [null, null, null, null];
+            // 隨機打亂所有積木碎片
+            spPool = [0, 1, 2, 3, 4, 5, 6].sort(() => Math.random() - 0.5);
+            renderScratchPuzzle2();
+        }
+
+        window.clickScratchPoolItem = function(pieceId) {
+            if(spStep >= Q_FLOW.length) return;
+            const currentQ = Q_FLOW[spStep];
+            const fb = document.getElementById('sp-feedback');
+            
+            if(pieceId === currentQ.expectedPieceId) {
+                // 答對了！
+                spPool = spPool.filter(id => id !== pieceId);
+                currentQ.action(P_HTML[pieceId]);
+                spStep++;
+                renderScratchPuzzle2();
+                
+                fb.innerHTML = '<span class="text-emerald-400 font-bold animate-[popIn_0.2s_ease-out]"><i data-lucide="check-circle-2" class="w-5 h-5 inline mr-1"></i> 選擇正確，組合成功！</span>';
+                lucide.createIcons();
+                setTimeout(() => { if(fb) fb.innerHTML = ''; }, 1500);
+            } else {
+                // 答錯了！
+                fb.innerHTML = '<span class="text-rose-400 font-bold animate-pulse"><i data-lucide="alert-circle" class="w-5 h-5 inline mr-1"></i> 不對喔，請再看一次上方的 A (解答提示)。</span>';
+                lucide.createIcons();
+                setTimeout(() => { if(fb) fb.innerHTML = ''; }, 2500);
+            }
+        }
+
+        function renderScratchPuzzle2() {
+            const container = document.getElementById('scratch-puzzle-container');
+            if (!container) return;
+
+            if (spStep >= Q_FLOW.length) {
+                container.innerHTML = `
+                    <div class="flex flex-col w-full animate-[slideUpFade_0.5s_ease-out]">
+                        <div class="bg-emerald-900/40 border border-emerald-500 p-6 rounded-xl text-center mb-6 shadow-inner relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500 rounded-full mix-blend-screen filter blur-[50px] opacity-20 pointer-events-none"></div>
+                            <i data-lucide="party-popper" class="w-12 h-12 text-emerald-400 mx-auto mb-3 animate-bounce"></i>
+                            <h4 class="text-emerald-400 font-bold text-2xl mb-2">挑戰成功！</h4>
+                            <p class="text-emerald-200 text-sm">您已透過 Q&A 完美還原了「隨機抽籤與防重複」的陣列演算法！</p>
+                        </div>
+                        <div class="text-slate-400 text-xs font-bold mb-2 flex items-center gap-1.5"><i data-lucide="code-2" class="w-4 h-4"></i> 完整程式積木：</div>
+                        <div class="bg-[#F9F9F9] p-6 rounded-xl border border-slate-200 shadow-inner overflow-x-auto custom-scrollbar w-full">
+                            <div class="flex flex-col items-start font-bold text-sm md:text-base w-max relative group min-w-full">
+                                <div class="px-4 py-2.5 rounded-t-lg rounded-br-lg rounded-bl-sm border-b-4 border-r-2 shadow-md flex items-center gap-1 whitespace-nowrap bg-[#FFAB19] text-white border-[#CF8B17] relative z-20 w-max">
+                                    重複 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">4</span> 次
+                                </div>
+                                <div class="ml-4 pl-3 border-l-[6px] border-[#CF8B17] py-3 bg-[#FFAB19]/10 relative z-10 flex flex-col gap-1 w-max min-h-[100px]">
+                                    ${spLines[0]}
+                                    ${spLines[1]}
+                                    ${spLines[2]}
+                                    ${spLines[3]}
+                                </div>
+                                <div class="h-8 w-32 rounded-b-xl border-b-4 border-r-2 shadow-sm bg-[#FFAB19] border-[#CF8B17] relative z-20 flex items-center"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            const currentQ = Q_FLOW[spStep];
+
+            container.innerHTML = `
+                <!-- 上半部：Q&A 提問與零件區 -->
+                <div class="flex flex-col lg:flex-row gap-6 w-full shrink-0">
+                    <!-- 左側：Step & Q&A -->
+                    <div class="w-full lg:w-5/12 flex flex-col">
+                        <div class="bg-indigo-950/60 border border-indigo-800 p-5 rounded-xl shadow-inner relative overflow-hidden h-full">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500 rounded-full mix-blend-screen filter blur-[40px] opacity-20 pointer-events-none"></div>
+                            <div class="text-indigo-300 font-bold mb-2 tracking-widest text-[10px] uppercase bg-indigo-900/80 inline-block px-2 py-0.5 rounded border border-indigo-700">Step ${spStep + 1} / 7</div>
+                            <h5 class="text-white font-bold text-lg mb-2 relative z-10 leading-snug">${currentQ.title}</h5>
+                            <div class="text-emerald-400 text-sm font-bold mb-3 relative z-10 bg-emerald-950/40 p-2.5 rounded-lg border border-emerald-900/50">${currentQ.desc}</div>
+                            ${currentQ.note ? `<div class="bg-indigo-900/40 p-3 rounded-lg text-indigo-200 text-xs leading-relaxed border border-indigo-700/50 relative z-10">${currentQ.note.replace(/\n/g, '<br>')}</div>` : ''}
+                        </div>
+                    </div>
+
+                    <!-- 右側：零件區 -->
+                    <div class="w-full lg:w-7/12 flex flex-col">
+                        <div class="text-slate-400 text-xs font-bold mb-2 flex items-center gap-1.5"><i data-lucide="mouse-pointer-click" class="w-4 h-4"></i> 請從下方點擊選出對應的積木碎片：</div>
+                        <div class="flex flex-wrap gap-3 p-5 bg-slate-900 rounded-xl border border-slate-700 min-h-[160px] content-start shadow-inner flex-1">
+                            ${spPool.map(id => `
+                                <div onclick="clickScratchPoolItem(${id})" class="cursor-pointer hover:scale-[1.03] hover:-translate-y-0.5 transition-all shadow-md active:scale-95 w-max">
+                                    ${P_POOL_HTML[id]}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div id="sp-feedback" class="h-6 mt-2 text-sm text-center"></div>
+                    </div>
+                </div>
+
+                <!-- 下半部：動態組裝區 (全寬) -->
+                <div class="flex flex-col w-full overflow-hidden border-t border-slate-700 pt-5 mt-2">
+                    <div class="text-slate-400 text-xs font-bold mb-2 flex items-center gap-1.5"><i data-lucide="package-plus" class="w-4 h-4"></i> 積木組裝區：</div>
+                    <div class="bg-[#F9F9F9] p-5 sm:p-6 rounded-xl border border-slate-200 shadow-inner overflow-x-auto custom-scrollbar flex flex-col relative w-full min-h-[200px]">
+                        
+                        ${spStaging ? `
+                        <div class="mb-5 p-4 bg-indigo-50/50 rounded-xl border-2 border-dashed border-indigo-300 shadow-sm animate-[popIn_0.3s_ease-out] w-max max-w-full">
+                            <div class="text-xs text-indigo-500 font-bold mb-2 flex items-center gap-1.5"><i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i> 目前正在組裝中的積木：</div>
+                            ${spStaging}
+                        </div>
+                        ` : ''}
+                        
+                        <div class="flex flex-col items-start font-bold text-sm md:text-base w-max relative group min-w-full">
+                            <div class="px-4 py-2.5 rounded-t-lg rounded-br-lg rounded-bl-sm border-b-4 border-r-2 shadow-md flex items-center gap-1 whitespace-nowrap bg-[#FFAB19] text-white border-[#CF8B17] relative z-20 w-max">
+                                重複 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">4</span> 次
+                            </div>
+                            <div class="ml-4 pl-3 border-l-[6px] border-[#CF8B17] py-3 bg-[#FFAB19]/10 relative z-10 flex flex-col gap-1 w-max min-h-[100px]">
+                                ${spLines[0] ? spLines[0] : `<div class="${spStep < 3 ? 'border-indigo-400 bg-indigo-50 text-indigo-500' : 'border-slate-300 bg-white/50 text-slate-400'} h-9 border-2 border-dashed rounded flex items-center px-3 text-xs transition-colors font-medium">等待放入第 1 行積木...</div>`}
+                                ${spLines[1] ? spLines[1] : `<div class="${(spStep >= 3 && spStep < 5) ? 'border-indigo-400 bg-indigo-50 text-indigo-500' : 'border-slate-300 bg-white/50 text-slate-400'} h-9 border-2 border-dashed rounded flex items-center px-3 text-xs transition-colors font-medium">等待放入第 2 行積木...</div>`}
+                                ${spLines[2] ? spLines[2] : `<div class="${spStep === 5 ? 'border-indigo-400 bg-indigo-50 text-indigo-500' : 'border-slate-300 bg-white/50 text-slate-400'} h-9 border-2 border-dashed rounded flex items-center px-3 text-xs transition-colors font-medium">等待放入第 3 行積木...</div>`}
+                                ${spLines[3] ? spLines[3] : `<div class="${spStep === 6 ? 'border-indigo-400 bg-indigo-50 text-indigo-500' : 'border-slate-300 bg-white/50 text-slate-400'} h-9 border-2 border-dashed rounded flex items-center px-3 text-xs transition-colors font-medium">等待放入第 4 行積木...</div>`}
+                            </div>
+                            <div class="h-8 w-32 rounded-b-xl border-b-4 border-r-2 shadow-sm bg-[#FFAB19] border-[#CF8B17] relative z-20 flex items-center"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        // 模擬器互動邏輯 (Plain JS)
+        // ==========================================
+        let classList = [];
+        let isAnimating = false;
+        let highlightedIndex = -1; 
+
+        function updateIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        function renderClassListUI() {
+            const container = document.getElementById('class-list-container');
+            const lengthDisplay = document.getElementById('list-length-display');
+            if (!container || !lengthDisplay) return;
+
+            if (classList.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center text-slate-500 py-12 font-bold border-2 border-dashed border-slate-700 rounded-xl">
+                        <i data-lucide="users" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                        清單目前為空，請點擊左側「建立初始資料」
+                    </div>
+                `;
+                lengthDisplay.innerText = '0';
+                updateIcons();
+                return;
+            }
+
+            container.innerHTML = classList.map((num, idx) => {
+                const isHighlight = idx === highlightedIndex;
+                const bgClass = isHighlight ? 'bg-amber-400 border-amber-300 ring-4 ring-amber-500/50 scale-110 z-20 shadow-lg shadow-amber-500/50' : 'bg-slate-800 border-slate-600 shadow-sm z-0';
+                const textClass = isHighlight ? 'text-slate-900' : 'text-cyan-400';
+                const numClass = isHighlight ? 'text-amber-800' : 'text-slate-400';
+
+                return `
+                <div class="relative ${bgClass} rounded-lg p-2.5 flex flex-col items-center justify-center transition-all duration-100">
+                    <span class="absolute top-1 left-1.5 text-[9px] ${numClass} font-bold">#${idx + 1}</span>
+                    <span class="text-xl sm:text-2xl font-mono font-black ${textClass} mt-2">${num}</span>
+                </div>
+            `}).join('');
+
+            lengthDisplay.innerText = classList.length;
+            
+            if (!document.getElementById('btn-draw').disabled && isAnimating && highlightedIndex === -1) {
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        async function createClassData() {
+            if (isAnimating) return;
+            isAnimating = true;
+            classList = [];
+            highlightedIndex = -1;
+            
+            const modal = document.getElementById('sim-modal-overlay');
+            if (modal) {
+                modal.className = 'hidden';
+                modal.innerHTML = '';
+            }
+
+            renderClassListUI();
+
+            const maxSeats = 30;
+            const statusEl = document.getElementById('sim-status-text');
+            const btnCreate = document.getElementById('btn-create-data');
+            const btnDraw = document.getElementById('btn-draw');
+
+            statusEl.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 inline animate-spin mr-1"></i> 正在執行重複迴圈，建立資料...';
+            btnCreate.disabled = true;
+            btnCreate.classList.add('opacity-50', 'cursor-not-allowed');
+            btnDraw.disabled = true;
+            btnDraw.classList.add('opacity-50', 'cursor-not-allowed');
+            updateIcons();
+
+            for (let i = 1; i <= maxSeats; i++) {
+                await new Promise(r => setTimeout(r, 40)); 
+                classList.push(i);
+                renderClassListUI();
+            }
+
+            statusEl.innerHTML = '✅ 資料建立完成！(長度：30)<br><span class="text-xs text-emerald-600 mt-1 block">請點擊下方按鈕進行「隨機抽籤」。</span>';
+            btnCreate.disabled = false;
+            btnCreate.classList.remove('opacity-50', 'cursor-not-allowed');
+            btnDraw.disabled = false;
+            btnDraw.classList.remove('opacity-50', 'cursor-not-allowed');
+            isAnimating = false;
+        }
+
+        async function drawClassData() {
+            if (isAnimating || classList.length === 0) return;
+            isAnimating = true;
+
+            const statusEl = document.getElementById('sim-status-text');
+            const btnCreate = document.getElementById('btn-create-data');
+            const btnDraw = document.getElementById('btn-draw');
+
+            btnCreate.disabled = true;
+            btnCreate.classList.add('opacity-50', 'cursor-not-allowed');
+            btnDraw.disabled = true;
+            btnDraw.classList.add('opacity-50', 'cursor-not-allowed');
+
+            statusEl.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 inline animate-spin mr-1"></i> 🎲 系統隨機取數中...';
+            updateIcons();
+            
+            const finalRandomIndex = Math.floor(Math.random() * classList.length);
+            const selectedItem = classList[finalRandomIndex];
+            
+            const jumps = 15;
+            for (let i = 0; i < jumps; i++) {
+                highlightedIndex = Math.floor(Math.random() * classList.length);
+                renderClassListUI();
+                await new Promise(r => setTimeout(r, 40 + i * 10)); 
+            }
+
+            highlightedIndex = finalRandomIndex;
+            renderClassListUI();
+
+            const listContainer = document.getElementById('class-list-container');
+            if (listContainer && listContainer.children[finalRandomIndex]) {
+                listContainer.children[finalRandomIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            statusEl.innerHTML = `<span class="text-amber-400 flex items-center justify-center gap-1"><i data-lucide="crosshair" class="w-4 h-4"></i> 取數完成！變數 [抽出座號] 設為：<strong>${selectedItem}</strong></span>`;
+            updateIcons();
+            await new Promise(r => setTimeout(r, 800));
+
+            const indexOfItem = classList.indexOf(selectedItem);
+            const modal = document.getElementById('sim-modal-overlay');
+            
+            statusEl.innerHTML = `<span class="text-indigo-400 flex flex-col items-center justify-center gap-1 text-sm"><span>請核對右側面板的比對結果，確認後執行刪除。</span></span>`;
+            
+            modal.className = "absolute bottom-5 left-5 right-5 z-50 animate-[slideUpFade_0.3s_ease-out]";
+            modal.innerHTML = `
+                <div class="bg-slate-800/95 backdrop-blur-md border border-indigo-500/70 rounded-2xl p-4 sm:p-5 shadow-[0_10px_40px_rgba(0,0,0,0.5)] flex flex-col gap-4 w-full max-w-3xl mx-auto">
+                    <!-- 上方資訊區 -->
+                    <div class="text-center w-full pb-3 border-b border-slate-700/50">
+                        <h3 class="text-base sm:text-lg font-bold text-white flex items-center justify-center gap-1.5 mb-2">
+                            <i data-lucide="search" class="w-5 h-5 text-indigo-400"></i> 抽籤結果比對
+                        </h3>
+                        <p class="text-xs sm:text-sm text-indigo-200">
+                            已抽出數值 <strong class="text-amber-400 text-sm mx-1">${selectedItem}</strong>，對照上方亮起的位置，確認它在清單的第 <strong class="text-[#FF661A] text-base mx-0.5">${indexOfItem + 1}</strong> 項。
+                        </p>
+                    </div>
+                    
+                    <!-- 下方數值對照與按鈕區 -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 w-full pt-1">
+                        <div class="flex items-center justify-center gap-4 bg-slate-900/80 px-6 py-2.5 rounded-xl border border-slate-700 shadow-inner w-full sm:w-auto">
+                            <div class="flex flex-col items-center">
+                                <span class="text-[10px] sm:text-xs text-slate-400 font-bold mb-1 tracking-wider">變數 [抽出座號]</span>
+                                <span class="text-3xl font-black text-amber-400 leading-none">${selectedItem}</span>
+                            </div>
+                            <i data-lucide="arrow-right" class="w-5 h-5 text-slate-500"></i>
+                            <div class="flex flex-col items-center">
+                                <span class="text-[10px] sm:text-xs text-slate-400 font-bold mb-1 tracking-wider">清單項目編號</span>
+                                <span class="text-3xl font-black text-[#FF661A] leading-none">${indexOfItem + 1}</span>
+                            </div>
+                        </div>
+
+                        <button id="modal-confirm-btn" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 sm:py-3 px-6 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm shrink-0">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i> 確認刪除
+                        </button>
+                    </div>
+                </div>
+            `;
+            updateIcons();
+
+            await new Promise(resolve => {
+                document.getElementById('modal-confirm-btn').onclick = resolve;
+            });
+
+            modal.className = 'hidden';
+            modal.innerHTML = '';
+
+            classList.splice(indexOfItem, 1);
+            highlightedIndex = -1; 
+            
+            renderClassListUI();
+
+            statusEl.innerHTML = `<span class="text-emerald-400">🎉 成功廣播並刪除：<strong>${selectedItem}</strong>！</span><br><span class="text-xs text-slate-400 mt-1 block">清單長度更新為：${classList.length}。</span>`;
+            
+            btnCreate.disabled = false;
+            btnCreate.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            if (classList.length === 0) {
+                statusEl.innerHTML += `<br><span class="text-rose-400 mt-1 block">⚠️ 清單已空，無法繼續抽籤！</span>`;
+            } else {
+                btnDraw.disabled = false;
+                btnDraw.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            isAnimating = false;
+        }
+
+        function initSimulator() {
+            const btnCreate = document.getElementById('btn-create-data');
+            const btnDraw = document.getElementById('btn-draw');
+            if(btnCreate) btnCreate.addEventListener('click', createClassData);
+            if(btnDraw) btnDraw.addEventListener('click', drawClassData);
+            renderClassListUI();
+        }
+
+        function renderSimulatorHTML() {
+            return `
+                <div class="bg-slate-900 rounded-2xl border border-slate-700 p-6 md:p-8 shadow-xl relative overflow-hidden flex flex-col lg:flex-row gap-8">
+                    <!-- 裝飾背景 -->
+                    <div class="absolute top-0 right-0 w-48 h-48 bg-cyan-500 rounded-full mix-blend-screen filter blur-[70px] opacity-20 pointer-events-none"></div>
+
+                    <!-- 控制面板 (左) -->
+                    <div class="w-full lg:w-1/3 flex flex-col gap-4 relative z-10 shrink-0">
+                        <h4 class="text-emerald-400 font-bold flex items-center gap-2 text-lg mb-2">
+                            <i data-lucide="settings-2" class="w-5 h-5"></i> 陣列操作控制台
+                        </h4>
+                        
+                        <div class="bg-slate-800/80 p-5 rounded-xl border border-slate-700 shadow-inner flex flex-col gap-3">
+                            <div class="text-sm font-bold text-slate-400 mb-1 flex items-center gap-2">
+                                <span class="bg-slate-700 text-white w-5 h-5 rounded flex items-center justify-center text-xs">1</span> 建立初始資料
+                            </div>
+                            <p class="text-xs text-slate-500 mb-1 leading-relaxed">利用迴圈與變數累加，將 1 到 30 依序存入清單中。</p>
+                            <button id="btn-create-data" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+                                <i data-lucide="list-plus" class="w-5 h-5"></i> 依序填入座號 (1~30)
+                            </button>
+                        </div>
+
+                        <div class="bg-slate-800/80 p-5 rounded-xl border border-slate-700 shadow-inner flex flex-col gap-3">
+                            <div class="text-sm font-bold text-slate-400 mb-1 flex items-center gap-2">
+                                <span class="bg-slate-700 text-white w-5 h-5 rounded flex items-center justify-center text-xs">2</span> 隨機抽籤與刪除
+                            </div>
+                            <p class="text-xs text-slate-500 mb-1 leading-relaxed">「先抽出數值」存入變數，再「透過數值反查項目編號」並將其刪除，防止未來重複。</p>
+                            <button id="btn-draw" disabled class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
+                                <i data-lucide="crosshair" class="w-5 h-5"></i> 抽出 1 名隊員 (防重複)
+                            </button>
+                        </div>
+
+                        <div class="mt-auto bg-slate-950 p-4 rounded-xl border border-emerald-900/50 flex flex-col justify-center min-h-[80px]">
+                            <div id="sim-status-text" class="text-sm font-bold text-emerald-400 text-center leading-relaxed">
+                                請先點擊「依序填入座號」建立清單資料。
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 陣列顯示區 (右) -->
+                    <div class="w-full lg:w-2/3 bg-slate-950/50 rounded-xl p-5 border border-slate-800 shadow-inner z-10 flex flex-col h-[500px] sm:h-[550px] relative overflow-hidden">
+                        <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800 shrink-0">
+                            <h4 class="text-cyan-400 font-bold flex items-center gap-2 text-lg">
+                                <i data-lucide="users" class="w-5 h-5"></i> 陣列：全班同學 (清單)
+                            </h4>
+                            <div class="text-sm text-slate-400 font-bold bg-slate-900 px-3 py-1 rounded-lg border border-slate-700">
+                                總長度: <span id="list-length-display" class="text-cyan-300 ml-1">0</span>
+                            </div>
+                        </div>
+                        
+                        <div id="class-list-container" class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-6 xl:grid-cols-10 gap-2 flex-1 items-start content-start overflow-y-auto custom-scrollbar pr-1 pb-24 relative z-10">
+                            <!-- JS 動態產生方塊 -->
+                        </div>
+
+                        <div id="sim-modal-overlay" class="hidden">
+                            <!-- JS 動態填入比對視窗內容 -->
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // 教學內容資料庫
+        // ==========================================
+        const lesson = {
+            id: 4, 
+            icon: "users", 
+            title: "招募先遣隊", 
+            subtitle: "(隨機不重複抽籤)",
+            description: "指揮官！我們需要從星際新兵庫中隨機招募先遣隊員。請運用清單建立名單，並透過「不重複抽籤」邏輯，隨機挑選出指定的勇士加入我們的隊伍。",
+            objective: "學習清單（陣列）與隨機取數的綜合應用。透過建立全班座號清單，練習資料初始化與不重複抽籤邏輯，實作從大量資料中隨機挑選特定人數的程式運算。",
+            learningPointsSummary: "本單元將帶領指揮官實作「隨機且不重複」的陣列抽籤演算法：",
+            learningPoints: [
+                { title: "資料建立", desc: "利用計次迴圈配合變數累加，將 1 至特定號碼依序添加至清單中建立名單。" },
+                { title: "隨機抽籤", desc: "結合隨機取數積木，從 1 到「目前的清單長度」中隨機抽出一個索引值。" },
+                { title: "防重複法", desc: "將已被抽出的座號從清單中「刪除」，確保剩餘的抽籤過程絕對不會重複。" },
+                { title: "迴圈控制", desc: "設定重複執行的次數來決定要抽出多少個號碼，並由角色依序宣告結果。" }
+            ],
+            pseudoCode1: `DELETE ALL OF "全班同學"\nSET 座號 = 0\n\nREPEAT 30 TIMES:\n    CHANGE 座號 BY 1\n    ADD 座號 TO "全班同學"\n\nSAY "按我，抽出4位同學" FOR 2 SECS`,
+            scratchBlocks1: [
+                { type: "list", text: '刪除 <span class="bg-black/10 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center mx-1">全班同學 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 的所有項目' },
+                { type: "variable", text: '變數 <span class="bg-black/15 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center leading-none mx-1">座號 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 設為 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm leading-none mx-1">0</span>' },
+                { type: "control", text: '重複 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm leading-none mx-1">30</span> 次', nested: [
+                    { type: "variable", text: '變數 <span class="bg-black/15 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center leading-none mx-1">座號 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 改變 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm leading-none mx-1">1</span>' },
+                    { type: "list", text: '添加 <span class="bg-[#FF8C1A] text-white px-3 py-0.5 rounded-full border-b-2 border-[#DB6E00] shadow-sm inline-block mx-1">座號</span> 到 <span class="bg-black/10 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center ml-1">全班同學 <span class="text-[10px] ml-1 opacity-70">▼</span></span>' }
+                ]},
+                { type: "looks", text: '說出 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1 leading-none">按我，抽出4位同學</span> 持續 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm leading-none mx-1">2</span> 秒' }
+            ]
+        };
+
+        function getBlockColorClass(type) {
+            switch(type) {
+                case 'event': return 'bg-[#FFBF00] text-slate-800 border-[#CC9900]';
+                case 'list': return 'bg-[#FF661A] text-white border-[#CC5214]';
+                case 'looks': return 'bg-[#9966FF] text-white border-[#774DCC]';
+                case 'variable': return 'bg-[#FF8C1A] text-white border-[#DB6E00]';
+                case 'control': return 'bg-[#FFAB19] text-white border-[#CF8B17]';
+                case 'operator': return 'bg-[#59C059] text-white border-[#389438]';
+                case 'sensing': return 'bg-[#5CB1D6] text-white border-[#478AA6]';
+                default: return 'bg-slate-400 text-white border-slate-500';
+            }
+        }
+
+        function renderScratchBlock(block, isFirst = false) {
+            let nestedHtml = '';
+            let bottomHtml = '';
+            
+            if (block.nested && block.nested.length > 0) {
+                const nestedBlocks = block.nested.map((b, i) => renderScratchBlock(b, i === 0)).join('');
+                nestedHtml = `<div class="ml-4 pl-3 border-l-[6px] border-[#CF8B17] py-0.5 bg-[#FFAB19]/10 relative z-10 flex flex-col">${nestedBlocks}</div>`;
+                bottomHtml = `<div class="h-8 w-32 rounded-b-xl border-b-4 border-r-2 shadow-sm ${getBlockColorClass(block.type)} relative z-20 flex items-center"><div class="absolute -bottom-1 left-4 w-8 h-2 bg-black/20 rounded-b-full z-30"></div></div>`;
+            }
+
+            const isHat = block.isHat === true;
+            const hatTop = isHat ? 'rounded-t-3xl pt-4' : 'rounded-t-lg';
+            const notchTop = !isHat ? `<div class="absolute top-[-4px] left-4 w-8 h-2 bg-black/20 rounded-b-full"></div>` : '';
+            const notchBottom = `<div class="absolute -bottom-1 left-4 w-8 h-2 bg-black/20 rounded-b-full z-30"></div>`;
+
+            return `
+                <div class="flex flex-col items-start font-bold text-sm md:text-base w-max relative mb-[-4px] ${isFirst ? '' : 'mt-1'} group">
+                    <div class="px-4 py-2.5 ${hatTop} rounded-br-lg rounded-bl-sm border-b-4 border-r-2 shadow-md flex items-center gap-1 whitespace-nowrap ${getBlockColorClass(block.type)} relative z-20 hover:brightness-110 transition-all cursor-default w-max">
+                        ${notchTop}
+                        ${block.text}
+                        ${!block.nested ? notchBottom : ''}
+                    </div>
+                    ${nestedHtml}${bottomHtml}
+                </div>`;
+        }
+
+        function renderLessonDetail(lesson) {
+            const dt = { iconBg: 'bg-cyan-100 text-cyan-600', tagText: 'text-cyan-500' };
+            
+            const learningPointsHtml = lesson.learningPoints.map(pt => `
+                <div class="bg-white border border-teal-100 p-4 rounded-xl shadow-sm flex items-start gap-3 hover:shadow-md transition-shadow">
+                    <div class="bg-teal-50 text-teal-600 p-2 rounded-lg shrink-0 mt-0.5 border border-teal-100">
+                        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-sm mb-1">${pt.title}</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed">${pt.desc}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="slide-up-fade">
+                    <button onclick="goToHome()" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors px-4 py-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm mb-6">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回任務儀表板
+                    </button>
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="p-8 md:p-10 border-b border-slate-100 bg-slate-50/50 flex flex-col items-start gap-4">
+                            <div class="flex items-center gap-5">
+                                <div class="w-14 h-14 ${dt.iconBg} rounded-2xl flex items-center justify-center shrink-0 shadow-sm">
+                                    <i data-lucide="${lesson.icon}" class="w-7 h-7"></i>
+                                </div>
+                                <div>
+                                    <span class="${dt.tagText} font-bold text-sm tracking-widest uppercase mb-1 block">LESSON ${lesson.id}</span>
+                                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">${lesson.title} <span class="text-slate-400 font-medium text-2xl">${lesson.subtitle}</span></h2>
+                                </div>
+                            </div>
+                            <p class="text-slate-600 font-light text-lg leading-relaxed mt-2 max-w-3xl">${lesson.description}</p>
+                        </div>
+                        
+                        <div class="p-8 md:p-10 flex flex-col gap-10">
+                            
+                            <!-- 任務目標 -->
+                            <section>
+                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-indigo-100 text-indigo-600 p-1.5 rounded-lg"><i data-lucide="target" class="w-5 h-5"></i></span>任務目標</h3>
+                                <div class="bg-indigo-50 text-indigo-900 p-5 rounded-2xl border border-indigo-100/50 leading-relaxed font-medium">${lesson.objective}</div>
+                            </section>
+
+                            <!-- 單元學習重點 -->
+                            <section>
+                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-teal-100 text-teal-600 p-1.5 rounded-lg"><i data-lucide="book-open" class="w-5 h-5"></i></span>單元學習重點</h3>
+                                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                                    <p class="text-slate-600 font-medium mb-6 leading-relaxed">${lesson.learningPointsSummary}</p>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        ${learningPointsHtml}
+                                    </div>
+                                </div>
+                            </section>
+                            
+                            <!-- 🚀 陣列建立與刪除模擬器 -->
+                            <section>
+                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-emerald-100 text-emerald-600 p-1.5 rounded-lg"><i data-lucide="play" class="w-5 h-5"></i></span>⚡ 條件篩選模擬器</h3>
+                                
+                                ${renderSimulatorHTML()}
+                            </section>
+
+                            <!-- ⭐ 虛擬碼拼圖挑戰 (階段一：恢復原始左右排版) -->
+                            <section class="mb-4">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-black text-sm shadow-sm">1</span>
+                                    <h3 class="text-xl font-bold text-slate-800">建立初始資料</h3>
+                                </div>
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    
+                                    <!-- 左側：虛擬碼拼圖 -->
+                                    <div class="h-full flex flex-col">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <h4 class="flex items-center gap-2 text-base font-bold text-slate-600"><i data-lucide="puzzle" class="w-4 h-4"></i>虛擬碼拼圖挑戰</h4>
+                                            <button onclick="togglePuzzle1Lang()" id="btn-toggle-puzzle-lang1" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border shadow-sm bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200">
+                                                <i data-lucide="languages" class="w-3.5 h-3.5"></i>
+                                                <span id="puzzle-lang-text1">切換為中文</span>
+                                            </button>
+                                        </div>
+                                        <div class="bg-slate-800 p-5 rounded-2xl flex flex-col gap-4 shadow-inner grow border border-slate-700">
+                                            <div class="text-slate-300 text-sm">請點擊下方片段，依照正確順序組合出虛擬碼：</div>
+                                            
+                                            <!-- Source Box -->
+                                            <div id="puzzle1-source" class="flex flex-wrap gap-2 min-h-[60px] p-3 bg-slate-900 rounded-xl border border-slate-700 shadow-inner"></div>
+                                            
+                                            <!-- Target Box -->
+                                            <div class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">您的組合區域 (點擊可退回)：</div>
+                                            <div id="puzzle1-target" class="flex flex-col gap-1.5 min-h-[220px] p-3 bg-slate-950 rounded-xl border-2 border-dashed border-slate-700"></div>
+                                            
+                                            <!-- Check Button -->
+                                            <div class="mt-auto pt-4 flex flex-col items-center gap-3">
+                                                <button id="btn-check-puzzle1" onclick="checkPuzzle1()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+                                                    <i data-lucide="check-circle-2" class="w-5 h-5"></i> 檢查順序並解鎖積木
+                                                </button>
+                                                <div id="puzzle1-feedback" class="text-sm font-bold text-center hidden min-h-[1.25rem]"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 右側：Scratch 積木 (初始隱藏) -->
+                                    <div class="h-full flex flex-col min-w-0 w-full">
+                                        <h4 class="flex items-center gap-2 text-base font-bold text-slate-600 mb-3 mt-9 lg:mt-0"><i data-lucide="blocks" class="w-4 h-4"></i>Scratch 實作積木</h4>
+                                        
+                                        <div class="relative grow flex flex-col">
+                                            <div id="scratch-blocks-container1" class="bg-[#F9F9F9] border border-slate-200 p-6 pt-8 pb-8 rounded-2xl flex flex-col gap-0 overflow-x-auto grow items-start custom-scrollbar shadow-inner opacity-0 blur-sm pointer-events-none transition-all duration-700 w-full">
+                                                ${lesson.scratchBlocks1.map((b, i) => renderScratchBlock(b, i === 0)).join('')}
+                                            </div>
+
+                                            <!-- 鎖定遮罩 -->
+                                            <div id="scratch-locked-overlay1" class="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center border border-slate-200 shadow-sm z-10 transition-opacity duration-500">
+                                                <div class="bg-white p-4 rounded-full shadow-md mb-3 border border-slate-100 flex items-center justify-center">
+                                                    <i data-lucide="lock" class="w-8 h-8 text-slate-400"></i>
+                                                </div>
+                                                <span class="text-slate-500 font-bold text-sm text-center px-4">完成左側拼圖即可解鎖</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- ⭐ 雙重闖關挑戰 (階段二：虛擬碼拼圖 + 互動積木組裝) -->
+                            <section>
+                                <div class="flex items-center gap-3 mb-6">
+                                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-700 font-black text-sm shadow-sm">2</span>
+                                    <h3 class="text-xl font-bold text-slate-800">隨機抽籤與刪除</h3>
+                                </div>
+                                
+                                <div class="flex flex-col gap-8">
+                                    
+                                    <!-- ================= 第一關：虛擬碼拼圖 ================= -->
+                                    <div class="flex flex-col">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <h4 class="flex items-center gap-2 text-base font-bold text-slate-600"><i data-lucide="code-2" class="w-4 h-4"></i>第一關：虛擬碼順序排列</h4>
+                                            <button onclick="togglePuzzle2Lang()" id="btn-toggle-puzzle-lang2" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border shadow-sm bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200">
+                                                <i data-lucide="languages" class="w-3.5 h-3.5"></i>
+                                                <span id="puzzle-lang-text2">切換為中文</span>
+                                            </button>
+                                        </div>
+                                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 bg-slate-800 p-5 sm:p-6 rounded-2xl shadow-inner border border-slate-700 relative overflow-hidden">
+                                            <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500 rounded-full mix-blend-screen filter blur-[50px] opacity-10 pointer-events-none"></div>
+                                            
+                                            <!-- 左半：Source Box -->
+                                            <div class="flex flex-col gap-2 relative z-10">
+                                                <div class="text-slate-300 text-sm mb-1">點擊下方片段，把它們依序放入右側的「組裝區」：</div>
+                                                <div id="puzzle2-source" class="flex flex-wrap gap-2 min-h-[60px] p-4 bg-slate-900 rounded-xl border border-slate-700 shadow-inner"></div>
+                                            </div>
+                                            
+                                            <!-- 右半：Target Box -->
+                                            <div class="flex flex-col gap-2 relative z-10">
+                                                <div class="text-slate-400 text-xs font-bold uppercase tracking-widest flex items-center gap-1.5 mb-1"><i data-lucide="wrench" class="w-4 h-4"></i> 您的組合區域 (點擊可退回)：</div>
+                                                <div id="puzzle2-target" class="flex flex-col gap-2 min-h-[180px] p-4 bg-slate-950/80 rounded-xl border-2 border-dashed border-slate-600"></div>
+                                                
+                                                <div class="mt-2 flex flex-col items-center gap-3">
+                                                    <button id="btn-check-puzzle2" onclick="checkPuzzle2()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-base">
+                                                        <i data-lucide="check-circle-2" class="w-5 h-5"></i> 檢查順序並解鎖第二關
+                                                    </button>
+                                                    <div id="puzzle2-feedback" class="text-sm font-bold text-center hidden min-h-[1.25rem]"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- ================= 第二關：Scratch 積木組裝 ================= -->
+                                    <div class="flex flex-col relative mt-2 w-full">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <h4 class="flex items-center gap-2 text-base font-bold text-slate-600"><i data-lucide="blocks" class="w-4 h-4"></i>第二關：進階 Scratch 積木引導組裝</h4>
+                                        </div>
+
+                                        <div class="relative w-full">
+                                            <!-- Container 會透過 JS 動態填入 (renderScratchPuzzle2) -->
+                                            <div id="scratch-puzzle-container" class="bg-slate-800 p-5 sm:p-6 rounded-2xl flex flex-col gap-4 sm:gap-6 shadow-inner border border-slate-700 relative overflow-hidden transition-all duration-700 opacity-0 blur-sm pointer-events-none w-full">
+                                            </div>
+
+                                            <!-- 鎖定遮罩 -->
+                                            <div id="scratch-locked-overlay2" class="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center border border-slate-200 shadow-sm z-30 transition-opacity duration-500">
+                                                <div class="bg-white p-5 rounded-full shadow-lg mb-4 border border-slate-100 flex items-center justify-center">
+                                                    <i data-lucide="lock" class="w-10 h-10 text-slate-400"></i>
+                                                </div>
+                                                <span class="text-slate-600 font-black text-lg text-center px-4">請先完成第一關虛擬碼排列，才能解鎖積木挑戰！</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- 單元導覽按鈕 -->
+                            <div class="mt-8 pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <a href="https://su-yung-sheng.github.io/unforte115/1150803.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 hover:text-cyan-600 transition-colors shadow-sm">
+                                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                                    上一單元
+                                </a>
+                                <a href="https://su-yung-sheng.github.io/unforte115/1150805.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-cyan-600 text-white font-bold rounded-xl hover:bg-cyan-700 transition-colors shadow-sm">
+                                    下一單元
+                                    <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        window.onload = function() {
+            // 渲染主要畫面
+            document.getElementById('app-container').innerHTML = renderLessonDetail(lesson);
+            // 綁定模擬器事件
+            initSimulator();
+            
+            // 初始化階段一虛擬碼拼圖挑戰
+            initPuzzle1();
+            renderPuzzle1();
+            
+            // 初始化階段二雙拼圖挑戰
+            initPuzzle2();
+            renderPuzzle2();
+            initScratchPuzzle2();
+            
+            // 初始化圖示
+            updateIcons();
+        };
+    </script>
+</body>
+</html>
