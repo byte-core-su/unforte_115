@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classroom 自動化評分管理系統</title>
+    <title>作業繳交即時看板｜教師端</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- 新增：用來打包 ZIP 檔的函式庫 -->
@@ -47,7 +47,7 @@
         #autoRefreshBoardToggle:checked + label .dot { transform: translateX(100%); }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-4">
+<body class="bg-slate-100 min-h-screen">
 
     <!-- 🟢 新增：精美的系統浮動提示 (Toast) -->
     <div id="toastNotification" class="fixed top-5 right-5 z-[100] transform transition-all duration-300 translate-x-full opacity-0 pointer-events-none">
@@ -86,16 +86,16 @@
         </div>
     </div>
 
-    <!-- 🟢 作業繳交即時看板 (完美 8 欄正方形 Modal) -->
-    <div id="boardModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-center items-center backdrop-blur-sm transition-opacity">
-        <div class="bg-gray-100 rounded-xl shadow-2xl w-[98vw] max-w-[1400px] h-[99vh] overflow-hidden flex flex-col">
+    <!-- 作業繳交即時看板：教師端主工作區 -->
+    <div id="boardModal" class="relative z-10 w-full px-4 py-5 md:px-6 md:py-8">
+        <div class="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[1400px] flex-col overflow-hidden rounded-2xl bg-gray-100 shadow-xl">
             <!-- 標題列 -->
             <div class="flex justify-between items-center bg-blue-700 p-3 shrink-0 shadow-md z-20">
                 <div class="flex items-center text-white">
                     <div class="w-8 h-8 bg-white/20 rounded flex items-center justify-center text-lg mr-3"><i class="fa-solid fa-chart-line"></i></div>
                     <div>
-                        <h3 class="font-black text-lg tracking-wide">作業繳交即時看板</h3>
-                        <p class="text-[11px] text-blue-200" id="boardSubtitle">請選擇要查看的課程與作業</p>
+                        <h3 class="font-black text-lg tracking-wide">教師端・作業繳交即時看板</h3>
+                        <p class="text-[11px] text-blue-200" id="boardSubtitle">讀取 Classroom 作業後，可依關鍵字、檔案類型與顯示人數篩選。</p>
                     </div>
                 </div>
                 <div class="flex gap-2">
@@ -114,8 +114,8 @@
                         <i class="fa-solid fa-rotate-right mr-1"></i>更新
                     </button>
 
-                    <button onclick="openBoardCourses()" class="text-xs bg-blue-600 hover:bg-blue-500 text-white border border-blue-500 px-3 py-1.5 rounded font-bold transition shadow-sm"><i class="fa-solid fa-arrow-left mr-1"></i>重選課程</button>
-                    <button onclick="closeBoardModal()" class="text-blue-200 hover:text-white transition px-2"><i class="fa-solid fa-times text-2xl"></i></button>
+                    <button onclick="openBoardCourses()" class="text-xs bg-blue-600 hover:bg-blue-500 text-white border border-blue-500 px-3 py-1.5 rounded font-bold transition shadow-sm"><i class="fa-solid fa-book-open mr-1"></i>選擇課程與作業</button>
+                    <a href="index.html" class="text-xs bg-blue-800 hover:bg-blue-900 text-white border border-blue-600 px-3 py-1.5 rounded font-bold transition shadow-sm"><i class="fa-solid fa-arrow-left mr-1"></i>返回入口網</a>
                 </div>
             </div>
             
@@ -246,7 +246,7 @@
     <!-- ========================================== -->
     <!-- 系統主畫面                                 -->
     <!-- ========================================== -->
-    <div class="max-w-7xl mx-auto mt-2">
+    <div class="hidden max-w-7xl mx-auto mt-2" aria-hidden="true">
         
         <!-- 系統標題列 -->
         <div class="flex justify-center items-center bg-white p-5 rounded-t-xl border-b shadow-sm">
@@ -668,11 +668,9 @@
             }
         }
 
-        window.addEventListener('DOMContentLoaded', () => { 
-            switchMainTab('classroom'); 
-            switchScratchTab('teacher');
-            checkConnection(); 
-            setInterval(checkConnection, 5000); 
+        window.addEventListener('DOMContentLoaded', () => {
+            // 本頁僅保留 Classroom 作業繳交看板；Scratch 助教將拆分為獨立教師端與學生端。
+            document.getElementById('boardModal').classList.remove('hidden');
         });
 
         // ==========================================
@@ -734,18 +732,11 @@
         // 🟢 作業繳交即時看板邏輯
         // ==========================================
         function openBoardCourses() {
-            closeBoardModal(); 
             loadGasCourses('board');
         }
 
         function closeBoardModal() {
-            document.getElementById('boardModal').classList.add('hidden');
-            // 關閉看板時，自動停止更新以節省效能
-            const toggle = document.getElementById('autoRefreshBoardToggle');
-            if(toggle && toggle.checked) {
-                toggle.checked = false;
-                toggleAutoRefreshBoard(toggle);
-            }
+            // 看板已是教師端主畫面，不再以浮動視窗關閉。
         }
 
         async function fetchBoardData(courseId, assignId, assignName) {
@@ -773,7 +764,7 @@
 
             } catch(err) {
                 alert(`讀取看板資料失敗：${err.message}`);
-                closeBoardModal();
+                document.getElementById('boardLoading').classList.replace('flex', 'hidden');
             }
         }
 
