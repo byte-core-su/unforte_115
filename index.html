@@ -63,12 +63,33 @@
 
     <!-- 主要內容區 -->
     <main class="flex-grow max-w-5xl mx-auto px-6 -mt-10 relative z-20 w-full mb-20 space-y-12">
+        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6" aria-label="首頁專區導覽">
+            <p class="text-sm font-bold text-indigo-600 tracking-wide mb-1">學習與教學入口</p>
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">選擇你的專區</h2>
+            <div class="grid md:grid-cols-3 gap-3">
+                <a href="#grade-7" class="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-4 hover:bg-indigo-100 transition-colors">
+                    <span class="block text-xs font-bold text-indigo-600 mb-1">第一區</span>
+                    <span class="block font-bold text-slate-800">七年級課程專區</span>
+                    <span class="block text-sm text-slate-500 mt-1">程式結構、迴圈、變數與專題創作</span>
+                </a>
+                <a href="#grade-8" class="rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-4 hover:bg-cyan-100 transition-colors">
+                    <span class="block text-xs font-bold text-cyan-700 mb-1">第二區</span>
+                    <span class="block font-bold text-slate-800">八年級課程專區</span>
+                    <span class="block text-sm text-slate-500 mt-1">清單、資料處理、演算法與遊戲應用</span>
+                </a>
+                <a href="#teacher-tools" class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-4 hover:bg-amber-100 transition-colors">
+                    <span class="block text-xs font-bold text-amber-700 mb-1">第三區</span>
+                    <span class="block font-bold text-slate-800">教師自動化工具專區</span>
+                    <span class="block text-sm text-slate-500 mt-1">看板、智慧評分與 AI 助教測試站</span>
+                </a>
+            </div>
+        </section>
         
         <!-- 模組 1: 課程模組 (七年級 / 八年級) -->
         <section>
             <div class="grid md:grid-cols-2 gap-6">
                 <!-- 七年級模組卡片 -->
-                <a href="1150700.html" class="block bg-white rounded-2xl shadow-sm border border-slate-200 p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <a id="grade-7" href="1150700.html" class="block bg-white rounded-2xl shadow-sm border border-slate-200 p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
                     <div class="flex items-start justify-between mb-4">
                         <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -87,7 +108,7 @@
                 </a>
 
                 <!-- 八年級模組卡片 -->
-                <a href="1150800.html" class="block bg-white rounded-2xl shadow-sm border border-slate-200 p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <a id="grade-8" href="1150800.html" class="block bg-white rounded-2xl shadow-sm border border-slate-200 p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
                     <div class="flex items-start justify-between mb-4">
                         <div class="w-14 h-14 bg-cyan-50 text-cyan-600 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:bg-cyan-600 group-hover:text-white transition-all duration-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -108,10 +129,10 @@
         </section>
 
         <!-- 模組 2: Google Classroom 自動化管理系統 (整合功能介紹) -->
-        <section>
+        <section id="teacher-tools">
             <div class="flex items-center mb-6 px-2">
                 <div class="w-2 h-8 bg-amber-500 rounded-full mr-3"></div>
-                <h2 class="text-2xl font-bold text-slate-800">Google Classroom 自動化管理系統</h2>
+                <h2 class="text-2xl font-bold text-slate-800">教師自動化工具專區</h2>
             </div>
 
             <div class="space-y-6">
