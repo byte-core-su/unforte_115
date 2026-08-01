@@ -1,6 +1,6 @@
 # unforte_115
 
-以 Scratch 為主的互動式程式設計教學網站，包含兩組課程、Scratch 範例教材，以及供教師批改與學生繳交作業使用的頁面。
+以 Scratch 為主的互動式程式設計教材網站，提供七、八年級課程、Scratch 範例教材與教師資源圖解。
 
 ## 課程內容
 
@@ -48,18 +48,15 @@
 
 | 頁面 | 用途 |
 | --- | --- |
-| `index.html` | 課程與工具入口首頁 |
+| `index.html` | 課程教材入口首頁 |
 | `1150700.html`～`1150706.html` | 11507 課程單元 |
 | `1150800.html`～`1150806.html` | 11508 課程單元 |
-| `easy-classroom.html` | 教師端：解析範例、建立批改規則、讀取與批改 Google Classroom 作業 |
-| `easy-student.html` | 學生端：上傳 `.sb3` 檔案並取得批改結果 |
+| `scratch_educators.html` | Scratch 教師帳戶、班級與學生管理操作圖解 |
 | `11507.zip`、`11508.zip` | 可下載的 Scratch `.sb3` 教材範例 |
 
 ## 使用方式
 
-直接以瀏覽器開啟 `index.html`，或部署至靜態網站服務（例如 GitHub Pages）。教材頁面可離線瀏覽，但外部 CDN 的圖示與樣式需要網路連線。
-
-教師與學生批改功能另外依賴外部批改 API、Google Apps Script、Google Classroom 與 Google Drive 授權；這些後端服務不包含在本倉庫中。
+直接以瀏覽器開啟 `index.html`，或部署至靜態網站服務（例如 GitHub Pages）。教材頁面可離線瀏覽，但外部 CDN 的字型與樣式需要網路連線。
 
 ## 技術概況
 
