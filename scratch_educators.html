@@ -18,19 +18,10 @@
     .screen-card:hover { transform: translateY(-4px); border-color: rgba(6, 182, 212, .65); box-shadow: 0 18px 35px rgba(14, 116, 144, .14); }
     .screen-card img { aspect-ratio: 16 / 9; object-fit: cover; object-position: top; }
     @media (min-width: 1024px) { .screen-card--wide { grid-column: span 2 / span 2; } .screen-card--wide img { aspect-ratio: 16 / 8.2; } }
-
-    /* Tailwind 元件在此頁統一使用淺色外觀，保留原本的青、紫、綠色主題。 */
-    .bg-slate-950, .bg-slate-900 { background-color: #ffffff !important; }
-    .bg-slate-900\/50 { background-color: #f8fafc !important; }
-    .border-slate-800, .border-slate-700 { border-color: #e2e8f0 !important; }
-    .text-slate-300 { color: #475569 !important; }
-    .text-slate-500 { color: #64748b !important; }
-    .text-cyan-300 { color: #0e7490 !important; }
-    .text-violet-300 { color: #6d28d9 !important; }
-    .text-emerald-300 { color: #047857 !important; }
   </style>
+    <link rel="stylesheet" href="site-theme.css">
 </head>
-<body class="min-h-screen text-slate-100">
+<body class="site-resources min-h-screen text-slate-800">
   <header class="border-b border-slate-200 bg-white/90 backdrop-blur">
     <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
       <a href="index.html" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-cyan-700" aria-label="返回首頁">
@@ -78,16 +69,16 @@
           <p class="mt-3 leading-7 text-slate-600">原始紀錄從教師專頁開始，依序呈現資源、教師社群與帳戶功能。點選任一畫面可開啟原尺寸截圖。</p>
         </div>
         <div class="grid gap-5 lg:grid-cols-2">
-          <figure class="screen-card screen-card--wide overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"><a href="imgs/scratch-educators/01-educators-01.png" target="_blank"><img src="imgs/scratch-educators/01-educators-01.png" alt="Scratch Educators 教師專頁首圖" class="w-full" loading="eager"></a><figcaption class="flex items-center justify-between gap-4 px-5 py-4 text-sm text-slate-300"><span>教師專頁入口與資源導覽</span><span class="font-semibold text-cyan-300">畫面 01 ↗</span></figcaption></figure>
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"><a href="imgs/scratch-educators/02-educators-02.png" target="_blank"><img src="imgs/scratch-educators/02-educators-02.png" alt="Scratch Educators 教師資源頁面 2" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300">教師使用 Scratch 的教學現況</figcaption></figure>
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"><a href="imgs/scratch-educators/03-educators-03.png" target="_blank"><img src="imgs/scratch-educators/03-educators-03.png" alt="Scratch Educators 教師資源頁面 3" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300">教學資源與活動內容</figcaption></figure>
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"><a href="imgs/scratch-educators/04-educators-04.png" target="_blank"><img src="imgs/scratch-educators/04-educators-04.png" alt="Scratch Educators 教師資源頁面 4" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300">教師資源瀏覽紀錄</figcaption></figure>
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"><a href="imgs/scratch-educators/05-educators-05.png" target="_blank"><img src="imgs/scratch-educators/05-educators-05.png" alt="Scratch Educators 教師資源頁面 5" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300">社群與資訊頁面</figcaption></figure>
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"><a href="imgs/scratch-educators/06-educators-06.png" target="_blank"><img src="imgs/scratch-educators/06-educators-06.png" alt="Scratch Educators 教師資源頁面 6" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300">教師專頁操作過程</figcaption></figure>
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"><a href="imgs/scratch-educators/07-educators-07.png" target="_blank"><img src="imgs/scratch-educators/07-educators-07.png" alt="Scratch Educators 教師資源頁面 7" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300">教育者功能與資源</figcaption></figure>
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"><a href="imgs/scratch-educators/08-educators-08.png" target="_blank"><img src="imgs/scratch-educators/08-educators-08.png" alt="Scratch Educators 教師資源頁面 8" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300">教師專頁操作過程</figcaption></figure>
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"><a href="imgs/scratch-educators/09-educators-09.png" target="_blank"><img src="imgs/scratch-educators/09-educators-09.png" alt="Scratch Educators 教師資源頁面 9" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300">教師專頁操作過程</figcaption></figure>
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"><a href="imgs/scratch-educators/10-educators-10.png" target="_blank"><img src="imgs/scratch-educators/10-educators-10.png" alt="Scratch Educators 教師資源頁面 10" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300">教師帳戶入口與說明</figcaption></figure>
+          <figure class="screen-card screen-card--wide overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/01-educators-01.png" target="_blank"><img src="imgs/scratch-educators/01-educators-01.png" alt="Scratch Educators 教師專頁首圖" class="w-full" loading="eager"></a><figcaption class="flex items-center justify-between gap-4 px-5 py-4 text-sm text-slate-600"><span>教師專頁入口與資源導覽</span><span class="font-semibold text-cyan-700">畫面 01 ↗</span></figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/02-educators-02.png" target="_blank"><img src="imgs/scratch-educators/02-educators-02.png" alt="Scratch Educators 教師資源頁面 2" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600">教師使用 Scratch 的教學現況</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/03-educators-03.png" target="_blank"><img src="imgs/scratch-educators/03-educators-03.png" alt="Scratch Educators 教師資源頁面 3" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600">教學資源與活動內容</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/04-educators-04.png" target="_blank"><img src="imgs/scratch-educators/04-educators-04.png" alt="Scratch Educators 教師資源頁面 4" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600">教師資源瀏覽紀錄</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/05-educators-05.png" target="_blank"><img src="imgs/scratch-educators/05-educators-05.png" alt="Scratch Educators 教師資源頁面 5" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600">社群與資訊頁面</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/06-educators-06.png" target="_blank"><img src="imgs/scratch-educators/06-educators-06.png" alt="Scratch Educators 教師資源頁面 6" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600">教師專頁操作過程</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/07-educators-07.png" target="_blank"><img src="imgs/scratch-educators/07-educators-07.png" alt="Scratch Educators 教師資源頁面 7" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600">教育者功能與資源</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/08-educators-08.png" target="_blank"><img src="imgs/scratch-educators/08-educators-08.png" alt="Scratch Educators 教師資源頁面 8" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600">教師專頁操作過程</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/09-educators-09.png" target="_blank"><img src="imgs/scratch-educators/09-educators-09.png" alt="Scratch Educators 教師資源頁面 9" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600">教師專頁操作過程</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/10-educators-10.png" target="_blank"><img src="imgs/scratch-educators/10-educators-10.png" alt="Scratch Educators 教師資源頁面 10" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600">教師帳戶入口與說明</figcaption></figure>
         </div>
       </div>
     </section>
@@ -95,40 +86,40 @@
     <section id="teacher-account" class="scroll-mt-6">
       <div class="mx-auto max-w-7xl px-5 py-14 lg:px-8">
         <div class="mb-8 max-w-3xl">
-          <p class="text-sm font-bold tracking-wider text-violet-300">02・REGISTER</p>
+          <p class="text-sm font-bold tracking-wider text-violet-700">02・REGISTER</p>
           <h2 class="mt-2 text-3xl font-extrabold text-slate-900">教師帳戶申請與驗證</h2>
-          <p class="mt-3 leading-7 text-slate-300">先說明在組織中使用 Scratch 的方式，接著填寫並確認電子信箱；最後到信箱開啟驗證連結。實際欄位與審查流程請以官方網站當下畫面為準。</p>
+          <p class="mt-3 leading-7 text-slate-600">先說明在組織中使用 Scratch 的方式，接著填寫並確認電子信箱；最後到信箱開啟驗證連結。實際欄位與審查流程請以官方網站當下畫面為準。</p>
         </div>
         <div class="grid gap-5 lg:grid-cols-2">
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-900"><a href="imgs/scratch-educators/11-registration-01.png" target="_blank"><img src="imgs/scratch-educators/11-registration-01.png" alt="Scratch 教師帳戶申請，說明使用方式" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300"><span class="mr-2 font-semibold text-violet-300">步驟 1</span>說明組織中的使用情境</figcaption></figure>
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-900"><a href="imgs/scratch-educators/12-registration-02.png" target="_blank"><img src="imgs/scratch-educators/12-registration-02.png" alt="Scratch 教師帳戶申請，填寫電子信箱" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300"><span class="mr-2 font-semibold text-violet-300">步驟 2</span>填寫並確認電子信箱</figcaption></figure>
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-900"><a href="imgs/scratch-educators/13-verification-email-01.png" target="_blank"><img src="imgs/scratch-educators/13-verification-email-01.png" alt="Scratch 教師帳戶電子郵件驗證通知" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300"><span class="mr-2 font-semibold text-violet-300">步驟 3</span>在電子信箱找到驗證通知</figcaption></figure>
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-900"><a href="imgs/scratch-educators/14-verification-email-02.png" target="_blank"><img src="imgs/scratch-educators/14-verification-email-02.png" alt="Scratch 教師帳戶信箱驗證完成通知" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300"><span class="mr-2 font-semibold text-violet-300">完成</span>確認教師帳戶信箱已驗證</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/11-registration-01.png" target="_blank"><img src="imgs/scratch-educators/11-registration-01.png" alt="Scratch 教師帳戶申請，說明使用方式" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600"><span class="mr-2 font-semibold text-violet-700">步驟 1</span>說明組織中的使用情境</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/12-registration-02.png" target="_blank"><img src="imgs/scratch-educators/12-registration-02.png" alt="Scratch 教師帳戶申請，填寫電子信箱" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600"><span class="mr-2 font-semibold text-violet-700">步驟 2</span>填寫並確認電子信箱</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/13-verification-email-01.png" target="_blank"><img src="imgs/scratch-educators/13-verification-email-01.png" alt="Scratch 教師帳戶電子郵件驗證通知" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600"><span class="mr-2 font-semibold text-violet-700">步驟 3</span>在電子信箱找到驗證通知</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/14-verification-email-02.png" target="_blank"><img src="imgs/scratch-educators/14-verification-email-02.png" alt="Scratch 教師帳戶信箱驗證完成通知" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600"><span class="mr-2 font-semibold text-violet-700">完成</span>確認教師帳戶信箱已驗證</figcaption></figure>
         </div>
       </div>
     </section>
 
-    <section id="classroom" class="scroll-mt-6 border-y border-slate-800 bg-slate-900/50">
+    <section id="classroom" class="scroll-mt-6 border-y border-slate-200 bg-slate-50">
       <div class="mx-auto max-w-7xl px-5 py-14 lg:px-8">
         <div class="mb-8 max-w-3xl">
-          <p class="text-sm font-bold tracking-wider text-emerald-300">03・ORGANIZE</p>
+          <p class="text-sm font-bold tracking-wider text-emerald-700">03・ORGANIZE</p>
           <h2 class="mt-2 text-3xl font-extrabold text-slate-900">班級與學生名單管理</h2>
-          <p class="mt-3 leading-7 text-slate-300">帳戶完成設定後，可建立班級並管理學生帳號。截圖也示範了以文字檔預先整理帳號與姓名，方便後續匯入或逐一建立。</p>
+          <p class="mt-3 leading-7 text-slate-600">帳戶完成設定後，可建立班級並管理學生帳號。截圖也示範了以文字檔預先整理帳號與姓名，方便後續匯入或逐一建立。</p>
         </div>
         <div class="grid gap-5 lg:grid-cols-2">
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"><a href="imgs/scratch-educators/15-classroom-01.png" target="_blank"><img src="imgs/scratch-educators/15-classroom-01.png" alt="Scratch 教師班級管理首頁" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300"><span class="mr-2 font-semibold text-emerald-300">步驟 1</span>從教師帳戶進入班級管理</figcaption></figure>
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"><a href="imgs/scratch-educators/16-classroom-02.png" target="_blank"><img src="imgs/scratch-educators/16-classroom-02.png" alt="Scratch 建立教師班級" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300"><span class="mr-2 font-semibold text-emerald-300">步驟 2</span>新增並命名班級</figcaption></figure>
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"><a href="imgs/scratch-educators/17-classroom-03.png" target="_blank"><img src="imgs/scratch-educators/17-classroom-03.png" alt="Scratch 班級學生管理功能" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300"><span class="mr-2 font-semibold text-emerald-300">步驟 3</span>開啟班級的學生管理頁面</figcaption></figure>
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"><a href="imgs/scratch-educators/18-classroom-04.png" target="_blank"><img src="imgs/scratch-educators/18-classroom-04.png" alt="Scratch 班級學生清單" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300"><span class="mr-2 font-semibold text-emerald-300">步驟 4</span>檢視班級中的學生帳號</figcaption></figure>
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"><a href="imgs/scratch-educators/19-student-list.png" target="_blank"><img src="imgs/scratch-educators/19-student-list.png" alt="學生帳號與名稱的文字清單範例" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300"><span class="mr-2 font-semibold text-emerald-300">準備資料</span>以帳號與姓名整理學生清單</figcaption></figure>
-          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-700 bg-slate-950"><a href="imgs/scratch-educators/20-classroom-05.png" target="_blank"><img src="imgs/scratch-educators/20-classroom-05.png" alt="Scratch 班級完成匯入後的學生帳號畫面" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-300"><span class="mr-2 font-semibold text-emerald-300">完成確認</span>確認班級學生帳號已建立</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/15-classroom-01.png" target="_blank"><img src="imgs/scratch-educators/15-classroom-01.png" alt="Scratch 教師班級管理首頁" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600"><span class="mr-2 font-semibold text-emerald-700">步驟 1</span>從教師帳戶進入班級管理</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/16-classroom-02.png" target="_blank"><img src="imgs/scratch-educators/16-classroom-02.png" alt="Scratch 建立教師班級" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600"><span class="mr-2 font-semibold text-emerald-700">步驟 2</span>新增並命名班級</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/17-classroom-03.png" target="_blank"><img src="imgs/scratch-educators/17-classroom-03.png" alt="Scratch 班級學生管理功能" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600"><span class="mr-2 font-semibold text-emerald-700">步驟 3</span>開啟班級的學生管理頁面</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/18-classroom-04.png" target="_blank"><img src="imgs/scratch-educators/18-classroom-04.png" alt="Scratch 班級學生清單" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600"><span class="mr-2 font-semibold text-emerald-700">步驟 4</span>檢視班級中的學生帳號</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/19-student-list.png" target="_blank"><img src="imgs/scratch-educators/19-student-list.png" alt="學生帳號與名稱的文字清單範例" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600"><span class="mr-2 font-semibold text-emerald-700">準備資料</span>以帳號與姓名整理學生清單</figcaption></figure>
+          <figure class="screen-card overflow-hidden rounded-2xl border border-slate-200 bg-white"><a href="imgs/scratch-educators/20-classroom-05.png" target="_blank"><img src="imgs/scratch-educators/20-classroom-05.png" alt="Scratch 班級完成匯入後的學生帳號畫面" class="w-full" loading="lazy"></a><figcaption class="px-5 py-4 text-sm text-slate-600"><span class="mr-2 font-semibold text-emerald-700">完成確認</span>確認班級學生帳號已建立</figcaption></figure>
         </div>
       </div>
     </section>
 
     <section class="mx-auto max-w-7xl px-5 py-12 lg:px-8">
       <div class="rounded-2xl border border-cyan-200 bg-cyan-50 p-6 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-8">
-        <div><h2 class="text-xl font-bold text-slate-900">需要最新的功能與規則嗎？</h2><p class="mt-2 text-sm leading-6 text-slate-300">本頁保存的是操作紀錄；帳戶申請、班級功能及驗證要求仍應以 Scratch 官方網站的即時資訊為準。</p></div>
+        <div><h2 class="text-xl font-bold text-slate-900">需要最新的功能與規則嗎？</h2><p class="mt-2 text-sm leading-6 text-slate-600">本頁保存的是操作紀錄；帳戶申請、班級功能及驗證要求仍應以 Scratch 官方網站的即時資訊為準。</p></div>
         <a href="https://scratch.mit.edu/educators/" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex shrink-0 items-center justify-center rounded-xl bg-cyan-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-cyan-700 sm:mt-0">前往官方教師專頁 ↗</a>
       </div>
     </section>

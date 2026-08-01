@@ -119,21 +119,9 @@
   const main = document.querySelector('main');
   if (!guide || !main) return;
 
-  const style = document.createElement('style');
-  style.textContent = `
-    .learning-guide { max-width: 72rem; margin: 1.5rem auto 0; padding: 0 1.5rem; font-family: "Noto Sans TC", system-ui, sans-serif; }
-    .learning-guide__card { border: 1px solid #bfdbfe; border-radius: 1.25rem; background: linear-gradient(135deg, #eff6ff, #f8fafc); padding: 1.25rem; box-shadow: 0 8px 24px rgba(30, 64, 175, .08); }
-    .learning-guide__tag { display: inline-block; margin-bottom: .5rem; color: #1d4ed8; font-size: .75rem; font-weight: 700; letter-spacing: .08em; }
-    .learning-guide h2 { margin: 0 0 .5rem; color: #1e3a8a; font-size: clamp(1.25rem, 3vw, 1.6rem); }
-    .learning-guide__goal { margin: 0; color: #334155; line-height: 1.65; }
-    .learning-guide__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .75rem; margin-top: 1rem; }
-    .learning-guide__item { border-radius: .85rem; background: #fff; padding: .85rem; color: #334155; font-size: .92rem; line-height: 1.6; }
-    .learning-guide__item strong { display: block; color: #1d4ed8; margin-bottom: .2rem; }
-    .learning-guide__check { margin: .9rem 0 0; padding: .75rem .9rem; border-radius: .75rem; background: #dbeafe; color: #1e3a8a; font-weight: 600; line-height: 1.55; }
-  `;
-  document.head.appendChild(style);
-
   const section = document.createElement('section');
+  const gradeClass = page.startsWith('11508') ? 'site-course--g8' : 'site-course--g7';
+  document.body.classList.add('site-course', gradeClass);
   section.className = 'learning-guide';
   section.setAttribute('aria-label', '本課學習導航');
   section.innerHTML = `
