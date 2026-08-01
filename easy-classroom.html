@@ -139,6 +139,26 @@
 
             <!-- 看板主內容區 -->
             <div id="boardContentArea" class="flex-grow flex flex-col overflow-hidden bg-gray-100 hidden">
+                <div class="bg-white border-b border-gray-200 px-3 py-3 flex flex-col lg:flex-row lg:items-center gap-3">
+                    <div class="font-bold text-gray-700 text-sm whitespace-nowrap"><i class="fa-solid fa-sliders text-blue-500 mr-1"></i>顯示篩選</div>
+                    <input id="boardKeywordFilter" type="search" class="flex-1 min-w-[180px] text-sm border border-gray-300 rounded-lg px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 outline-none" placeholder="關鍵字：學生姓名或檔名" oninput="reRenderBoard()">
+                    <select id="boardFileTypeFilter" class="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white focus:border-blue-500 outline-none" onchange="reRenderBoard()">
+                        <option value="all">所有檔案類型</option>
+                        <option value="sb3">Scratch 專案（.sb3）</option>
+                        <option value="image">圖片</option>
+                        <option value="video">影片</option>
+                        <option value="audio">音訊</option>
+                        <option value="document">文件</option>
+                    </select>
+                    <select id="boardDisplayLimit" class="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white focus:border-blue-500 outline-none" onchange="reRenderBoard()" aria-label="最多顯示人數">
+                        <option value="0">顯示全部</option>
+                        <option value="8">最多顯示 8 人</option>
+                        <option value="16">最多顯示 16 人</option>
+                        <option value="24">最多顯示 24 人</option>
+                        <option value="40">最多顯示 40 人</option>
+                    </select>
+                    <span id="boardFilterCount" class="text-xs font-bold text-blue-700 whitespace-nowrap">尚未篩選</span>
+                </div>
                 
                 <!-- 🟢 強制上下拆行的看板設定列 (Google Site 防擠壓設計) -->
                 <div class="bg-white flex flex-col shrink-0 shadow-sm z-10 border-b border-gray-200">
@@ -199,41 +219,6 @@
     </div>
 
     <!-- 🟢 建立新作業的視窗 (Modal) -->
-    <div id="createAssignmentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-center items-center backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-xl shadow-2xl w-[500px] max-w-full overflow-hidden flex flex-col">
-            <div class="flex justify-between items-center bg-green-600 p-4">
-                <h3 class="font-bold text-lg text-white"><i class="fa-solid fa-bullhorn mr-2"></i>發佈新作業至 Classroom</h3>
-                <button onclick="closeCreateAssignmentModal()" class="text-green-100 hover:text-white transition"><i class="fa-solid fa-times text-2xl"></i></button>
-            </div>
-            <div id="createAssignLoading" class="hidden justify-center items-center py-10 text-green-600">
-                <div class="spinner !border-l-green-600 mr-2"></div><span class="font-bold">讀取課程中...</span>
-            </div>
-            <div id="createAssignForm" class="p-6 space-y-4">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">1. 選擇發佈課程 <span class="text-red-500">*</span></label>
-                    <select id="newAssignCourse" class="w-full border rounded-lg p-2 focus:ring-green-500 focus:border-green-500"></select>
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">2. 作業名稱 <span class="text-red-500">*</span></label>
-                    <input type="text" id="newAssignTitle" class="w-full border rounded-lg p-2 focus:ring-green-500 focus:border-green-500" placeholder="例如：Scratch 迷宮遊戲作業">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">3. 作業說明 (選填)</label>
-                    <textarea id="newAssignDesc" rows="3" class="w-full border rounded-lg p-2 focus:ring-green-500 focus:border-green-500 custom-scrollbar" placeholder="請同學上傳完成的檔案..."></textarea>
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">4. 滿分設定</label>
-                    <input type="number" id="newAssignPoints" value="100" class="w-32 border rounded-lg p-2 font-bold text-blue-600 focus:ring-green-500 focus:border-green-500">
-                </div>
-                <div class="pt-4 border-t flex justify-end gap-2 mt-4">
-                    <button onclick="closeCreateAssignmentModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-bold transition">取消</button>
-                    <button id="createAssignBtn" onclick="submitCreateAssignment()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold shadow-md transition"><i class="fa-solid fa-paper-plane mr-2"></i>發佈作業</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 🟢 角色篩選浮動視窗 (Modal) -->
     <div id="targetFilterModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-center items-center backdrop-blur-sm transition-opacity">
         <div class="bg-white rounded-xl shadow-2xl w-96 max-w-full overflow-hidden flex flex-col max-h-[80vh]">
             <div class="flex justify-between items-center bg-blue-600 p-4">
@@ -266,14 +251,14 @@
         <!-- 系統標題列 -->
         <div class="flex justify-center items-center bg-white p-5 rounded-t-xl border-b shadow-sm">
             <h1 class="text-2xl md:text-3xl font-black text-gray-800 tracking-wide">
-                <i class="fa-solid fa-graduation-cap text-blue-600 mr-2"></i>Classroom 自動化評分管理
+                <i class="fa-solid fa-graduation-cap text-blue-600 mr-2"></i>教師自動化工具
             </h1>
         </div>
 
         <!-- 🟢 第一層主導覽選單 (深色風格) -->
         <div class="bg-gray-800 px-4 pt-3 flex overflow-x-auto custom-scrollbar border-b border-gray-700">
             <button onclick="switchMainTab('classroom')" id="main-tab-btn-classroom" class="flex-1 justify-center px-6 py-3 font-bold border-b-4 rounded-t-lg transition flex items-center gap-2 whitespace-nowrap border-blue-500 bg-gray-700 text-white">
-                <i class="fa-brands fa-google text-lg"></i> 1. Classroom 作業管理
+                <i class="fa-solid fa-chart-line text-lg"></i> 1. 作業繳交即時看板
             </button>
             <button onclick="switchMainTab('scratch')" id="main-tab-btn-scratch" class="flex-1 justify-center px-6 py-3 font-bold border-b-4 border-transparent text-gray-300 hover:bg-gray-700 hover:text-white rounded-t-lg transition flex items-center gap-2 whitespace-nowrap">
                 <i class="fa-solid fa-cat text-lg"></i> 2. Scratch 智慧評分系統
@@ -284,32 +269,20 @@
         <div class="bg-white shadow-lg rounded-b-xl overflow-hidden min-h-[600px] flex flex-col">
             
             <!-- ========================================== -->
-            <!-- 模組 1：Classroom 作業管理                 -->
+            <!-- 模組 1：作業繳交即時看板                 -->
             <!-- ========================================== -->
             <div id="main-tab-content-classroom" class="p-6 md:p-8 flex-grow block bg-gray-50">
-                <div class="mb-8">
+                <div class="mb-8 hidden">
                     <h2 class="text-2xl font-bold text-gray-800 mb-2 border-l-4 border-blue-500 pl-3">Classroom 作業與班級管理</h2>
                     <p class="text-gray-600 ml-4">集中管理您的 Google Classroom，在此發佈的作業能完美支援「自動寫回成績」功能。</p>
                 </div>
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2 border-l-4 border-blue-500 pl-3">作業繳交即時看板</h2>
+                    <p class="text-gray-600 ml-4">選擇 Google Classroom 課程與作業後，即時讀取學生繳交狀態；可依學生姓名、檔名或檔案類型篩選顯示內容。</p>
+                </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 max-w-6xl mx-auto">
+                <div class="grid grid-cols-1 max-w-2xl mx-auto">
                     <!-- 發佈作業卡片 -->
-                    <div class="border border-green-200 rounded-xl p-6 bg-white shadow-sm flex flex-col justify-between hover:shadow-md hover:-translate-y-1 transition duration-300">
-                        <div>
-                            <div class="w-14 h-14 bg-green-100 text-green-600 rounded-xl flex items-center justify-center text-2xl mb-4 border border-green-200">
-                                <i class="fa-solid fa-bullhorn"></i>
-                            </div>
-                            <h4 class="font-bold text-gray-800 text-xl mb-2">發佈作業至 Classroom</h4>
-                            <p class="text-sm text-gray-500 mb-4 leading-relaxed">
-                                由此系統派發作業給學生，未來學生繳交後，即可使用 Scratch 評分模組的「一鍵批改」功能，將成績自動同步回 Classroom 草稿。
-                            </p>
-                        </div>
-                        <button onclick="openCreateAssignmentModal()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold shadow-md transition flex items-center justify-center gap-2 mt-4">
-                            <i class="fa-solid fa-plus"></i> 建立新作業
-                        </button>
-                    </div>
-                    
-                    <!-- 作業繳交即時看板 -->
                     <div class="border border-blue-200 rounded-xl p-6 bg-white shadow-sm flex flex-col justify-between hover:shadow-md hover:-translate-y-1 transition duration-300">
                         <div>
                             <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-2xl mb-4 border border-blue-200">
@@ -805,7 +778,39 @@
         }
 
         function reRenderBoard() {
-            if (!currentBoardData || currentBoardData.length === 0) return;
+            if (!currentBoardData || currentBoardData.length === 0) {
+                document.getElementById('boardGrid').innerHTML = '<p class="col-span-full text-center text-gray-500 py-10">目前沒有可顯示的學生繳交資料。</p>';
+                document.getElementById('stat-total').innerText = '0';
+                document.getElementById('stat-submitted').innerText = '0';
+                document.getElementById('stat-missing').innerText = '0';
+                document.getElementById('stat-warning').innerText = '0';
+                document.getElementById('boardFilterCount').innerText = '符合 0 位，顯示 0 位';
+                return;
+            }
+
+            const keyword = (document.getElementById('boardKeywordFilter')?.value || '').trim().toLowerCase();
+            const fileType = document.getElementById('boardFileTypeFilter')?.value || 'all';
+            const displayLimit = parseInt(document.getElementById('boardDisplayLimit')?.value || '0', 10);
+            const matchesFileType = (fileItem) => {
+                if (fileType === 'all') return true;
+                const fileName = (typeof fileItem === 'object' ? fileItem.name : fileItem || '').toLowerCase();
+                const mimeType = (typeof fileItem === 'object' ? fileItem.mimeType : '').toLowerCase();
+                if (fileType === 'sb3') return fileName.endsWith('.sb3');
+                if (fileType === 'image') return mimeType.startsWith('image/') || /\.(png|jpe?g|gif|webp|heic)$/.test(fileName);
+                if (fileType === 'video') return mimeType.startsWith('video/') || /\.(mp4|mov|webm|m4v)$/.test(fileName);
+                if (fileType === 'audio') return mimeType.startsWith('audio/') || /\.(mp3|wav|m4a|ogg|aac)$/.test(fileName);
+                return mimeType.includes('pdf') || /\.(pdf|docx?|pptx?|xlsx?|txt)$/.test(fileName);
+            };
+            const matchingStudents = currentBoardData
+                .map((student, sourceIndex) => ({ student, sourceIndex }))
+                .filter(({ student }) => {
+                    const files = student.files || [];
+                    const nameMatches = !keyword || (student.name || '').toLowerCase().includes(keyword)
+                        || files.some(fileItem => (typeof fileItem === 'object' ? fileItem.name : fileItem || '').toLowerCase().includes(keyword));
+                    const typeMatches = fileType === 'all' || files.some(matchesFileType);
+                    return nameMatches && typeMatches;
+                });
+            const displayedStudents = displayLimit > 0 ? matchingStudents.slice(0, displayLimit) : matchingStudents;
 
             const reqInputs = document.querySelectorAll('.board-req-file');
             let rules = Array.from(reqInputs).map(inp => inp.value.trim()).filter(s => s);
@@ -818,7 +823,7 @@
             let turnedInCount = 0, missingCount = 0, warningCount = 0;
             let html = '';
 
-            currentBoardData.forEach((student, index) => {
+            displayedStudents.forEach(({ student, sourceIndex }) => {
                 const files = student.files || [];
                 const state = student.classroomState; 
                 
@@ -896,7 +901,7 @@
                 html += `
                     <div class="border rounded-xl p-2 flex flex-col items-center justify-center gap-1 shadow-sm relative transition hover:shadow-md bg-white aspect-square group">
                         <div class="absolute top-1.5 left-1.5 z-10">
-                            <input type="checkbox" class="board-student-cb w-4 h-4 text-green-600 rounded border-gray-300 focus:ring-green-500 cursor-pointer shadow-sm" data-index="${index}">
+                            <input type="checkbox" class="board-student-cb w-4 h-4 text-green-600 rounded border-gray-300 focus:ring-green-500 cursor-pointer shadow-sm" data-index="${sourceIndex}">
                         </div>
                         ${gradeHtml}
                         <div class="w-8 h-8 sm:w-10 sm:h-10 shrink-0 rounded-full flex items-center justify-center text-sm sm:text-base ${statusColor.split(' ')[0]} ${statusColor.split(' ')[1]}">
@@ -912,10 +917,11 @@
             });
 
             document.getElementById('boardGrid').innerHTML = html;
-            document.getElementById('stat-total').innerText = currentBoardData.length;
+            document.getElementById('stat-total').innerText = matchingStudents.length;
             document.getElementById('stat-submitted').innerText = turnedInCount;
             document.getElementById('stat-missing').innerText = missingCount;
             document.getElementById('stat-warning').innerText = warningCount;
+            document.getElementById('boardFilterCount').innerText = `符合 ${matchingStudents.length} 位，顯示 ${displayedStudents.length} 位`;
         }
 
         // 🟢 新增：手動更新與自動更新邏輯
@@ -1137,76 +1143,6 @@
 
         // ==========================================
         // 發佈新作業至 Classroom 邏輯
-        // ==========================================
-        async function openCreateAssignmentModal() {
-            document.getElementById('createAssignmentModal').classList.remove('hidden');
-            document.getElementById('createAssignLoading').classList.replace('hidden', 'flex');
-            document.getElementById('createAssignForm').classList.add('hidden');
-            
-            try {
-                const data = await fetchJSONP(`${GAS_URL}?action=getCourses`);
-                if (data.status === 'error') throw new Error(data.message);
-                
-                let options = '<option value="">請點選選擇課程...</option>';
-                if(data.courses.length > 0) {
-                    data.courses.forEach(c => {
-                        options += `<option value="${c.id}">${escapeHTML(c.name)}</option>`;
-                    });
-                } else {
-                    options = '<option value="">找不到課程，請確認權限</option>';
-                }
-                document.getElementById('newAssignCourse').innerHTML = options;
-                
-                document.getElementById('createAssignLoading').classList.replace('flex', 'hidden');
-                document.getElementById('createAssignForm').classList.remove('hidden');
-            } catch (err) {
-                alert("讀取課程失敗，請確認是否已授權。\n" + err.message);
-                closeCreateAssignmentModal();
-            }
-        }
-        
-        function closeCreateAssignmentModal() { document.getElementById('createAssignmentModal').classList.add('hidden'); }
-        
-        async function submitCreateAssignment() {
-            const courseId = document.getElementById('newAssignCourse').value;
-            const title = document.getElementById('newAssignTitle').value.trim();
-            const desc = document.getElementById('newAssignDesc').value.trim();
-            const pts = document.getElementById('newAssignPoints').value;
-            
-            if(!courseId || !title) return alert("請選擇課程並填寫作業名稱！");
-            
-            const btn = document.getElementById('createAssignBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>發佈中...';
-            
-            try {
-                const params = `action=createAssignment&courseId=${courseId}&title=${encodeURIComponent(title)}&description=${encodeURIComponent(desc)}&maxPoints=${pts}`;
-                const data = await fetchJSONP(`${GAS_URL}?${params}`);
-                
-                if(data.status === 'error') { throw new Error(data.message || "收到未知錯誤，請確保 GAS 程式已『發布為新版本』。"); }
-                
-                alert(`✅ 成功建立作業：「${data.assignment.title}」！\n這份作業已發佈到 Classroom，未來學生繳交後，本系統即可自動寫回成績。`);
-                closeCreateAssignmentModal();
-                
-                if(pts) document.getElementById('customScoreInput').value = pts;
-                
-                if(confirm("作業已發佈！要直接前往「Scratch 智慧評分系統」上傳教師解答嗎？")) {
-                    switchMainTab('scratch');
-                    switchScratchTab('teacher');
-                }
-                
-            } catch (err) {
-                console.error("發佈失敗詳細錯誤：", err);
-                alert("建立作業失敗：" + err.message + "\n\n💡 提示：如果您剛更新了 GAS 程式碼，請務必進入「管理部署作業」選擇「新版本」重新發布！");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i>發佈作業';
-            }
-        }
-
-        // ==========================================
-        // 共用 Classroom 層級瀏覽邏輯 
-        // ==========================================
         function closeGasFileModal() { document.getElementById('gasFileModal').classList.add('hidden'); }
         function authorizeGas() { window.open(`${GAS_URL}?action=auth`, '_blank'); }
 
