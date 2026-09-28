@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "build:lesson-plans": "node scripts/build-lesson-plans.cjs"
+  },
+  "devDependencies": {
+    "marked": "17.0.5"
+  }
+}

@@ -4,7 +4,7 @@
 
 > 想從零建立一套相同類型的教材網站，請閱讀[從零復刻教材系統：新手開發手冊](SYSTEM_REPLICATION_GUIDE.md)；想了解本網站如何從課程整理、教材設計調整到目前定位，可閱讀[系統開發過程](DEVELOPMENT.md)；要新增或復刻單一教材單元時，請參考[新增教材單元指南](UNIT_AUTHORING_GUIDE.md)。
 
-授課規劃可參考[七年級教案](LESSON_PLAN_GRADE_7.md)、[八年級教案](LESSON_PLAN_GRADE_8.md)、[108 課綱逐課對照](CURRICULUM_ALIGNMENT.md)與可列印的[學生學習紀錄表](STUDENT_RECORDS.md)。兩份教案各為六單元、建議 12 節的主題教材，不代表已涵蓋各年級全學年的課程。
+授課規劃可在網站閱讀[七年級教案](lesson-plan-grade-7.html)與[八年級教案](lesson-plan-grade-8.html)，也可參考[108 課綱逐課對照](CURRICULUM_ALIGNMENT.md)與可列印的[學生學習紀錄表](STUDENT_RECORDS.md)。兩份教案各為六單元、建議 12 節的主題教材，不代表已涵蓋各年級全學年的課程。教案的 Markdown 原始檔仍為 `LESSON_PLAN_GRADE_7.md`、`LESSON_PLAN_GRADE_8.md`；修改後執行 `npm install` 與 `npm run build:lesson-plans`，即可更新對應 HTML 頁面。
 
 ## 課程內容
 
@@ -57,6 +57,7 @@
 | `index.html` | 課程教材入口首頁 |
 | `1150700.html`～`1150706.html` | 11507 課程單元 |
 | `1150800.html`～`1150806.html` | 11508 課程單元 |
+| `lesson-plan-grade-7.html`、`lesson-plan-grade-8.html` | 可在首頁課程小卡開啟的七、八年級教案 |
 | `scratch_educators.html` | Scratch 教師帳戶、班級與學生管理操作圖解 |
 | `11507.zip`、`11508.zip` | 可下載的 Scratch `.sb3` 教材範例 |
 
