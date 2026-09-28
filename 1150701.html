@@ -2,9 +2,10 @@
 <html lang="zh-TW">
 <head>
     <script src="learning-guides.js" defer></script>
+    <script src="curriculum-labs.js" defer></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LESSON 1 - Scratch 積木大考驗</title>
+    <title>LESSON 1 - 起步診斷與資訊安全</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
@@ -39,8 +40,8 @@
         
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-10 mb-8 relative min-h-[500px] flex flex-col slide-up-fade">
             <span class="text-sm font-semibold text-slate-400 tracking-wider block mb-2">LESSON 1</span>
-            <h2 class="text-3xl font-bold text-slate-800 mb-2">資格認證：Scratch 積木大考驗</h2>
-            <p class="text-slate-500 font-light text-base mb-8 pb-6 border-b border-slate-100">星際防禦工程師資格考驗！我們將進行 10 題系統測驗，包含 <strong class="text-emerald-600">5 題核心基本題</strong> 與 <strong class="text-indigo-600">5 題隨機進階題</strong>。滿 80 分即可獲得專屬通關證書，取得操作防護網發生器的權限！</p>
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">起步診斷：Scratch 積木大考驗</h2>
+            <p class="text-slate-500 font-light text-base mb-8 pb-6 border-b border-slate-100">先用 10 題了解自己的 Scratch 起點，包含 <strong class="text-emerald-600">5 題核心基本題</strong> 與 <strong class="text-indigo-600">5 題隨機進階題</strong>。滿 80 分可取得紀念證書；分數用於發現需要練習的積木，不限制進入下一課。</p>
             
             <div id="quiz-start-screen" class="flex-grow flex flex-col items-center justify-center text-center pb-8 slide-up-fade">
                 <div class="text-6xl mb-6 animate-bounce">🧩</div>
@@ -311,12 +312,12 @@
             if (finalScore >= 80) {
                 emoji.textContent = "🎉";
                 title.textContent = "太棒了！測驗通關";
-                msg.textContent = "你具備了扎實的 Scratch 基礎，趕快填寫資料領取你的專屬通關證書吧！";
+                msg.textContent = "你具備了扎實的 Scratch 基礎！如有需要，可選擇在自己的裝置製作紀念證書；不填寫資料也能直接進入下一課。";
                 msg.className = "text-emerald-600 font-bold mb-6 bg-emerald-50 px-6 py-3 rounded-xl border border-emerald-200";
                 
                 certForm.classList.remove('hidden');
                 certForm.classList.add('flex');
-                nextBtn.classList.add('hidden');
+                nextBtn.classList.remove('hidden');
                 
                 try { localStorage.setItem('unforte115_l1QuizPassed', 'true'); } catch(e){}
             } else {

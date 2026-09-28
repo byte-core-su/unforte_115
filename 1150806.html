@@ -2,6 +2,7 @@
 <html lang="zh-TW">
 <head>
     <script src="learning-guides.js" defer></script>
+    <script src="curriculum-labs.js" defer></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>用清單打造星際任務 - LESSON 6</title>
@@ -305,7 +306,7 @@
             document.getElementById('btn-sim-enemy').classList.add('hidden');
             document.getElementById('arena-status').innerHTML = '<span class="text-purple-400 font-bold">偵測到敵方訊號！隨機產生 6 艘敵軍戰艦與戰鬥力...</span>';
             
-            // 秘密由後端從剩餘的洗牌清單中取出 6 個，確保不會有重複數字
+            // 瀏覽器端從剩餘的洗牌清單中取出 6 個，確保不會有重複數字
             simEnemyFleet = [];
             for (let i = 0; i < 6; i++) {
                 if (prepPool.length > 0) {

@@ -2,6 +2,7 @@
 <html lang="zh-TW">
 <head>
     <script src="learning-guides.js" defer></script>
+    <script src="curriculum-labs.js" defer></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>用清單打造星際任務 - LESSON 2</title>
@@ -288,14 +289,14 @@
                         </div>
                     </div>
 
-                    <!-- ⭐ AI 檢核系統整合區塊 (學生挑戰) -->
+                    <!-- 瀏覽器端音訊比對練習（非教師評分） -->
                     <div class="bg-slate-900 rounded-3xl shadow-2xl border border-slate-800 p-6 md:p-8 text-slate-100 relative overflow-hidden mt-12 mb-10 slide-up-fade" style="animation-delay: 0.4s;">
                         <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500 rounded-full mix-blend-screen filter blur-[100px] opacity-10 pointer-events-none"></div>
                         
                         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4 border-b border-slate-800 pb-4 relative z-10">
                             <div>
                                 <h3 class="flex items-center gap-2 text-2xl font-bold"><span class="bg-indigo-600 p-1.5 rounded-xl"><i data-lucide="mic" class="w-6 h-6 text-white"></i></span>學生挑戰 (彈奏)：通訊頻率檢核</h3>
-                                <p class="text-slate-400 text-sm mt-2">請上傳您的彈奏或吹奏錄音，系統將自動擷取音階，並與指定的【目標頻率】進行動態規劃 (DP) 精準比對。</p>
+                                <p class="text-slate-400 text-sm mt-2">可選擇自己的短錄音，在瀏覽器中擷取音階並與目標頻率比對。此工具以訊號分析與序列比對提供練習回饋，結果可能受雜音影響；不是 AI 評分，也不代替教師評量。請勿選用含他人聲音或個資的檔案。</p>
                             </div>
                         </div>
 
@@ -307,7 +308,7 @@
                                 <div class="mb-5 bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-sm">
                                     <label class="block text-xs font-bold text-slate-400 mb-2">比對目標頻率 <span class="font-normal text-slate-500">(若自動辨識失準可手動指定)</span></label>
                                     <select id="ai-target-song-select" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2.5 text-sm font-bold text-white focus:outline-none focus:border-indigo-500 transition-colors">
-                                        <option value="auto_detect" class="text-indigo-300">✨ 自動辨識 (全庫智慧比對)</option>
+                                        <option value="auto_detect" class="text-indigo-300">自動比對目標旋律</option>
                                         <!-- JS 會動態將 SONGS_DB 的歌曲塞入此處 -->
                                     </select>
                                 </div>
@@ -458,7 +459,7 @@
 
             els.aiFileInput.addEventListener('change', handleFileUpload);
             
-            // 下拉選單變更時重置 AI 面板
+            // 下拉選單變更時重置音訊比對面板
             els.aiTargetSongSelect.addEventListener('change', () => {
                 // 如果目前檔案已經分析完畢，切換目標後應允許重新分析
                 if(currentAudioFile) {
@@ -698,7 +699,7 @@
             playNextStep();
         }
 
-        // ================= AI 檢核系統 =================
+        // ================= 瀏覽器端音訊比對 =================
         let currentAudioFile = null;
 
         function resetAiPanel() {
@@ -733,7 +734,7 @@
 
             els.btnStartAi.disabled = false;
             els.btnStartAi.className = "w-full py-4 mt-auto rounded-xl font-bold text-base shadow-sm transition-all bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-900/50";
-            els.btnStartAi.innerText = "⭐ 啟動 AI 樂理比對檢核";
+            els.btnStartAi.innerText = "啟動音訊比對練習";
             
             els.btnStartAi.onclick = () => startAiAnalysis(file);
             els.aiProgressContainer.classList.add('hidden');

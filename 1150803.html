@@ -287,7 +287,7 @@
         // ==========================================
         // ⚡ 能源加總模擬器 (包含陣列邏輯)
         // ==========================================
-        const simData = [120, 80, 150, 90, 160];
+        let simData = [120, 80, 150, 90, 160];
         let simIndex = 0; 
         let simSum = 0;
         let simFinished = false;
@@ -295,7 +295,7 @@
         function renderSimList() {
             const container = document.getElementById('sim-list-container');
             if (!container) return;
-            container.innerHTML = simData.map((val, idx) => {
+            container.innerHTML = simData.length ? simData.map((val, idx) => {
                 const isCurrent = (idx + 1) === simIndex && !simFinished;
                 const bgClass = isCurrent 
                     ? 'bg-[#FF661A] text-white shadow-md scale-[1.02] border-[#CC5214] ring-2 ring-orange-300' 
@@ -309,7 +309,7 @@
                         </div>
                     </div>
                 `;
-            }).join('');
+            }).join('') : '<p class="text-slate-300 text-sm">清單是空的，沒有可讀取的項目。</p>';
         }
 
         function updateSimUI() {
@@ -334,6 +334,12 @@
         }
 
         function simNextStep() {
+            if (simData.length === 0) {
+                const mathTextEl = document.getElementById('sim-math-text');
+                mathTextEl.textContent = '空清單沒有平均值：清單長度為 0，不能作為除數。';
+                mathTextEl.className = 'mt-1 text-sm font-bold text-amber-300 shrink-0';
+                return;
+            }
             if (simFinished) {
                 const average = simSum / simData.length;
                 
@@ -341,7 +347,7 @@
                 if (historyEl) {
                     const logItem = document.createElement('div');
                     logItem.className = "bg-cyan-950/50 px-3 py-2 rounded-lg border border-cyan-800 text-cyan-200 text-xs sm:text-sm animate-[popIn_0.3s_ease-out] mt-2";
-                    logItem.innerHTML = `<span class="font-bold">⭐ 平均能源計算：</span> <span class="font-mono text-white">${simSum} ÷ 5 = ${average}</span>`;
+                    logItem.innerHTML = `<span class="font-bold">⭐ 平均能源計算：</span> <span class="font-mono text-white">${simSum} ÷ ${simData.length} = ${average}</span>`;
                     historyEl.appendChild(logItem);
                 }
 
@@ -435,6 +441,20 @@
             const btnReset = document.getElementById('sim-btn-reset');
             if(btnNext) btnNext.addEventListener('click', simNextStep);
             if(btnReset) btnReset.addEventListener('click', simReset);
+            const applyButton = document.getElementById('sim-data-apply');
+            if (applyButton) applyButton.addEventListener('click', () => {
+                const raw = document.getElementById('sim-data-input').value.trim();
+                const parts = raw ? raw.split(/[,，\s]+/) : [];
+                const error = document.getElementById('sim-data-error');
+                if (parts.length > 8 || parts.some(value => !/^\d+$/.test(value) || Number(value) > 999)) {
+                    error.textContent = '請輸入 0～8 筆、每筆 0～999 的整數；以逗號或空格分隔。';
+                    return;
+                }
+                error.textContent = '';
+                simData = parts.map(Number);
+                document.getElementById('sim-repeat-count').textContent = simData.length;
+                simReset();
+            });
         }
 
         function renderSimulatorHTML() {
@@ -448,6 +468,12 @@
                         <h4 class="text-cyan-400 font-bold mb-4 flex items-center gap-2 text-lg">
                             <i data-lucide="list-ordered" class="w-5 h-5"></i> 陣列：艙房能源 (清單)
                         </h4>
+                        <label class="text-slate-200 text-sm font-bold" for="sim-data-input">自訂能源資料（逗號分隔；留空測試空清單）</label>
+                        <div class="flex gap-2 mt-2 mb-2">
+                            <input id="sim-data-input" type="text" value="120,80,150,90,160" class="min-w-0 flex-1 rounded-lg px-3 py-2 text-slate-900" aria-describedby="sim-data-error">
+                            <button id="sim-data-apply" type="button" class="rounded-lg bg-cyan-600 px-3 py-2 text-white font-bold">套用</button>
+                        </div>
+                        <p id="sim-data-error" class="text-amber-300 text-xs min-h-[1.25rem]" aria-live="polite"></p>
                         <!-- 表頭：編號 / 資料值 -->
                         <div class="flex items-center gap-3 px-2 mb-3 border-b border-slate-700 pb-3">
                             <div class="text-sm font-bold text-slate-400 w-12 text-center tracking-widest">編號</div>
@@ -465,7 +491,7 @@
                         <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-4 shadow-inner mb-2">
                             <div class="text-cyan-400 font-bold flex items-center gap-2 mb-3">
                                 <i data-lucide="repeat" class="w-4 h-4"></i> 重複 
-                                <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner text-xs mx-1">5</span> 次
+                                <span id="sim-repeat-count" class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner text-xs mx-1">5</span> 次
                             </div>
                             
                             <div class="pl-4 border-l-2 border-cyan-500/30 ml-2 flex flex-col gap-2.5">
@@ -586,16 +612,16 @@
         // ==========================================
         const lesson = {
             id: 3, icon: "battery-charging", title: "能源庫存分析", subtitle: "(計算總和與平均)",
-            description: "母艦各艙房的能源指數已匯入清單。請指揮官幫忙計算目前的「總能源量」以及「平均能源」，以確保航行安全。",
+            description: "母艦各艙房的能源指數已整理成清單。請指揮官幫忙計算目前的「總能源量」以及「平均能源」，並測試清單只有一筆或沒有資料時會怎樣。",
             objective: "透過問題拆解，學會使用變數搭配迴圈，將清單內所有數值進行加總與平均數的數學運算。",
-            learningPointsSummary: "學習清單（陣列）與計次迴圈的數值運算。透過匯入艙房能源資料，練習利用變數記錄總能源與索引項次，實作連續讀取、自動加總與計算平均值的程式邏輯。",
+            learningPointsSummary: "學習清單（陣列）與計次迴圈的數值運算。輸入不同筆數的艙房能源資料，利用變數記錄總能源與索引項次；計算平均前先確認清單不為空。",
             learningPoints: [
-                { title: "外部匯入", desc: "將各艙房的能源數值文字檔批次匯入清單，快速建立可用於計算的連續數據序列。" },
+                { title: "建立資料", desc: "在模擬器輸入各艙房能源數值，以逗號分隔；也可留空測試沒有資料的情況。" },
                 { title: "索引控制", desc: "利用自訂的「艙房編號」變數作為索引值，精準定位並讀取清單中的特定艙房能源指數。" },
                 { title: "迴圈加總", desc: "依據清單長度設定迴圈次數，逐一取出清單能源數值並累加至「總能源」變數中。" },
                 { title: "算術運算", desc: "待迴圈掃描結束後，將總能源變數除以清單長度，計算出平均值並由系統語音回報結果。" }
             ],
-            pseudoCode: `SET 總能源 = 0, 艙房編號 = 0\nREPEAT LENGTH("艙房能源") TIMES:\n    CHANGE 艙房編號 BY 1\n    總能源 = 總能源 + GET_ITEM(艙房編號) FROM "艙房能源"\nSET 平均 = 總能源 / LENGTH("艙房能源")\nSAY "平均能源是：" + 平均`,
+            pseudoCode: `SET 總能源 = 0, 艙房編號 = 0\nREPEAT LENGTH("艙房能源") TIMES:\n    CHANGE 艙房編號 BY 1\n    總能源 = 總能源 + GET_ITEM(艙房編號) FROM "艙房能源"\nIF LENGTH("艙房能源") = 0: SAY "沒有資料，無法計算平均"\nELSE: SAY "平均能源是：" + 總能源 / LENGTH("艙房能源")`,
             scratchBlocks: [
                 { type: "event", text: '當 <i data-lucide="flag" class="w-5 h-5 text-green-600 fill-green-500 inline mx-1"></i> 被點擊' },
                 { type: "variable", text: '變數 <span class="bg-black/15 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center leading-none mx-1">總能源 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 設為 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm leading-none mx-1">0</span>' },
@@ -603,6 +629,10 @@
                 { type: "control", text: '重複 <span class="bg-[#FF661A] text-white px-3 py-1 rounded-full border-b-2 border-[#CC5214] shadow-sm inline-flex items-center font-bold leading-none mx-1"><span class="bg-black/10 text-white px-2 py-1 rounded border border-black/20 shadow-inner inline-flex items-center mr-1">艙房能源 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 的長度</span> 次', nested: [
                     { type: "variable", text: '變數 <span class="bg-black/15 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center leading-none mx-1">艙房編號 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 改變 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm leading-none mx-1">1</span>' },
                     { type: "variable", text: '變數 <span class="bg-black/15 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center leading-none mx-1">總能源 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 改變 <span class="bg-[#FF661A] text-white px-3 py-1 rounded-full border-b-2 border-[#CC5214] shadow-sm inline-flex items-center font-bold leading-none mx-1">第 <span class="bg-[#FF8C1A] text-white px-3 py-0.5 rounded-full border-b-2 border-[#DB6E00] shadow-sm inline-block mx-1">艙房編號</span> 項 <span class="bg-black/10 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center ml-1">艙房能源 <span class="text-[10px] ml-1 opacity-70">▼</span></span></span>' }
+                ]},
+                { type: "control", text: '如果 <span class="bg-white text-slate-800 px-2 py-0.5 rounded-full mx-1">艙房能源的長度 = 0</span> 那麼', nested: [
+                    { type: "looks", text: '說出「沒有資料，無法計算平均」' },
+                    { type: "control", text: '停止這個程式' }
                 ]},
                 { type: "looks", text: '說出 <span class="bg-[#59C059] text-white px-3 py-1 rounded-full border-b-2 border-[#389438] shadow-sm inline-flex items-center font-bold leading-none mx-1">字串組合 <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm mx-1">平均能源是：</span> <span class="bg-[#59C059] text-white px-3 py-1 rounded-full border-b-2 border-[#389438] shadow-sm inline-flex items-center font-bold leading-none mx-1"><span class="bg-[#FF8C1A] text-white px-3 py-0.5 rounded-full border-b-2 border-[#DB6E00] shadow-sm inline-block mr-1">總能源</span> / <span class="bg-[#FF661A] text-white px-3 py-0.5 rounded-full border-b-2 border-[#CC5214] shadow-sm inline-flex items-center font-bold leading-none mx-1"><span class="bg-black/10 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center mr-1">艙房能源 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 的長度</span></span></span> <span class="bg-white text-slate-800 px-3 py-1 rounded-full shadow-inner border border-black/10 inline-block font-normal text-sm leading-none mx-1">2</span> 秒' }
             ]
