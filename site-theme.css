@@ -124,6 +124,18 @@ button { transition: transform .18s ease, box-shadow .18s ease, background-color
   line-height: 1.6;
 }
 
+.learning-guide__exit {
+  margin: .7rem 0 0;
+  border: 1px solid var(--grade-border);
+  border-radius: .75rem;
+  background: #fff;
+  padding: .8rem 1rem;
+  color: #334155;
+  line-height: 1.7;
+}
+.learning-guide__exit strong { color: var(--grade-primary); }
+.learning-guide__exit a { display: inline-block; margin-left: .5rem; color: var(--grade-primary); font-weight: 800; text-underline-offset: .2em; }
+
 .curriculum-lab { margin: 2rem 0; }
 .curriculum-lab__card {
   border: 1px solid var(--site-border);
@@ -163,7 +175,51 @@ button { transition: transform .18s ease, box-shadow .18s ease, background-color
 .curriculum-lab__questions output { display: block; min-height: 1.5rem; color: var(--grade-primary); font-weight: 700; }
 .curriculum-lab__task { border-left: 4px solid var(--grade-primary); padding: .5rem .8rem; font-weight: 600; }
 
+/* Optional, session-only adaptive practice appended after each lesson. */
+.adaptive-practice {
+  max-width: 72rem;
+  margin: 2rem auto 3rem;
+  padding: 0 1.5rem;
+  font-family: "Noto Sans TC", system-ui, sans-serif;
+}
+.adaptive-practice__card {
+  border: 1px solid var(--grade-border);
+  border-top: 5px solid var(--grade-primary);
+  border-radius: var(--site-radius-lg);
+  background: #fff;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  box-shadow: var(--site-shadow);
+  color: #334155;
+}
+.adaptive-practice__tag { margin: 0; color: var(--grade-primary); font-size: .85rem; font-weight: 800; }
+.adaptive-practice h2 { margin: .2rem 0 .5rem; color: var(--site-text); font-size: 1.45rem; font-weight: 800; }
+.adaptive-practice p { line-height: 1.7; }
+.adaptive-practice__levels, .adaptive-practice__actions { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1rem 0; }
+.adaptive-practice button {
+  border: 1px solid var(--grade-primary);
+  border-radius: .7rem;
+  background: #fff;
+  padding: .55rem .9rem;
+  color: var(--grade-primary);
+  font-weight: 700;
+  cursor: pointer;
+}
+.adaptive-practice button:hover { background: var(--grade-soft); }
+.adaptive-practice button:disabled { opacity: .55; cursor: not-allowed; }
+.adaptive-practice .adaptive-practice__check, .adaptive-practice button[aria-pressed="true"] { background: var(--grade-primary); color: #fff; }
+.adaptive-practice__status { color: var(--grade-primary); font-weight: 800; }
+.adaptive-practice fieldset { border: 1px solid var(--site-border); border-radius: .85rem; padding: 1rem; }
+.adaptive-practice legend { max-width: 100%; padding: 0 .35rem; color: var(--site-text); font-weight: 800; line-height: 1.6; }
+.adaptive-practice__choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: .55rem; }
+.adaptive-practice__choices label { display: flex; align-items: flex-start; gap: .5rem; border: 1px solid var(--site-border); border-radius: .7rem; padding: .65rem; cursor: pointer; line-height: 1.5; }
+.adaptive-practice__choices label:has(input:checked) { border-color: var(--grade-primary); background: var(--grade-soft); }
+.adaptive-practice__choices input { margin-top: .3rem; accent-color: var(--grade-primary); }
+.adaptive-practice__feedback { min-height: 3rem; border-left: 4px solid var(--grade-primary); border-radius: .6rem; background: var(--grade-soft); padding: .65rem .85rem; }
+.adaptive-practice__note { margin-bottom: 0; color: var(--site-muted); font-size: .9rem; }
+
 @media (max-width: 640px) {
   .learning-guide { padding: 0 1rem; }
   .learning-guide__grid { grid-template-columns: 1fr; }
+  .adaptive-practice { padding: 0 1rem; }
+  .adaptive-practice__choices { grid-template-columns: 1fr; }
 }

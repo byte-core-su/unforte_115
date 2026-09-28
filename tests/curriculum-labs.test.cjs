@@ -42,11 +42,18 @@ function loadLab(page) {
   get('#g7-data-demo').click();
   assert.match(result.innerHTML, /固定示範/);
   assert.match(result.innerHTML, /<td>A<\/td><td>4<\/td><td>1<\/td>/);
+  get('#g7-data-prediction').value = 'B';
+  get('#g7-data-run').click();
+  assert.match(result.innerHTML, /預測符合條件/);
+  get('#g7-data-prediction').value = 'C';
+  get('#g7-data-run').click();
+  assert.match(result.innerHTML, /預測不同/);
   get('#g7-data-query').value = 'B';
   get('#g7-data-run').click();
   assert.match(result.innerHTML, /共 1 筆/);
   get('#g7-data-new').click();
   assert.match(result.innerHTML, /先算出各筆消耗量/);
+  assert.equal(get('#g7-data-prediction').value, '', 'new data case should clear old prediction');
   get('#g7-data-run').click();
   const threshold = Number(result.innerHTML.match(/門檻為 (\d+)/)[1]);
   const rows = [...result.innerHTML.matchAll(/<tr><td>[A-D]<\/td><td>(\d+)<\/td><td>(\d+)<\/td><td>(是|否)<\/td><td>(\d+)<\/td><\/tr>/g)];
@@ -70,13 +77,17 @@ function loadLab(page) {
   assert.notEqual(state.textContent, first, 'new search case should differ');
   get('#g8-search-demo').click();
   assert.match(state.textContent, /固定示範；清單：\[能量電池、防護罩、修復劑、雷射槍\]/);
+  get('#g8-search-prediction').value = '2';
   get('#g8-search-step').click();
   get('#g8-search-step').click();
   assert.match(state.textContent, /找到，位置是第 2 項/);
+  assert.match(state.textContent, /預測正確/);
   get('#g8-search-target').value = '不存在的裝備';
   get('#g8-search-reset').click();
   for (let i = 0; i < 4; i++) get('#g8-search-step').click();
   assert.match(state.textContent, /沒有找到/);
+  get('#g8-search-new').click();
+  assert.equal(get('#g8-search-prediction').value, '', 'new search case should clear old prediction');
 }
 
 {
@@ -94,6 +105,11 @@ function loadLab(page) {
   assert.match(state.textContent, /排序完成/);
   get('#g8-sort-demo').click();
   assert.match(state.textContent, /固定示範；清單：\[7、3、5、1\]/);
+  get('#g8-sort-prediction').value = 'swap';
+  get('#g8-sort-step').click();
+  assert.match(state.textContent, /第一次預測正確/);
+  get('#g8-sort-new').click();
+  assert.equal(get('#g8-sort-prediction').value, '', 'new sort case should clear old prediction');
 }
 
 console.log('curriculum-labs challenges passed');

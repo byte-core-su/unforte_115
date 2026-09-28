@@ -4,6 +4,12 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
 const home = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const guides = fs.readFileSync(path.join(root, 'learning-guides.js'), 'utf8');
+const records = fs.readFileSync(path.join(root, 'STUDENT_RECORDS.md'), 'utf8');
+assert.equal((guides.match(/exit: '/g) || []).length, 12, 'each lesson should have an exit task');
+assert.match(guides, /網頁答對或闖關成功不等於正式成績/);
+assert.match(records, /七年級：第 2–5 課離堂任務/);
+assert.match(records, /八年級：音符清單與索引/);
 
 for (const grade of [7, 8]) {
   const source = fs.readFileSync(path.join(root, `LESSON_PLAN_GRADE_${grade}.md`), 'utf8');
@@ -16,6 +22,8 @@ for (const grade of [7, 8]) {
   assert.equal((html.match(/<h1>/g) || []).length, 1, `${filename} should have one H1`);
   assert.equal((html.match(/<h3>第 [1-6] 課/g) || []).length, 6, `${filename} should include six lessons`);
   assert.match(html, /<h2 id="section-4">評量方式<\/h2>/);
+  assert.match(html, /4：能遷移與改良/);
+  assert.match(html, /網頁不保存姓名或成績/);
   assert.match(html, /<div class="lesson-table-scroll"><table>/);
 
   const markdownLessonTitles = [...source.matchAll(/^### (第 [1-6] 課.+)$/gm)].map(match => match[1]);
