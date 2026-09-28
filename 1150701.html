@@ -169,6 +169,15 @@
             return { ...qObj, options: opts.map(item => item.opt), ans: newAns };
         }
 
+        function shuffleQuestions(questions) {
+            const result = [...questions];
+            for (let i = result.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [result[i], result[j]] = [result[j], result[i]];
+            }
+            return result;
+        }
+
         function getCategoryTag(cat, catName) {
             let bgClass = "", textClass = "text-white";
             switch(cat) {
@@ -227,10 +236,8 @@
         let currentScore = 0;
 
         function startQuiz() {
-            let basicQs = basicPool.map(q => shuffleQuestionOptions(q));
-            basicQs = basicQs.sort(() => 0.5 - Math.random());
-            const shuffledAdvanced = [...advancedPool].sort(() => 0.5 - Math.random());
-            const advancedQs = shuffledAdvanced.slice(0, 5).map(q => shuffleQuestionOptions(q));
+            const basicQs = shuffleQuestions(basicPool).map(q => shuffleQuestionOptions(q));
+            const advancedQs = shuffleQuestions(advancedPool).slice(0, 5).map(q => shuffleQuestionOptions(q));
             
             currentQuizQuestions = [...basicQs, ...advancedQs];
             currentQIndex = 0;

@@ -291,6 +291,7 @@
         let simIndex = 0; 
         let simSum = 0;
         let simFinished = false;
+        let simPreviousCase = '';
 
         function renderSimList() {
             const container = document.getElementById('sim-list-container');
@@ -455,6 +456,28 @@
                 document.getElementById('sim-repeat-count').textContent = simData.length;
                 simReset();
             });
+            document.getElementById('sim-data-new').addEventListener('click', () => {
+                let candidate;
+                let attempts = 0;
+                do {
+                    candidate = Array.from({ length: 4 + Math.floor(Math.random() * 4) }, () => 20 + Math.floor(Math.random() * 181));
+                } while (candidate.join(',') === simPreviousCase && ++attempts < 12);
+                if (candidate.join(',') === simPreviousCase) candidate[0] = candidate[0] === 200 ? 20 : candidate[0] + 1;
+                simPreviousCase = candidate.join(',');
+                simData = candidate;
+                document.getElementById('sim-data-input').value = simData.join(',');
+                document.getElementById('sim-data-error').textContent = '';
+                document.getElementById('sim-repeat-count').textContent = simData.length;
+                simReset();
+            });
+            document.getElementById('sim-data-demo').addEventListener('click', () => {
+                simData = [120, 80, 150, 90, 160];
+                document.getElementById('sim-data-input').value = simData.join(',');
+                document.getElementById('sim-data-error').textContent = '';
+                document.getElementById('sim-repeat-count').textContent = simData.length;
+                simReset();
+            });
+            document.getElementById('sim-data-new').click();
         }
 
         function renderSimulatorHTML() {
@@ -472,6 +495,10 @@
                         <div class="flex gap-2 mt-2 mb-2">
                             <input id="sim-data-input" type="text" value="120,80,150,90,160" class="min-w-0 flex-1 rounded-lg px-3 py-2 text-slate-900" aria-describedby="sim-data-error">
                             <button id="sim-data-apply" type="button" class="rounded-lg bg-cyan-600 px-3 py-2 text-white font-bold">套用</button>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-2">
+                            <button id="sim-data-new" type="button" class="rounded-lg bg-indigo-600 px-3 py-2 text-white font-bold">再產生一題</button>
+                            <button id="sim-data-demo" type="button" class="rounded-lg bg-slate-700 px-3 py-2 text-white font-bold">固定示範</button>
                         </div>
                         <p id="sim-data-error" class="text-amber-300 text-xs min-h-[1.25rem]" aria-live="polite"></p>
                         <!-- 表頭：編號 / 資料值 -->
@@ -538,7 +565,7 @@
                             <button id="sim-btn-next" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 px-3 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm">
                                 <i data-lucide="play-circle" class="w-4 h-4"></i> 讀取並加總 (執行一次迴圈)
                             </button>
-                            <button id="sim-btn-reset" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md active:scale-95 text-sm" title="重置模擬器">
+                            <button id="sim-btn-reset" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md active:scale-95 text-sm" title="同題重試" aria-label="同題重試">
                                 <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                             </button>
                         </div>

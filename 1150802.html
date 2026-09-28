@@ -256,7 +256,9 @@
                                         <h2 id="song-title" class="text-2xl font-bold text-slate-900">載入中...</h2>
                                         <p id="song-artist" class="text-slate-500 text-sm mt-1">...</p>
                                     </div>
-                                    <div class="flex gap-3">
+                                    <div class="flex flex-wrap justify-center gap-2">
+                                        <button onclick="choosePracticeSong()" class="flex items-center gap-2 px-3 py-2.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-xl font-bold text-sm">再抽一首</button>
+                                        <button onclick="choosePracticeSong(true)" class="flex items-center gap-2 px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm">固定示範</button>
                                         <button id="btn-play" class="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-md transition-all active:scale-95 text-sm">
                                             <i data-lucide="play" class="w-4 h-4 fill-white"></i> 自動讀取陣列
                                         </button>
@@ -367,6 +369,14 @@
         // ================= 全域控制邏輯 =================
         let isScratchMode = false;
         let selectedSong = SONGS[0];
+        function choosePracticeSong(demo = false) {
+            stopAutoPlay();
+            const choices = SONGS.slice(1).filter(song => song.id !== selectedSong.id);
+            selectedSong = demo ? SONGS[0] : choices[Math.floor(Math.random() * choices.length)];
+            els.searchInput.value = '';
+            renderAll();
+            if (els.aiTargetSongSelect.value !== 'auto_detect') els.aiTargetSongSelect.value = selectedSong.title;
+        }
         let isPlaying = false;
         let currentPlayIndex = -1;
         let playTimeout = null;

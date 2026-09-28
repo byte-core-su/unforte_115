@@ -225,6 +225,8 @@
                                         <button onclick="setPolygonPreset(5)" class="px-3 py-1.5 bg-sky-50 text-sky-700 border border-sky-200 rounded hover:bg-sky-100 transition text-xs font-bold shadow-sm">正五邊形</button>
                                         <button onclick="setPolygonPreset(6)" class="px-3 py-1.5 bg-rose-50 text-rose-700 border border-rose-200 rounded hover:bg-rose-100 transition text-xs font-bold shadow-sm">正六邊形</button>
                                         <button onclick="setPolygonPreset('')" class="px-3 py-1.5 bg-slate-100 text-slate-600 border border-slate-300 rounded hover:bg-slate-200 transition text-xs font-bold shadow-sm">自訂多邊形</button>
+                                        <button onclick="newPolygonCase()" class="px-3 py-1.5 bg-indigo-100 text-indigo-700 border border-indigo-200 rounded hover:bg-indigo-200 transition text-xs font-bold shadow-sm">再產生一題</button>
+                                        <button onclick="setPolygonPreset(4)" class="px-3 py-1.5 bg-slate-100 text-slate-700 border border-slate-300 rounded hover:bg-slate-200 transition text-xs font-bold shadow-sm">固定示範</button>
                                     </div>
 
                                     <h5 class="text-sm font-bold text-slate-700 mb-3">2. 填寫探測車積木指令</h5>
@@ -685,10 +687,18 @@
 
         // ====== 實戰程式設計區 (多邊形挑戰) ======
         let polyInterval = null;
+        let polyPreviousSides = null;
+
+        function newPolygonCase() {
+            const choices = [3, 4, 5, 6, 8].filter(sides => sides !== polyPreviousSides);
+            setPolygonPreset(choices[Math.floor(Math.random() * choices.length)]);
+        }
 
         function setPolygonPreset(sides) {
+            if (polyInterval) clearInterval(polyInterval);
             const nInput = document.getElementById('poly-n');
             const angleInput = document.getElementById('poly-angle');
+            if (sides) polyPreviousSides = sides;
             
             if (!sides) {
                 nInput.value = '';
@@ -699,6 +709,7 @@
             }
             
             document.getElementById('poly-svg').innerHTML = '';
+            document.getElementById('poly-formula-reveal').classList.add('hidden');
             const fb = document.getElementById('poly-feedback');
             fb.textContent = `已選擇目標：正 ${sides ? sides : 'N'} 邊形，請填寫旋轉角度！`;
             fb.className = "bg-indigo-600 text-white rounded-b-2xl p-4 text-sm font-medium transition-colors duration-300 text-center shadow-md";
@@ -791,6 +802,7 @@
         document.addEventListener("DOMContentLoaded", () => {
             initPenGame();
             initSqGame();
+            newPolygonCase();
         });
     </script>
 </body>

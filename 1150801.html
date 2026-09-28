@@ -342,7 +342,7 @@
         // ==========================================
         // 元件 3：第二階段 - 自由探索 (Sandbox Mode)
         // ==========================================
-        const SandboxMode = ({ list, setList, setMessage }) => {
+        const SandboxMode = ({ list, setList, setMessage, onNewCase }) => {
             const [useItemIndex, setUseItemIndex] = useState('1');
             const [removeItemIndex, setRemoveItemIndex] = useState('1');
             const [scenarioInsertIndex, setScenarioInsertIndex] = useState('1');
@@ -485,6 +485,10 @@
 
             return (
                 <div className="animate-[fadeIn_0.5s_ease-out]">
+                    <div className="flex flex-wrap gap-2 mb-4">
+                        <button onClick={onNewCase} className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold text-sm">再產生一題</button>
+                        <button onClick={() => { setList(['🔋 能量電池', '🔫 雷射光槍', '🔧 奈米修復劑']); setMessage('已載入固定示範清單；請預測操作後的項目與索引。'); }} className="bg-slate-200 text-slate-700 px-4 py-2 rounded-xl font-bold text-sm">固定示範</button>
+                    </div>
                     {/* 區塊 1：真實場景應用 */}
                     <div className="bg-white rounded-2xl shadow-md p-6 mb-8 border-t-8 border-indigo-500">
                         <h2 className="text-2xl font-bold text-slate-800 mb-3 flex items-center gap-2">
@@ -601,6 +605,24 @@
         // ==========================================
         // 主程式 (控制階段切換與版面)
         // ==========================================
+        const practiceItemPool = ['🔋 能量電池', '🔫 雷射光槍', '🔧 奈米修復劑', '💎 星際礦石', '🛡️ 基礎防護罩', '📡 通訊器', '🚀 推進器'];
+        let previousPracticeList = '';
+        function makePracticeList() {
+            let result;
+            let attempts = 0;
+            do {
+                result = [...practiceItemPool];
+                for (let i = result.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [result[i], result[j]] = [result[j], result[i]];
+                }
+                result = result.slice(0, 3 + Math.floor(Math.random() * 3));
+            } while (result.join(',') === previousPracticeList && ++attempts < 12);
+            if (result.join(',') === previousPracticeList) result.reverse();
+            previousPracticeList = result.join(',');
+            return result;
+        }
+
         function App() {
             const [mode, setMode] = useState('tutorial'); // 階段狀態：'tutorial' 或 'sandbox'
             const [list, setList] = useState([]);         // 共享的背包資料
@@ -621,13 +643,14 @@
                                     list={list} 
                                     setList={setList} 
                                     setMessage={setMessage} 
-                                    onComplete={() => setMode('sandbox')} 
+                                    onComplete={() => { setList(makePracticeList()); setMessage('自由練習已產生一組新裝備清單。先預測操作結果，再按積木驗證。'); setMode('sandbox'); }}
                                 />
                             ) : (
                                 <SandboxMode 
                                     list={list} 
                                     setList={setList} 
                                     setMessage={setMessage} 
+                                    onNewCase={() => { setList(makePracticeList()); setMessage('新清單已產生。先預測操作結果，再按積木驗證。'); }}
                                 />
                             )}
                         </div>
