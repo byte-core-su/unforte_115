@@ -68,7 +68,7 @@
 
 直接以瀏覽器開啟 `index.html`，或部署至靜態網站服務（例如 GitHub Pages）。教材頁面可離線瀏覽，但外部 CDN 的字型與樣式需要網路連線。
 
-Python Lab 需要透過網站網址開啟；本機執行 `npm run preview`（或 `node scripts/preview.cjs`）後，開啟 `http://127.0.0.1:4173/pythonlab/index.html`。Python 執行環境固定使用 Pyodide 0.27.7，首次載入需網路。草稿、預測、離堂說明與挑戰驗證只保存在此瀏覽器，不跨裝置同步。詳細教學流程與維護方式見 [Python Lab 說明](pythonlab/README.md)，課程規劃見 [Python 課程設計](PYTHON_COURSE_PLAN.md)。
+Python Lab 是獨立課程，直接以其網站網址開啟，與原教材首頁不互相導連。可將 `pythonlab/` 單獨部署；本機執行 `npm run preview`（或 `node scripts/preview.cjs`）後，開啟 `http://127.0.0.1:4173/pythonlab/index.html`。Python 執行環境固定使用 Pyodide 0.27.7，首次載入需網路。草稿、預測、離堂說明與挑戰驗證只保存在此瀏覽器，不跨裝置同步。詳細教學流程與維護方式見 [Python Lab 說明](pythonlab/README.md)，課程規劃見 [Python 課程設計](PYTHON_COURSE_PLAN.md)。
 
 Python 的十個單元依序為輸出、變數與輸入、型態與運算、條件、for 累加、巢狀迴圈、while、清單、函式與模組、購物結帳專題。每課包含示範、引導、挑戰，以及語法卡、逐層提示與離堂檢核。
 

@@ -51,6 +51,7 @@ const root = path.resolve(__dirname, '..');
   assert.equal(engine[6].results[0].passed, false, 'hardcoding must not satisfy a for task');
   assert.ok(engine[7].results.every(item => item.passed), 'different correct implementations should pass output checks');
   assert.equal(engine[8].results[0].passed, false, 'NaN must not pass numeric comparison');
-  assert.match(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), /href="pythonlab\/index.html"/);
+  assert.doesNotMatch(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), /href="(?:pythonlab\/index.html|#python-course)"/);
+  assert.doesNotMatch(fs.readFileSync(path.join(root, 'pythonlab/index.html'), 'utf8'), /(?:href|src)="\.\.\//);
   console.log(`Python curriculum: ${requests.length} demo, starter, solution and dictionary checks passed; runtime error, isolation, output limit and alternative-solution checks passed.`);
 })().catch(error => { console.error(error); process.exitCode = 1; });

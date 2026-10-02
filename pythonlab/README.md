@@ -4,7 +4,7 @@
 
 ## 開啟課程
 
-部署至靜態網站（例如 GitHub Pages）後，從首頁的 Python 專區進入。維護者本機可在專案根目錄執行 `npm run preview`（或 `node scripts/preview.cjs`），再開啟 `http://127.0.0.1:4173/pythonlab/index.html`，不需安裝額外套件。
+這是獨立課程，直接開啟 `pythonlab/index.html` 的網站網址即可使用，不經過原教材首頁。頁面只提供 Python 課程總覽、十個單元與參考小幫手，不與原有 Scratch 課程互相導連，也不依賴上一層的樣式檔。可將 `pythonlab/` 目錄單獨部署至靜態網站（例如 GitHub Pages）。維護者本機可在專案根目錄執行 `npm run preview`（或 `node scripts/preview.cjs`），再開啟 `http://127.0.0.1:4173/pythonlab/index.html`，不需安裝額外套件。
 
 首次進入單元會從 jsDelivr 載入固定版本的 Pyodide 0.27.7。尚未載入時可閱讀、編輯；失敗時會提供重試。Python 不支援直接雙擊 HTML 的開啟方式。
 
