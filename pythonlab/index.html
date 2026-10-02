@@ -29,6 +29,21 @@
     <input id="dictionary-search" type="search" placeholder="例如：迴圈、input、NameError…" autocomplete="off">
     <div id="dictionary-results"></div>
   </dialog>
+  <dialog id="certificate-dialog" aria-labelledby="certificate-dialog-title">
+    <div class="dialog-heading"><div><p class="eyebrow">留住你的學習成果</p><h2 id="certificate-dialog-title">通關證書</h2></div><button type="button" id="close-certificate" class="button" aria-label="關閉證書，回到練習">回到練習 ✕</button></div>
+    <p id="certificate-intro" class="certificate-intro"></p>
+    <form id="certificate-form">
+      <div class="student-fields">
+        <label for="certificate-class">班級<input id="certificate-class" name="className" required maxlength="40" pattern=".*\S.*" autocomplete="off" placeholder="例如：七年一班"></label>
+        <label for="certificate-seat">座號<input id="certificate-seat" name="seat" required inputmode="numeric" maxlength="3" pattern="[0-9]{1,3}" autocomplete="off" placeholder="例如：08"></label>
+        <label for="certificate-name">姓名<input id="certificate-name" name="name" required maxlength="40" pattern=".*\S.*" autocomplete="off" placeholder="請填寫姓名"></label>
+      </div>
+      <p class="small-label">座號請填 1～999。資料用於本機證書，不會傳送至伺服器；各單元可修改。</p>
+      <button type="submit" class="button blue">顯示通關證書</button>
+    </form>
+    <div id="certificate-view" hidden></div>
+    <div class="certificate-actions"><button type="button" id="certificate-edit" class="button quiet" hidden>修改學生資料</button><button type="button" id="certificate-continue" class="button primary">繼續挑戰 →</button></div>
+  </dialog>
   <noscript><p class="notice">請啟用 JavaScript，才能使用 Python 課程、語法字典與編輯器。</p></noscript>
 </body>
 </html>
