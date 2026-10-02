@@ -7,20 +7,24 @@ const root = path.resolve(__dirname, '..');
 
 (async () => {
   const { lessons, dictionary } = await import(pathToFileURL(path.join(root, 'pythonlab/course-data.js')));
+  const { verificationTests } = await import(pathToFileURL(path.join(root, 'pythonlab/challenge-data.js')));
   assert.equal(lessons.length, 10);
   const requests = [];
   for (const lesson of lessons) {
-    assert.equal(lesson.activities.length, 3);
+    assert.equal(lesson.activities.length, 5);
+    assert.deepEqual(lesson.activities.slice(2).map(item => item.tier), [1, 2, 3]);
+    assert.equal(lesson.activities[4].optional, true);
     for (const id of lesson.syntax) assert.ok(dictionary.find(entry => entry.id === id), `${lesson.id}: missing syntax ${id}`);
     for (const source of lesson.source) assert.ok(fs.existsSync(path.join(root, `pythonlab/data/class-${String(source).padStart(2, '0')}.txt`)));
     lesson.activities.forEach((activity, stage) => {
+      for (const id of activity.syntax || []) assert.ok(dictionary.find(entry => entry.id === id), `${lesson.id}/${stage}: missing syntax ${id}`);
       assert.ok(activity.starter.trim(), `${lesson.id}/${stage}: blank starter`);
       requests.push({ action: 'compile', code: activity.starter, label: `${lesson.id}/${stage}: starter` });
       requests.push({ action: 'run', code: activity.solution, input: activity.input, label: `${lesson.id}/${stage}: solution` });
       if (stage === 0) requests.push({ action: 'check', code: activity.starter, tests: [{ name: 'demo', expected: activity.expected, input: activity.input }], label: `${lesson.id}: demonstration` });
       if (stage > 0) {
         assert.ok(activity.tests.length, `${lesson.id}/${stage}: no meaningful tests`);
-        requests.push({ action: 'check', code: activity.solution, tests: activity.tests, label: `${lesson.id}/${stage}: cases` });
+        requests.push({ action: 'check', code: activity.solution, tests: verificationTests(lesson, activity, () => 0.37), label: `${lesson.id}/${stage}: cases` });
       }
     });
   }

@@ -3,6 +3,7 @@
 <body><h1>Python 瀏覽器驗證</h1><p id="status">正在載入實際 Python 執行環境…</p><pre id="results"></pre><a href="../pythonlab/index.html">返回課程</a>
 <script type="module">
 import { lessons, dictionary } from '../pythonlab/course-data.js';
+import { verificationTests } from '../pythonlab/challenge-data.js';
 const status = document.querySelector('#status');
 const output = document.querySelector('#results');
 let worker;
@@ -40,12 +41,12 @@ try {
   await start(); let cases = 0;
   for (const lesson of lessons) {
     for (const activity of lesson.activities) {
-      const tests = activity.tests.length ? activity.tests : [{ name: '示範', input: activity.input, expected: activity.expected }];
+      const tests = activity.tests.length ? verificationTests(lesson, activity) : [{ name: '示範', input: activity.input, expected: activity.expected }];
       const result = await send({ action: 'check', code: activity.solution, tests });
       assert(result.results.every(item => item.passed), `第 ${lesson.id} 課 ${activity.title}: ${JSON.stringify(result)}`);
       cases += result.results.length;
     }
-    output.textContent += `✓ 第 ${lesson.id} 單元：示範、引導、挑戰全部通過\n`;
+    output.textContent += `✓ 第 ${lesson.id} 單元：示範、引導、一星、二星、三星全部通過\n`;
   }
   for (const entry of dictionary) {
     const result = await send({ action: 'check', code: entry.example, tests: [{ name: entry.id, input: entry.input || '', expected: entry.output }] });

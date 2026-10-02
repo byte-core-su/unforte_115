@@ -1,4 +1,5 @@
 // 教材由 data/class-01.txt～class-10.txt 重整；原始資料保留供教師查閱。
+import { extraActivities } from './challenge-data.js';
 const activity = (title, task, starter, solution, tests, hints, input = '', expected = '') => ({ title, task, starter, solution, tests, hints, input, expected });
 const test = (name, input, expected, extra = {}) => ({ name, input, expected, ...extra });
 export const lessons = [
@@ -108,7 +109,16 @@ export const lessons = [
   }
 ];
 
+for (const lesson of lessons) {
+  lesson.activities[2].tier = 1;
+  lesson.activities[2].title = lesson.activities[2].title.replace('挑戰：', '初階：');
+  lesson.activities.push(...extraActivities(lesson));
+}
+
 export const dictionary = [
+  { id: 'membership', name: 'in / not in・是否已在清單中', desc: '檢查清單是否包含某個值，可用來只收集第一次出現的資料。', format: 'value in items\nvalue not in items', example: 'items = [3, 1]\nprint(3 in items)\nprint(2 not in items)', output: 'True\nTrue', mistake: 'in 檢查值是否存在；索引則用來取出特定位置。', scratch: '「清單包含」積木', url: 'https://docs.python.org/3/tutorial/datastructures.html' },
+  { id: 'none', name: 'None / is None・沒有有效結果', desc: 'None 表示沒有結果。本課的進階函式以 None 回傳無效參數，不會把有效的數值 0 當成錯誤。', format: 'if result is None:\n    print("輸入無效")', example: 'result = None\nprint(result is None)\nresult = 0\nprint(result is None)', output: 'True\nFalse', mistake: 'None 是特殊值，不是字串 "None"。不要用 if not result 取代檢查，因為 0 也會被當成假。', scratch: '為函式增加「沒有有效結果」的狀態', url: 'https://docs.python.org/3/library/constants.html#None' },
+  { id: 'exceptions', name: 'try / except・處理輸入異常', desc: '嘗試執行 try 的內容；若出現指定的例外，改執行 except。第 10 課終極挑戰用它處理非整數或輸入不足。', format: 'try:\n    number = int(input())\nexcept (ValueError, EOFError):\n    print("輸入無效")', example: 'try:\n    number = int("hello")\nexcept ValueError:\n    print("輸入無效")', output: '輸入無效', mistake: '只捕捉需要處理的錯誤。try / except 與範圍判斷各有用途，數字轉換成功後仍要檢查上下限。', scratch: '替程式增加錯誤情況的處理路徑', url: 'https://docs.python.org/3/tutorial/errors.html' },
   { id: 'strings', name: '字串・組合與切片', desc: '字串以引號包住，可用 + 組合、* 重複，或用索引與切片取出內容。', format: 'word[索引]\nword[起點:終點]', example: 'word = "Python"\nprint(word[0])\nprint(word[1:4])\nprint("Hi" * 2)', output: 'P\nyth\nHiHi', mistake: '索引從 0 開始；切片不包含終點。字串加數字前要先轉換型態。', scratch: '「連接」「字串的第幾個字」「字串長度」', url: 'https://docs.python.org/3/tutorial/introduction.html#strings' },
   { id: 'encoding', name: 'ord / chr・字元與碼位', desc: 'ord() 取得一個字元的 Unicode 碼位；chr() 將碼位轉為字元。ASCII 字元位於 0～127，中文字通常超出這個範圍。', format: 'ord("A")\nchr(65)', example: 'print(ord("A"))\nprint(chr(66))\nprint(ord("中"))', output: '65\nB\n20013', mistake: 'ord() 的字串只能有一個 Unicode 碼位；碼位與 UTF-8 位元組不同。可用小幫手的編碼工具比較。', scratch: '延伸認識電腦如何用數字表示文字', url: 'https://docs.python.org/3/library/functions.html#ord' },
   { id: 'bases', name: 'bin / hex・數字的不同寫法', desc: '同一個整數可以用二進位或十六進位表示。bin() 與 hex() 的結果是帶前綴的字串。', format: 'bin(數字)\nhex(數字)\nint("二進位文字", 2)', example: 'print(bin(65))\nprint(hex(65))\nprint(int("1000001", 2))', output: '0b1000001\n0x41\n65', mistake: '0b 表示二進位，0x 表示十六進位；字串內容必須符合指定進位。', scratch: '延伸認識同一個數字的不同表示法', url: 'https://docs.python.org/3/library/functions.html#bin' },

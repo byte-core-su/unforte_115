@@ -53,12 +53,24 @@ def _lab_matches(actual, case):
     expected = _lab_normalize(case["expected"])
     if not case.get("numeric"):
         return actual == expected
-    try:
-        a = [float(value) for value in actual.splitlines()]
-        b = [float(value) for value in expected.splitlines()]
-        return len(a) == len(b) and all(math.isfinite(x) and math.isclose(x, y, rel_tol=1e-7, abs_tol=1e-7) for x, y in zip(a, b))
-    except ValueError:
+    a = actual.splitlines()
+    b = expected.splitlines()
+    if len(a) != len(b):
         return False
+    for x, y in zip(a, b):
+        try:
+            target = float(y)
+        except ValueError:
+            if x != y:
+                return False
+            continue
+        try:
+            value = float(x)
+        except ValueError:
+            return False
+        if not math.isfinite(value) or not math.isfinite(target) or not math.isclose(value, target, rel_tol=1e-7, abs_tol=1e-7):
+            return False
+    return True
 
 
 def _lab_dispatch(request_json):
@@ -79,6 +91,9 @@ def _lab_dispatch(request_json):
         missing = [name for name in case.get("requires", []) if name not in nodes]
         if case.get("nestedFor") and not nested_for:
             missing.append("巢狀 for 迴圈")
+        if case.get("printKeyword"):
+            if not nodes or not any(isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "print" and any(keyword.arg == case["printKeyword"] for keyword in node.keywords) for node in ast.walk(tree)):
+                missing.append("print 的 " + case["printKeyword"] + " 參數")
         result.update({"name": case["name"], "input": case.get("input", ""), "expected": case["expected"], "missing": missing})
         result["passed"] = not result["error"] and not missing and _lab_matches(result["output"], case)
         results.append(result)
