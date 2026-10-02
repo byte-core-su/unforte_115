@@ -1,5 +1,6 @@
 // 教材由 data/class-01.txt～class-10.txt 重整；原始資料保留供教師查閱。
 import { extraActivities } from './challenge-data.js';
+import { enrichVerification } from './verification-data.js';
 const activity = (title, task, starter, solution, tests, hints, input = '', expected = '') => ({ title, task, starter, solution, tests, hints, input, expected });
 const test = (name, input, expected, extra = {}) => ({ name, input, expected, ...extra });
 export const lessons = [
@@ -114,6 +115,7 @@ for (const lesson of lessons) {
   lesson.activities[2].title = lesson.activities[2].title.replace('挑戰：', '初階：');
   lesson.activities.push(...extraActivities(lesson));
 }
+enrichVerification(lessons);
 
 export const dictionary = [
   { id: 'membership', name: 'in / not in・是否已在清單中', desc: '檢查清單是否包含某個值，可用來只收集第一次出現的資料。', format: 'value in items\nvalue not in items', example: 'items = [3, 1]\nprint(3 in items)\nprint(2 not in items)', output: 'True\nTrue', mistake: 'in 檢查值是否存在；索引則用來取出特定位置。', scratch: '「清單包含」積木', url: 'https://docs.python.org/3/tutorial/datastructures.html' },

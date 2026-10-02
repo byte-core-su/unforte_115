@@ -81,7 +81,7 @@ export function verificationTests(lesson, activity, random = Math.random) {
   const tests = activity.tests.slice();
   if (!activity.tier || activity.tier < 2 || lesson.id === 1) return tests;
   const integer = (min, max) => min + Math.floor(random() * (max - min + 1));
-  for (let trial = 0; trial < 3; trial++) {
+  for (let trial = 0; trial < 6; trial++) {
     const name = `新情境 ${trial + 1}`;
     const tier = activity.tier;
     let extra;

@@ -32,7 +32,7 @@ function start() {
 function send(request) {
   return new Promise((resolve, reject) => {
     const id = ++counter;
-    waiting = { id, resolve, reject, timeout: setTimeout(() => reject(new Error('執行逾時')), 8000) };
+    waiting = { id, resolve, reject, timeout: setTimeout(() => { worker.terminate(); waiting = null; reject(new Error('執行逾時')); }, 8000) };
     worker.postMessage({ id, ...request });
   });
 }
@@ -53,6 +53,26 @@ try {
     assert(result.results[0].passed, `字典 ${entry.id}`); cases++;
   }
   output.textContent += `✓ ${dictionary.length} 個字典範例通過\n`;
+  const engineCases = [
+    ['print("正確")', { expected: '正確' }, true],
+    ['print(" 正確")', { expected: '正確' }, false],
+    ['print("正確 ")', { expected: '正確' }, false],
+    ['print("正確\\n")', { expected: '正確' }, false],
+    ['print(1)\nprint()', { expected: '1', numeric: true }, false],
+    ['print(0)', { expected: '0.0000000001', numeric: true }, false],
+    ['print(3.1415926535)', { expected: String(Math.PI), numeric: true }, true],
+    ...['nan', 'inf', '-inf'].map(value => [`print(float("${value}"))`, { expected: '1', numeric: true }, false]),
+    ['def tool():\n    return None', { expected: '', calls: [{ function: 'tool', args: [], expected: null }] }, true],
+    ['def tool():\n    return "None"', { expected: '', calls: [{ function: 'tool', args: [], expected: null }] }, false],
+    ['def tool():\n    return "5"', { expected: '', calls: [{ function: 'tool', args: [], expected: 5 }] }, false],
+    ['def tool():\n    return False', { expected: '', calls: [{ function: 'tool', args: [], expected: 0 }] }, false],
+    ['print("我會觀察 | 我會修改 | 我會驗證")\nif False:\n    print("a", "b", "c", sep=" | ")', lessons[0].activities[3].tests[0], false],
+  ];
+  for (const [code, test, pass] of engineCases) {
+    const result = await send({ action: 'check', code, tests: [{ name: '執行器回歸', input: '', ...test }] });
+    assert(result.results[0].passed === pass, `輸出、回傳型態或執行語法判斷錯誤: ${code}`);
+  }
+  output.textContent += `✓ ${engineCases.length} 組輸出格式、浮點精度、回傳型態與實際 print 檢查通過\n`;
   await send({ action: 'run', code: 'not_shared = 42' });
   const isolation = await send({ action: 'run', code: 'print(not_shared)' });
   assert(isolation.error?.type === 'NameError', '變數未隔離');
@@ -70,6 +90,14 @@ try {
   const restored = await send({ action: 'run', code: 'print(6 * 7)' });
   assert(restored.output.trim() === '42', '停止後無法重新執行');
   output.textContent += '✓ 無限迴圈停止與重新啟動通過\n';
+  let timedOut = false;
+  try { await send({ action: 'run', code: 'while True:\n    pass' }); }
+  catch (error) { timedOut = error.message === '執行逾時'; }
+  assert(timedOut, '8秒逾時未生效');
+  await start();
+  const afterTimeout = await send({ action: 'run', code: 'print(42)' });
+  assert(afterTimeout.output.trim() === '42', '逾時後無法重新執行');
+  output.textContent += '✓ 8秒逾時終止與重新載入通過\n';
   status.textContent = `全部通過：10 單元、${cases} 組教材與字典案例，以及執行器邊界測試。`;
 } catch (error) { status.textContent = `驗證失敗：${error.message}`; }
 finally { worker?.terminate(); clearTimeout(loadTimeout); }

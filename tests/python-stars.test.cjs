@@ -31,12 +31,13 @@ const root = path.resolve(__dirname, '..');
       const low = verificationTests(lesson, activity, () => 0);
       const high = verificationTests(lesson, activity, () => .999999);
       if (lesson.id !== 1) {
-        assert.equal(low.length, activity.tests.length + 3);
-        assert.notDeepEqual(low.slice(-3).map(item => item.input), high.slice(-3).map(item => item.input));
+        assert.equal(low.length, activity.tests.length + 6);
+        assert.notDeepEqual(low.slice(-6).map(item => item.input), high.slice(-6).map(item => item.input));
       }
       requests.push({ code: activity.solution, tests: low, shouldPass: true, label: `${lesson.id}/${stage}: generated minimum` });
       requests.push({ code: activity.solution, tests: high, shouldPass: true, label: `${lesson.id}/${stage}: generated maximum` });
-      requests.push({ code: lesson.activities[stage - 1].solution, tests: activity.tests, shouldPass: false, label: `${lesson.id}/${stage}: copying previous answer` });
+      // 前一關未必有上限檢查；使用代表性案例避免本機刻意錯誤的程式跑巨量迴圈。
+      requests.push({ code: lesson.activities[stage - 1].solution, tests: activity.tests.slice(0, 5), shouldPass: false, label: `${lesson.id}/${stage}: copying previous answer` });
     }
   }
   for (const [id, oldText, newText] of [[4, 'pressure > 100', 'pressure > 1000'], [5, 'n < 1', 'n < 0'], [8, 'score >= 60', 'score > 60'], [10, 'code < 1', 'code < 0']]) {

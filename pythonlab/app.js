@@ -153,7 +153,8 @@ async function runCode(check = false) {
   $('#feedback').hidden = true;
   $('#output').textContent = check ? '正在驗證…' : '正在執行…';
   try {
-    const result = await execute(check ? 'check' : 'run', code, $('#stdin').value, verificationTests(lesson, activity));
+    const tests = check ? verificationTests(lesson, activity) : [];
+    const result = await execute(check ? 'check' : 'run', code, $('#stdin').value, tests);
     if (currentLesson !== lesson || currentStage !== stage) return;
     if (!check) {
       $('#output').textContent = result.output || '（沒有輸出）';
@@ -161,11 +162,11 @@ async function runCode(check = false) {
       else setFeedback('執行完成。和你的預測相同嗎？試著改一個值，再觀察差異。');
       return;
     }
-    const allPassed = result.results.length > 0 && result.results.every(item => item.passed);
+    const allPassed = tests.length > 0 && result.results.length === tests.length && result.results.every(item => item.passed);
     $('#output').textContent = '驗證會分別使用下方的測試資料，每一組都從新的程式狀態開始。';
     const passed = result.results.filter(item => item.passed).length;
     const structuralNames = { For: 'for 迴圈', While: 'while 迴圈', Break: 'break', FunctionDef: 'def 函式', List: '清單' };
-    const rows = result.results.map(item => `<details class="test-row" ${item.passed ? '' : 'open'}><summary>${item.passed ? '✓' : '✕'} ${escape(item.name)}</summary><pre>輸入：\n${escape(item.input || '（不需輸入）')}\n\n預期輸出：\n${escape(item.expected || '（沒有輸出）')}\n\n你的輸出：\n${escape(item.output || '（沒有輸出）')}${item.error ? `\n\n${escape(errorText(item.error))}` : ''}${item.missing?.length ? `\n\n此任務還需要：${escape(item.missing.map(name => structuralNames[name] || name).join('、'))}` : ''}</pre></details>`).join('');
+    const rows = [...result.results].sort((a, b) => Number(a.passed) - Number(b.passed)).map(item => `<details class="test-row" ${item.passed ? '' : 'open'}><summary>${item.passed ? '✓' : '✕'} ${escape(item.name)}</summary><pre>輸入：\n${escape(item.input || '（不需輸入）')}\n\n預期輸出：\n${escape(item.expected || '（沒有輸出）')}\n\n你的輸出：\n${escape(item.output || '（沒有輸出）')}${item.callResults?.length ? `\n\n函式檢查：\n${escape([...item.callResults].sort((a, b) => Number(a.passed) - Number(b.passed)).map(call => `${call.passed ? "✓" : "✕"} ${call.function}(${JSON.stringify(call.args).slice(1, -1)})\n預期回傳：${call.expected}\n實際回傳：${call.actual}`).join("\n\n"))}` : ""}${item.error ? `\n\n${escape(errorText(item.error))}` : ''}${item.missing?.length ? `\n\n此任務還需要：${escape(item.missing.map(name => structuralNames[name] || name).join('、'))}` : ''}</pre></details>`).join('');
     let message = allPassed ? `全部 ${passed} 組資料驗證通過！請再用自己的話說明程式。` : `通過 ${passed} / ${result.results.length} 組。比較第一個失敗案例，找出需要修改的地方。`;
     let nextLink = '';
     if (tier && allPassed) {

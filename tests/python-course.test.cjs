@@ -43,7 +43,7 @@ const root = path.resolve(__dirname, '..');
     { action: 'run', code: 'print(private_value)', input: '' },
     { action: 'run', code: 'while True:\n    print("x" * 1000)', input: '' },
     { action: 'check', code: 'print(5050)', tests: lessons[4].activities[1].tests },
-    { action: 'check', code: 'n = int(input())\nprint(sum(range(1, n + 1)))', tests: lessons[4].activities[2].tests.filter(test => !test.requires) },
+    { action: 'check', code: 'n = int(input())\nprint(sum(range(1, n + 1)))', tests: lessons[4].activities[2].tests.map(({ requires, ...test }) => test) },
     { action: 'check', code: 'print(float("nan"))', tests: [{ name: 'finite only', input: '', expected: '80', numeric: true }] }
   ];
   const engine = JSON.parse(execFileSync('python', ['-X', 'utf8', '-c', driver], { cwd: root, input: JSON.stringify(engineRequests), encoding: 'utf8' }));
