@@ -1,6 +1,6 @@
 # unforte_115
 
-以 Scratch 為主的互動式程式設計教材網站，提供七、八年級課程、Scratch 範例教材與教師資源圖解。
+互動式程式設計教材網站，提供七、八年級 Scratch 課程、Python 引導式學習、Scratch 範例教材與教師資源圖解。
 
 > 想從零建立一套相同類型的教材網站，請閱讀[從零復刻教材系統：新手開發手冊](SYSTEM_REPLICATION_GUIDE.md)；想了解本網站如何從課程整理、教材設計調整到目前定位，可閱讀[系統開發過程](DEVELOPMENT.md)；要新增或復刻單一教材單元時，請參考[新增教材單元指南](UNIT_AUTHORING_GUIDE.md)。
 
@@ -57,6 +57,7 @@
 | 頁面 | 用途 |
 | --- | --- |
 | `index.html` | 課程教材入口首頁 |
+| `pythonlab/index.html` | 10 單元 Python 引導式課程、網站內執行與站內參考小幫手 |
 | `1150700.html`～`1150706.html` | 11507 課程單元 |
 | `1150800.html`～`1150806.html` | 11508 課程單元 |
 | `lesson-plan-grade-7.html`、`lesson-plan-grade-8.html` | 可在首頁課程小卡開啟的七、八年級教案 |
@@ -67,6 +68,10 @@
 
 直接以瀏覽器開啟 `index.html`，或部署至靜態網站服務（例如 GitHub Pages）。教材頁面可離線瀏覽，但外部 CDN 的字型與樣式需要網路連線。
 
+Python Lab 需要透過網站網址開啟；本機執行 `npm run preview`（或 `node scripts/preview.cjs`）後，開啟 `http://127.0.0.1:4173/pythonlab/index.html`。Python 執行環境固定使用 Pyodide 0.27.7，首次載入需網路。草稿、預測、離堂說明與挑戰驗證只保存在此瀏覽器，不跨裝置同步。詳細教學流程與維護方式見 [Python Lab 說明](pythonlab/README.md)，課程規劃見 [Python 課程設計](PYTHON_COURSE_PLAN.md)。
+
+Python 的十個單元依序為輸出、變數與輸入、型態與運算、條件、for 累加、巢狀迴圈、while、清單、函式與模組、購物結帳專題。每課包含示範、引導、挑戰，以及語法卡、逐層提示與離堂檢核。
+
 ## 技術概況
 
 - 靜態 HTML、CSS、原生 JavaScript 為主
@@ -74,3 +79,4 @@
 - `1150801.html` 使用 React 與 Babel 的瀏覽器端版本
 - `learning-guides.js` 顯示逐課目標與完成證據；`curriculum-labs.js` 提供課綱補強互動活動；`adaptive-practice.js` 提供不保存作答資料的三級自適應練習
 - 僅七年級第 1、2 課部分通關狀態以瀏覽器 `localStorage` 保存；網站不記錄全站成績，也沒有作業繳交後端
+- Python Lab 另以 `localStorage` 保存自身的練習草稿與挑戰驗證；Python 在可停止的 Worker 執行，每次任務使用新的變數命名空間，限制執行時間與輸出量，並提供多組案例驗證。這些是形成性練習，不是正式評分或安全隔離服務。

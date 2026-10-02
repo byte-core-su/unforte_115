@@ -1,0 +1,29 @@
+Scratch 和 Python 都是程式語言，但它們在各方面有所不同。：
+Scratch 是一款由麻省理工學院（MIT）設計開發的圖形化程式工具，專為青少年設計。
+針對 7 歲及以上孩子的認知水平，以及對界面的喜好，MIT進行了深入研究並有針對性地設計開發。
+Scratch 使用可視化的“積木”形式，通過拖動小方塊來編寫故事、動畫和各種小遊戲。
+優點：容易上手，生動有趣，適合 7-11 歲的孩子進行少兒編程啟蒙。
+缺點：變量類型較少，算法相對簡單，難以實現複雜的數據結構。
+適用領域：少兒編程教育.
+https://scratch.mit.edu/
+：
+Python 是一種文本編程語言，被廣泛用於Web、科學計算、機器學習、爬蟲、數據分析、量化交易、雲計算等領域。
+Python 的靈活性高，易於學習，是軟件工程師們喜愛的程式語言之一。
+優點：靈活易學，開源，程式碼縮進規範。
+缺點：程式碼不能加密。
+適用領域：Web、科學計算、機器學習、爬蟲、數據分析、量化交易、雲計算、運維.
+https://www.python.org/
+https://trinket.io/python
+https://www.onlinegdb.com/online_python_compiler
+https://colab.research.google.com/?hl=zh-tw
+https://jupyter.org/
+總之，Scratch 適合初次學習程式語言的小學階段，而Python 則更適合進階學習，尤其在人工智能領域. 選擇哪種語言取決於孩子的興趣和學習目標。 .
+
+例題一:
+使用Scratch 小貓說出" Hello World!"
+使用上述三個Python 編譯器，列印 " Hello World!"
+print('Hello World !')
+例題二:
+使用Scratch 小貓詢問"請問您的名字?"，小貓說出"哈囉! XXX 您好!"
+使用上述三個Python 編譯器，如下範例說明編寫程式。
+祝成功

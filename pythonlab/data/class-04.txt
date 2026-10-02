@@ -1,0 +1,81 @@
+https://simplelearn.tw/python-for-beginners-tutorial-operators/#google_vignette
+
+
+在 Python 中，我們可以使用 if、elif 和 else 來進行邏輯判斷。讓我們來看看這些語法的用法和範例：
+使用方式：if 條件:
+如果條件為 True，則執行對應的程式；如果為 False，則跳過判斷式，繼續執行下方的程式。
+範例 1:
+a = 2
+b = 3 
+if a > b: 
+     print('hello') # 不會印出，因為結果為 False 
+     print('ok') # ok
+
+
+使用方式：if 條件: ... else: ...
+如果條件為 True，執行 if 對應的程式；否則執行 else 對應的程式。
+範例 2:
+a = 2
+b = 3
+if a > b: 
+           print('hello') # 不會印出，因為結果為 False 
+else:
+           print('world') # world
+           print('ok') # ok
+使用方式：if 條件: ... elif 條件: ... else: ...
+可以判斷多種不同的條件，elif 對應結果為 True 的程式，else 對應結果為 False 的程式。
+範例 3：
+a = 2
+b = 3
+if a > b:
+           print('a > b') # 不會印出
+elif a < b:
+           print('a < b') # a < b
+else:
+           print('a = b') # 不會印出
+print('ok') # ok
+
+在一個判斷式裡，還有另外 n 個判斷，層層判斷下去。
+範例 4：
+a = 2
+b = 3
+if a < b:
+           print('a < b') # a < b
+if a == 1:
+           print('a = 1') # 不會印出
+elif a == 2:
+           print('a = 2') # a = 2
+elif a == 3:
+           print('a = 3') # 不會印出
+else:
+           print('a > b') # 不會印出
+print('ok') # ok
+
+簡化只有 if 和 else 的判斷式。
+語法：變數 = 值1 if 條件式 else 值2
+範例 5：
+a = 1
+b = 2
+c = 'a' if a > b else 'b' 
+print(c) # b
+
+範例 6：
+輸入任一數值，判斷輸出是奇偶數
+
+範例 7：
+level 0 題目一:
+遊樂園小火車進廠進行輪胎檢驗。
+檢驗項目包含輪胎的胎壓(PSI)與胎痕(公分)。當胎壓低於30PSI或胎痕小於1.6公分，表示輪胎需要維護。
+請設計自動檢驗機，根據輪胎狀況輸出「需要維護」或「不需要維護」。
+
+輸入：
+40 1.8
+正確輸出：
+不需要維護
+你的輸出：
+
+輸入：
+25 1.7
+正確輸出：
+需要維護
+你的輸出：

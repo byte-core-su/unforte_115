@@ -1,0 +1,82 @@
+使用ChatGPT 學習 Python。
+
+def & import
+
+Python 裡，def 和 import 是兩個完全不同的關鍵字，各自有不同的用途：
+📝 def：定義函式
+用來建立一個新的函式。
+語法結構：pythondef 函式名稱(參數):
+# 函式內容
+return 結果
+範例：
+pythondef add(a, b):
+return a + b
+
+print(add(3, 5)) # 輸出 8
+📦 import：匯入模組
+用來載入 Python 標準庫或第三方套件。
+語法結構：pythonimport 模組名稱
+範例：python
+import math
+print(math.sqrt(16)) # 輸出 4.0
+👉 簡單來說：
+def
+import
+要不要我幫你設計一個小範例，把 def 和 import 結合起來，例如用 math 模組計算圓面積的函式？
+
+幫我設計一個小範例，把 def 和 import 結合起來，例如用 math 模組計算圓面積的函式？
+
+好的，這裡幫你設計一個簡單範例，把 def 和 import 結合起來，用 math 模組計算圓面積：
+python
+
+import math # 匯入 math 模組
+
+# 定義一個函式來計算圓面積
+def circle_area(radius):
+return math.pi * (radius ** 2)
+
+# 測試函式
+r = 5
+print(f"半徑 {r} 的圓面積是 {circle_area(r)}")
+✨ 程式解說
+import math：匯入 Python 的數學模組，裡面有常數 math.pi。
+def circle_area(radius):：定義一個函式，輸入半徑 radius。
+math.pi * (radius ** 2)：利用公式 計算面積。
+print(...)：輸出結果。
+執行後會得到：
+程式碼
+
+半徑 5 的圓面積是 78.53981633974483
+
+要不要我再幫你擴充一下，讓這個函式同時可以計算圓周長（使用 math.pi * 2 * r），變成一個「圓形工具包」？
+
+擴充一下，讓這個函式同時可以計算圓周長（使用 math.pi * 2 * r），變成一個「圓形工具包」？
+
+好的！我們來設計一個「圓形工具包」，同時能計算 和 ：
+python
+
+import math # 匯入 math 模組
+
+# 定義圓形工具包
+def circle_tools(radius):
+area = math.pi * (radius ** 2) # 圓面積公式：πr²
+circumference = 2 * math.pi * radius # 圓周長公式：2πr
+return area, circumference
+
+# 測試函式
+r = 5
+area, circumference = circle_tools(r)
+print(f"半徑 {r} 的圓面積是 {area}")
+print(f"半徑 {r} 的圓周長是 {circumference}")
+✨ 程式解說
+circle_tools(radius)：這個函式同時回傳面積和周長。
+math.pi：使用 math 模組提供的 π 常數。
+return area, circumference：一次回傳兩個值。
+呼叫函式後，用 area, circumference = circle_tools(r) 接收結果。
+執行後會得到：
+程式碼
+
+半徑 5 的圓面積是 78.53981633974483
+半徑 5 的圓周長是 31.41592653589793
+
+要不要我再幫你升級一下，把它改成 （用 class 定義一個 Circle 類別），讓你可以更直覺地呼叫 circle.area() 和 circle.circumference()？

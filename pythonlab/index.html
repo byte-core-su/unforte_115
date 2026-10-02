@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="已有 Scratch 基礎的國中生適用：10 個 Python 引導式單元，直接在網站撰寫、執行與驗證程式。">
+  <title>Python Lab｜Python 互動學習</title>
+  <link rel="stylesheet" href="../site-theme.css">
+  <link rel="stylesheet" href="pythonlab.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body class="python-lab">
+  <a class="skip-link" href="#main">跳到主要內容</a>
+  <header class="topbar">
+    <a class="brand" href="#"><span class="brand-mark" aria-hidden="true">Py</span><span>Python <b>Lab</b><small>從積木，走向程式碼</small></span></a>
+    <nav aria-label="主要導覽"><a href="../index.html">教材首頁</a><a href="#">課程總覽</a><button type="button" data-dictionary>參考小幫手</button></nav>
+  </header>
+  <main id="main" tabindex="-1"></main>
+  <script>
+    if (location.protocol === 'file:') {
+      document.getElementById('main').innerHTML = '<p class="notice">請從教材網站網址開啟 Python 課程。本機預覽可在專案執行 npm run preview，再開啟 http://127.0.0.1:4173/pythonlab/index.html。</p>';
+    }
+  </script>
+  <footer class="lab-footer"><span>Python Lab · 115 學年度資訊科技</span><span>草稿與學習進度只保存在此瀏覽器</span></footer>
+  <dialog id="dictionary-dialog" aria-labelledby="dictionary-title">
+    <div class="dialog-heading"><div><p class="eyebrow">隨時查，不用離開練習</p><h2 id="dictionary-title">參考小幫手</h2></div><button type="button" id="close-dictionary" class="button" aria-label="關閉參考小幫手，回到練習">回到練習 ✕</button></div>
+    <nav id="helper-nav" class="helper-nav" aria-label="參考分類"></nav>
+    <p id="helper-context" class="helper-context"></p>
+    <label for="dictionary-search">搜尋目前分類的語法、用途或錯誤</label>
+    <input id="dictionary-search" type="search" placeholder="例如：迴圈、input、NameError…" autocomplete="off">
+    <div id="dictionary-results"></div>
+  </dialog>
+  <noscript><p class="notice">請啟用 JavaScript，才能使用 Python 課程、語法字典與編輯器。</p></noscript>
+</body>
+</html>

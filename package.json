@@ -1,7 +1,10 @@
 {
   "private": true,
   "scripts": {
-    "build:lesson-plans": "node scripts/build-lesson-plans.cjs"
+    "build:lesson-plans": "node scripts/build-lesson-plans.cjs",
+    "preview": "node scripts/preview.cjs",
+    "test": "node --test tests/*.test.cjs",
+    "test:python": "node --test tests/python-course.test.cjs tests/python-helper.test.cjs"
   },
   "devDependencies": {
     "marked": "17.0.5"

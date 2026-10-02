@@ -1,0 +1,104 @@
+https://www.rapidtables.org/zh-TW/convert/number/ascii-hex-bin-dec-converter.html#google_vignette
+
+Scratch
+Scratch是一個視覺化程式語言，它的變數沒有明確的資料型態區別。因此，在 Scratch 中，你不需要進行資料型態轉換的操作。
+你可以創建變數並賦予它們值，而不必擔心它們是整數、浮點數、還是字串。
+Python
+Python是一個文字型程式語言，它有幾種不同的資料型態：
+整數（Integers） :用於儲存沒有小數部分的數字，例如 5、-3、42 等。
+浮點數（Floats） :用於儲存帶有小數部分的數字，例如 3.14、-0.001、2.0 等。
+字串（Strings） :用來儲存文字，必須寫在引號內，例如 “hello”、“Python3” 等。
+布林值（Booleans） :只有兩個值，True 和 False，用來表示事情的真假。
+
+在實際應用中，我們經常需要進行型態轉換，例如將數字轉換為字串或反之。 提供了內建的函式，如 str()、int() 和 float()，來實現這些轉換。變數和資料型態是程式編寫的基石，無論是簡單的數據處理還是複雜的算法開發，都離不開對它們的理解和運用。
+https://www.python.org/
+https://trinket.io/python
+https://www.onlinegdb.com/online_python_compiler
+例題一:
+#int
+x = 1
+print(x)
+print(type(x))
+
+例題二:
+#float
+x = 1.5
+print(x)
+print(type(x))
+
+例題三:
+#bool
+1. a = True
+    print(a)
+    print(type(a))
+
+2. a = 1
+    b = 2
+    print(a==b)
+
+例題四:
+#str
+1. song = "Hello, Goodbye"
+    print(song)
+    print(type(song))
+
+2. print('"Bohemian Rhapsody" is a song by the British rock band Queen.')
+
+3.  str1 = "Lucy in the sky"
+     str2 = " with diamonds"
+     print(str1 + str2)
+
+4. str = "ccClub"
+    print(str*3)
+
+5. str = "Python"
+     print(str)
+     print(len(str))
+
+6. str = "Python"
+    print(str[1:4])
+    print(str[4])
+
+例題五:
+#chr
+c = 66
+cAsChr = chr(c)
+print(cAsChr)
+
+例題六:
+強制型別轉換
+floatNum = 55.0
+intNum = int(floatNum)
+print(floatNum)
+print(intNum)
+print(type(floatNum))
+print(type(intNum))
+
+stringNum = "55"
+intNum = int(stringNum)
+print(stringNum)
+print(intNum)
+print(type(stringNum))
+print(type(intNum))
+
+例題七:
+自動型別轉換
+ 1. number= 8+6.3
+    print(number)
+    print(type(number))
+
+2. 23+64
+    23+'64'
+    'hello'+34
+    'hello'+'34'
+    'hello'+str(34)
+
+3.  number1=56+'23'
+     number2=56+int('23')
+     print(type(number2))
+  
+為何有所不同?
+
+例題八:(Scratch, python
+設計一個程式，讓使用者輸入三個數字，並輸出三數之和
+祝成功

@@ -1,0 +1,56 @@
+Scratch
+Scratch是一個視覺化程式語言，它的變數沒有明確的資料型態區別。因此，在 Scratch 中，你不需要進行資料型態轉換的操作。
+你可以創建變數並賦予它們值，而不必擔心它們是整數、浮點數、還是字串。
+Python
+Python是一個文字型程式語言，它有幾種不同的資料型態：
+整數（Integers） :用於儲存沒有小數部分的數字，例如 5、-3、42 等。
+浮點數（Floats） :用於儲存帶有小數部分的數字，例如 3.14、-0.001、2.0 等。
+字串（Strings） :用來儲存文字，必須寫在引號內，例如 “hello”、“Python3” 等。
+布林值（Booleans） :只有兩個值，True 和 False，用來表示事情的真假。
+
+在實際應用中，我們經常需要進行型態轉換，例如將數字轉換為字串或反之。 提供了內建的函式，如 str()、int() 和 float()，來實現這些轉換。變數和資料型態是程式編寫的基石，無論是簡單的數據處理還是複雜的算法開發，都離不開對它們的理解和運用。
+https://www.python.org/
+https://trinket.io/python
+https://www.onlinegdb.com/online_python_compiler
+https://colab.research.google.com/?hl=zh-tw
+https://jupyter.org/
+例題一:
+print(”How",”are", ”you?")
+print(”How",”are", ”you?", sep="@")
+◼︎ 執行結果:
+How are you?
+How@are@you?
+
+例題二:
+print("How","are", ”you?")
+print("How","are", ”you?", end="#")
+print("How","are", ”you?")
+◼︎ 執行結果:
+How are you?
+How are you?#How are you?
+
+例題三:
+score= input("請輸入考試成績")
+score= input('請輸入考試成績')
+score= input()
+以上三種均為合法的命令
+
+例題四:
+score = input('請輸入考試成績')
+print("考試成績  : ", score)
+
+例題五:(Scratch, python)
+值日生
+請設計一個程式，讓使用者輸入值日生的名字後，電腦會將今天值日生的名字呈現在畫面上。 
+
+例題六:
+score = input('請輸入考試成績')
+print("考試成績  : ", score+score)
+◼︎ 執行結果:
+????
+score =int( input('請輸入考試成績'))
+print("考試成績  : ", score+score)
+◼︎ 執行結果:
+????
+
+為何有所不同?

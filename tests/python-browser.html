@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-TW"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Python 瀏覽器驗證</title>
+<body><h1>Python 瀏覽器驗證</h1><p id="status">正在載入實際 Python 執行環境…</p><pre id="results"></pre><a href="../pythonlab/index.html">返回課程</a>
+<script type="module">
+import { lessons, dictionary } from '../pythonlab/course-data.js';
+const status = document.querySelector('#status');
+const output = document.querySelector('#results');
+let worker;
+let counter = 0;
+let waiting;
+let loadResolve;
+let loadReject;
+let loadTimeout;
+function start() {
+  return new Promise((resolve, reject) => {
+    loadResolve = resolve; loadReject = reject;
+    worker = new Worker('../pythonlab/python-worker.js', { type: 'module' });
+    loadTimeout = setTimeout(() => reject(new Error('載入超過 90 秒')), 90000);
+    worker.onmessage = ({ data }) => {
+      if (data.type === 'ready') { clearTimeout(loadTimeout); loadResolve(); }
+      else if (data.type === 'load-error') { clearTimeout(loadTimeout); loadReject(new Error(data.message)); }
+      else if (waiting && data.id === waiting.id) {
+        clearTimeout(waiting.timeout);
+        const current = waiting; waiting = null;
+        if (data.type === 'result') current.resolve(data.result); else current.reject(new Error(data.message));
+      }
+    };
+    worker.onerror = event => { clearTimeout(loadTimeout); reject(new Error(event.message)); };
+  });
+}
+function send(request) {
+  return new Promise((resolve, reject) => {
+    const id = ++counter;
+    waiting = { id, resolve, reject, timeout: setTimeout(() => reject(new Error('執行逾時')), 8000) };
+    worker.postMessage({ id, ...request });
+  });
+}
+function assert(condition, message) { if (!condition) throw new Error(message); }
+try {
+  await start(); let cases = 0;
+  for (const lesson of lessons) {
+    for (const activity of lesson.activities) {
+      const tests = activity.tests.length ? activity.tests : [{ name: '示範', input: activity.input, expected: activity.expected }];
+      const result = await send({ action: 'check', code: activity.solution, tests });
+      assert(result.results.every(item => item.passed), `第 ${lesson.id} 課 ${activity.title}: ${JSON.stringify(result)}`);
+      cases += result.results.length;
+    }
+    output.textContent += `✓ 第 ${lesson.id} 單元：示範、引導、挑戰全部通過\n`;
+  }
+  for (const entry of dictionary) {
+    const result = await send({ action: 'check', code: entry.example, tests: [{ name: entry.id, input: entry.input || '', expected: entry.output }] });
+    assert(result.results[0].passed, `字典 ${entry.id}`); cases++;
+  }
+  output.textContent += `✓ ${dictionary.length} 個字典範例通過\n`;
+  await send({ action: 'run', code: 'not_shared = 42' });
+  const isolation = await send({ action: 'run', code: 'print(not_shared)' });
+  assert(isolation.error?.type === 'NameError', '變數未隔離');
+  const syntax = await send({ action: 'run', code: 'if True\n    print(1)' });
+  assert(syntax.error?.type === 'SyntaxError' && syntax.error.line === 1, '錯誤行號不正確');
+  const eof = await send({ action: 'run', code: 'print(input())\nprint(input())', input: 'one' });
+  assert(eof.error?.type === 'EOFError' && eof.output.trim() === 'one', '缺少輸入的處理錯誤');
+  const capped = await send({ action: 'run', code: 'while True:\n    print("x" * 1000)' });
+  assert(capped.error?.type === 'RuntimeError', '未限制輸出');
+  output.textContent += '✓ 輸入、語法行號、變數隔離、輸出限制通過\n';
+  // Terminate a truly non-printing infinite loop, then verify a new worker runs.
+  worker.postMessage({ id: ++counter, action: 'run', code: 'while True:\n    pass' });
+  await new Promise(resolve => setTimeout(resolve, 150));
+  worker.terminate(); await start();
+  const restored = await send({ action: 'run', code: 'print(6 * 7)' });
+  assert(restored.output.trim() === '42', '停止後無法重新執行');
+  output.textContent += '✓ 無限迴圈停止與重新啟動通過\n';
+  status.textContent = `全部通過：10 單元、${cases} 組教材與字典案例，以及執行器邊界測試。`;
+} catch (error) { status.textContent = `驗證失敗：${error.message}`; }
+finally { worker?.terminate(); clearTimeout(loadTimeout); }
+</script></body></html>
