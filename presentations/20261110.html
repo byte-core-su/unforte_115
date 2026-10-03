@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="115 學年度國中資訊科技教材的課程結構、設計理念、互動評量與課綱對應簡報。">
+  <meta name="color-scheme" content="light">
+  <title>國中資訊科技互動教材：課程與網站設計簡報</title>
+  <style>
+    :root { --bg:#f8fafc; --surface:#fff; --text:#1e293b; --muted:#64748b; --line:#e2e8f0; --g7:#4f46e5; --g8:#0891b2; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font-family:"Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif; line-height:1.5; }
+    button,select { font:inherit; }
+    a { color:var(--g7); text-underline-offset:4px; }
+    button,a,select,summary { touch-action:manipulation; }
+    :focus-visible { outline:3px solid var(--g8); outline-offset:4px; }
+    .toolbar { display:none; position:sticky; top:0; z-index:10; align-items:center; justify-content:space-between; gap:16px; padding:12px 24px; background:rgba(255,255,255,.97); border-bottom:1px solid var(--line); }
+    .js .toolbar { display:flex; }
+    .controls { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+    button,select { border:1px solid #cbd5e1; border-radius:8px; background:white; color:var(--text); min-height:42px; padding:8px 12px; cursor:pointer; }
+    button:hover:not(:disabled) { background:#eef2ff; border-color:var(--g7); }
+    button:disabled { opacity:.4; cursor:default; }
+    button[aria-pressed="true"] { color:var(--g7); background:#eef2ff; border-color:var(--g7); }
+    select { max-width:280px; }
+    .toolbar > a { white-space:nowrap; font-size:14px; }
+    main { width:min(1280px,calc(100% - 48px)); margin:24px auto; }
+    .js main { width:min(1280px,calc(100% - 48px),calc((100dvh - 150px) * 16 / 9)); }
+    .slide-page { margin-bottom:32px; container-type:inline-size; }
+    .slide-page[hidden] { display:none; }
+    .slide { --accent:var(--g7); aspect-ratio:16/9; display:flex; flex-direction:column; padding:clamp(24px,5cqw,64px); background:var(--bg); border:1px solid var(--line); box-shadow:0 12px 40px #1e293b08; }
+    .grade8 { --accent:var(--g8); }
+    .eyebrow { margin:0 0 14px; color:var(--accent); font-weight:700; font-size:clamp(14px,1.6cqw,20px); }
+    h1,h2 { margin:0; font-size:clamp(28px,3.5cqw,44px); line-height:1.25; letter-spacing:.02em; }
+    h3 { font-size:clamp(23px,2.7cqw,34px); line-height:1.35; margin:0 0 20px; color:var(--accent); }
+    p { margin:0 0 18px; }
+    .content { flex:1; display:flex; flex-direction:column; justify-content:center; gap:16px; min-height:0; margin:24px 0 18px; font-size:clamp(18px,2.2cqw,28px); }
+    .content > p { margin:0; }
+    .columns { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center; }
+    .example { grid-template-columns:1.6fr 1fr; gap:32px; }
+    .copy p:last-child { margin-bottom:0; }
+    .lead { font-size:clamp(28px,3.4cqw,43px); line-height:1.35; font-weight:700; color:var(--accent); }
+    .cover .content { gap:36px; }
+    .cover .lead { font-size:clamp(34px,4.7cqw,60px); }
+    .cover .subtitle { font-size:clamp(23px,2.7cqw,34px); }
+    .muted { color:var(--muted); }
+    .callout { font-size:clamp(20px,2.2cqw,28px); font-weight:700; color:var(--accent); }
+    .caveat { font-size:clamp(16px,1.8cqw,23px); color:var(--muted); }
+    .slide-footer { display:flex; justify-content:space-between; gap:16px; color:var(--muted); font-size:clamp(13px,1.4cqw,18px); }
+    .slide-footer a { color:inherit; }
+    figure { margin:0; }
+    figure img { display:block; width:100%; height:auto; max-height:min(380px,27cqw); object-fit:contain; }
+    figcaption { margin-top:12px; color:var(--muted); font-size:clamp(14px,1.6cqw,20px); }
+    .table-wrap { width:100%; overflow:auto; }
+    table { border-collapse:collapse; width:100%; font-size:clamp(16px,1.85cqw,24px); line-height:1.4; }
+    th,td { border:1px solid var(--line); padding:7px 12px; text-align:left; vertical-align:middle; }
+    thead { color:white; background:var(--accent); }
+    th { font-weight:700; }
+    tbody tr:nth-child(odd) { background:white; }
+    .course-table th:first-child { width:23%; }
+    .course-table th:nth-child(2) { width:37%; }
+    .course-table th,.course-table td { padding:5px 12px; line-height:1.35; }
+    .notes { margin-top:12px; background:white; border:1px solid var(--line); padding:16px 24px; font-size:17px; }
+    .notes summary { cursor:pointer; font-weight:700; color:var(--muted); }
+    .notes p { margin-top:16px; }
+    .notes ul { padding-left:24px; }
+    .notes li { margin-bottom:6px; overflow-wrap:anywhere; }
+    .weight-row { display:grid; grid-template-columns:110px 1fr; align-items:center; gap:20px; margin-bottom:24px; }
+    .weight-bar { display:flex; height:64px; color:white; font-weight:700; }
+    .weight-bar span { display:flex; align-items:center; justify-content:center; }
+    .weight-bar .major { width:83.333333%; background:var(--g7); }
+    .weight-bar .data { background:var(--g8); }
+    .weight-bar .project { width:16.666667%; background:#64748b; }
+    .chart-caption { font-size:clamp(16px,1.8cqw,23px); margin-top:8px; }
+    .legend { font-size:clamp(17px,1.9cqw,24px); }
+    .grade7-text { color:var(--g7); }
+    .grade8-text { color:var(--g8); }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    .help { text-align:center; color:var(--muted); font-size:14px; padding:0 20px 20px; }
+    .status { min-width:66px; text-align:center; color:var(--muted); font-variant-numeric:tabular-nums; }
+    body:fullscreen { overflow:auto; background:var(--bg); }
+    body:fullscreen main { margin-top:12px; }
+    @media (max-width:900px) {
+      .toolbar { padding:10px 12px; flex-wrap:wrap; }
+      .toolbar > a { display:none; }
+      main { width:calc(100% - 24px); margin:12px auto; }
+      .js main { width:calc(100% - 24px); }
+      .slide { aspect-ratio:auto; min-height:65vh; padding:28px 24px; }
+      .content { gap:24px; }
+      .columns { gap:24px; }
+      th,td { padding:10px; }
+      .weight-row { grid-template-columns:85px 1fr; gap:12px; }
+    }
+    @media (max-width:620px) {
+      .columns { grid-template-columns:1fr; }
+      figure img { max-height:300px; }
+      .slide-footer { font-size:12px; }
+      select { max-width:200px; }
+      .content { font-size:20px; }
+      table { min-width:610px; font-size:16px; }
+      .weight-bar { height:54px; font-size:17px; }
+      .notes { padding:14px; }
+    }
+    @media (prefers-reduced-motion:no-preference) { button { transition:background .15s; } }
+    @page { size:A4 landscape; margin:8mm; }
+    @media print {
+      body { background:white; }
+      .toolbar,.help,.notes { display:none!important; }
+      main,.js main { width:100%; margin:0; }
+      .slide-page,.slide-page[hidden] { display:block!important; margin:0; break-after:page; page-break-after:always; container-type:normal; }
+      .slide-page:last-child { break-after:auto; page-break-after:auto; }
+      .slide { aspect-ratio:16/9; min-height:0; height:185mm; padding:10mm 12mm; border:0; box-shadow:none; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+      .eyebrow { font-size:11pt; margin-bottom:3mm; }
+      h1,h2 { font-size:25pt; }
+      h3 { font-size:20pt; margin-bottom:4mm; }
+      .content { font-size:17pt; gap:4mm; margin:5mm 0; }
+      .lead { font-size:25pt; }
+      .cover .lead { font-size:34pt; }
+      .cover .subtitle { font-size:22pt; }
+      .columns { grid-template-columns:1fr 1fr; gap:7mm; }
+      .example { grid-template-columns:1.6fr 1fr; }
+      table { min-width:0; font-size:13pt; }
+      th,td,.course-table th,.course-table td { padding:2.5mm; }
+      figure img { max-height:95mm; }
+      .callout { font-size:17pt; }
+      .caveat,figcaption,.chart-caption { font-size:12pt; }
+      .weight-bar { height:17mm; }
+      .slide-footer { font-size:10pt; }
+      .table-wrap { overflow:visible; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="toolbar" aria-label="簡報控制列">
+    <div class="controls">
+      <button type="button" id="previous" aria-label="上一頁">上一頁</button>
+      <span class="status" id="page-status" aria-live="polite" aria-atomic="true">1 / 16</span>
+      <button type="button" id="next" aria-label="下一頁">下一頁</button>
+      <label class="sr-only" for="slide-picker">選擇簡報頁面</label>
+      <select id="slide-picker"></select>
+      <button type="button" id="notes-toggle" aria-pressed="false" aria-keyshortcuts="N">講者備註</button>
+      <button type="button" id="fullscreen" aria-pressed="false" aria-keyshortcuts="F">全螢幕</button>
+      <button type="button" id="print">列印全部</button>
+    </div>
+    <a href="../index.html">返回教材首頁</a>
+  </nav>
+  <main id="presentation" aria-label="課程與網站設計簡報">
+    <article class="slide-page" id="slide-1">
+      <section class="slide cover" aria-labelledby="title-1">
+        <header><p class="eyebrow">115 學年度課程設計報告</p><h1 id="title-1">國中資訊科技互動教材</h1></header>
+        <div class="content"><p class="lead">Scratch 課程與網站設計</p><p class="subtitle">七年級程式結構與創作<br>八年級清單與演算法理解</p><p class="caveat">教授簡報用</p></div>
+        <footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>01 / 16</span></footer>
+      </section>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>開場可用約 40 秒說明：本網站支援國中 Scratch 教學。報告聚焦課程內容、設計取捨與可觀察的學習證據，最後提出尚待驗證的問題。建議全份簡報約 12 至 15 分鐘。</p><ul><li><a href="../index.html">教材入口</a></li><li><a href="https://github.com/byte-core-su/unforte_115/blob/main/README.md" target="_blank" rel="noopener noreferrer">專案 README</a></li></ul></details>
+    </article>
+    <article class="slide-page" id="slide-2">
+      <section class="slide" aria-labelledby="title-2"><header><p class="eyebrow">課程設計</p><h2 id="title-2">網站定位與教學範圍</h2></header>
+        <div class="content columns"><div class="copy"><p class="lead">七、八年級各 6 單元</p><p>每單元建議 2 節，每節 45 分鐘<br>每年級共 12 節，合計 24 節</p><p>提供互動教材與教案<br>正式作業收取與成績由教師處理</p></div><figure><img src="assets/20261110/home.png" alt="教材網站首頁，包含七年級、八年級與 Scratch Educators 入口" width="1265" height="712"><figcaption>網站入口實際畫面</figcaption></figure></div>
+        <footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>02 / 16</span></footer></section>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>網站定位為教材提供與課堂練習支援。24 節是兩份教案的建議合計，並非完整學年授課量。教師可以依先備能力調整時數。Scratch Educators 是教師資源，其他延伸教材不納入這次七、八年級比重分析。</p><ul><li><a href="../lesson-plan-grade-7.html">七年級教案</a></li><li><a href="../lesson-plan-grade-8.html">八年級教案</a></li><li><a href="../scratch_educators.html">Scratch Educators</a></li></ul></details>
+    </article>
+    <article class="slide-page" id="slide-3">
+      <section class="slide" aria-labelledby="title-3"><header><p class="eyebrow">課程設計</p><h2 id="title-3">課程設計理念</h2></header><div class="content"><div class="table-wrap"><table><thead><tr><th scope="col">學習環節</th><th scope="col">學生的行動</th><th scope="col">教師可觀察的證據</th></tr></thead><tbody><tr><td>預測</td><td>執行前判斷輸出與資料狀態</td><td>預測結果與理由</td></tr><tr><td>操作</td><td>組裝積木，調整參數並執行</td><td>程式作品與操作結果</td></tr><tr><td>追蹤</td><td>記下變數或清單的中間狀態</td><td>逐步追蹤表</td></tr><tr><td>解釋與修正</td><td>比較預測，測試另一組資料</td><td>除錯說明與測試案例</td></tr></tbody></table></div><p class="callout">情境任務提供共同目標，學習導航標示完成條件</p></div><footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>03 / 16</span></footer></section>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>星際任務是學習情境。核心仍是讓學生在執行前說出推理，在執行後追蹤與解釋。每課的目標、任務、完成證據與離堂檢核，協助教師與學生對齊重點。</p><ul><li><a href="../1150703.html">七年級多邊形課程</a></li><li><a href="../1150803.html">八年級資料統計課程</a></li><li><a href="https://github.com/byte-core-su/unforte_115/blob/main/CURRICULUM_ALIGNMENT.md" target="_blank" rel="noopener noreferrer">課綱對照表</a></li></ul></details>
+    </article>
+    <article class="slide-page" id="slide-4">
+      <section class="slide" aria-labelledby="title-4"><header><p class="eyebrow">七年級</p><h2 id="title-4">七年級課程結構</h2></header><div class="content"><div class="table-wrap"><table class="course-table"><thead><tr><th scope="col">單元</th><th scope="col">主要內容</th><th scope="col">完成證據</th></tr></thead><tbody><tr><td>1 起步診斷</td><td>積木基礎與資訊安全</td><td>診斷結果與安全判斷理由</td></tr><tr><td>2 三大結構</td><td>循序、選擇、重複與 IPO</td><td>流程圖與輸出預測</td></tr><tr><td>3 迴圈多邊形</td><td>重複次數與外角規律</td><td>兩種圖形及參數標註</td></tr><tr><td>4 變數螺旋</td><td>變數更新與圖形變化</td><td>每輪變數追蹤</td></tr><tr><td>5 曼陀羅</td><td>雙層迴圈與變數整合</td><td>內外迴圈功能說明</td></tr><tr><td>6 防禦網專題</td><td>座標、陣列繪圖與成本比較</td><td>三組參數測試及選擇理由</td></tr></tbody></table></div><p class="callout">自訂積木列為進階體驗，避免增加基礎課程負擔</p></div><footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>04 / 16</span></footer></section>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>七年級以程式結構、變數與視覺化繪圖建立基礎。第 1 課診斷不是下一課通行門檻。第 5 課自訂積木是進階延伸，核心仍是迴圈與變數。第 6 課要求測試與比較，而不只展示成品。</p><ul><li><a href="../1150700.html">七年級課程總覽</a></li><li><a href="../lesson-plan-grade-7.html">七年級教案</a></li></ul></details>
+    </article>
+    <article class="slide-page" id="slide-5">
+      <section class="slide grade8" aria-labelledby="title-5"><header><p class="eyebrow">八年級</p><h2 id="title-5">八年級課程結構</h2></header><div class="content"><div class="table-wrap"><table class="course-table"><thead><tr><th scope="col">單元</th><th scope="col">主要內容</th><th scope="col">完成證據</th></tr></thead><tbody><tr><td>1 清單基礎</td><td>索引、增刪與搜尋</td><td>操作前後的清單狀態</td></tr><tr><td>2 星際通訊</td><td>音符清單與依序走訪</td><td>索引與播放順序追蹤</td></tr><tr><td>3 能源分析</td><td>累加、平均及空清單處理</td><td>正常、單筆、空清單測試</td></tr><tr><td>4 不重複抽樣</td><td>候選清單與已選清單</td><td>兩份清單的變化紀錄</td></tr><tr><td>5 洗牌與排序</td><td>隨機重排與相鄰比較</td><td>交換過程及結果差異</td></tr><tr><td>6 對決專題</td><td>自訂積木與模組分工</td><td>三種情境測試與分工說明</td></tr></tbody></table></div><p class="callout">每課都追蹤執行前、執行中與執行後的資料</p></div><footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>05 / 16</span></footer></section>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>八年級重點是處理清單的步驟與資料狀態，涵蓋搜尋、走訪、累加、抽樣、洗牌及排序。第 2 課音訊體驗可選用，結合隱私與著作權討論。第 6 課測試正常發牌、牌數不足與不重複等情況。</p><ul><li><a href="../1150800.html">八年級課程總覽</a></li><li><a href="../lesson-plan-grade-8.html">八年級教案</a></li></ul></details>
+    </article>
+    <article class="slide-page" id="slide-6">
+      <section class="slide" aria-labelledby="title-6"><header><p class="eyebrow">課程設計</p><h2 id="title-6">課程比重的分析方式</h2></header><div class="content"><p>按主要教學目標分類，每個單元等權計算</p><figure aria-label="主要教學目標分類：七年級五個程式結構與實作單元、一個專題；八年級五個資料結構與演算法單元、一個專題。"><div class="weight-row"><span>七年級</span><div class="weight-bar"><span class="major">5／6</span><span class="project">1／6</span></div></div><div class="weight-row"><span>八年級</span><div class="weight-bar"><span class="major data">5／6</span><span class="project">1／6</span></div></div><figcaption class="legend"><span class="grade7-text">靛紫：程式結構與實作</span>　<span class="grade8-text">青藍：資料結構與演算法</span>　灰色：專題整合</figcaption></figure><p class="caveat">這是單元主目標的分析，不是授課時數比例。各單元仍同時涉及程式與演算法。</p></div><footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>06 / 16</span></footer></section>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>這是本簡報提出的分析口徑，不是網站已量測的數據。各年級六單元等權，第一至第五單元依主要目標分組，第六單元單列專題。5／6 約 83.3%，1／6 約 16.7%，但報告時宜優先使用單元數。七年級也有幾何演算法，八年級全部都要以 Scratch 實作。若需正式時數占比，須逐項標記活動時間，並建立混合活動分類規則。</p><ul><li><a href="../lesson-plan-grade-7.html">七年級教案</a></li><li><a href="../lesson-plan-grade-8.html">八年級教案</a></li></ul></details>
+    </article>
+    <article class="slide-page" id="slide-7">
+      <section class="slide" aria-labelledby="title-7"><header><p class="eyebrow">課程設計</p><h2 id="title-7">程式設計與演算法的關係</h2></header><div class="content"><p class="callout">同一個任務，可以用兩種角度理解</p><div class="table-wrap"><table><thead><tr><th scope="col">觀察角度</th><th scope="col">七年級多邊形</th><th scope="col">八年級清單加總</th></tr></thead><tbody><tr><td>演算法</td><td>重複 N 次，每次轉 360 ÷ N 度</td><td>逐項取值，更新累計總和</td></tr><tr><td>程式設計</td><td>用重複積木表達規律</td><td>用索引、迴圈與變數實作</td></tr><tr><td>理解檢核</td><td>改邊數後，哪些值必須改？</td><td>清單長度改變後如何處理？</td></tr></tbody></table></div><p>七年級偏重建立程式表達能力<br>八年級增加資料狀態、處理步驟與例外情況的分析</p></div><footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>07 / 16</span></footer></section>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>程式設計與演算法不是互斥類別。前者重視如何表達與實作，後者重視步驟是否合理、能否處理不同輸入。課程心智圖可將七年級放在程式設計節點，八年級放在演算法與資料處理節點，保留交叉連結。這是依本教材分析的定位建議，並非外部心智圖的正式節點名稱。</p><ul><li><a href="../1150703.html">迴圈多邊形</a></li><li><a href="../1150803.html">清單加總</a></li></ul></details>
+    </article>
+    <article class="slide-page" id="slide-8">
+      <section class="slide" aria-labelledby="title-8"><header><p class="eyebrow">課程設計</p><h2 id="title-8">一節課的教學安排</h2></header><div class="content"><div class="table-wrap"><table><thead><tr><th scope="col">環節</th><th scope="col">建議時間</th><th scope="col">活動重點</th></tr></thead><tbody><tr><td>導入與診斷</td><td>5 分鐘</td><td>提出問題與先備檢核</td></tr><tr><td>示範與預測</td><td>8 分鐘</td><td>讀程式，先說出執行結果</td></tr><tr><td>實作與資料追蹤</td><td>27 分鐘</td><td>操作、紀錄、除錯與測試</td></tr><tr><td>離堂檢核</td><td>5 分鐘</td><td>解釋規律並提出完成證據</td></tr></tbody></table></div><p class="lead">實作與追蹤約占 60%（27 ÷ 45）</p><p class="caveat">依教案建議時程計算，尚未以實際課堂觀察驗證</p></div><footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>08 / 16</span></footer></section>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>這裡分析教案建議的單節活動時間，與單元主要目標的比重不同。27／45＝60%，涵蓋操作、追蹤與測試，不應稱為純程式撰寫時間。教師可依學生熟練度增加示範或討論。</p><ul><li><a href="../lesson-plan-grade-7.html">七年級教案</a></li><li><a href="../lesson-plan-grade-8.html">八年級教案</a></li></ul></details>
+    </article>
+    <article class="slide-page" id="slide-9">
+      <section class="slide" aria-labelledby="title-9"><header><p class="eyebrow">互動教學案例</p><h2 id="title-9">七年級案例：迴圈多邊形</h2></header><div class="content columns example"><figure><img src="assets/20261110/polygon.png" alt="Scratch 多邊形模擬器，以重複三次、右轉120度畫出三角形" width="1265" height="712"><figcaption><a href="../1150703.html" target="_blank" rel="noopener noreferrer">開啟多邊形教材</a></figcaption></figure><div class="copy"><h3>正三角形</h3><p>重複 3 次<br>每次右轉 120 度</p><p>學生先預測能否閉合<br>再比較實際繪圖結果</p><p>延伸檢核<br>換成五邊形並解釋規律</p></div></div><footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>09 / 16</span></footer></section>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>此案例示範三次重複與 120 度轉角。正式檢核要換邊數並說明 360／N 的規律，避免只記住 3 與 120。截圖來自公開網站的實際操作，擷取日期為 2026-10-03。</p><ul><li><a href="../1150703.html">七年級第 3 課</a></li></ul></details>
+    </article>
+    <article class="slide-page" id="slide-10">
+      <section class="slide grade8" aria-labelledby="title-10"><header><p class="eyebrow">互動教學案例</p><h2 id="title-10">八年級案例：清單累加追蹤</h2></header><div class="content columns example"><figure><img src="assets/20261110/trace.png" alt="能源清單12、18、30的第一輪累加，索引為1，累計總和為12" width="1265" height="712"><figcaption><a href="../1150803.html" target="_blank" rel="noopener noreferrer">開啟清單累加教材</a></figcaption></figure><div class="copy"><h3>清單 [12, 18, 30]</h3><p>第 1 輪：總和 12<br>第 2 輪：總和 30<br>第 3 輪：總和 60</p><p>平均值 = 60 ÷ 3 = 20</p><p>再測試空清單<br>說明為何不能直接計算平均</p></div></div><footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>10 / 16</span></footer></section>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>截圖顯示第一輪狀態，右側列出完整的預期追蹤。學生需理解索引與總和變化，也需處理沒有資料時除數為零的情況。此處用簡單數值方便口頭說明，實際教材支援產生新資料。截圖擷取日期為 2026-10-03。</p><ul><li><a href="../1150803.html">八年級第 3 課</a></li></ul></details>
+    </article>
+    <article class="slide-page" id="slide-11">
+      <section class="slide" aria-labelledby="title-11"><header><p class="eyebrow">課程設計</p><h2 id="title-11">反覆練習與簡易自適應</h2></header><div class="content"><div class="columns example"><figure><img src="assets/20261110/adaptive.png" alt="自適應練習畫面，提供基礎、標準、挑戰三種難度與檢查預測功能" width="1265" height="712"></figure><div class="copy"><h3>三種難度</h3><p>兩題新題首次答對<br>提高下一題難度</p><p>第一次答錯給提示<br>第二次給詳解並降級</p><p>可自行選級或跳題<br>重新整理會重置</p></div></div><p class="caveat">規則式形成性練習，不計分，也不保存這組作答紀錄</p></div><footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>11 / 16</span></footer></section>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>十二課都有自適應練習，依當次作答調整，屬規則式機制，並非 AI 診斷或心理計量模型。新數值與選項變化降低背特定答案的可能，但無法完全阻止他人告知答案。正式評量仍需要推理與新情境任務。重新整理後練習狀態重置。部分既有功能使用本機儲存，不能把全站說成完全不留資料。</p><ul><li><a href="../1150703.html#adaptive-practice">自適應練習範例</a></li><li><a href="https://github.com/byte-core-su/unforte_115/blob/main/adaptive-practice.js" target="_blank" rel="noopener noreferrer">自適應練習機制</a></li></ul></details>
+    </article>
+    <article class="slide-page" id="slide-12">
+      <section class="slide" aria-labelledby="title-12"><header><p class="eyebrow">課程設計</p><h2 id="title-12">評量方式與學習證據</h2></header><div class="content"><div class="table-wrap"><table><thead><tr><th scope="col">層級</th><th scope="col">判斷重點</th><th scope="col">可觀察的證據</th></tr></thead><tbody><tr><td>4 遷移與改善</td><td>能處理新情境並提出改進</td><td>新案例測試及設計選擇理由</td></tr><tr><td>3 達成目標</td><td>作品正確且能解釋過程</td><td>程式、追蹤表與測試一致</td></tr><tr><td>2 部分達成</td><td>完成部分操作，解釋不完整</td><td>指出錯誤位置並嘗試修正</td></tr><tr><td>1 需要支持</td><td>仍需協助理解或完成任務</td><td>依提示操作並記錄困難</td></tr></tbody></table></div><p class="callout">網頁練習提供即時回饋，教師依作品與解釋評量</p><p>新資料、口頭理由與例外測試，可降低只背答案的影響</p></div><footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>12 / 16</span></footer></section>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>教案採四層級規準，可結合自評與同儕回饋。正式判斷以作品、資料追蹤與說明為證據，符合科技領域課綱鼓勵多元評量、形成性與總結性評量及照顧個別差異的方向。網站沒有成績登錄、作業繳交或 AI 自動評分後端。隨機題不能保證防作弊。</p><ul><li><a href="../lesson-plan-grade-7.html">七年級評量規準</a></li><li><a href="../lesson-plan-grade-8.html">八年級評量規準</a></li><li><a href="https://stv.naer.edu.tw/data/course_outline/pta_18529_8438379_60115.pdf" target="_blank" rel="noopener noreferrer">國家教育研究院：科技領域課綱</a></li></ul></details>
+    </article>
+    <article class="slide-page" id="slide-13">
+      <section class="slide" aria-labelledby="title-13"><header><p class="eyebrow">課程設計</p><h2 id="title-13">108 課綱的對應方式</h2></header><div class="content"><div class="table-wrap"><table><thead><tr><th scope="col">課程焦點</th><th scope="col">主要學習內容代碼</th><th scope="col">任務對應</th></tr></thead><tbody><tr><td>七年級程式基礎</td><td>A-IV-1、P-IV-1、P-IV-2</td><td>三大結構、變數與繪圖</td></tr><tr><td>八年級資料與演算法</td><td>A-IV-2、A-IV-3、P-IV-3</td><td>清單、搜尋、排序與資料處理</td></tr><tr><td>八年級模組化實作</td><td>P-IV-4、P-IV-5</td><td>自訂積木與專題測試</td></tr><tr><td>資訊科技使用責任</td><td>H-IV-1～3、H-IV-4～5</td><td>安全判斷、隱私與著作權</td></tr></tbody></table></div><p class="callout">學習表現以 t-IV-4、p-IV-1、a-IV-2 等條目逐課對應</p><p class="caveat">對應條目需搭配實際任務與證據，不能只靠頁面出現相關名詞</p></div><footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>13 / 16</span></footer></section>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>本教材對應資訊科技相關條目，未涵蓋科技領域全部課綱。專案對照表逐課列出活動與證據。七年級第 5 課的 P-IV-4／5 屬進階延伸，學習表現的具體對應以教案與課綱對照表為準。</p><ul><li><a href="https://stv.naer.edu.tw/data/course_outline/pta_18529_8438379_60115.pdf" target="_blank" rel="noopener noreferrer">官方科技領域課綱</a></li><li><a href="https://github.com/byte-core-su/unforte_115/blob/main/CURRICULUM_ALIGNMENT.md" target="_blank" rel="noopener noreferrer">逐課課綱對照表</a></li></ul></details>
+    </article>
+    <article class="slide-page" id="slide-14">
+      <section class="slide" aria-labelledby="title-14"><header><p class="eyebrow">課程設計</p><h2 id="title-14">網站架構與視覺一致性</h2></header><div class="content"><div class="columns"><div class="copy"><h3>靜態教材網站</h3><p>HTML、CSS 與瀏覽器互動程式<br>GitHub Pages 提供網頁入口</p><p>共用樣式與練習機制<br>單元內容可獨立修改與復刻</p></div><div class="copy"><p>淺色背景 #F8FAFC</p><p class="grade7-text">七年級靛紫 #4F46E5</p><p class="grade8-text">八年級青藍 #0891B2</p><p>綠色：成功<br>琥珀色：提示<br>紅色：需要修正</p></div></div><p class="caveat">部分互動保留深色模擬區，外層導航與教材保持淺色</p></div><footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>14 / 16</span></footer></section>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>架構以靜態頁面為主，共用 site-theme.css 管理外觀，adaptive-practice.js 提供跨課練習。部分頁面使用 React／Babel 與 CDN，不能說成所有頁面都是純原生或完全離線。年級色用於主題辨識，成功、提示、錯誤的語意維持共通。本簡報沿用網站色碼。</p><ul><li><a href="../site-theme.css">網站共用樣式</a></li><li><a href="https://github.com/byte-core-su/unforte_115/blob/main/README.md" target="_blank" rel="noopener noreferrer">專案架構說明</a></li></ul></details>
+    </article>
+    <article class="slide-page" id="slide-15">
+      <section class="slide" aria-labelledby="title-15"><header><p class="eyebrow">課程設計</p><h2 id="title-15">設計優點與目前限制</h2></header><div class="content"><div class="table-wrap"><table><thead><tr><th scope="col">現有設計</th><th scope="col">可提供的教學支持</th><th scope="col">目前限制</th></tr></thead><tbody><tr><td>視覺化互動</td><td>顯示參數、變數與資料變化</td><td>操作成功不等於理解</td></tr><tr><td>新題與同題重試</td><td>反覆練習並保留除錯機會</td><td>仍可能猜答或獲他人提示</td></tr><tr><td>規則式難度調整</td><td>提供不同起點與挑戰程度</td><td>無長期能力估計或學習紀錄</td></tr><tr><td>靜態架構與教案</td><td>便於部署、維護及單元復刻</td><td>依賴教師收集成果及網路資源</td></tr></tbody></table></div><p class="callout">上述是功能與設計上的優點，學習成效仍需課堂資料驗證</p></div><footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>15 / 16</span></footer></section>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>設計優勢與限制並列，方便教授檢視研究問題。無需帳號的教材部署減少系統整合負擔，但不等於沒有資料風險或一定更有效。CDN、外部連結與瀏覽器音訊支援需課前確認。目前沒有長期學習歷程或自動成績判斷。</p><ul><li><a href="https://github.com/byte-core-su/unforte_115/blob/main/README.md" target="_blank" rel="noopener noreferrer">專案功能與限制</a></li><li><a href="https://github.com/byte-core-su/unforte_115/blob/main/adaptive-practice.js" target="_blank" rel="noopener noreferrer">練習機制</a></li></ul></details>
+    </article>
+    <article class="slide-page" id="slide-16">
+      <section class="slide" aria-labelledby="title-16"><header><p class="eyebrow">課程設計</p><h2 id="title-16">後續驗證與討論</h2></header><div class="content"><p class="lead">優先驗證學生能否解釋與遷移</p><p>以前後測比較新情境的程式預測與資料追蹤<br>以相同規準檢視作品、除錯說明與例外測試<br>記錄學生卡關處及教師介入時間</p><div><h3 class="grade8-text">與教授討論</h3><p>單元主目標分類是否合適？<br>哪些任務最能呈現演算法理解與課綱學習表現？</p></div></div><footer class="slide-footer"><a href="../index.html">115 學年度資訊科技教材</a><span>16 / 16</span></footer></section>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>下一階段先以小規模課堂試用檢視任務與規準，再考慮比較研究。前後測應用等值但不同資料的新情境，避免只量測熟悉題目的答對率。若要聲稱自適應提升學習效果，需要適當比較組、研究倫理與樣本規劃，現階段不預設成效。教授可協助修訂比重的分類口徑。</p><ul><li><a href="../index.html">教材入口</a></li><li><a href="../lesson-plan-grade-7.html">七年級教案</a></li><li><a href="../lesson-plan-grade-8.html">八年級教案</a></li><li><a href="https://stv.naer.edu.tw/data/course_outline/pta_18529_8438379_60115.pdf" target="_blank" rel="noopener noreferrer">官方科技領域課綱</a></li></ul></details>
+    </article>
+  </main>
+  <p class="help">鍵盤 ← → 翻頁，Home／End 跳到首末頁，N 切換備註，F 全螢幕。手機可使用上方按鈕。列印會輸出全部 16 頁。</p>
+  <p id="feedback" class="sr-only" role="status" aria-live="polite"></p>
+  <script>
+    (() => {
+      const pages = Array.from(document.querySelectorAll('.slide-page'));
+      const previous = document.getElementById('previous');
+      const next = document.getElementById('next');
+      const picker = document.getElementById('slide-picker');
+      const status = document.getElementById('page-status');
+      const notesButton = document.getElementById('notes-toggle');
+      const fullscreenButton = document.getElementById('fullscreen');
+      const feedback = document.getElementById('feedback');
+      let current = 0;
+      let showNotes = false;
+      pages.forEach((page,index) => {
+        const option = document.createElement('option');
+        option.value = String(index);
+        option.textContent = `${index + 1}. ${page.querySelector('h1,h2').textContent}`;
+        picker.append(option);
+      });
+      function hashIndex() {
+        const match = /^#slide-(\d+)$/.exec(location.hash);
+        return match ? Math.min(pages.length - 1,Math.max(0,Number(match[1]) - 1)) : 0;
+      }
+      function show(index,updateHash = true) {
+        current = Math.min(pages.length - 1,Math.max(0,index));
+        pages.forEach((page,i) => { page.hidden = i !== current; });
+        pages[current].querySelector('.notes').open = showNotes;
+        previous.disabled = current === 0;
+        next.disabled = current === pages.length - 1;
+        picker.value = String(current);
+        status.textContent = `${current + 1} / ${pages.length}`;
+        document.title = `${current + 1}／${pages.length} ${pages[current].querySelector('h1,h2').textContent}：課程簡報`;
+        if (updateHash) {
+          try { history.replaceState(null,'',`#slide-${current + 1}`); }
+          catch { location.hash = `slide-${current + 1}`; }
+        }
+        window.scrollTo({top:0,behavior:'instant'});
+      }
+      function toggleNotes() {
+        showNotes = !pages[current].querySelector('.notes').open;
+        pages[current].querySelector('.notes').open = showNotes;
+        notesButton.setAttribute('aria-pressed',String(showNotes));
+      }
+      pages.forEach(page => page.querySelector('.notes').addEventListener('toggle',() => {
+        if (page === pages[current]) {
+          showNotes = page.querySelector('.notes').open;
+          notesButton.setAttribute('aria-pressed',String(showNotes));
+        }
+      }));
+      async function toggleFullscreen() {
+        try {
+          if (document.fullscreenElement) await document.exitFullscreen();
+          else await document.body.requestFullscreen();
+        } catch {
+          feedback.className = 'help';
+          feedback.textContent = '此瀏覽器未能啟用全螢幕，仍可正常翻頁；也可使用瀏覽器本身的全螢幕功能。';
+        }
+      }
+      previous.addEventListener('click',() => show(current - 1));
+      next.addEventListener('click',() => show(current + 1));
+      picker.addEventListener('change',() => show(Number(picker.value)));
+      notesButton.addEventListener('click',toggleNotes);
+      fullscreenButton.addEventListener('click',toggleFullscreen);
+      document.getElementById('print').addEventListener('click',() => window.print());
+      document.addEventListener('fullscreenchange',() => {
+        const active = Boolean(document.fullscreenElement);
+        fullscreenButton.textContent = active ? '離開全螢幕' : '全螢幕';
+        fullscreenButton.setAttribute('aria-pressed',String(active));
+      });
+      document.addEventListener('keydown',event => {
+        if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.target.closest('input,textarea,select,button,a,summary,[contenteditable]')) return;
+        switch (event.key) {
+          case 'ArrowRight': case 'PageDown': event.preventDefault(); show(current + 1); break;
+          case 'ArrowLeft': case 'PageUp': event.preventDefault(); show(current - 1); break;
+          case 'Home': event.preventDefault(); show(0); break;
+          case 'End': event.preventDefault(); show(pages.length - 1); break;
+          case 'n': case 'N': event.preventDefault(); toggleNotes(); break;
+          case 'f': case 'F': event.preventDefault(); toggleFullscreen(); break;
+        }
+      });
+      window.addEventListener('hashchange',() => show(hashIndex(),false));
+      show(hashIndex(),false);
+      document.documentElement.classList.add('js');
+      if (!document.fullscreenEnabled) fullscreenButton.hidden = true;
+    })();
+  </script>
+</body>
+</html>
