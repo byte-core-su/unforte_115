@@ -137,6 +137,7 @@ button { transition: transform .18s ease, box-shadow .18s ease, background-color
 .learning-guide__exit a { display: inline-block; margin-left: .5rem; color: var(--grade-primary); font-weight: 800; text-underline-offset: .2em; }
 
 .curriculum-lab { margin: 2rem 0; }
+#app-container + .curriculum-lab { max-width: 72rem; margin: 2rem auto; padding: 0 1.5rem; }
 .curriculum-lab__card {
   border: 1px solid var(--site-border);
   border-top: 5px solid var(--grade-primary);

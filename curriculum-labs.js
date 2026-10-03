@@ -24,8 +24,8 @@
     },
     '1150802.html': {
       title: '音訊與作品使用判斷',
-      codes: '資 H-IV-4／5｜運 a-IV-2',
-      intro: '音符清單可用於創作；錄音與現成旋律涉及個資、授權與公開分享，操作前先做判斷。此頁的錄音比對由瀏覽器端處理，不是教師評分或後端作業系統。',
+      codes: '資 H-IV-1、資 H-IV-2（複習）｜資 H-IV-5（倫理面向部分融入）｜運 a-IV-2',
+      intro: '音符清單可用於創作；錄音與現成旋律涉及個資、授權與公開分享，操作前先做判斷。本活動複習個資保護與合理使用，部分融入使用倫理，不涵蓋資 H-IV-4 的網路成癮、網路交友議題。課綱來源與採證範圍見<a href="lesson-plan-grade-8.html#section-1">八年級教案</a>。此頁的錄音比對由瀏覽器端處理，不是教師評分或後端作業系統。',
       html: `<div class="curriculum-lab__questions" data-quiz="g8-ethics"></div>`
     },
     '1150805.html': {
@@ -48,7 +48,9 @@
   section.className = 'curriculum-lab';
   section.setAttribute('aria-label', '課綱補強實作');
   section.innerHTML = `<div class="curriculum-lab__card"><p class="curriculum-lab__code">課綱補強實作｜${lab.codes}</p><h2>${lab.title}</h2><p>${lab.intro}</p>${lab.html}</div>`;
-  main.appendChild(section);
+  // Dynamic lessons replace app-container contents; keep the lab outside that render root.
+  if (main.id === 'app-container') main.insertAdjacentElement('afterend', section);
+  else main.appendChild(section);
 
   const randomInt = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
   const shuffle = items => {
