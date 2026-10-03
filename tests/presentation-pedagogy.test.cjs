@@ -7,6 +7,21 @@ const deck = fs.readFileSync(path.join(__dirname, '../presentations/20261110.htm
 const article = number => deck.match(new RegExp(`<article class="slide-page" id="slide-${number}">([\\s\\S]*?)</article>`))?.[1];
 const visible = number => article(number)?.split('<details class="notes">')[0];
 
+test('task count tables provide a visible abbreviation legend at first use', () => {
+  for (const number of [4, 5]) {
+    const legend = visible(number).match(/<caption class="task-legend">([^<]+)<\/caption>/)?.[1];
+    assert.ok(legend, 'count table needs a visible caption');
+    for (const label of ['P 程式設計', 'A 演算法／資料結構推理', 'M 混合', 'O 其他']) {
+      assert.ok(legend.includes(label), label);
+    }
+  }
+  assert.match(visible(7), /本教材分類，非課綱代碼/);
+  assert.match(visible(6), /P 程式設計/);
+  assert.match(visible(6), /A 演算法／資料結構推理/);
+  assert.match(visible(6), /M 混合與 O 其他/);
+  assert.match(visible(6), /分母 P＋A＝程式設計＋演算法／資料結構推理/);
+});
+
 test('presentation states both course progressions on the slides, not only in notes', () => {
   assert.match(visible(4), /Scratch 核心程式思維/);
   for (const topic of ['讀懂積木', '預測結果', '迴圈', '變數', '多組資料測試', '自訂積木與參數為進階延伸']) {
