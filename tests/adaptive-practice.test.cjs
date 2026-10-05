@@ -53,6 +53,7 @@ const element = selector => {
   if (!elements.has(selector)) elements.set(selector, {
     textContent: '', innerHTML: '', disabled: false, listeners: {},
     addEventListener(type, callback) { this.listeners[type] = callback; },
+    insertBefore() {},
     querySelector() { return this.selected || null; }
   });
   return elements.get(selector);
@@ -65,20 +66,23 @@ const section = {
 };
 let inserted = false;
 const main = { nextSibling: null, parentNode: { insertBefore(node) { inserted = node === section; } } };
-const document = { querySelector: selector => selector === 'main' ? main : null, createElement: () => section };
+const document = { querySelector: selector => selector === 'main' ? main : null, createElement: tag => tag === 'section' ? section : { querySelector: element }, hasFocus: () => true, addEventListener() {} };
 const predictableMath = Object.create(Math);
 predictableMath.random = () => 0;
-vm.runInNewContext(source, { document, window: { location: { pathname: '/1150703.html' } }, Math: predictableMath });
+vm.runInNewContext(source, { document, window: { location: { pathname: '/1150703.html' }, addEventListener() {} }, Math: predictableMath });
 assert.ok(inserted, 'practice card should be inserted beside the lesson main');
 assert.match(element('.adaptive-practice__prompt').textContent, /正 .*邊形/);
 let item = createQuestion('1150703.html', 1, () => 0);
 element('.adaptive-practice__choices').selected = { value: String(item.answer) };
 element('.adaptive-practice__check').listeners.click();
 assert.match(element('.adaptive-practice__feedback').textContent, /首次答對/);
+predictableMath.random = () => 0.5;
 element('.adaptive-practice__next').listeners.click();
+item = createQuestion('1150703.html', 1, () => 0.5);
 element('.adaptive-practice__choices').selected = { value: String(item.answer) };
 element('.adaptive-practice__check').listeners.click();
 assert.match(element('.adaptive-practice__status').textContent, /標準/);
+predictableMath.random = () => 0;
 element('.adaptive-practice__levels').listeners.click({ target: { dataset: { level: '3' } } });
 item = createQuestion('1150703.html', 3, () => 0);
 element('.adaptive-practice__choices').selected = { value: String((item.answer + 1) % 4) };

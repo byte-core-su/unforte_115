@@ -209,6 +209,12 @@ button { transition: transform .18s ease, box-shadow .18s ease, background-color
 .adaptive-practice button:disabled { opacity: .55; cursor: not-allowed; }
 .adaptive-practice .adaptive-practice__check, .adaptive-practice button[aria-pressed="true"] { background: var(--grade-primary); color: #fff; }
 .adaptive-practice__status { color: var(--grade-primary); font-weight: 800; }
+.adaptive-practice__focus { margin: 1rem 0; padding: .85rem 1rem; border: 1px solid var(--grade-border); border-radius: .85rem; background: var(--grade-soft); }
+.adaptive-practice__focus-toggle { display: flex; align-items: flex-start; gap: .6rem; color: var(--site-text); font-weight: 700; cursor: pointer; }
+.adaptive-practice__focus-toggle input { flex-shrink: 0; width: 1.1rem; height: 1.1rem; margin-top: .25rem; accent-color: var(--grade-primary); }
+.adaptive-practice__focus p { margin: .5rem 0 0; font-size: .9rem; }
+.adaptive-practice__focus-notice { color: var(--grade-primary); font-weight: 700; }
+.adaptive-practice input:focus-visible { outline: 2px solid var(--grade-primary); outline-offset: 3px; }
 .adaptive-practice fieldset { border: 1px solid var(--site-border); border-radius: .85rem; padding: 1rem; }
 .adaptive-practice legend { max-width: 100%; padding: 0 .35rem; color: var(--site-text); font-weight: 800; line-height: 1.6; }
 .adaptive-practice__choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: .55rem; }

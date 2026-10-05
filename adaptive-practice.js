@@ -153,7 +153,27 @@
     return { ...state, attempts, streak: 0, level: attempts >= 2 ? Math.max(1, state.level - 1) : state.level, resolved: attempts >= 2 };
   }
 
-  if (typeof module !== 'undefined' && module.exports) module.exports = { createQuestion, gradeAttempt };
+  // Measure the whole absence on return: background timers may be throttled.
+  function createFocusMode({ now = () => performance.now(), canReplace, replace }) {
+    let enabled = false;
+    let awaySince = null;
+    return {
+      setEnabled(value) { enabled = Boolean(value); awaySince = null; },
+      reset() { awaySince = null; },
+      update(away) {
+        if (!enabled) { awaySince = null; return; }
+        if (away) {
+          if (awaySince === null) awaySince = now();
+          return;
+        }
+        const elapsed = awaySince === null ? 0 : now() - awaySince;
+        awaySince = null;
+        if (elapsed >= 3000 && canReplace()) replace();
+      }
+    };
+  }
+
+  if (typeof module !== 'undefined' && module.exports) module.exports = { createQuestion, gradeAttempt, createFocusMode };
   if (typeof document === 'undefined') return;
   const page = window.location.pathname.split('/').pop();
   if (!lessonPages.test(page)) return;
@@ -166,12 +186,19 @@
   section.innerHTML = `<div class="adaptive-practice__card"><p class="adaptive-practice__tag">本課自適應練習・不計分</p><h2>換一題，練習同一個規則</h2><p>先預測再檢查；答錯可看提示並同題重試。連續兩道新題首次答對會提高難度；兩次答錯會提供詳解並降低難度。可自行選級或跳題，重新整理後即重置，不保存作答資料。</p><div class="adaptive-practice__levels" role="group" aria-label="手動選擇練習難度"><button type="button" data-level="1">基礎</button><button type="button" data-level="2">標準</button><button type="button" data-level="3">挑戰</button></div><p class="adaptive-practice__status" aria-live="polite"></p><fieldset><legend class="adaptive-practice__prompt"></legend><div class="adaptive-practice__choices"></div></fieldset><div class="adaptive-practice__actions"><button type="button" class="adaptive-practice__check">檢查預測</button><button type="button" class="adaptive-practice__next">換一題（跳過不升級）</button></div><p class="adaptive-practice__feedback" role="status" aria-live="polite"></p><p class="adaptive-practice__note">這是形成性練習，不能取代作品、資料追蹤與教師評量；請在離堂任務中寫下自己的推理。</p></div>`;
   main.parentNode.insertBefore(section, main.nextSibling);
 
+  const focusControls = document.createElement('div');
+  focusControls.className = 'adaptive-practice__focus';
+  focusControls.innerHTML = `<label class="adaptive-practice__focus-toggle"><input type="checkbox" class="adaptive-practice__focus-enabled" aria-describedby="adaptive-focus-help"><span>專注作答模式（預設關閉）</span></label><p id="adaptive-focus-help">開啟後，離開分頁或切換視窗滿 3 秒，返回時會更換尚未按過「檢查預測」的題目，清除本題選擇並保持難度，不扣分。已檢查的題目保留供訂正；需要切到 Scratch 或查資料時，請先關閉。此模式僅作用於本區練習，不影響課程操作，也不是可靠的防作弊機制。</p><p class="adaptive-practice__focus-notice" role="status" aria-live="polite">專注作答模式已關閉，可自由切換視窗。</p>`;
+  section.querySelector('.adaptive-practice__card').insertBefore(focusControls, section.querySelector('.adaptive-practice__levels'));
+
   const prompt = section.querySelector('.adaptive-practice__prompt');
   const choices = section.querySelector('.adaptive-practice__choices');
   const status = section.querySelector('.adaptive-practice__status');
   const feedback = section.querySelector('.adaptive-practice__feedback');
   const check = section.querySelector('.adaptive-practice__check');
   const next = section.querySelector('.adaptive-practice__next');
+  const focusEnabled = focusControls.querySelector('.adaptive-practice__focus-enabled');
+  const focusNotice = focusControls.querySelector('.adaptive-practice__focus-notice');
   let state = { level: 1, streak: 0, attempts: 0, resolved: false };
   let current;
   let previous = '';
@@ -183,8 +210,13 @@
     });
   };
   const newQuestion = () => {
+    focusMode.reset();
     let attempts = 0;
     do { current = createQuestion(page, state.level); } while (current.key === previous && ++attempts < 15);
+    // Even a run of repeated random values must not leave the same question.
+    if (current.key === previous) {
+      current = [0, 0.5, 0.999999].map(value => createQuestion(page, state.level, () => value)).find(item => item.key !== previous) || current;
+    }
     previous = current.key;
     state = { ...state, attempts: 0, resolved: false };
     prompt.textContent = current.prompt;
@@ -194,6 +226,29 @@
     next.textContent = '換一題（跳過不升級）';
     updateStatus();
   };
+  const focusMode = createFocusMode({
+    canReplace: () => !state.resolved && state.attempts === 0,
+    replace: () => {
+      newQuestion();
+      focusNotice.textContent = '離開已滿 3 秒，已更換未提交的題目並清除選擇；難度與連續答對紀錄不變，不扣分。';
+    }
+  });
+  let pageFocused = document.hasFocus();
+  const updateFocus = () => focusMode.update(document.hidden || !pageFocused);
+  focusEnabled.addEventListener('change', () => {
+    focusMode.setEnabled(focusEnabled.checked);
+    focusNotice.textContent = focusEnabled.checked
+      ? '專注作答模式已開啟。需要切到 Scratch 或查資料時，請先關閉。'
+      : '專注作答模式已關閉，可自由切換視窗。';
+    pageFocused = document.hasFocus();
+    updateFocus();
+  });
+  window.addEventListener('blur', () => { pageFocused = false; updateFocus(); });
+  window.addEventListener('focus', () => { pageFocused = true; updateFocus(); });
+  document.addEventListener('visibilitychange', () => {
+    pageFocused = document.hasFocus();
+    updateFocus();
+  });
   section.querySelector('.adaptive-practice__levels').addEventListener('click', event => {
     const level = Number(event.target.dataset.level);
     if (![1, 2, 3].includes(level)) return;
