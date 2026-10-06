@@ -8,7 +8,8 @@ const root = path.resolve(__dirname, '..');
 (async () => {
   const { lessons, dictionary } = await import(pathToFileURL(path.join(root, 'pythonlab/course-data.js')));
   const { verificationTests } = await import(pathToFileURL(path.join(root, 'pythonlab/challenge-data.js')));
-  assert.equal(lessons.length, 10);
+  assert.equal(lessons.length, 12);
+  assert.deepEqual(lessons.map(lesson => lesson.id), Array.from({ length: 12 }, (_, i) => i + 1), 'preserve existing unit IDs and append 11, 12');
   const requests = [];
   for (const lesson of lessons) {
     assert.equal(lesson.activities.length, 5);

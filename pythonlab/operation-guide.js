@@ -1,10 +1,10 @@
 // Suggestions guide the workflow; students may still run or verify in any order.
-export function operationStep({ stage, activity, code, input, execution, verification, completed, ready, busy, runtimeState, lastAction }) {
+export function operationStep({ stage, activity, code, input, execution, verification, completed, ready, busy, runtimeState, lastAction, isLastUnit = false }) {
   const tier = activity.tier || 0;
   const tested = verification?.code === code ? verification : null;
   const ran = execution?.code === code && execution.input === input ? execution : null;
   const passed = tested ? tested.ok : tier && completed?.levels?.[tier]?.code === code;
-  const next = { action: 'next', label: stage === 0 ? '前往引導練習 →' : stage === 1 ? '挑戰初階一星 →' : tier === 1 ? '繼續挑戰二星 →' : tier === 2 ? '選做三星挑戰 →' : '前往下一單元 →' };
+  const next = { action: 'next', label: stage === 0 ? '前往引導練習 →' : stage === 1 ? '挑戰初階一星 →' : tier === 1 ? '繼續挑戰二星 →' : tier === 2 ? '選做三星挑戰 →' : isLastUnit ? '返回課程總覽 →' : '前往下一單元 →' };
   const step = (title, text, action, label, secondary = null) => ({ title, text, action, label, secondary, disabled: false });
   if (busy) return { ...step('程式執行中，請稍候', '若一直沒有結束，可按「停止」並檢查迴圈條件。', 'stop', '停止本次執行'), busy: true };
   if (ran && !ran.ok && lastAction === 'run') return step('先修正執行錯誤', '查看錯誤行號和修正提示。若輸入不足，在「輸入資料」補齊各行，再重新執行。', 'feedback', '查看錯誤提示', { action: 'helper', label: '查參考小幫手' });

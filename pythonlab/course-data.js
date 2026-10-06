@@ -1,6 +1,7 @@
 // 教材由 data/class-01.txt～class-10.txt 重整；原始資料保留供教師查閱。
 import { extraActivities } from './challenge-data.js';
 import { enrichVerification } from './verification-data.js';
+import { extensionLessons } from './extension-course-data.js';
 const activity = (title, task, starter, solution, tests, hints, input = '', expected = '') => ({ title, task, starter, solution, tests, hints, input, expected });
 const test = (name, input, expected, extra = {}) => ({ name, input, expected, ...extra });
 export const lessons = [
@@ -110,15 +111,19 @@ export const lessons = [
   }
 ];
 
+lessons.push(...extensionLessons);
 for (const lesson of lessons) {
   lesson.activities[2].tier = 1;
   lesson.activities[2].title = lesson.activities[2].title.replace('挑戰：', '初階：');
-  lesson.activities.push(...extraActivities(lesson));
+  if (lesson.activities.length === 3) lesson.activities.push(...extraActivities(lesson));
 }
 enrichVerification(lessons);
 
 export const dictionary = [
-  { id: 'membership', name: 'in / not in・是否已在清單中', desc: '檢查清單是否包含某個值，可用來只收集第一次出現的資料。', format: 'value in items\nvalue not in items', example: 'items = [3, 1]\nprint(3 in items)\nprint(2 not in items)', output: 'True\nTrue', mistake: 'in 檢查值是否存在；索引則用來取出特定位置。', scratch: '「清單包含」積木', url: 'https://docs.python.org/3/tutorial/datastructures.html' },
+  { id: 'sorting', name: 'sorted / sort・排序與取前三筆', desc: 'sorted(values) 建立由小到大的新清單；values.sort() 直接修改原清單，回傳 None。reverse=True 改為由大到小；清單切片 [:3] 取前三筆，重複值保留。', format: 'sorted(values)\nsorted(values, reverse=True)[:3]\nvalues[:]  # 複製清單', example: 'values = [70, 90, 80, 90]\nprint(sorted(values, reverse=True)[:3])\nprint(values)', output: '[90, 90, 80]\n[70, 90, 80, 90]', mistake: '不要把 values = values.sort() 當成排序結果，因為 sort() 回傳 None。不足三筆時切片仍可使用。', scratch: '依數值重新排列清單項目', url: 'https://docs.python.org/3/tutorial/datastructures.html' },
+  { id: 'dict', name: 'dict・用鍵查值與更新', desc: '字典把名稱（鍵）對應到資料（值）。用 counts[choice] 查票數；choice in counts 檢查鍵是否存在；for key in counts 依建立順序走訪鍵。', format: 'counts = {"蘋果": 0, "香蕉": 0}\nif choice in counts:\n    counts[choice] += 1', example: 'counts = {"蘋果": 0, "香蕉": 0}\ncounts["蘋果"] += 1\nfor fruit in counts:\n    print(fruit, counts[fruit], sep="：")', output: '蘋果：1\n香蕉：0', mistake: '{} 是空字典；[] 是空清單。直接讀取不存在的鍵會造成 KeyError，先用 in 檢查。', scratch: '把多個選項的計數變數收在同一份表裡', url: 'https://docs.python.org/3/tutorial/datastructures.html#dictionaries' },
+  { id: 'text-methods', name: 'strip / join・整理與組合文字', desc: 'text.strip() 移除前後空白，不改中間的文字；"、".join(names) 用頓號連接清單中的字串。', format: 'choice = input().strip()\n"、".join(names)', example: 'choice = "  蘋果  ".strip()\nprint(choice)\nprint("、".join(["蘋果", "香蕉"]))', output: '蘋果\n蘋果、香蕉', mistake: 'join() 的項目須為字串。只有題目要求整理空白時才用 strip()；其他題目仍需保留原輸入。', scratch: '整理答案文字，再用「連接」組成公告', url: 'https://docs.python.org/3/library/stdtypes.html#string-methods' },
+  { id: 'membership', name: 'in / not in・檢查值或鍵是否存在', desc: '檢查清單是否包含某個值，或字典是否包含某個鍵。可用來去重或避免查找未知選項。', format: 'value in items\nvalue not in items', example: 'items = [3, 1]\nprint(3 in items)\nprint(2 not in items)', output: 'True\nTrue', mistake: 'in 檢查值是否存在；索引則用來取出特定位置。', scratch: '「清單包含」積木', url: 'https://docs.python.org/3/tutorial/datastructures.html' },
   { id: 'none', name: 'None / is None・沒有有效結果', desc: 'None 表示沒有結果。本課的進階函式以 None 回傳無效參數，不會把有效的數值 0 當成錯誤。', format: 'if result is None:\n    print("輸入無效")', example: 'result = None\nprint(result is None)\nresult = 0\nprint(result is None)', output: 'True\nFalse', mistake: 'None 是特殊值，不是字串 "None"。不要用 if not result 取代檢查，因為 0 也會被當成假。', scratch: '為函式增加「沒有有效結果」的狀態', url: 'https://docs.python.org/3/library/constants.html#None' },
   { id: 'exceptions', name: 'try / except・處理輸入異常', desc: '嘗試執行 try 的內容；若出現指定的例外，改執行 except。第 10 課終極挑戰用它處理非整數或輸入不足。', format: 'try:\n    number = int(input())\nexcept (ValueError, EOFError):\n    print("輸入無效")', example: 'try:\n    number = int("hello")\nexcept ValueError:\n    print("輸入無效")', output: '輸入無效', mistake: '只捕捉需要處理的錯誤。try / except 與範圍判斷各有用途，數字轉換成功後仍要檢查上下限。', scratch: '替程式增加錯誤情況的處理路徑', url: 'https://docs.python.org/3/tutorial/errors.html' },
   { id: 'strings', name: '字串・組合與切片', desc: '字串以引號包住，可用 + 組合、* 重複，或用索引與切片取出內容。', format: 'word[索引]\nword[起點:終點]', example: 'word = "Python"\nprint(word[0])\nprint(word[1:4])\nprint("Hi" * 2)', output: 'P\nyth\nHiHi', mistake: '索引從 0 開始；切片不包含終點。字串加數字前要先轉換型態。', scratch: '「連接」「字串的第幾個字」「字串長度」', url: 'https://docs.python.org/3/tutorial/introduction.html#strings' },

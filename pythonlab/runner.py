@@ -120,6 +120,8 @@ def _lab_dispatch(request_json):
         nodes = [type(node).__name__ for node in ast.walk(tree)]
         if any(isinstance(node, ast.ListComp) or (isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "list") for node in ast.walk(tree)):
             nodes.append("List")
+        if any(isinstance(node, ast.DictComp) or (isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "dict") for node in ast.walk(tree)):
+            nodes.append("Dict")
         nested_for = any(isinstance(node, ast.For) and any(isinstance(child, ast.For) for statement in node.body for child in ast.walk(statement)) for node in ast.walk(tree))
     except SyntaxError:
         nodes = []

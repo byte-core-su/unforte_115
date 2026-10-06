@@ -106,6 +106,22 @@ function rng(seed) { let value = seed >>> 0; return () => ((value = (Math.imul(v
     [10, 4, 'len(cart) >= 50', 'len(cart) > 50', '第51筆被接受'],
     [10, 4, 'ValueError, EOFError', 'ValueError', '未處理缺少輸入'],
     [10, 4, 'total * 9 // 10', 'total * 9 / 10', '折扣未捨去'],
+    [11, 1, 'reverse=True', 'reverse=False', '由高到低的方向錯誤'],
+    [11, 2, 'sorted(values)', 'values', '未排序資料'],
+    [11, 3, '[:3]', '[:2]', '前三筆少取一筆'],
+    [11, 3, 'score > 100', 'score > 101', '滿分上限缺口'],
+    [11, 3, 'n > 100', 'n > 101', '筆數上限缺口'],
+    [11, 4, 'result = values[:]', 'result = values', '排序改到原清單'],
+    [11, 4, 'result[index] < result[smallest]', 'result[index] > result[smallest]', '選擇排序方向相反'],
+    [11, 4, 'ValueError, EOFError', 'ValueError', '排序缺少輸入未捕捉'],
+    [12, 1, 'prices[choice]', '30', '價格查找寫死'],
+    [12, 2, 'counts[choice] += 1', 'counts[choice] = 1', '重複票未累加'],
+    [12, 3, 'invalid += 1', 'invalid += 0', '無效票未統計'],
+    [12, 3, 'n > 100', 'n > 101', '計票筆數上限缺口'],
+    [12, 4, 'input().strip()', 'input()', '未整理投票空白'],
+    [12, 4, 'largest > 0', 'largest >= 0', '零票也公告當選'],
+    [12, 4, 'return winners', 'return winners[:1]', '平手只保留第一個'],
+    [12, 4, 'ValueError, EOFError', 'ValueError', '未完整讀票就輸出'],
   ].forEach(args => mutate(...args));
   check(mutations).forEach((result, i) => assert.equal(result.passed, false, `未抓到錯誤：${mutations[i].label}`));
 
@@ -127,6 +143,8 @@ function rng(seed) { let value = seed >>> 0; return () => ((value = (Math.imul(v
   addEngine('for i in range(200):\n    print("", end="")', { ...plain, expected: '', printCount: 200 }, true, 'print計數不限制保留的紀錄數');
   addEngine('values = list()\nfor i in range(2):\n    values.append(i)\nprint(values)', { ...plain, expected: '[0, 1]', requires: ['For', 'List'] }, true, '接受list()替代方括號');
   addEngine('values = [i for i in range(2)]\nprint(values)', { ...plain, expected: '[0, 1]', requires: ['List'] }, true, '接受清單生成式');
+  addEngine('counts = dict(蘋果=1)\nprint(counts["蘋果"])', { ...plain, expected: '1', requires: ['Dict'] }, true, '接受dict()替代大括號');
+  addEngine('counts = {name: 0 for name in ["蘋果"]}\nprint(counts["蘋果"])', { ...plain, expected: '0', requires: ['Dict'] }, true, '接受字典生成式');
   addEngine('print("正確")\nraise SystemExit()', plain, false, '有錯誤不能通過');
   check(engine).forEach((result, i) => assert.equal(result.passed, engine[i].pass, `${engine[i].label}: ${JSON.stringify(result.failed)}`));
   console.log(`Verification coverage: ${fixed} fixed cases; ${total} dense/generated cases across 64 seeds; ${mutations.length} faulty solutions rejected; ${engine.length} format, type and runtime regressions passed.`);

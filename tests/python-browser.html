@@ -67,6 +67,8 @@ try {
     ['def tool():\n    return "5"', { expected: '', calls: [{ function: 'tool', args: [], expected: 5 }] }, false],
     ['def tool():\n    return False', { expected: '', calls: [{ function: 'tool', args: [], expected: 0 }] }, false],
     ['print("我會觀察 | 我會修改 | 我會驗證")\nif False:\n    print("a", "b", "c", sep=" | ")', lessons[0].activities[3].tests[0], false],
+    ['counts = dict(蘋果=1)\nprint(counts["蘋果"])', { expected: '1', requires: ['Dict'] }, true],
+    ['counts = {name: 0 for name in ["蘋果"]}\nprint(counts["蘋果"])', { expected: '0', requires: ['Dict'] }, true],
   ];
   for (const [code, test, pass] of engineCases) {
     const result = await send({ action: 'check', code, tests: [{ name: '執行器回歸', input: '', ...test }] });
@@ -98,7 +100,7 @@ try {
   const afterTimeout = await send({ action: 'run', code: 'print(42)' });
   assert(afterTimeout.output.trim() === '42', '逾時後無法重新執行');
   output.textContent += '✓ 8秒逾時終止與重新載入通過\n';
-  status.textContent = `全部通過：10 單元、${cases} 組教材與字典案例，以及執行器邊界測試。`;
+  status.textContent = `全部通過：${lessons.length} 單元、${cases} 組教材與字典案例，以及執行器邊界測試。`;
 } catch (error) { status.textContent = `驗證失敗：${error.message}`; }
 finally { worker?.terminate(); clearTimeout(loadTimeout); }
 </script></body></html>

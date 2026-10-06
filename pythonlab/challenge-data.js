@@ -122,6 +122,26 @@ export function verificationTests(lesson, activity, random = Math.random) {
         const items = Array.from({ length: integer(0, 6) }, () => [integer(1, 3), integer(1, 10)]), balance = integer(0, 20000);
         extra = t(name, cartInput(balance, items), cartExpected(balance, items, tier === 3), { ...whileLoop, ...functions }); break;
       }
+      case 11: {
+        const values = Array.from({ length: integer(0, 12) }, () => tier === 2 ? integer(0, 100) : integer(-1000, 1000));
+        const result = values.slice().sort((a, b) => tier === 2 ? b - a : a - b);
+        extra = t(name, [values.length, ...values].join('\n'), `[${(tier === 2 ? result.slice(0, 3) : result).join(', ')}]`); break;
+      }
+      case 12: {
+        const fruits = ['蘋果', '香蕉', '葡萄', '橘子'];
+        const votes = Array.from({ length: integer(0, 12) }, () => {
+          const vote = [...fruits, '西瓜'][integer(0, 4)];
+          return tier === 3 && integer(0, 1) ? ` ${vote} ` : vote;
+        });
+        const counts = fruits.map(fruit => votes.filter(vote => (tier === 3 ? vote.trim() : vote) === fruit).length);
+        const invalid = votes.length - counts.reduce((a, b) => a + b, 0);
+        let expected = fruits.map((fruit, i) => `${fruit}：${counts[i]}`).join('\n') + `\n無效票：${invalid}`;
+        if (tier === 3) {
+          const largest = Math.max(...counts), winners = fruits.filter((fruit, i) => counts[i] === largest);
+          expected += largest === 0 ? '\n沒有有效票' : `\n最高票：${largest}\n${winners.length === 1 ? '當選' : '並列'}：${winners.join('、')}`;
+        }
+        extra = t(name, [votes.length, ...votes].join('\n'), expected); break;
+      }
     }
     tests.push(extra);
   }

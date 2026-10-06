@@ -50,5 +50,5 @@ const root = path.resolve(__dirname, '..');
   results.forEach((result, i) => {
     assert.equal(result.results.every(item => item.passed), requests[i].shouldPass, `${requests[i].label}: ${JSON.stringify(result.results.filter(item => !item.passed))}`);
   });
-  console.log('Three-star course: legacy migration, sequential unlock, optional third tier, generated inputs, 20 old-answer rejection checks and 4 boundary-defect checks passed.');
+  console.log(`Three-star course: legacy migration, sequential unlock, optional third tier, generated inputs, ${lessons.length * 2} old-answer rejection checks and 4 boundary-defect checks passed.`);
 })().catch(error => { console.error(error); process.exitCode = 1; });

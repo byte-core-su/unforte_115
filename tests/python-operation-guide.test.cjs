@@ -30,6 +30,7 @@ const { pathToFileURL } = require('node:url');
         assert.notEqual(get({ verification: { ...verification, ok: true }, code: 'changed after passing' }).action, 'certificate', 'changed code must not be shown as freshly verified');
       }
       if (activity.tier) {
+        if (stage === 4) assert.equal(get({ verification: { code: base.code, ok: true }, isLastUnit: lesson.id === lessons.at(-1).id }).secondary.label, lesson.id === lessons.at(-1).id ? '返回課程總覽 →' : '前往下一單元 →');
         const completed = { levels: { [activity.tier]: { code: base.code } } };
         assert.equal(get({ completed }).action, 'certificate');
         assert.notEqual(get({ completed, code: 'changed' }).action, 'certificate');

@@ -60,7 +60,7 @@
 | --- | --- |
 | `index.html` | 課程教材入口首頁 |
 | `codegame/index.html` | Lightbot 遊戲內嵌學習頁，顯示學生資料、日期與學習時間，方便截圖記錄 |
-| `pythonlab/index.html` | 10 單元 Python 引導式課程、網站內執行與站內參考小幫手 |
+| `pythonlab/index.html` | 12 單元 Python 引導式課程、網站內執行與站內參考小幫手 |
 | `1150700.html`～`1150706.html` | 11507 課程單元 |
 | `1150800.html`～`1150806.html` | 11508 課程單元 |
 | `lesson-plan-grade-7.html`、`lesson-plan-grade-8.html` | 可在首頁課程小卡開啟的七、八年級教案 |
@@ -89,7 +89,7 @@ window.LightbotLearning.setStudent({
 
 Python Lab 是獨立課程，直接以其網站網址開啟，與原教材首頁不互相導連。可將 `pythonlab/` 單獨部署；本機執行 `npm run preview`（或 `node scripts/preview.cjs`）後，開啟 `http://127.0.0.1:4173/pythonlab/index.html`。Python 執行環境固定使用 Pyodide 0.27.7，首次載入需網路。草稿、預測、離堂說明與挑戰驗證只保存在此瀏覽器，不跨裝置同步。詳細教學流程與維護方式見 [Python Lab 說明](pythonlab/README.md)，課程規劃見 [Python 課程設計](PYTHON_COURSE_PLAN.md)。
 
-Python 的十個單元依序為輸出、變數與輸入、型態與運算、條件、for 累加、巢狀迴圈、while、清單、函式與模組、購物結帳專題。每課包含示範、引導、初階一星、進階二星與選做終極三星，以及語法卡、逐層提示與離堂檢核。一星允許參考完整解答，二星需修改規則並通過新測資，完成核心學習；三星不強制。既有通過紀錄保留為一星。
+Python 的十二個單元依序為輸出、變數與輸入、型態與運算、條件、for 累加、巢狀迴圈、while、清單、函式與模組、購物結帳專題、資料排序、字典票選統計。每課包含示範、引導、初階一星、進階二星與選做終極三星，以及語法卡、逐層提示與離堂檢核。一星允許參考完整解答，二星需修改規則並通過新測資，完成核心學習；三星不強制。既有通過紀錄保留為一星。
 
 ## 技術概況
 

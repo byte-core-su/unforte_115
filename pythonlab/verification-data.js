@@ -177,6 +177,68 @@ export function supplementalTests(id, stage, dense = false) {
       }
       break;
     }
+    case 11: {
+      const sets = [[], [0], [100], [3, 1, 2], [100, 100, 0, 100], [0, 60, 100, 59], [100, 60, 59, 0], Array(100).fill(0), Array(100).fill(100), range(1, 100), range(1, 100).reverse()];
+      if (stage === 2 || stage === 4) sets.push([-1000, 1000, 0, -1000], [-1, -3, -2], Array(100).fill(-1000));
+      if (dense) {
+        const values = stage === 2 || stage === 4 ? [-1000, -1, 0, 1, 1000] : [0, 59, 60, 100];
+        for (const a of values) for (const b of values) for (const d of values) sets.push([a, b, d]);
+      }
+      sets.forEach(values => {
+        const sorted = values.slice().sort((a, b) => stage === 1 || stage === 3 ? b - a : a - b);
+        add(data(values), `[${(stage === 3 ? sorted.slice(0, 3) : sorted).join(', ')}]`, {}, '排序方向重複與筆數');
+      });
+      if (stage >= 3) {
+        [-1e12, -1, 101, 1e12].forEach(n => add(n, '輸入無效', {}, '筆數越界'));
+        const invalid = stage === 3 ? [-1e12, -1, 101, 1e12] : [-1e12, -1001, 1001, 1e12];
+        invalid.forEach(v => { add(`1\n${v}`, '輸入無效', {}, '數值越界'); add(`3\n0\n${v}\n0`, '輸入無效', {}, '中間數值越界'); });
+      }
+      if (stage === 4) {
+        ['abc', '1.5', 'nan', ' ', '🙂'].forEach(v => { add(v, '輸入無效', {}, '筆數非整數'); add(`1\n${v}`, '輸入無效', {}, '資料非整數'); });
+        ['', '\n', '1', '3\n0\n1'].forEach(input => add(input, '輸入無效', {}, '資料不足'));
+        const originals = [[], [0], [3, 1, 2, 1], [-1000, 0, 1000], Array(100).fill(7)];
+        add('0', '[]', { calls: originals.map(values => call('selection_sort', [values], values.slice().sort((a, b) => a - b))) }, '重用排序函式');
+        add('0', '[]\n[1, 2, 3]\n[3, 1, 2]', { probe: 'original = [3, 1, 2]\nprint(selection_sort(original))\nprint(original)' }, '不修改原清單');
+      }
+      break;
+    }
+    case 12: {
+      const fruits = ['蘋果', '香蕉', '葡萄', '橘子'];
+      if (stage === 1) {
+        ['蘋果', '香蕉', '葡萄', '橘子', ' 蘋果 ', 'apple', '🍎', '蘋果汁', '\n'].forEach(choice => add(choice, ({ 蘋果: 30, 香蕉: 20, 葡萄: 50 })[choice] ?? '未知選項', {}, '名稱查找'));
+        break;
+      }
+      const sets = [[], ['蘋果'], ['香蕉'], ['葡萄'], ['蘋果', '香蕉', '葡萄'], ['香蕉', '蘋果', '香蕉'], ...fruits.slice(0, stage === 2 ? 3 : 4).map(fruit => Array(100).fill(fruit))];
+      if (stage >= 3) sets.push(['橘子'], ['西瓜'], [''], [' 蘋果 '], ['\t香蕉\t'], ['蘋果', '橘子', '蘋果', '西瓜'], ['橘子', '葡萄'], ['橘子', '葡萄', '香蕉', '蘋果'], ['西瓜', '', '🍎', '蘋果汁'], Array(100).fill('西瓜'));
+      if (dense) {
+        const options = stage === 2 ? fruits.slice(0, 3) : [...fruits, '西瓜', '', ' 蘋果 '];
+        for (const a of options) for (const b of options) for (const d of options) sets.push([a, b, d]);
+      }
+      sets.forEach(votes => {
+        const choices = stage === 2 ? fruits.slice(0, 3) : fruits;
+        const counts = choices.map(fruit => votes.filter(vote => (stage === 4 ? vote.trim() : vote) === fruit).length);
+        let expected = choices.map((fruit, i) => `${fruit}：${counts[i]}`).join('\n');
+        if (stage >= 3) expected += `\n無效票：${votes.length - sum(counts)}`;
+        if (stage === 4) {
+          const largest = Math.max(...counts), winners = choices.filter((fruit, i) => counts[i] === largest);
+          expected += largest === 0 ? '\n沒有有效票' : `\n最高票：${largest}\n${winners.length === 1 ? '當選' : '並列'}：${winners.join('、')}`;
+        }
+        add(data(votes), expected, {}, '計票順序零值與平手');
+      });
+      if (stage >= 3) [-1e12, -1, 101, 1e12].forEach(n => add(n, '輸入無效', {}, '票數筆數越界'));
+      if (stage === 4) {
+        ['', '\n', '2\n蘋果', 'abc', '1.5', 'nan', '🙂'].forEach(input => add(input, '輸入無效', {}, '資料不足或筆數非整數'));
+        add('2\n\u3000蘋果\u3000\n\t香蕉\t', '蘋果：1\n香蕉：1\n葡萄：0\n橘子：0\n無效票：0\n最高票：1\n並列：蘋果、香蕉', {}, '整理 Unicode 空白');
+        const calls = [];
+        const values = dense ? [0, 1, 2, 100] : [0, 1, 100];
+        for (const a of values) for (const b of values) {
+          const counts = [a, b, a, b], largest = Math.max(a, b);
+          calls.push(call('winner_names', [Object.fromEntries(fruits.map((fruit, i) => [fruit, counts[i]]))], largest ? fruits.filter((fruit, i) => counts[i] === largest) : []));
+        }
+        add('0', '蘋果：0\n香蕉：0\n葡萄：0\n橘子：0\n無效票：0\n沒有有效票', { calls }, '函式最高票與平手');
+      }
+      break;
+    }
   }
   return tests;
 }
