@@ -12,7 +12,7 @@
   <a class="skip-link" href="#main">跳到主要內容</a>
   <header class="topbar">
     <a class="brand" href="#"><span class="brand-mark" aria-hidden="true">Py</span><span>Python <b>Lab</b><small>從積木，走向程式碼</small></span></a>
-    <nav aria-label="主要導覽"><a href="#">課程總覽</a><button type="button" data-dictionary>參考小幫手</button></nav>
+    <nav aria-label="主要導覽"><a href="#">課程總覽</a><button type="button" data-operation-help>操作說明</button><button type="button" data-dictionary>參考小幫手</button></nav>
   </header>
   <main id="main" tabindex="-1"></main>
   <script>
@@ -28,6 +28,17 @@
     <label for="dictionary-search">搜尋目前分類的語法、用途或錯誤</label>
     <input id="dictionary-search" type="search" placeholder="例如：迴圈、input、NameError…" autocomplete="off">
     <div id="dictionary-results"></div>
+  </dialog>
+  <dialog id="operation-dialog" aria-labelledby="operation-title">
+    <div class="dialog-heading"><div><p class="eyebrow">從第一步，到通關領證</p><h2 id="operation-title">學生操作說明</h2></div><button type="button" id="close-operation" class="button" aria-label="關閉操作說明，回到課程">回到課程 ✕</button></div>
+    <ol class="operation-steps">
+      <li><strong>選一個單元，先從「示範」開始</strong><p>先閱讀任務；程式已經放好，可以直接試跑，不必從空白開始。「示範 → 引導 → 初階 → 進階 → 終極」是建議順序。</p></li>
+      <li><strong>在「程式區」修改，在「輸入資料」準備回答</strong><p>程式區放 Python 程式。「輸入資料」每一行對應一次 input()，網站已預填範例；遇到 input() 不用在執行結果裡打字。不需輸入的題目會另外提醒。</p></li>
+      <li><strong>先執行觀察，再驗證任務</strong><div class="operation-compare"><div><b>▶ 執行程式</b><p>使用你填的輸入資料試跑，觀察下方結果。執行成功還不會得星。</p></div><div><b>✓ 驗證任務</b><p>使用本站多組測資檢查，不使用輸入區。全部通過才算完成任務；初階以上才計星。</p></div></div></li>
+      <li><strong>失敗時，先看第一個失敗案例</strong><p>比較預期輸出與你的輸出，或依錯誤行號修正，一次改一處再試。不知道語法時，使用題目提示與「參考小幫手」，查完回到同一題。</p></li>
+      <li><strong>取得一星後，就能領證並繼續升星</strong><p>初階可參考完整解答；二星需要修改新規則；三星為選做。通過新星級會開啟班級、座號、姓名表單，按「顯示通關證書」後擷圖。當天或之後都能繼續挑戰，升星後更新證書。</p></li>
+    </ol>
+    <p class="operation-note">每題保留自己的草稿。時間按單元累計，可手動暫停；背景分頁與證書畫面暫停計時。草稿、星級與資料只保存在此瀏覽器，換裝置不會自動帶過去。</p>
   </dialog>
   <dialog id="certificate-dialog" aria-labelledby="certificate-dialog-title">
     <div class="dialog-heading"><div><p class="eyebrow">留住你的學習成果</p><h2 id="certificate-dialog-title">通關證書</h2></div><button type="button" id="close-certificate" class="button" aria-label="關閉證書，回到練習">回到練習 ✕</button></div>
