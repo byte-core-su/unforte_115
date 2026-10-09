@@ -59,7 +59,7 @@
 | 頁面 | 用途 |
 | --- | --- |
 | `index.html` | 課程教材入口首頁 |
-| `codegame/index.html` | Lightbot 遊戲內嵌學習頁，顯示學生資料、日期與學習時間，方便截圖記錄 |
+| `codegame/index.html` | 自行開發的 20 關指令解謎遊戲，依學生保存草稿、通關與學習時間 |
 | `pythonlab/index.html` | 12 單元 Python 引導式課程、網站內執行與站內參考小幫手 |
 | `1150700.html`～`1150706.html` | 11507 課程單元 |
 | `1150800.html`～`1150806.html` | 11508 課程單元 |
@@ -71,21 +71,9 @@
 
 直接以瀏覽器開啟 `index.html`，或部署至靜態網站服務（例如 GitHub Pages）。教材頁面可離線瀏覽，但外部 CDN 的字型與樣式需要網路連線。
 
-Lightbot 學習紀錄頁保存在 `codegame/`，可直接開啟 `codegame/index.html`，或在本機預覽開啟 `http://127.0.0.1:4173/codegame/`。此資料夾可單獨部署至靜態網站服務。它以 Internet Archive 提供的 `https://archive.org/embed/lightbot-codehour` 內嵌遊戲，不包含原介紹頁的導覽、下載區與評論。上方顯示學生姓名、學號、班級，下方顯示臺北日期與本次學習時間，方便透過電腦的螢幕擷取功能記錄遊戲進度。桌面版會依視窗高度等比例縮放遊戲，讓三張卡片同時顯示。操作說明保留在下方的展開區。
+CodeGame 點亮任務保存在 `codegame/`，可開啟 `codegame/index.html`，或在本機預覽開啟 `http://127.0.0.1:4173/codegame/`。它是自行開發的機器人指令解謎遊戲，逐關重現指定 Lightbot Code Hour 保存版本的 20 關地圖、高度、起點、方向與指令容量。支援前進、轉向、跳躍、點燈、P1/P2 程序、遞迴迴圈、單步執行與通關判定。原版嵌入頁保留在 `codegame/archive.html`。
 
-目前預設為示範學生資料，可按「設定學生資料」暫時替換；不保存至瀏覽器或伺服器，重新整理後恢復示範值。計時只累計頁面可見期間的停留時間，切到背景暫停，重新整理或換學生歸零；它不代表遊戲內有效操作時間。切換學生不會重置外部遊戲，正式多人共用流程需另外安排遊戲重啟。
-
-頁面標題、說明與欄位在 `codegame/index.html` 修改，版型配色在 `codegame/lightbot.css` 修改，資料更新與計時在 `codegame/lightbot.js` 維護。日後串接登入與資料庫時，可由後端取得目前登入學生的資料後呼叫以下入口（尚未串接 API 或資料庫）：
-
-```js
-window.LightbotLearning.setStudent({
-    name: '學生姓名',
-    studentId: '學生學號',
-    className: '班級'
-});
-```
-
-入口將資料當作純文字顯示，並檢查欄位與長度；學生資料不放入 iframe 網址，也不傳給 Internet Archive。外部 iframe 使用 `no-referrer`。遊戲需網路連線，啟動畫面及遊戲內的選單由外部播放器提供；本頁無法修改遊戲內文字或自動讀取通關紀錄。學生資料與畫面截圖的保存、上傳須待後續後端流程實作。
+學生姓名、學號、班級顯示在遊戲上方；草稿、通關、最佳指令、嘗試次數與學習時間依班級及學號保存於此瀏覽器，重新整理後可繼續練習。可下載包含學生資料、遊戲狀態及指令的 PNG，或匯出學習紀錄 JSON。尚未提供登入驗證與資料庫同步。後續可透過 `window.LightbotLearning.setStudent(...)` 更新學生，透過 `exportData()` 及 `codegame:progress` 事件取得紀錄；詳細規則、來源與資料介面見 [CodeGame 說明](codegame/README.md)。
 
 Python Lab 是獨立課程，直接以其網站網址開啟，與原教材首頁不互相導連。可將 `pythonlab/` 單獨部署；本機執行 `npm run preview`（或 `node scripts/preview.cjs`）後，開啟 `http://127.0.0.1:4173/pythonlab/index.html`。Python 執行環境固定使用 Pyodide 0.27.7，首次載入需網路。草稿、預測、離堂說明與挑戰驗證只保存在此瀏覽器，不跨裝置同步。詳細教學流程與維護方式見 [Python Lab 說明](pythonlab/README.md)，課程規劃見 [Python 課程設計](PYTHON_COURSE_PLAN.md)。
 

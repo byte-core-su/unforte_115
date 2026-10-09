@@ -1,0 +1,58 @@
+:root { color-scheme: light; font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif; color: #1e293b; background: #f3f4f7; line-height: 1.6; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: #5145e5; text-underline-offset: .2em; }
+button, input { font: inherit; }
+button { cursor: pointer; border: 1px solid #d9ddf3; background: #fff; color: #5145e5; border-radius: .5rem; padding: .4rem .75rem; font-size: .875rem; }
+button:hover { background: #eef0ff; }
+:focus-visible { outline: 3px solid #6860ff; outline-offset: 3px; }
+.learning-page { width: min(1100px, 100%); height: calc(100svh - 28px); min-height: 580px; margin: 14px auto; padding: 0 16px; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 16px; }
+.card { background: #fff; border: 1px solid #e0e3eb; border-radius: 14px; box-shadow: 0 1px 2px #18294b0a; }
+.student-card { display: flex; gap: 18px; align-items: center; padding: 20px 26px; }
+.student-icon { display: grid; place-items: center; flex-shrink: 0; width: 62px; height: 62px; background: #e0e6ff; border-radius: 50%; color: #5b4dff; }
+.student-icon svg { width: 32px; height: 32px; }
+h1 { margin: 0 0 4px; font-size: 1.65rem; line-height: 1.4; font-weight: 600; overflow-wrap: anywhere; }
+.student-tags { display: flex; flex-wrap: wrap; gap: 8px; font-size: .875rem; color: #5145ff; }
+.student-tags > span { background: #eef0ff; border-radius: 4px; padding: 1px 8px; overflow-wrap: anywhere; }
+.student-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.demo-label { font-size: .875rem; color: #64748b; }
+.game-card { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.game-toolbar { display: flex; flex-shrink: 0; justify-content: space-between; align-items: center; gap: 1rem; padding: 10px 18px; border-bottom: 1px solid #eef0f5; }
+h2 { font-size: 1rem; margin: 0; font-weight: 600; }
+.game-toolbar a { font-size: .875rem; }
+.game-area { flex: 1; min-height: 0; position: relative; overflow: hidden; }
+.game-screen { position: absolute; top: 50%; left: 50%; width: 960px; height: 650px; transform-origin: center; }
+iframe { display: block; width: 960px; height: 650px; border: 0; }
+.session-card { display: flex; justify-content: space-between; gap: 20px; padding: 20px 26px; }
+.session-date, .session-time { display: flex; gap: 12px; align-items: center; }
+.session-time { padding-left: 24px; border-left: 1px solid #e0e3eb; text-align: right; }
+.session-card svg { width: 28px; height: 28px; flex-shrink: 0; }
+.calendar-icon { color: #7260ff; }
+.timer-icon { color: #ff7200; }
+.session-label { font-size: .875rem; color: #64748b; margin: 0; }
+.date-value { font-size: 1.25rem; font-weight: 600; margin: 0; }
+.time-value { color: #6045ff; font-family: ui-monospace, Consolas, monospace; font-size: 1.5rem; font-weight: 700; line-height: 1.4; margin: 0; font-variant-numeric: tabular-nums; }
+.page-note, .learning-help { width: min(1068px, calc(100% - 32px)); margin: 12px auto; color: #64748b; font-size: .875rem; }
+.learning-help { padding-bottom: 20px; }
+summary { cursor: pointer; color: #5145e5; }
+dialog { border: 1px solid #e0e3eb; border-radius: 14px; width: min(440px, calc(100% - 32px)); padding: 24px; }
+dialog::backdrop { background: #18243866; }
+dialog h2 { font-size: 1.25rem; }
+dialog p { color: #64748b; font-size: .875rem; }
+dialog label { display: block; margin-top: 12px; }
+dialog input { width: 100%; margin-top: 4px; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.primary-button { background: #5b4dff; color: #fff; border-color: #5b4dff; }
+.primary-button:hover { background: #493bd9; }
+@media (max-width: 650px) {
+    .learning-page { padding: 0 10px; gap: 12px; height: auto; min-height: 0; }
+    .student-card { padding: 16px; gap: 12px; flex-wrap: wrap; }
+    .student-icon { width: 48px; height: 48px; }
+    .student-info { flex: 1; min-width: 0; }
+    .student-actions { width: 100%; justify-content: flex-end; }
+    .game-area { flex: none; height: auto; aspect-ratio: 96 / 65; }
+    .game-toolbar { padding: 10px 12px; flex-wrap: wrap; gap: 4px; }
+    .session-card { padding: 16px; flex-wrap: wrap; }
+    .session-time { padding-left: 0; border-left: 0; text-align: left; }
+    .date-value { font-size: 1rem; }
+}

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Lightbot 學習畫面，顯示學生資料、日期與本次學習時間，方便截圖記錄進度。">
+    <title>Lightbot 學習紀錄</title>
+    <link rel="stylesheet" href="archive.css">
+    <script src="archive.js" defer></script>
+</head>
+<body>
+    <main class="learning-page" aria-label="Lightbot 學習紀錄">
+        <header class="student-card card">
+            <span class="student-icon" aria-hidden="true">
+                <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="16" cy="10" r="5"/><path d="M6 27v-4a6 6 0 0 1 6-6h8a6 6 0 0 1 6 6v4"/></svg>
+            </span>
+            <div class="student-info">
+                <h1 id="student-name">王小明</h1>
+                <div class="student-tags">
+                    <span>學號 <span id="student-id">1510100</span></span>
+                    <span>班級 <span id="student-class">11501</span></span>
+                </div>
+            </div>
+            <div class="student-actions">
+                <span id="student-source" class="demo-label">示範資料</span>
+                <button id="edit-student" type="button">設定學生資料</button>
+            </div>
+        </header>
+        <section class="game-card card" aria-label="Lightbot 遊戲">
+            <div class="game-toolbar">
+                <h2>Lightbot 點亮任務</h2>
+                <a href="https://archive.org/details/lightbot-codehour" target="_blank" rel="noopener noreferrer">開啟遊戲原頁</a>
+            </div>
+            <div class="game-area">
+                <div class="game-screen">
+                    <!-- 固定播放器尺寸，再等比例縮放，完整保留遊戲按鈕。 -->
+                    <iframe src="https://archive.org/embed/lightbot-codehour"
+                        title="Lightbot Hour of Code 互動遊戲" width="960" height="650"
+                        referrerpolicy="no-referrer" allow="fullscreen" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+        <footer class="session-card card">
+            <div class="session-date">
+                <svg class="calendar-icon" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="6" width="20" height="18" rx="2"/><path d="M9 3v6m10-6v6M4 12h20"/></svg>
+                <div><p class="session-label">今天是</p><p id="session-date" class="date-value"></p></div>
+            </div>
+            <div class="session-time">
+                <svg class="timer-icon" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="14" cy="16" r="9"/><path d="M11 2h6m-3 5V4m0 12 4-4m5-5 2 2"/></svg>
+                <div><p class="session-label">本次學習時間</p><p id="session-time" class="time-value" role="timer" aria-label="本次學習時間">00:00</p></div>
+            </div>
+        </footer>
+    </main>
+    <p class="page-note">點擊遊戲畫面開始。截圖時請保留上方學生資料與下方日期、時間。計時為本頁顯示中的停留時間，重新整理後歸零。</p>
+    <details class="learning-help">
+        <summary>操作說明與課堂任務</summary>
+        <p>安排前進、轉向、跳躍和點燈指令，讓機器人點亮所有藍色方格。執行前先預測路徑，遇到錯誤就調整指令再試一次。</p>
+        <p>挑選一關，向同學說明指令順序與修改的方法。完成後使用電腦的螢幕擷取功能，留下遊戲進度與學生資料。</p>
+        <p>遊戲由 <a href="https://archive.org/details/lightbot-codehour" target="_blank" rel="noopener noreferrer">Internet Archive 保存的 Lightbot 版本</a>提供，首次載入需網路。</p>
+    </details>
+    <dialog id="student-dialog" aria-labelledby="student-dialog-title">
+        <form id="student-form">
+            <h2 id="student-dialog-title">設定學生資料</h2>
+            <p>資料只顯示於本頁，重新整理後恢復示範值。</p>
+            <label for="name-input">姓名</label><input id="name-input" name="name" maxlength="80" required autocomplete="off">
+            <label for="id-input">學號</label><input id="id-input" name="studentId" maxlength="40" required autocomplete="off">
+            <label for="class-input">班級</label><input id="class-input" name="className" maxlength="40" required autocomplete="off">
+            <p>切換學生後，本次學習時間會歸零；遊戲畫面維持目前狀態。</p>
+            <div class="dialog-actions"><button id="cancel-student" type="button">取消</button><button class="primary-button" type="submit">套用資料</button></div>
+        </form>
+    </dialog>
+</body>
+</html>
