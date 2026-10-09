@@ -10,6 +10,7 @@
     <script src="engine.js" defer></script>
     <script src="progress.js" defer></script>
     <script src="renderer.js" defer></script>
+    <script src="cards.js" defer></script>
     <script src="lightbot.js" defer></script>
 </head>
 <body>
@@ -40,11 +41,12 @@
             </section>
             <section class="program-panel card" aria-label="排列程式指令">
                 <div class="section-heading"><h2>排列指令</h2><span id="command-count" class="muted">0 個</span></div>
-                <p class="program-help">點選指令格，再選動作。指令由左到右依序執行；程序執行完會返回。</p>
+                <p class="program-help">把圖卡拖進程式格，或點選格子後加入動作。由左到右執行，程序執行完會返回。</p>
                 <div id="program-sections"></div>
                 <div class="edit-controls"><button id="move-earlier" type="button" aria-label="將選取的指令向前移">前移</button><button id="move-later" type="button" aria-label="將選取的指令向後移">後移</button><button id="delete-command" type="button">刪除這格</button><button id="clear-program" type="button">清空本關</button></div>
+                <div id="card-trash" class="card-trash">拖到這裡刪除圖卡</div>
                 <h3 class="palette-title">可用指令</h3><div id="command-palette" class="command-palette"></div>
-                <p class="keyboard-tip">也可拖曳指令排序。選取指令格後，按 Delete 刪除。</p>
+                <p class="keyboard-tip">拖曳可插入、排序或移到 P1／P2。放滿時，拖入新圖卡可替換這格；按 Esc 取消拖曳。</p>
                 <div class="level-record"><span id="level-complete">尚未完成</span><span id="attempt-count">嘗試 0 次</span><span id="best-count">最佳 —</span></div>
                 <button id="next-level" class="next-button" type="button" hidden>前往下一關</button>
             </section>

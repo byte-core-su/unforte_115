@@ -14,6 +14,13 @@
     try { const saved = storage?.getItem('codegame.student.v1'); if (saved) student = normalizeStudent(JSON.parse(saved)); } catch { /* Use the demo profile if saved data is damaged. */ }
     let record = store.load(student), level = levels.find(item => item.id === record.currentLevel) || levels[0];
     let selected = { section: 'main', index: 0 }, machine, autoplay = false, timeout = null, sessionMs = 0, checkpoint = performance.now();
+    const cards = window.CodeGameCards;
+    const cardDrag = new cards.CardDrag({
+        context: () => ({ level, programs: entry().programs }),
+        start: () => { stop(); status('拖動圖卡到程式格；放開即可放入，按 Esc 取消。'); },
+        commit: plan => applyPlan(plan),
+        cancelled: () => status('未放入圖卡，原指令仍保留。')
+    });
     function entry() { return record.levels[level.id] ||= { programs: { main: [], p1: [], p2: [] }, attempts: 0, elapsedMs: 0, completed: false, bestCommands: null, bestProgram: null, completedAt: null, lastRun: null }; }
     function collectTime() { const now = performance.now(); if (!document.hidden) { const elapsed = Math.max(0, Math.round(now - checkpoint)); sessionMs += elapsed; entry().elapsedMs += elapsed; } checkpoint = now; }
     const duration = ms => { const seconds = Math.floor(ms / 1000); return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`; };
@@ -21,7 +28,7 @@
     function save() { const ok = store.save(student, record); $('save-status').textContent = ok ? '進度儲存於此瀏覽器' : '無法儲存；請下載紀錄備份'; $('save-status').classList.toggle('error', !ok); window.dispatchEvent(new CustomEvent('codegame:progress', { detail: exportData() })); }
     function status(message, tone = '') { $('game-status').textContent = message; $('game-status').className = `game-status ${tone}`; }
     function stop() { clearTimeout(timeout); timeout = null; autoplay = false; $('run-program').textContent = machine?.status === 'running' ? '繼續執行' : '執行程式'; }
-    function reset(message = '先選指令格，再點選下方指令。') { stop(); machine = new Machine(level, entry().programs); renderer.set(level, machine.snapshot()); updateBoard(); renderPrograms(); status(message); }
+    function reset(message = '拖曳或點選圖卡，排好後執行程式。') { stop(); machine = new Machine(level, entry().programs); renderer.set(level, machine.snapshot()); updateBoard(); renderPrograms(); status(message); }
     function renderStudent() { $('student-name').textContent = student.name; $('student-id').textContent = student.studentId; $('student-class').textContent = student.className; $('student-source').textContent = student.source; }
     function renderNav() {
         const fragment = document.createDocumentFragment();
@@ -40,24 +47,20 @@
         ['main', 'p1', 'p2'].forEach(section => {
             if (!level.capacity[section]) return;
             const wrapper = document.createElement('div'); wrapper.className = 'program-section'; const heading = document.createElement('h3'); heading.textContent = `${section === 'main' ? '主程式' : section.toUpperCase()} · ${programs[section].length} / ${level.capacity[section]}`;
-            const grid = document.createElement('div'); grid.className = 'slots';
+            const grid = document.createElement('div'); grid.className = 'slots'; grid.dataset.section = section;
             for (let index = 0; index < level.capacity[section]; index++) {
                 const command = programs[section][index], button = document.createElement('button'); button.type = 'button'; button.className = 'slot'; button.dataset.section = section; button.dataset.index = index;
                 button.classList.toggle('selected', selected.section === section && selected.index === index); button.classList.toggle('executing', machine?.last?.section === section && machine.last.index === index);
-                button.classList.toggle('filled', !!command); button.draggable = !!command; button.textContent = command ? actions[command][0] : '+'; button.setAttribute('aria-label', `${section === 'main' ? '主程式' : section.toUpperCase()} 第 ${index + 1} 格：${command ? actions[command][1] : '空格'}`); button.title = button.getAttribute('aria-label');
+                button.classList.toggle('filled', !!command); button.setAttribute('aria-label', `${section === 'main' ? '主程式' : section.toUpperCase()} 第 ${index + 1} 格：${command ? actions[command][1] : '空格'}`); button.title = button.getAttribute('aria-label');
+                if (command) {
+                    button.dataset.command = command; button.append(cards.icon(command));
+                    const label = document.createElement('span'); label.className = 'card-label'; label.textContent = actions[command][1]; button.append(label);
+                    cardDrag.bind(button, { kind: 'program', section, index });
+                } else { const empty = document.createElement('span'); empty.className = 'empty-slot'; empty.textContent = '+'; button.append(empty); }
                 const number = document.createElement('small'); number.textContent = index + 1; button.append(number);
                 button.addEventListener('click', () => { selected = { section, index }; renderPrograms(); });
                 button.addEventListener('keydown', event => { if (event.key === 'Delete' || event.key === 'Backspace') { event.preventDefault(); selected = { section, index }; deleteCommand(); } });
-                button.addEventListener('dragstart', event => event.dataTransfer.setData('application/x-codegame-slot', JSON.stringify({ section, index })));
-                button.addEventListener('dragover', event => { if ([...event.dataTransfer.types].includes('application/x-codegame-slot')) event.preventDefault(); });
-                button.addEventListener('drop', event => {
-                    event.preventDefault(); try {
-                        const from = JSON.parse(event.dataTransfer.getData('application/x-codegame-slot'));
-                        if (!['main', 'p1', 'p2'].includes(from.section) || !Number.isInteger(from.index) || !programs[from.section][from.index]) return;
-                        if (from.section !== section && programs[section].length >= level.capacity[section]) return;
-                        const [moved] = programs[from.section].splice(from.index, 1), position = Math.min(index, programs[section].length); programs[section].splice(position, 0, moved); selected = { section, index: position }; edited();
-                    } catch { /* Ignore external drags. */ }
-                }); grid.append(button);
+                grid.append(button);
             } wrapper.append(heading, grid); fragment.append(wrapper);
         }); $('program-sections').replaceChildren(fragment);
         $('command-count').textContent = `${Object.values(programs).reduce((sum, list) => sum + list.length, 0)} 個`;
@@ -65,21 +68,34 @@
     }
     function renderPalette() {
         const fragment = document.createDocumentFragment(); level.commands.forEach(command => {
-            const button = document.createElement('button'); button.type = 'button'; button.className = 'command-button'; const symbol = document.createElement('span'); symbol.textContent = actions[command][0]; const label = document.createElement('small'); label.textContent = actions[command][1]; button.append(symbol, label);
-            button.addEventListener('click', () => { const list = entry().programs[selected.section], index = Math.min(selected.index, list.length); if (index >= level.capacity[selected.section]) { status('這個程序已放滿指令。請選取要替換的指令格。'); return; } list[index] = command; selected.index = Math.min(index + 1, level.capacity[selected.section] - 1); edited(); }); fragment.append(button);
+            const button = document.createElement('button'); button.type = 'button'; button.className = 'command-button'; button.dataset.command = command;
+            const label = document.createElement('small'); label.textContent = actions[command][1]; button.append(cards.icon(command), label);
+            cardDrag.bind(button, { kind: 'palette', command });
+            button.addEventListener('click', () => {
+                const section = selected.section, list = entry().programs[section], index = Math.min(selected.index, list.length);
+                if (index >= level.capacity[section]) { status('這個程序已放滿指令。請選取要替換的指令格。'); return; }
+                list[index] = command; selected.index = Math.min(index + 1, level.capacity[section] - 1); edited();
+                const destination = document.querySelector(`.slot[data-section="${section}"][data-index="${index}"]`);
+                cardDrag.fly(button, destination); destination.classList.add('card-landed');
+            }); fragment.append(button);
         }); $('command-palette').replaceChildren(fragment);
     }
     function updateRecord() { const item = entry(); $('level-complete').textContent = item.completed ? '✓ 已完成' : '尚未完成'; $('attempt-count').textContent = `嘗試 ${item.attempts} 次`; $('best-count').textContent = `最佳 ${item.bestCommands ?? '—'}${item.bestCommands ? ' 個' : ''}`; $('next-level').hidden = !item.completed; $('next-level').disabled = level === levels[levels.length - 1]; $('next-level').textContent = level === levels[levels.length - 1] ? '已到最後一關' : '前往下一關'; }
     function updateBoard() { const snapshot = machine.snapshot(); $('light-count').textContent = `已點亮 ${snapshot.lit.length} / ${level.goals.length}`; $('step-count').textContent = `執行 ${snapshot.steps} 步`; $('robot-position').textContent = `第 ${snapshot.robot.row + 1} 列、${snapshot.robot.col + 1} 欄`; $('robot-facing').textContent = `朝${['東', '南', '西', '北'][snapshot.robot.direction]}`; }
     function selectLevel(id) {
-        collectTime(); stop(); const next = levels.find(item => item.id === id); if (!next) return; level = next; record.currentLevel = id; selected = { section: 'main', index: 0 };
+        cardDrag.cancel(); collectTime(); stop(); const next = levels.find(item => item.id === id); if (!next) return; level = next; record.currentLevel = id; selected = { section: 'main', index: 0 };
         $('level-group').textContent = `${groups[level.group - 1]} · ${level.id}`; $('level-title').textContent = level.title; $('level-tip').textContent = level.group === 1 ? '排列動作，點亮所有藍色目標。橘色箭頭是機器人的前方。' : level.group === 2 ? '把重複的動作放入 P1 或 P2，在主程式中呼叫。' : '主程式只有一格。讓程序呼叫自己，重複動作直到所有燈亮起。';
         $('board-description').textContent = level.board.map((row, index) => `第 ${index + 1} 列：${row.map((height, col) => height === null ? '空洞' : `${height} 層${level.goals.some(([r, c]) => r === index && c === col) ? '目標' : ''}`).join('、')}`).join('；');
-        renderNav(); renderPalette(); updateRecord(); reset(entry().completed ? '這關已完成，仍可修改程式再練習。' : '先選指令格，再點選下方指令。'); save();
+        renderNav(); renderPalette(); updateRecord(); reset(entry().completed ? '這關已完成，仍可修改程式再練習。' : '拖曳或點選圖卡，排好後執行程式。'); save();
     }
     function edited() { reset('草稿已更新，可以執行或單步檢查。'); save(); }
-    function deleteCommand() { entry().programs[selected.section].splice(selected.index, 1); edited(); }
-    function moveCommand(offset) { const list = entry().programs[selected.section], index = selected.index, to = index + offset; if (!list[index] || to < 0 || to >= list.length) return; [list[index], list[to]] = [list[to], list[index]]; selected.index = to; edited(); }
+    function applyPlan(plan) { entry().programs = plan.programs; selected = { section: plan.section, index: plan.index }; edited(); status(`${plan.mode}圖卡完成，可以執行檢查。`); }
+    function deleteCommand() { const before = cardDrag.positions(), plan = cards.removePlan(entry().programs, { kind: 'program', ...selected }); if (plan) { applyPlan(plan); cardDrag.animateMoves(before, plan.moves); } }
+    function moveCommand(offset) {
+        const list = entry().programs[selected.section], index = selected.index, to = index + offset; if (!list[index] || to < 0 || to >= list.length) return;
+        const before = cardDrag.positions(), plan = cards.editPlan(level, entry().programs, { kind: 'program', ...selected }, { section: selected.section, index: offset < 0 ? to : to + 1 });
+        if (plan) { applyPlan(plan); cardDrag.animateMoves(before, plan.moves); }
+    }
     function beginAttempt() { if (!['ready', 'running'].includes(machine.status)) reset(); if (machine.status === 'ready') { entry().attempts++; updateRecord(); save(); } }
     function executeStep() {
         const before = machine.robot.direction;
