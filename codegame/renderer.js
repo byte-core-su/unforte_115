@@ -48,15 +48,14 @@
             const h = Math.max(1, Math.round(rect.height * dpr));
             if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
             const ctx = canvas.getContext('2d');
-            ctx.setTransform(w / WIDTH, 0, 0, h / HEIGHT, 0, 0);
-            this.paint(ctx, WIDTH, HEIGHT);
+            // Fit the board to its available height without stretching tiles or the robot.
+            ctx.setTransform(w / WIDTH, 0, 0, w / WIDTH, 0, 0);
+            this.paint(ctx, WIDTH, h * WIDTH / w);
         }
         paint(ctx, width, height, animate = true) {
             const gradient = ctx.createLinearGradient(0, 0, 0, height);
             gradient.addColorStop(0, '#f2f8ff'); gradient.addColorStop(1, '#e8eff9');
             ctx.fillStyle = gradient; ctx.fillRect(0, 0, width, height);
-            ctx.fillStyle = '#cddbef';
-            for (let x = 20; x < width; x += 30) for (let y = 20; y < height; y += 30) { ctx.beginPath(); ctx.arc(x, y, 1, 0, Math.PI * 2); ctx.fill(); }
             const tiles = [];
             this.level.board.forEach((row, r) => row.forEach((z, c) => {
                 if (z !== null) tiles.push({ row: r, col: c, z, ...this.project(r, c, z) });

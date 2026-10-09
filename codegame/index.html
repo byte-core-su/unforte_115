@@ -28,28 +28,30 @@
             <nav class="level-panel card" aria-label="選擇關卡">
                 <div class="section-heading"><h2>挑戰關卡</h2><span class="muted">20 關</span></div>
                 <div id="level-list"></div>
-                <p class="nav-note">可自由選關。每一關的草稿與通關紀錄會分別保存。</p>
                 <a class="reference-link" href="lightbot.html" target="_blank" rel="noopener">對照原版遊戲</a>
             </nav>
-            <section class="board-panel card" aria-labelledby="level-title">
+            <div class="play-area card">
+            <section class="board-panel" aria-labelledby="level-title">
                 <div class="board-heading"><div><span id="level-group" class="eyebrow">基礎 · 1-1</span><h2 id="level-title">第一盞燈</h2></div><button id="rotate-view" type="button" title="只改變觀看角度，不改變機器人方向">旋轉視角</button></div>
-                <p id="level-tip" class="level-tip"></p>
                 <div class="board-stage"><canvas id="game-board" width="900" height="560" role="img" aria-label="關卡地圖，橘色箭頭表示機器人朝向">請使用支援 Canvas 的瀏覽器。</canvas></div>
-                <div class="board-stats"><span id="light-count">已點亮 0 / 1</span><span id="step-count">執行 0 步</span><span id="robot-position" class="muted"></span><span id="robot-facing" class="facing-badge"></span></div>
+                <div class="board-stats"><span id="light-count">已點亮 0 / 1</span><span id="step-count">執行 0 步</span><span id="robot-facing" class="facing-badge"></span></div>
                 <div id="game-status" class="game-status" role="status" aria-live="polite">先選指令格，再點選下方指令。</div>
-                <div class="run-controls"><button id="run-program" class="primary-button" type="button">執行程式</button><button id="step-program" type="button">單步執行</button><button id="reset-board" type="button">回到起點</button><label class="speed-label" for="run-speed">速度 <select id="run-speed" aria-label="執行速度"><option value="1600">慢速 · 1.6 秒</option><option value="1000" selected>一般 · 1 秒</option><option value="500">快速 · 0.5 秒</option></select></label></div>
+                <details class="board-info"><summary>關卡提示</summary><p id="level-tip"></p><span id="robot-position" class="muted"></span></details>
             </section>
-            <section class="program-panel card" aria-label="排列程式指令">
-                <div class="section-heading"><h2>排列指令</h2><span id="command-count" class="muted">0 個</span></div>
-                <p class="program-help">把圖卡拖進程式格，或點選格子後加入動作。由左到右執行，程序執行完會返回。</p>
+            <section class="program-panel" aria-label="排列程式指令">
+                <div class="section-heading"><h2>排列指令</h2><span id="command-count" class="visually-hidden">0 個</span><label class="speed-label" for="run-speed">速度 <select id="run-speed" aria-label="執行速度"><option value="1600">慢速</option><option value="1000" selected>一般</option><option value="500">快速</option></select></label></div>
+                <div class="run-controls" aria-label="執行控制"><button id="run-program" class="primary-button" type="button">執行程式</button><button id="step-program" type="button" title="只執行一個指令" aria-label="單步執行">單步</button><button id="reset-board" type="button" title="機器人回到起點，保留指令" aria-label="回到起點">重設</button></div>
                 <div id="program-sections"></div>
+                <div class="editor-tools">
                 <div class="edit-controls"><button id="move-earlier" type="button" aria-label="將選取的指令向前移">前移</button><button id="move-later" type="button" aria-label="將選取的指令向後移">後移</button><button id="delete-command" type="button">刪除這格</button><button id="clear-program" type="button">清空本關</button></div>
                 <div id="card-trash" class="card-trash">拖到這裡刪除圖卡</div>
-                <h3 class="palette-title">可用指令</h3><div id="command-palette" class="command-palette"></div>
-                <p class="keyboard-tip">拖曳可插入、排序或移到 P1／P2。放滿時，拖入新圖卡可替換這格；按 Esc 取消拖曳。</p>
+                </div>
+                <div class="palette-heading"><h3>動作圖卡</h3><span class="muted">拖曳或點選加入</span></div><div id="command-palette" class="command-palette"></div>
+                <details class="program-help"><summary>操作說明</summary><p>把圖卡拖進程式格，或點選格子後加入動作。由左到右執行，程序執行完會返回。</p><p>拖曳可插入、排序或移到 P1／P2。放滿時，拖入新圖卡可替換這格；拖到刪除區可移除圖卡，按 Esc 取消拖曳。</p></details>
                 <div class="level-record"><span id="level-complete">尚未完成</span><span id="attempt-count">嘗試 0 次</span><span id="best-count">最佳 —</span></div>
                 <button id="next-level" class="next-button" type="button" hidden>前往下一關</button>
             </section>
+            </div>
         </div>
         <footer class="session-card card"><div><p class="session-label">今天是</p><p id="session-date" class="date-value"></p></div><div><p class="session-label">本次學習時間</p><p id="session-time" class="time-value" role="timer">00:00</p></div><div class="save-summary"><p id="save-status">進度儲存於此瀏覽器</p><button id="download-screen" type="button">下載學習畫面</button></div></footer>
         <details class="learning-help"><summary>玩法、紀錄與關卡來源</summary><p>前進只能到相同高度；跳躍只能向上一層或向下。遇到邊界、空洞或不符合高度的動作時，機器人會留在原位並繼續下一個指令。點燈會切換目標的亮／暗；所有目標都亮起時立即過關。</p><p>P1、P2 代表共用程序。在程序最後放入自己的呼叫指令，就能形成迴圈。程式最多執行 10,000 步，避免無法結束的迴圈持續執行。</p><p>草稿、通關、最佳指令數與每關累積學習時間只存在此瀏覽器。學生身分目前由手動設定，尚未登入或連接資料庫；清除網站資料會失去紀錄，可在「學習紀錄」下載備份。計時只累計頁面可見期間，並非有效操作時間。</p><p>本遊戲獨立開發畫面與執行程式；20 關地圖、高度、起點、朝向與指令容量依 <a href="https://archive.org/details/lightbot-codehour" target="_blank" rel="noopener noreferrer">Lightbot Code Hour 保存版本</a>核對。另可參考 <a href="https://lightbot.com/resources.html" target="_blank" rel="noopener noreferrer">原作者的教師資源</a>。</p><details><summary>目前關卡的文字地圖</summary><p id="board-description"></p></details></details>
