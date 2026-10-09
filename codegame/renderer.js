@@ -86,9 +86,7 @@
             }
             const position = this.project(robot.row, robot.col, robot.height ?? this.level.board[this.snapshot.robot.row][this.snapshot.robot.col]);
             tiles.sort((a, b) => a.depth - b.depth || a.col - b.col);
-            let robotDrawn = false;
             for (const tile of tiles) {
-                if (!robotDrawn && tile.depth > position.depth + .01) { this.paintRobot(ctx, position.x, position.y - lift, (robot.direction + this.rotation) % 4); robotDrawn = true; }
                 const { x, y } = tile;
                 const base = this.project(tile.row, tile.col, 0).y + 18;
                 polygon(ctx, [[x - 48, y], [x, y + 26], [x, base + 26], [x - 48, base]], '#bacbdf');
@@ -100,12 +98,10 @@
                 if (goal) {
                     ctx.fillStyle = active ? '#ad7414' : '#fff'; ctx.font = 'bold 16px system-ui'; ctx.textAlign = 'center'; ctx.fillText(active ? '✓' : '·', x, y + 6);
                 }
-                if (!robotDrawn && Math.abs(tile.depth - position.depth) < .01 && tile.row === this.snapshot.robot.row && tile.col === this.snapshot.robot.col) {
-                    this.paintRobot(ctx, position.x, position.y - lift, (robot.direction + this.rotation) % 4); robotDrawn = true;
-                }
             }
-            if (!robotDrawn) this.paintRobot(ctx, position.x, position.y - lift, (robot.direction + this.rotation) % 4);
-            // Draw the heading above the tiles so high steps cannot hide it.
+            // Keep the robot visible throughout the move, including between tiles and
+            // behind tall platforms. Tile depth only orders the board, never the robot.
+            this.paintRobot(ctx, position.x, position.y - lift, (robot.direction + this.rotation) % 4);
             this.paintHeading(ctx, position.x, position.y, robot.direction + this.rotation);
             ctx.restore();
             const direction = (this.snapshot.robot.direction + this.rotation) % 4;
