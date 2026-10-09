@@ -4,7 +4,7 @@
 
 ## 關卡與規則
 
-完整重現使用者指定的 [Lightbot Code Hour 保存版本](https://archive.org/details/lightbot-codehour)所選的 20 個可玩關卡：基礎 8 關、程序 6 關、迴圈 6 關。地圖、空洞、高度、目標、起點、方向、主程式與程序容量均來自該保存版本的 `LevelsDict.levelsHOC15`，不是以其他年度解答推測。畫面、機器人造型與執行程式獨立製作，未附原版 SWF、程式碼、圖片或音效。原版嵌入頁保留在 `archive.html` 供對照。
+完整重現使用者指定的 [Lightbot Code Hour 保存版本](https://archive.org/details/lightbot-codehour)所選的 20 個可玩關卡：基礎 8 關、程序 6 關、迴圈 6 關。地圖、空洞、高度、目標、起點、方向、主程式與程序容量均來自該保存版本的 `LevelsDict.levelsHOC15`，不是以其他年度解答推測。畫面、機器人造型與執行程式獨立製作，未附原版 SWF、程式碼、圖片或音效。原版嵌入頁保留在 `lightbot.html` 供對照。
 
 `source-levels.json` 保存逐關校對常數與來源 SHA-256；`levels.js` 將步幅 7 的原始地圖轉為二維陣列。原始 `botx` 是列、`boty` 是欄，`startr` 是方向（0 東、1 南、2 西、3 北）。`leveltypes` 的 6 是空洞、1 是點燈目標。官方教學背景見 [原作者資源](https://lightbot.com/resources.html)。不同年度版本的部分關卡不一樣，本專案以指定保存檔為準。
 

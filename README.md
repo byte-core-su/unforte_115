@@ -71,7 +71,7 @@
 
 直接以瀏覽器開啟 `index.html`，或部署至靜態網站服務（例如 GitHub Pages）。教材頁面可離線瀏覽，但外部 CDN 的字型與樣式需要網路連線。
 
-CodeGame 點亮任務保存在 `codegame/`，可開啟 `codegame/index.html`，或在本機預覽開啟 `http://127.0.0.1:4173/codegame/`。它是自行開發的機器人指令解謎遊戲，逐關重現指定 Lightbot Code Hour 保存版本的 20 關地圖、高度、起點、方向與指令容量。支援前進、轉向、跳躍、點燈、P1/P2 程序、遞迴迴圈、單步執行與通關判定。原版嵌入頁保留在 `codegame/archive.html`。
+CodeGame 點亮任務保存在 `codegame/`，可開啟 `codegame/index.html`，或在本機預覽開啟 `http://127.0.0.1:4173/codegame/`。它是自行開發的機器人指令解謎遊戲，逐關重現指定 Lightbot Code Hour 保存版本的 20 關地圖、高度、起點、方向與指令容量。支援前進、轉向、跳躍、點燈、P1/P2 程序、遞迴迴圈、單步執行與通關判定。原版嵌入頁保留在 `codegame/lightbot.html`。
 
 學生姓名、學號、班級顯示在遊戲上方；草稿、通關、最佳指令、嘗試次數與學習時間依班級及學號保存於此瀏覽器，重新整理後可繼續練習。可下載包含學生資料、遊戲狀態及指令的 PNG，或匯出學習紀錄 JSON。尚未提供登入驗證與資料庫同步。後續可透過 `window.LightbotLearning.setStudent(...)` 更新學生，透過 `exportData()` 及 `codegame:progress` 事件取得紀錄；詳細規則、來源與資料介面見 [CodeGame 說明](codegame/README.md)。
 
