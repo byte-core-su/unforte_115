@@ -34,9 +34,9 @@
                 <div class="board-heading"><div><span id="level-group" class="eyebrow">基礎 · 1-1</span><h2 id="level-title">第一盞燈</h2></div><button id="rotate-view" type="button" title="只改變觀看角度，不改變機器人方向">旋轉視角</button></div>
                 <p id="level-tip" class="level-tip"></p>
                 <div class="board-stage"><canvas id="game-board" width="900" height="560" role="img" aria-label="關卡地圖，橘色箭頭表示機器人朝向">請使用支援 Canvas 的瀏覽器。</canvas></div>
-                <div class="board-stats"><span id="light-count">已點亮 0 / 1</span><span id="step-count">執行 0 步</span><span id="robot-position" class="muted"></span></div>
+                <div class="board-stats"><span id="light-count">已點亮 0 / 1</span><span id="step-count">執行 0 步</span><span id="robot-position" class="muted"></span><span id="robot-facing" class="facing-badge"></span></div>
                 <div id="game-status" class="game-status" role="status" aria-live="polite">先選指令格，再點選下方指令。</div>
-                <div class="run-controls"><button id="run-program" class="primary-button" type="button">執行程式</button><button id="step-program" type="button">單步執行</button><button id="reset-board" type="button">回到起點</button><label class="speed-label" for="run-speed">速度 <select id="run-speed"><option value="650">慢速</option><option value="350" selected>一般</option><option value="80">快速</option></select></label></div>
+                <div class="run-controls"><button id="run-program" class="primary-button" type="button">執行程式</button><button id="step-program" type="button">單步執行</button><button id="reset-board" type="button">回到起點</button><label class="speed-label" for="run-speed">速度 <select id="run-speed" aria-label="執行速度"><option value="1600">慢速 · 1.6 秒</option><option value="1000" selected>一般 · 1 秒</option><option value="500">快速 · 0.5 秒</option></select></label></div>
             </section>
             <section class="program-panel card" aria-label="排列程式指令">
                 <div class="section-heading"><h2>排列指令</h2><span id="command-count" class="muted">0 個</span></div>

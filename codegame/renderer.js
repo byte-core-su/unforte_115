@@ -21,10 +21,15 @@
             this.observer = new ResizeObserver(() => this.draw());
             this.observer.observe(canvas);
         }
-        set(level, snapshot, animate = false) {
+        set(level, snapshot, animate = false, duration = 650) {
             const before = this.snapshot?.robot;
+            if (this.raf) { cancelAnimationFrame(this.raf); this.raf = null; }
+            const command = snapshot.last?.command;
+            const moved = before && (before.row !== snapshot.robot.row || before.col !== snapshot.robot.col);
+            const turn = command === 'left' ? -1 : command === 'right' ? 1 : 0;
+            const reducedMotion = root.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
             this.level = level; this.snapshot = snapshot;
-            this.lastMove = animate && before ? { from: before, to: snapshot.robot, started: performance.now(), jump: snapshot.last?.command === 'jump' } : null;
+            this.lastMove = animate && before && !reducedMotion && (moved || turn) ? { from: before, to: snapshot.robot, started: performance.now(), duration, jump: command === 'jump' && moved, turn } : null;
             this.draw();
         }
         rotate() { this.rotation = (this.rotation + 1) % 4; this.lastMove = null; this.draw(); }
@@ -46,7 +51,7 @@
             ctx.setTransform(w / WIDTH, 0, 0, h / HEIGHT, 0, 0);
             this.paint(ctx, WIDTH, HEIGHT);
         }
-        paint(ctx, width, height) {
+        paint(ctx, width, height, animate = true) {
             const gradient = ctx.createLinearGradient(0, 0, 0, height);
             gradient.addColorStop(0, '#f2f8ff'); gradient.addColorStop(1, '#e8eff9');
             ctx.fillStyle = gradient; ctx.fillRect(0, 0, width, height);
@@ -67,14 +72,16 @@
             let moving = false;
             let robot = { ...this.snapshot.robot };
             let lift = 0;
-            if (this.lastMove) {
-                const t = Math.min(1, (performance.now() - this.lastMove.started) / 260);
+            if (animate && this.lastMove) {
+                const t = Math.min(1, (performance.now() - this.lastMove.started) / this.lastMove.duration);
                 const ease = t * t * (3 - 2 * t);
                 robot.row = this.lastMove.from.row + (this.lastMove.to.row - this.lastMove.from.row) * ease;
                 robot.col = this.lastMove.from.col + (this.lastMove.to.col - this.lastMove.from.col) * ease;
                 const startH = this.level.board[this.lastMove.from.row][this.lastMove.from.col];
                 const endH = this.level.board[this.lastMove.to.row][this.lastMove.to.col];
                 robot.height = startH + (endH - startH) * ease;
+                // Signed quarter-turns also interpolate correctly across north/east (3 ↔ 0).
+                robot.direction = this.lastMove.turn ? this.lastMove.from.direction + this.lastMove.turn * ease : this.lastMove.to.direction;
                 lift = this.lastMove.jump ? Math.sin(t * Math.PI) * 30 : 0;
                 moving = t < 1;
             }
@@ -99,7 +106,14 @@
                 }
             }
             if (!robotDrawn) this.paintRobot(ctx, position.x, position.y - lift, (robot.direction + this.rotation) % 4);
+            // Draw the heading above the tiles so high steps cannot hide it.
+            this.paintHeading(ctx, position.x, position.y, robot.direction + this.rotation);
             ctx.restore();
+            const direction = (this.snapshot.robot.direction + this.rotation) % 4;
+            const turning = this.snapshot.last?.command === 'left' || this.snapshot.last?.command === 'right';
+            box(ctx, 22, 18, turning ? 280 : 170, 48, 12, '#fff4df');
+            ctx.fillStyle = '#a64808'; ctx.font = 'bold 23px "Microsoft JhengHei", system-ui'; ctx.textAlign = 'left';
+            ctx.fillText(`${['↘', '↙', '↖', '↗'][direction]} 朝${['東', '南', '西', '北'][this.snapshot.robot.direction]}${turning ? this.snapshot.last.command === 'left' ? ' · ↶ 左轉' : ' · ↷ 右轉' : ''}`, 38, 50);
             ctx.fillStyle = '#415976'; ctx.font = '18px "Microsoft JhengHei", system-ui'; ctx.textAlign = 'left';
             ctx.fillText('藍色：待點亮', 30, height - 26); ctx.fillText('黃色：已點亮', 225, height - 26);
             ctx.textAlign = 'right'; ctx.fillText(`已點亮 ${this.snapshot.lit.length} / ${this.level.goals.length}`, width - 30, height - 26);
@@ -110,23 +124,38 @@
         }
         paintRobot(ctx, x, y, direction) {
             ctx.save(); ctx.translate(x, y);
+            const angle = direction * Math.PI / 2;
+            const dx = Math.cos(angle) - Math.sin(angle);
+            const dy = Math.cos(angle) + Math.sin(angle);
             ctx.fillStyle = '#172c6540'; ctx.beginPath(); ctx.ellipse(0, 2, 20, 9, 0, 0, Math.PI * 2); ctx.fill();
             box(ctx, -17, -30, 34, 26, 8, '#5148d8');
-            box(ctx, -21, -62, 42, 33, 10, '#fff');
+            box(ctx, -21, -62, 42, 33, 10, dy > 0 ? '#fff' : '#bfc2f7');
             ctx.strokeStyle = '#3b3d89'; ctx.lineWidth = 2; ctx.stroke();
-            box(ctx, -15, -54, 30, 17, 5, '#283e71');
-            ctx.fillStyle = '#87e5ff'; ctx.beginPath(); ctx.arc(-7, -46, 3, 0, Math.PI * 2); ctx.arc(7, -46, 3, 0, Math.PI * 2); ctx.fill();
+            // The face follows the front; north/west expose the back of the head.
+            if (dy > 0) {
+                const faceX = dx * 5;
+                box(ctx, faceX - 14, -54, 28, 17, 5, '#283e71');
+                ctx.fillStyle = '#87e5ff'; ctx.beginPath(); ctx.arc(faceX - 6, -46, 3, 0, Math.PI * 2); ctx.arc(faceX + 6, -46, 3, 0, Math.PI * 2); ctx.fill();
+            } else {
+                box(ctx, dx * 4 - 10, -53, 20, 15, 4, '#9699dd');
+                ctx.strokeStyle = '#6267af'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(dx * 4 - 5, -48); ctx.lineTo(dx * 4 + 5, -48); ctx.moveTo(dx * 4 - 5, -43); ctx.lineTo(dx * 4 + 5, -43); ctx.stroke();
+            }
             ctx.strokeStyle = '#6a66ed'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -62); ctx.lineTo(0, -70); ctx.stroke();
             ctx.fillStyle = '#f7c74b'; ctx.beginPath(); ctx.arc(0, -73, 4, 0, Math.PI * 2); ctx.fill();
             box(ctx, -23, -23, 7, 18, 3, '#7570ee'); box(ctx, 16, -23, 7, 18, 3, '#7570ee');
             box(ctx, -14, -6, 10, 8, 3, '#302d8e'); box(ctx, 4, -6, 10, 8, 3, '#302d8e');
-            // Direction indicator points to the next tile in the rendered camera orientation.
-            const vectors = [[1, .54], [-1, .54], [-1, -.54], [1, -.54]];
-            const [dx, dy] = vectors[direction];
-            ctx.strokeStyle = '#f86b22'; ctx.fillStyle = '#f86b22'; ctx.lineWidth = 3;
-            ctx.beginPath(); ctx.moveTo(dx * 27, dy * 27); ctx.lineTo(dx * 42, dy * 42); ctx.stroke();
-            const a = Math.atan2(dy, dx);
-            polygon(ctx, [[dx * 44, dy * 44], [dx * 44 - Math.cos(a - .55) * 11, dy * 44 - Math.sin(a - .55) * 11], [dx * 44 - Math.cos(a + .55) * 11, dy * 44 - Math.sin(a + .55) * 11]], '#f86b22', '#f86b22');
+            ctx.restore();
+        }
+        paintHeading(ctx, x, y, direction) {
+            ctx.save(); ctx.translate(x, y);
+            const angle = direction * Math.PI / 2;
+            const dx = Math.cos(angle) - Math.sin(angle), dy = (Math.cos(angle) + Math.sin(angle)) * .54;
+            ctx.strokeStyle = '#ffb76d'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.ellipse(0, 0, 35, 19, 0, 0, Math.PI * 2); ctx.stroke();
+            const points = [[-13, -5], [8, -5], [8, -12], [27, 0], [8, 12], [8, 5], [-13, 5]].map(([along, across]) => [dx * (43 + along) - dy * across, dy * (43 + along) + dx * across]);
+            ctx.shadowColor = '#fff'; ctx.shadowBlur = 5;
+            polygon(ctx, points, '#f86b22', '#fff');
             ctx.restore();
         }
     }
