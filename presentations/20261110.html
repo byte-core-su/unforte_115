@@ -154,6 +154,13 @@
     .workflow-table th:nth-child(2) { width:36%; }
     #slide-6 .content,#slide-7 .content,#slide-11 .content { gap:12px; margin:16px 0 12px; }
     #slide-6 .content { margin:14px 0 10px; }
+    .classification-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:20px; }
+    .classification-card { padding:18px 22px; border:1px solid var(--line); border-top:4px solid var(--accent); border-radius:10px; background:white; }
+    .classification-card h3 { font-size:clamp(21px,2.2cqw,28px); margin:0 0 10px; }
+    .classification-topic { font-size:clamp(20px,1.95cqw,25px); font-weight:700; line-height:1.4; margin:0 0 14px; }
+    .classification-reason { font-size:clamp(17px,1.8cqw,23px); line-height:1.5; margin:0 0 14px; }
+    .classification-evidence { font-size:clamp(16px,1.65cqw,21px); line-height:1.5; margin:0; color:var(--accent); }
+    .classification-principle { font-size:clamp(19px,2cqw,26px); font-weight:700; line-height:1.4; text-wrap:balance; }
     .case-content { gap:10px; margin:20px 0 14px; }
     .teaching-example { grid-template-columns:1.25fr 1fr; gap:28px; }
     .teaching-example figure img { max-height:24cqw; }
@@ -184,6 +191,7 @@
       .package-grid { grid-template-columns:repeat(2,1fr); }
       .adoption-grid,.teaching-example { grid-template-columns:1fr; }
       .teaching-example figure img { max-height:300px; }
+      .classification-grid { grid-template-columns:1fr; }
     }
     @media print {
       .package-card { padding:3mm 4mm; }
@@ -195,6 +203,12 @@
       .teaching-step p { font-size:14pt; }
       .rubric-example h3 { font-size:15pt; }
       .rubric-example p { font-size:13pt; }
+      .classification-card { padding:4mm 5mm; }
+      .classification-card h3 { font-size:18pt; }
+      .classification-topic { font-size:16pt; }
+      .classification-reason { font-size:14pt; }
+      .classification-evidence { font-size:13pt; }
+      .classification-principle { font-size:16pt; }
     }
   </style>
 </head>
@@ -216,10 +230,10 @@
     <article class="slide-page" id="slide-1">
       <section class="slide cover" aria-labelledby="title-1">
         <header><p class="eyebrow">115 學年度資訊科技教材</p><h1 id="title-1">可直接帶進課堂的 Scratch 教材包</h1></header>
-        <div class="content "><p class="lead">從備課到評量的成套支援</p><p class="subtitle">教案、互動教材、範例與評量工具一起提供<br>讓教師帶著提問教，讓學生留下理解的證據</p><p class="caveat">七、八年級各 6 單元，建議各 12 節</p></div>
+        <div class="content "><p class="lead">從備課到評量的成套支援</p><p class="subtitle">教案、互動教材、範例與評量工具一起提供<br>讓教師帶著提問教，讓學生留下理解的證據</p><p class="caveat">七年級程式設計｜八年級演算法<br>各 6 單元，建議各 12 節</p></div>
         <footer class="slide-footer"><span>115 學年度 Scratch 教材包</span><span>01 / 16</span></footer>
       </section>
-      <details class="notes"><summary>講者備註與資料來源</summary><p>本教材包提供現場教師可選用的七、八年級 Scratch 主題課程。這次向教育相關教授說明教材包的課程設計、互動教學價值與現場採用方式。教師可沿用教案、範例及評量工具，再依班級程度調整。七年級建立程式思維，八年級以清單發展資料追蹤與演算法理解。教材設計的預期效益，仍需教師試用及學生學習資料進一步檢視。</p><ul><li><a href="../index.html">教材入口</a></li><li><a href="../README.md">教材包範圍與使用方式</a></li></ul></details>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>本教材包提供現場教師可選用的七、八年級 Scratch 主題課程。這次向教育相關教授說明教材包的課程設計、互動教學價值與現場採用方式。教師可沿用教案、範例及評量工具，再依班級程度調整。七年級以「結構化程式與互動作品」歸入程式設計，八年級以「資料結構與演算法應用」歸入演算法。兩套課程各以作品建構及資料處理規則為主軸，並結合實作與推理。教材設計的預期效益，仍需教師試用及學生學習資料進一步檢視。</p><ul><li><a href="../index.html">教材入口</a></li><li><a href="../README.md">教材包範圍與使用方式</a></li></ul></details>
     </article>
     <article class="slide-page" id="slide-2">
       <section class="slide " aria-labelledby="title-2">
@@ -235,30 +249,55 @@
     </article>
     <article class="slide-page" id="slide-4">
       <section class="slide " aria-labelledby="title-4">
-        <header><p class="eyebrow">課程進程與學習成果</p><h2 id="title-4">七年級的 Scratch 核心程式思維</h2></header>
-        <div class="content "><div class="table-wrap"><table class="course-table outcomes-table"><thead><tr><th scope="col">單元</th><th scope="col">逐步建立的能力</th><th scope="col">教師可收取的成果</th></tr></thead><tbody><tr><td>1 起步診斷</td><td>讀懂積木用途，判斷安全情境</td><td>積木說明與判斷理由</td></tr><tr><td>2 三大結構</td><td>預測結果，定位流程錯誤</td><td>分支與迴圈預測紀錄</td></tr><tr><td>3 迴圈多邊形</td><td>整理重複動作與轉角規律</td><td>新邊數作品與規則說明</td></tr><tr><td>4 變數螺旋</td><td>追蹤變數初始值與更新位置</td><td>前三輪追蹤與圖形比較</td></tr><tr><td>5 幾何曼陀羅</td><td>整合迴圈與變數，比較設定</td><td>作品與參數選擇理由</td></tr><tr><td>6 防禦網專題</td><td>多組資料測試並修正作品</td><td>作品、測試與方案理由</td></tr></tbody></table></div><p class="callout">讀懂與預測 → 追蹤與解釋 → 整合與測試</p><p class="caveat">星際防禦工程師主題串聯六單元。自訂積木與參數為進階延伸。</p></div>
+        <header><p class="eyebrow">心智圖主分類・程式設計</p><h2 id="title-4">七年級｜結構化程式與互動作品</h2></header>
+        <div class="content "><div class="table-wrap"><table class="course-table outcomes-table"><thead><tr><th scope="col">單元</th><th scope="col">逐步建立的能力</th><th scope="col">教師可收取的成果</th></tr></thead><tbody><tr><td>1 起步診斷</td><td>讀懂積木用途，判斷安全情境</td><td>積木說明與判斷理由</td></tr><tr><td>2 三大結構</td><td>預測結果，定位流程錯誤</td><td>分支與迴圈預測紀錄</td></tr><tr><td>3 迴圈多邊形</td><td>整理重複動作與轉角規律</td><td>新邊數作品與規則說明</td></tr><tr><td>4 變數螺旋</td><td>追蹤變數初始值與更新位置</td><td>前三輪追蹤與圖形比較</td></tr><tr><td>5 幾何曼陀羅</td><td>整合迴圈與變數，比較設定</td><td>作品與參數選擇理由</td></tr><tr><td>6 防禦網專題</td><td>多組資料測試並修正作品</td><td>作品、測試與方案理由</td></tr></tbody></table></div><p class="callout">讀懂程式 → 規劃與實作 → 除錯與測試</p><p class="caveat">星際防禦工程師主題串聯六單元。自訂積木與參數為進階延伸。</p></div>
         <footer class="slide-footer"><span>115 學年度 Scratch 教材包</span><span>04 / 16</span></footer>
       </section>
-      <details class="notes"><summary>講者備註與資料來源</summary><p>七年級用星際防禦工程師情境串聯六個單元，從讀懂積木與預測結果開始，經迴圈和變數追蹤，最後完成可調參數並可測試的防禦網。右欄列教師可收取的成果，讓教授看見課程進程與採證要求的關聯。第5課核心是迴圈與變數，自訂積木與參數供進階延伸。第6課將參數測試連到方案選擇，學生須說明有效與省資源的理由。</p><ul><li><a href="../1150700.html">年級課程總覽</a></li><li><a href="../lesson-plan-grade-7.html">逐課教案與評量</a></li></ul></details>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>七年級用星際防禦工程師情境串聯六個單元，從讀懂積木與預測結果開始，經迴圈和變數追蹤，最後完成可調參數並可測試的防禦網。右欄列教師可收取的成果，讓教授看見課程進程與採證要求的關聯。第5課核心是迴圈與變數，自訂積木與參數供進階延伸。第6課將參數測試連到方案選擇，學生須說明有效與省資源的理由。流程推理讓學生規劃、解釋與修正自己的程式，與程式設計主分類相互連結。</p><ul><li><a href="../1150700.html">年級課程總覽</a></li><li><a href="../lesson-plan-grade-7.html">逐課教案與評量</a></li></ul></details>
     </article>
     <article class="slide-page" id="slide-5">
       <section class="slide grade8" aria-labelledby="title-5">
-        <header><p class="eyebrow">課程進程與學習成果</p><h2 id="title-5">八年級的 Scratch 清單與演算法</h2></header>
-        <div class="content "><div class="table-wrap"><table class="course-table outcomes-table"><thead><tr><th scope="col">單元</th><th scope="col">逐步建立的能力</th><th scope="col">教師可收取的成果</th></tr></thead><tbody><tr><td>1 清單與搜尋</td><td>理解索引與搜尋停止條件</td><td>操作對照、搜尋作品</td></tr><tr><td>2 音符走訪</td><td>依索引讀取，判斷素材使用</td><td>短旋律與授權理由</td></tr><tr><td>3 能源分析</td><td>追蹤累加，處理空清單</td><td>多筆、單筆、空清單紀錄</td></tr><tr><td>4 不重複抽取</td><td>追蹤候選與已選清單</td><td>抽取作品與不重複理由</td></tr><tr><td>5 洗牌與排序</td><td>比較移轉、交換與停止規則</td><td>過程追蹤與排序作品</td></tr><tr><td>6 對決專題</td><td>以模組分工，測試不同情況</td><td>模組作品與三組測試</td></tr></tbody></table></div><p class="callout">執行前、執行中、執行後，都能說明資料如何改變</p><p class="caveat">星際陣列指揮官主題。先備包含事件、條件、迴圈與變數。</p></div>
+        <header><p class="eyebrow">心智圖主分類・演算法</p><h2 id="title-5">八年級｜資料結構與演算法應用</h2></header>
+        <div class="content "><div class="table-wrap"><table class="course-table outcomes-table"><thead><tr><th scope="col">單元</th><th scope="col">逐步建立的能力</th><th scope="col">教師可收取的成果</th></tr></thead><tbody><tr><td>1 清單與搜尋</td><td>理解索引與搜尋停止條件</td><td>操作對照、搜尋作品</td></tr><tr><td>2 音符走訪</td><td>依索引讀取，判斷素材使用</td><td>短旋律與授權理由</td></tr><tr><td>3 能源分析</td><td>追蹤累加，處理空清單</td><td>多筆、單筆、空清單紀錄</td></tr><tr><td>4 不重複抽取</td><td>追蹤候選與已選清單</td><td>抽取作品與不重複理由</td></tr><tr><td>5 洗牌與排序</td><td>比較移轉、交換與停止規則</td><td>過程追蹤與排序作品</td></tr><tr><td>6 對決專題</td><td>整合處理步驟，驗證資料規則</td><td>模組作品、流程與三組測試</td></tr></tbody></table></div><p class="callout">執行前、執行中、執行後，都能說明資料如何改變</p><p class="caveat">星際陣列指揮官主題。先備包含事件、條件、迴圈與變數。</p></div>
         <footer class="slide-footer"><span>115 學年度 Scratch 教材包</span><span>05 / 16</span></footer>
       </section>
-      <details class="notes"><summary>講者備註與資料來源</summary><p>八年級沿用星際任務情境，以清單作為資料結構主軸，逐步發展索引、走訪、搜尋、累加、抽取、洗牌與排序，最後用自訂積木分工完成對決專題。各課教師都可要求學生在執行前預測、執行中追蹤、執行後驗證。第3課的指定成果是資料模擬、追蹤與案例說明，參考積木用於閱讀。學生獨立程式成果由第1、2、4、5、6課採集。</p><ul><li><a href="../1150800.html">年級課程總覽</a></li><li><a href="../lesson-plan-grade-8.html">逐課教案與評量</a></li></ul></details>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>八年級沿用星際任務情境，以清單作為資料結構主軸，逐步發展索引、走訪、搜尋、累加、抽取、洗牌與排序，最後用自訂積木分工完成對決專題，將資料處理規則寫成可執行程式，再用不同案例驗證。各課教師都可要求學生在執行前預測、執行中追蹤、執行後驗證。第3課的指定成果是資料模擬、追蹤與案例說明，參考積木用於閱讀。學生獨立程式成果由第1、2、4、5、6課採集。</p><ul><li><a href="../1150800.html">年級課程總覽</a></li><li><a href="../lesson-plan-grade-8.html">逐課教案與評量</a></li></ul></details>
     </article>
     <article class="slide-page" id="slide-6">
-      <section class="slide " aria-labelledby="title-6">
-        <header><p class="eyebrow">內容分布</p><h2 id="title-6">實作與推理在課程中的安排</h2></header>
-        <div class="content "><div class="table-wrap"><table class="distribution-table" id="content-distribution"><thead><tr><th scope="col">範圍</th><th scope="col">程式設計</th><th scope="col">演算法／<br>資料結構</th><th scope="col">混合</th><th scope="col">其他</th></tr></thead><tbody><tr data-total="22"><th scope="row">七年級<br>22 項</th><td data-count="8">8 項<br>36.4%</td><td data-count="8">8 項<br>36.4%</td><td data-count="4">4 項<br>18.2%</td><td data-count="2">2 項<br>9.1%</td></tr><tr data-total="23"><th scope="row">八年級<br>23 項</th><td data-count="6">6 項<br>26.1%</td><td data-count="15">15 項<br>65.2%</td><td data-count="1">1 項<br>4.3%</td><td data-count="1">1 項<br>4.3%</td></tr><tr data-total="45"><th scope="row">合計<br>45 項</th><td data-count="14">14 項<br>31.1%</td><td data-count="23">23 項<br>51.1%</td><td data-count="5">5 項<br>11.1%</td><td data-count="3">3 項<br>6.7%</td></tr></tbody></table></div><p class="callout">七年級實作與流程推理並重<br>八年級著重資料結構與演算法理解</p><p class="caveat">按全部必做任務數計算。按 N 展開計算附錄，或<a href="../COURSE_CONTENT_ANALYSIS.md">查看逐項依據</a>。</p></div>
+      <section class="slide" aria-labelledby="title-6">
+        <header><p class="eyebrow">課程定位與分類依據</p><h2 id="title-6">心智圖的主分類如何決定</h2></header>
+        <div class="content">
+          <div class="classification-grid">
+            <section class="classification-card" aria-labelledby="classification-grade7">
+              <h3 id="classification-grade7">程式設計 → 七年級</h3>
+              <p class="classification-topic">結構化程式與互動作品</p>
+              <p class="classification-reason">以積木、迴圈與變數建構作品<br>流程推理支援程式規劃、除錯與測試</p>
+              <p class="classification-evidence">程式與流程推理各 8 項<br>依繪圖與防禦網的作品主軸歸類</p>
+            </section>
+            <section class="classification-card grade8" aria-labelledby="classification-grade8">
+              <h3 id="classification-grade8">演算法 → 八年級</h3>
+              <p class="classification-topic">資料結構與演算法應用</p>
+              <p class="classification-reason">以清單狀態與資料處理規則為主軸<br>透過追蹤、比較與邊界測試驗證規則</p>
+              <p class="classification-evidence">資料結構與推理 15 項、程式 6 項<br>教學重點與內容分布共同支持歸類</p>
+            </section>
+          </div>
+          <p class="classification-principle">單一歸屬依課程主軸、核心能力與最終成果判定</p>
+          <p class="caveat">兩套課程均結合實作與推理。按 N 查看 45 項必做任務的完整分布與計算。</p>
+        </div>
         <footer class="slide-footer"><span>115 學年度 Scratch 教材包</span><span>06 / 16</span></footer>
       </section>
-      <details class="notes"><summary>講者備註與資料來源</summary><p>主畫面保留全部45項必做任務的四類分布，讓教授看見課程安排。計數只用來描述教材內容，教學時間、任務難度與學習成效需另行判讀。七年級沒有穩定的一邊占優勢，適合稱為實作與流程推理並重。八年級即使把混合任務歸到程式設計，仍以資料結構與演算法推理任務較多。投影片主敘事可簡要說明重點，追問計算時再展開下方附錄。</p><section class="analysis-appendix" aria-labelledby="analysis-title"><h3 id="analysis-title">附錄・任務分類與比例計算</h3>
+      <details class="notes"><summary>講者備註與資料來源</summary>
+        <h3>對教授與組員的說明</h3>
+        <p>這次心智圖每套教材只能選一個分支，我們以課程主軸、核心能力與最終成果共同選定主分類，任務數提供內容分布的佐證。建議節點為「程式設計 → 七年級｜結構化程式與互動作品」及「演算法 → 八年級｜資料結構與演算法應用」。這是本教材包的展示分類，各單元的課綱對照仍依實際活動與學習證據呈現。</p>
+        <p>七年級的定位是「七年級實作與流程推理並重」。程式設計與演算法／資料結構推理各有8項，另有4項混合與2項其他任務，數量並列時，進一步看課程如何組織。學生從積木、迴圈與變數出發，逐步建構多邊形、螺旋、曼陀羅與防禦網，並用預測、除錯和多組測試改善作品，因此選擇「程式設計」作主分類。流程推理是建構與檢查程式的重要學習內容。</p>
+        <p>八年級的定位是「八年級著重資料結構與演算法理解」。課程以清單、索引和中間狀態為主軸，要求學生解釋走訪、累加、搜尋、抽取、洗牌與排序的步驟，並驗證停止條件、不重複規則與邊界情況。任務清單有15項演算法／資料結構推理、6項程式設計，另有1項混合與1項其他內容，因此選擇「演算法」作主分類。清單程式、自訂積木與對決作品，讓學生將資料處理規則付諸實作。</p>
+        <p>任務數描述教材內容分布。每個必做任務族等權計數，時數、難度、工作量與學習成效需另行判讀。完整四類分布、逐課計數及比較分母保留於下方，討論時可回到教案、學生任務與成果條件複核。</p>
+        <section class="analysis-appendix" aria-labelledby="analysis-title"><h3 id="analysis-title">附錄・任務分類與比例計算</h3>
 <p>P 程式設計、A 演算法／資料結構推理、M 混合、O 其他。這是本教材的內容分類。每個可獨立檢核的必做任務族各計一票，選做與同一概念的重複練習排除。</p>
-<h4>可分離的程式設計與推理任務</h4><figure aria-label="排除混合與其他任務後，七年級程式設計8項、演算法8項，各50.0%；八年級程式設計6項、演算法15項，分別28.6%及71.4%。"><div class="weight-row"><span>七年級<br><small>8：8</small></span><div class="weight-bar" data-programming-count="8" data-algorithm-count="8"><span class="major" style="width:50%">50.0%</span><span class="algorithm" style="width:50%">50.0%</span></div></div><div class="weight-row"><span>八年級<br><small>6：15</small></span><div class="weight-bar" data-programming-count="6" data-algorithm-count="15"><span class="major" style="width:28.5714285714%">28.6%</span><span class="algorithm" style="width:71.4285714286%">71.4%</span></div></div><figcaption class="legend"><span class="grade7-text">P 程式設計</span>　<span class="grade8-text">A 演算法／資料結構推理</span></figcaption></figure><p>此比較排除 M 混合與 O 其他。分母 P＋A＝程式設計＋演算法／資料結構推理。七年級 8／16＝50.0%，八年級 6／21＝28.6%、15／21＝71.4%。合計 14／37＝37.8%、23／37＝62.2%。</p>
-<p>主畫面完整分布的分母則為七年級22項、八年級23項、合計45項。混合任務保留為一類。比例按任務數計算，時數、難度與學生工作量另行考量。</p><h4>七年級逐課計數</h4><div class="table-wrap"><table class="course-table content-count-table" id="ratio-grade7"><caption class="task-legend">P 程式設計　A 演算法／資料結構推理　M 混合　O 其他</caption><thead><tr><th scope="col">單元</th><th scope="col">逐步建立的能力</th><th scope="col">P／A／M／O 項數</th></tr></thead><tbody><tr><td>1 起步診斷</td><td>讀懂積木用途，判斷安全情境</td><td>2／0／0／1</td></tr><tr><td>2 三大結構</td><td>用流程圖預測結果、定位錯誤</td><td>0／3／1／0</td></tr><tr><td>3 迴圈多邊形</td><td>將重複動作整理為迴圈與轉角規律</td><td>2／1／1／0</td></tr><tr><td>4 變數螺旋</td><td>追蹤初始值、更新位置與圖形變化</td><td>2／1／1／0</td></tr><tr><td>5 曼陀羅</td><td>整合迴圈、變數並比較不同設定</td><td>1／2／0／0</td></tr><tr><td>6 防禦網專題</td><td>製作互動作品，以多組資料測試修正</td><td>1／1／1／1</td></tr></tbody></table></div><h4>八年級逐課計數</h4><div class="table-wrap"><table class="course-table content-count-table" id="ratio-grade8"><caption class="task-legend">P 程式設計　A 演算法／資料結構推理　M 混合　O 其他</caption><thead><tr><th scope="col">單元</th><th scope="col">逐步建立的能力</th><th scope="col">P／A／M／O 項數</th></tr></thead><tbody><tr><td>1 清單與搜尋</td><td>理解索引，逐項搜尋並說明停止條件</td><td>1／2／0／0</td></tr><tr><td>2 音符走訪</td><td>依索引播放旋律，檢查素材使用責任</td><td>1／2／0／1</td></tr><tr><td>3 能源分析</td><td>逐輪追蹤累加器，檢查空清單邊界</td><td>0／2／0／0</td></tr><tr><td>4 不重複抽取</td><td>追蹤候選與已選清單，驗證不重複</td><td>1／3／0／0</td></tr><tr><td>5 洗牌與排序</td><td>比較移轉與交換規則，確認資料不遺漏</td><td>2／4／0／0</td></tr><tr><td>6 對決專題</td><td>以模組處理資料，測試正常與不足情境</td><td>1／2／1／0</td></tr></tbody></table></div><p>分類由一位分析者依現有教材與教案建立。任務切分粒度會影響數字，修改必做任務後需重新計數，四捨五入可能造成加總差異。混合任務的敏感度檢查與逐項來源見完整分析文件。</p></section><ul><li><a href="../COURSE_CONTENT_ANALYSIS.md">完整任務清單、分類與敏感度檢查</a></li></ul></details>
+<h4>全部45項必做任務的四類分布</h4><div class="table-wrap"><table class="distribution-table" id="content-distribution"><thead><tr><th scope="col">範圍</th><th scope="col">程式設計</th><th scope="col">演算法／<br>資料結構</th><th scope="col">混合</th><th scope="col">其他</th></tr></thead><tbody><tr data-total="22"><th scope="row">七年級<br>22 項</th><td data-count="8">8 項<br>36.4%</td><td data-count="8">8 項<br>36.4%</td><td data-count="4">4 項<br>18.2%</td><td data-count="2">2 項<br>9.1%</td></tr><tr data-total="23"><th scope="row">八年級<br>23 項</th><td data-count="6">6 項<br>26.1%</td><td data-count="15">15 項<br>65.2%</td><td data-count="1">1 項<br>4.3%</td><td data-count="1">1 項<br>4.3%</td></tr><tr data-total="45"><th scope="row">合計<br>45 項</th><td data-count="14">14 項<br>31.1%</td><td data-count="23">23 項<br>51.1%</td><td data-count="5">5 項<br>11.1%</td><td data-count="3">3 項<br>6.7%</td></tr></tbody></table></div><p>按全部必做任務數計算，各類任務以相同權重計數。</p><h4>可分離的程式設計與推理任務</h4><figure aria-label="排除混合與其他任務後，七年級程式設計8項、演算法8項，各50.0%；八年級程式設計6項、演算法15項，分別28.6%及71.4%。"><div class="weight-row"><span>七年級<br><small>8：8</small></span><div class="weight-bar" data-programming-count="8" data-algorithm-count="8"><span class="major" style="width:50%">50.0%</span><span class="algorithm" style="width:50%">50.0%</span></div></div><div class="weight-row"><span>八年級<br><small>6：15</small></span><div class="weight-bar" data-programming-count="6" data-algorithm-count="15"><span class="major" style="width:28.5714285714%">28.6%</span><span class="algorithm" style="width:71.4285714286%">71.4%</span></div></div><figcaption class="legend"><span class="grade7-text">P 程式設計</span>　<span class="grade8-text">A 演算法／資料結構推理</span></figcaption></figure><p>此比較排除 M 混合與 O 其他。分母 P＋A＝程式設計＋演算法／資料結構推理。七年級 8／16＝50.0%，八年級 6／21＝28.6%、15／21＝71.4%。合計 14／37＝37.8%、23／37＝62.2%。</p>
+<p>上方完整分布的分母則為七年級22項、八年級23項、合計45項。混合任務保留為一類。比例按任務數計算，時數、難度與學生工作量另行考量。</p><h4>七年級逐課計數</h4><div class="table-wrap"><table class="course-table content-count-table" id="ratio-grade7"><caption class="task-legend">P 程式設計　A 演算法／資料結構推理　M 混合　O 其他</caption><thead><tr><th scope="col">單元</th><th scope="col">逐步建立的能力</th><th scope="col">P／A／M／O 項數</th></tr></thead><tbody><tr><td>1 起步診斷</td><td>讀懂積木用途，判斷安全情境</td><td>2／0／0／1</td></tr><tr><td>2 三大結構</td><td>用流程圖預測結果、定位錯誤</td><td>0／3／1／0</td></tr><tr><td>3 迴圈多邊形</td><td>將重複動作整理為迴圈與轉角規律</td><td>2／1／1／0</td></tr><tr><td>4 變數螺旋</td><td>追蹤初始值、更新位置與圖形變化</td><td>2／1／1／0</td></tr><tr><td>5 曼陀羅</td><td>整合迴圈、變數並比較不同設定</td><td>1／2／0／0</td></tr><tr><td>6 防禦網專題</td><td>製作互動作品，以多組資料測試修正</td><td>1／1／1／1</td></tr></tbody></table></div><h4>八年級逐課計數</h4><div class="table-wrap"><table class="course-table content-count-table" id="ratio-grade8"><caption class="task-legend">P 程式設計　A 演算法／資料結構推理　M 混合　O 其他</caption><thead><tr><th scope="col">單元</th><th scope="col">逐步建立的能力</th><th scope="col">P／A／M／O 項數</th></tr></thead><tbody><tr><td>1 清單與搜尋</td><td>理解索引，逐項搜尋並說明停止條件</td><td>1／2／0／0</td></tr><tr><td>2 音符走訪</td><td>依索引播放旋律，檢查素材使用責任</td><td>1／2／0／1</td></tr><tr><td>3 能源分析</td><td>逐輪追蹤累加器，檢查空清單邊界</td><td>0／2／0／0</td></tr><tr><td>4 不重複抽取</td><td>追蹤候選與已選清單，驗證不重複</td><td>1／3／0／0</td></tr><tr><td>5 洗牌與排序</td><td>比較移轉與交換規則，確認資料不遺漏</td><td>2／4／0／0</td></tr><tr><td>6 對決專題</td><td>以模組處理資料，測試正常與不足情境</td><td>1／2／1／0</td></tr></tbody></table></div><p>分類由一位分析者依現有教材與教案建立。任務切分粒度會影響數字，修改必做任務後需重新計數，四捨五入可能造成加總差異。混合任務的敏感度檢查與逐項來源見完整分析文件。</p></section>
+        <ul><li><a href="../COURSE_CONTENT_ANALYSIS.md">完整任務清單、分類與敏感度檢查</a></li><li><a href="../CURRICULUM_ALIGNMENT.md">逐課課綱與學習證據對照</a></li><li><a href="../lesson-plan-grade-7.html">七年級教案與作品要求</a></li><li><a href="../lesson-plan-grade-8.html">八年級教案與推理要求</a></li></ul>
+      </details>
     </article>
     <article class="slide-page" id="slide-7">
       <section class="slide grade8" aria-labelledby="title-7">
@@ -269,20 +308,20 @@
       <details class="notes"><summary>講者備註與資料來源</summary><p>這一課用來示範教師如何把教材包的配套接在一起。課前看八年級第3課教案，先試跑12、18、30的固定案例。第一節先讓學生預測，再逐輪核對索引、目前項目與累計總和，留下資料追蹤表。第二節改用新資料，分別測多筆、單筆和空清單，最後收一筆差異與修正理由。資料追蹤規準可作形成性回饋參考，教師依本課目標調整。這一課的核心成果是追蹤與解釋，教案中的加總程式供閱讀參考。完整課程的 Scratch 實作安排見第4、5頁。</p><ul><li><a href="../lesson-plan-grade-8.html#section-3">八年級能源分析教案</a></li><li><a href="../1150803.html">能源分析互動教材</a></li><li><a href="../STUDENT_RECORDS.md">累加與空清單紀錄表</a></li></ul></details>
     </article>
     <article class="slide-page" id="slide-8">
-      <section class="slide" aria-labelledby="title-8"><header><p class="eyebrow">單元活動結構</p><h2 id="title-8">學習導航中的五段活動節奏</h2></header><div class="content"><div class="table-wrap"><table><thead><tr><th scope="col">活動階段</th><th scope="col">學生的理解任務</th><th scope="col">教師可直接採用</th></tr></thead><tbody><tr><td>1 情境任務與目標</td><td>確認要解決的問題與完成條件</td><td>本課目標與情境提問</td></tr><tr><td>2 概念示範與引導</td><td>先預測，再操作核對差異</td><td>投影互動介面、停下提問</td></tr><tr><td>3 獨立 Scratch 挑戰</td><td>依本課任務實作或修改程式</td><td>選用範例與分級支援</td></tr><tr><td>4 成果證據</td><td>留下作品、程式說明或追蹤表</td><td>沿用現成紀錄與規準</td></tr><tr><td>5 離堂檢核</td><td>用自己的話解釋規則與修正</td><td>以理由判讀學生理解</td></tr></tbody></table></div><p class="callout">操作有目標，結果要驗證，理解要留下可說明的證據</p><p class="caveat">每課提供目標、行動、證據與檢核。實作深度依逐課教案調整。</p></div><footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>08 / 16</span></footer></section>
-      <details class="notes"><summary>講者備註與資料來源</summary><p>我把共同學習節奏整理成情境與目標、示範引導、獨立挑戰、成果證據、離堂檢核五段。每課導航明列目標、行動、證據與自我檢核，學生知道本課要理解什麼，教師也有現成提問起點。這是活動安排，不是所有頁面都具備五個按鈕或自動闖關。獨立挑戰的深度依教案安排，例如八年級第3課核心是資料模擬與追蹤，第1課診斷以說明積木為主，不把所有單元都說成必交完整作品。網頁先提供觀察與驗證，教師再視任務銜接 Scratch 實作、成果紀錄與離堂理由。一節45分鐘可參考5分鐘情境、8分鐘示範、27分鐘操作與成果紀錄、5分鐘檢核，依班級調整。分鐘不參與內容占比計算。</p><ul><li><a href="../lesson-plan-grade-7.html">七年級教案</a></li><li><a href="../lesson-plan-grade-8.html">八年級教案</a></li><li><a href="../learning-guides.js">學習導航的目標、行動、證據與檢核</a></li><li><a href="https://github.com/byte-core-su/unforte_115/blob/main/README.md" target="_blank" rel="noopener noreferrer">課程活動結構</a></li></ul></details>
+      <section class="slide" aria-labelledby="title-8"><header><p class="eyebrow">單元活動結構</p><h2 id="title-8">學習導航中的五段活動節奏</h2></header><div class="content"><div class="table-wrap"><table><thead><tr><th scope="col">活動階段</th><th scope="col">學生的理解任務</th><th scope="col">教師可直接採用</th></tr></thead><tbody><tr><td>1 情境任務與目標</td><td>確認要解決的問題與完成條件</td><td>本課目標與情境提問</td></tr><tr><td>2 概念示範與引導</td><td>先預測，再操作核對差異</td><td>投影互動介面、停下提問</td></tr><tr><td>3 獨立任務與驗證</td><td>依目標實作程式或追蹤資料</td><td>選用範例與分級支援</td></tr><tr><td>4 成果證據</td><td>留下作品、程式說明或追蹤表</td><td>沿用現成紀錄與規準</td></tr><tr><td>5 離堂檢核</td><td>用自己的話解釋規則與修正</td><td>以理由判讀學生理解</td></tr></tbody></table></div><p class="callout">操作有目標，結果要驗證，理解要留下可說明的證據</p><p class="caveat">七年級連到程式作品，八年級依單元採資料追蹤或程式實作。</p></div><footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>08 / 16</span></footer></section>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>我把共同學習節奏整理成情境與目標、示範引導、獨立任務與驗證、成果證據、離堂檢核五段。每課導航明列目標、行動、證據與自我檢核，學生知道本課要理解什麼，教師也有現成提問起點。這是活動安排，不是所有頁面都具備五個按鈕或自動闖關。獨立任務依教案目標安排。七年級逐步銜接程式作品與測試，八年級第3課核心是資料模擬與追蹤，其餘有程式成果要求的單元則收取作品與資料規則說明。第1課診斷以說明積木為主，教師按單元採證。網頁先提供觀察與驗證，教師再視任務銜接 Scratch 實作、成果紀錄與離堂理由。一節45分鐘可參考5分鐘情境、8分鐘示範、27分鐘操作與成果紀錄、5分鐘檢核，依班級調整。分鐘不參與內容占比計算。</p><ul><li><a href="../lesson-plan-grade-7.html">七年級教案</a></li><li><a href="../lesson-plan-grade-8.html">八年級教案</a></li><li><a href="../learning-guides.js">學習導航的目標、行動、證據與檢核</a></li><li><a href="https://github.com/byte-core-su/unforte_115/blob/main/README.md" target="_blank" rel="noopener noreferrer">課程活動結構</a></li></ul></details>
     </article>
     <article class="slide-page" id="slide-9">
       <section class="slide " aria-labelledby="title-9">
-        <header><p class="eyebrow">七年級互動教學</p><h2 id="title-9">多邊形案例中的教師提問</h2></header>
-        <div class="content case-content"><div class="columns teaching-example"><figure><img src="assets/20261110/polygon.png" alt="Scratch 多邊形模擬器，重複三次、右轉120度畫出三角形" width="1265" height="712"><figcaption><a href="../1150703.html" target="_blank" rel="noopener noreferrer">開啟本課互動教材</a></figcaption></figure><div class="copy"><div class="teaching-step"><h3>先預測</h3><p>「畫三角形，應轉幾度？」<br>預期能區分內角與行進轉角</p></div><div class="teaching-step"><h3>再核對</h3><p>一次只改次數或轉角<br>追問「哪個改動影響閉合？」</p></div><div class="teaching-step"><h3>換題實作</h3><p>換成五邊形，在 Scratch 實作<br>請學生用 360 ÷ N 說明規律</p></div></div></div><p class="callout">收取新邊數作品、參數紀錄與轉角理由</p></div>
+        <header><p class="eyebrow">程式設計・七年級案例</p><h2 id="title-9">多邊形案例中的教師提問</h2></header>
+        <div class="content case-content"><div class="columns teaching-example"><figure><img src="assets/20261110/polygon.png" alt="Scratch 多邊形模擬器，重複三次、右轉120度畫出三角形" width="1265" height="712"><figcaption><a href="../1150703.html" target="_blank" rel="noopener noreferrer">開啟本課互動教材</a></figcaption></figure><div class="copy"><div class="teaching-step"><h3>先預測</h3><p>「畫三角形，應轉幾度？」<br>預期能區分內角與行進轉角</p></div><div class="teaching-step"><h3>再核對</h3><p>一次只改次數或轉角<br>追問「哪個改動影響閉合？」</p></div><div class="teaching-step"><h3>換題實作</h3><p>換成五邊形，在 Scratch 實作<br>用重複次數與轉角積木驗證規律</p></div></div></div><p class="callout">收取 Scratch 作品、參數紀錄與轉角理由</p></div>
         <footer class="slide-footer"><span>115 學年度 Scratch 教材包</span><span>09 / 16</span></footer>
       </section>
-      <details class="notes"><summary>講者備註與資料來源</summary><p>教師先問三角形每次要轉幾度，請學生寫出預測理由，再以3次、120度執行核對。若有人填60度，可追問內角與角色行進方向改變的角度有何差異。接著一次只改次數或轉角，要求用圖形指出差異。最後改為五邊形，讓學生在 Scratch 完成作品並用360除以邊數解釋轉角。這些是建議提問與預期回應，實際學生回答由課堂蒐集。介面可調參數和圖形並列，讓教師有共同提問與比較的依據。截圖擷取日期為2026-10-03。</p><ul><li><a href="../1150703.html">案例教材</a></li><li><a href="../lesson-plan-grade-7.html">課程目標與採證</a></li><li><a href="../STUDENT_RECORDS.md">可直接取用的紀錄表</a></li></ul></details>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>教師先問三角形每次要轉幾度，請學生寫出預測理由，再以3次、120度執行核對。若有人填60度，可追問內角與角色行進方向改變的角度有何差異。接著一次只改次數或轉角，要求用圖形指出差異。最後改為五邊形，讓學生用360除以邊數求得72度，再把重複5次與轉向72度組成自己的 Scratch 程式，測試能否閉合。數學規律經由積木結構與作品測試實現，形成程式設計的學習證據。這些是建議提問與預期回應，實際學生回答由課堂蒐集。介面可調參數和圖形並列，讓教師有共同提問與比較的依據。截圖擷取日期為2026-10-03。</p><ul><li><a href="../1150703.html">案例教材</a></li><li><a href="../lesson-plan-grade-7.html">課程目標與採證</a></li><li><a href="../STUDENT_RECORDS.md">可直接取用的紀錄表</a></li></ul></details>
     </article>
     <article class="slide-page" id="slide-10">
       <section class="slide grade8" aria-labelledby="title-10">
-        <header><p class="eyebrow">八年級互動教學</p><h2 id="title-10">清單案例中的教師提問</h2></header>
+        <header><p class="eyebrow">演算法・八年級案例</p><h2 id="title-10">清單案例中的教師提問</h2></header>
         <div class="content case-content"><div class="columns teaching-example"><figure><img src="assets/20261110/trace.png" alt="清單12、18、30的第一輪累加，索引為1，累計總和為12" width="1265" height="712"><figcaption><a href="../1150803.html" target="_blank" rel="noopener noreferrer">開啟本課互動教材</a></figcaption></figure><div class="copy"><div class="teaching-step"><h3>執行前</h3><p>「第二輪累計是 18 還是 30？」<br>請學生說明目前項目與累計</p></div><div class="teaching-step"><h3>執行中</h3><p>逐輪核對 12、30、60<br>追問「從哪一輪開始不同？」</p></div><div class="teaching-step"><h3>執行後</h3><p>「空清單的平均怎麼處理？」<br>預期能指出筆數為零的問題</p></div></div></div><p class="callout">收取多筆、單筆、空清單追蹤表與解釋</p></div>
         <footer class="slide-footer"><span>115 學年度 Scratch 教材包</span><span>10 / 16</span></footer>
       </section>
@@ -290,23 +329,23 @@
     </article>
     <article class="slide-page" id="slide-11">
       <section class="slide " aria-labelledby="title-11">
-        <header><p class="eyebrow">差異化與分級支援</p><h2 id="title-11">同一課，如何照顧不同學習起點</h2></header>
+        <header><p class="eyebrow">差異化與分級支援</p><h2 id="title-11">以清單案例說明分級支援</h2></header>
         <div class="content "><div class="table-wrap"><table class=""><thead><tr><th scope="col">學生當前需要</th><th scope="col">教師可採用的安排</th><th scope="col">共同保留的檢核</th></tr></thead><tbody><tr><td>需要支持</td><td>先用三筆資料與紙卡<br>提供部分完成的追蹤表</td><td>說出一輪資料如何變化</td></tr><tr><td>可獨立練習</td><td>換新資料，自行預測與追蹤<br>對照結果後訂正</td><td>指出差異並說明修正</td></tr><tr><td>準備進階</td><td>增加資料量，提出邊界案例<br>減少提示後再解釋</td><td>驗證新案例與處理規則</td></tr></tbody></table></div><p class="callout">12 課另附三級練習，提示後保留同題重試</p><p class="caveat">教師依當前表現調整支援，並以過程紀錄與理由回饋。</p></div>
         <footer class="slide-footer"><span>115 學年度 Scratch 教材包</span><span>11 / 16</span></footer>
       </section>
-      <details class="notes"><summary>講者備註與資料來源</summary><p>表格呈現教師可做的差異化教學安排，依學生當前的表現彈性調整。紙卡、三筆資料與部分追蹤表來自八年級教案的支持策略，教師可逐步減少提示。進階學生先完成共同檢核，再增加資料量、邊界或規則比較。網站十二課另提供基礎、標準、挑戰三級練習，學生可自行選難度。首次答錯提示、同題再錯提供詳解並降低下一題難度，連續兩道新題首次答對則升級。這是當次作答的規則式練習，教師仍須看理由、追蹤與作品。</p><ul><li><a href="../lesson-plan-grade-8.html">差異化教學與備課提醒</a></li><li><a href="../1150703.html#adaptive-practice">三級練習與提示範例</a></li><li><a href="../adaptive-practice.js">規則式練習機制</a></li></ul></details>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>本頁以八年級清單課示範教師可做的差異化教學安排，依學生當前的表現彈性調整。七年級依教案提供半成品程式與追蹤欄位，先完成起點辨識、下一步預測及執行驗證，進階者再增加參數或防禦條件。兩年級各依作品建構或資料處理目標調整支援。紙卡、三筆資料與部分追蹤表來自八年級教案的支持策略，教師可逐步減少提示。進階學生先完成共同檢核，再增加資料量、邊界或規則比較。網站十二課另提供基礎、標準、挑戰三級練習，學生可自行選難度。首次答錯提示、同題再錯提供詳解並降低下一題難度，連續兩道新題首次答對則升級。這是當次作答的規則式練習，教師仍須看理由、追蹤與作品。</p><ul><li><a href="../lesson-plan-grade-8.html">差異化教學與備課提醒</a></li><li><a href="../1150703.html#adaptive-practice">三級練習與提示範例</a></li><li><a href="../adaptive-practice.js">規則式練習機制</a></li></ul></details>
     </article>
     <article class="slide-page" id="slide-12">
       <section class="slide grade8" aria-labelledby="title-12">
-        <header><p class="eyebrow">可直接採用的評量工具</p><h2 id="title-12">用紀錄表看見學生的理解</h2></header>
-        <div class="content "><p class="caveat">節錄「累加與空清單」模板，以下為教師填寫示例</p><div class="table-wrap"><table class="sample-record"><thead><tr><th scope="col">清單資料</th><th scope="col">每輪累計</th><th scope="col">總和</th><th scope="col">筆數</th><th scope="col">平均或理由</th></tr></thead><tbody><tr><td>12、18、30</td><td>12 → 30 → 60</td><td>60</td><td>3</td><td>20</td></tr><tr><td>空清單</td><td>尚無項目可讀取</td><td>0</td><td>0</td><td>筆數為零，先處理邊界</td></tr></tbody></table></div><div class="rubric-example"><h3>沿用資料追蹤規準回饋</h3><p><strong>需要支持</strong>　依提示指出目前項目與位置<br><strong>部分達成</strong>　有答案，關鍵中間值仍有缺漏<br><strong>達成目標</strong>　中間值完整，能核對輸入與輸出<br><strong>遷移與改善</strong>　能用中間值定位錯誤，修正後再測</p></div><p class="callout">教師再追問「哪裡不同？你如何修正？」</p></div>
+        <header><p class="eyebrow">演算法理解的形成性評量</p><h2 id="title-12">八年級的資料追蹤評量</h2></header>
+        <div class="content "><p class="caveat">節錄八年級能源分析紀錄表，以下為教師填寫示例</p><div class="table-wrap"><table class="sample-record"><thead><tr><th scope="col">清單資料</th><th scope="col">每輪累計</th><th scope="col">總和</th><th scope="col">筆數</th><th scope="col">平均或理由</th></tr></thead><tbody><tr><td>12、18、30</td><td>12 → 30 → 60</td><td>60</td><td>3</td><td>20</td></tr><tr><td>空清單</td><td>尚無項目可讀取</td><td>0</td><td>0</td><td>筆數為零，先處理邊界</td></tr></tbody></table></div><div class="rubric-example"><h3>沿用資料追蹤規準回饋</h3><p><strong>需要支持</strong>　依提示指出目前項目與位置<br><strong>部分達成</strong>　有答案，關鍵中間值仍有缺漏<br><strong>達成目標</strong>　中間值完整，能核對輸入與輸出<br><strong>遷移與改善</strong>　能用中間值定位錯誤，修正後再測</p></div><p class="callout">七年級另看程式作品、結構說明與測試紀錄</p></div>
         <footer class="slide-footer"><span>115 學年度 Scratch 教材包</span><span>12 / 16</span></footer>
       </section>
-      <details class="notes"><summary>講者備註與資料來源</summary><p>上表是既有學生學習紀錄表「八年級：累加與空清單」欄位的簡化節錄，保留總和與筆數分欄。數值與回答是教師講解示例。完整模板另有單筆案例，正式使用請收齊多筆、單筆、空清單三種情況。下方以教案資料追蹤面向的四級規準改寫為本課形成性回饋語，第一級另依本課索引理解提供提示。要判斷遷移與改善，應另給新資料或含錯誤的追蹤，收取定位、修正與重測紀錄。教師可用紙本或校內既有平台收取，並依其他課的目標另看作品、數位表達與倫理理由。</p><ul><li><a href="../STUDENT_RECORDS.md">完整紀錄模板</a></li><li><a href="../lesson-plan-grade-8.html">教案內四級評量規準</a></li></ul></details>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>上表是既有學生學習紀錄表「八年級：累加與空清單」欄位的簡化節錄，保留總和與筆數分欄。數值與回答是教師講解示例。完整模板另有單筆案例，正式使用請收齊多筆、單筆、空清單三種情況。下方以教案資料追蹤面向的四級規準改寫為本課形成性回饋語，第一級另依本課索引理解提供提示。要判斷遷移與改善，應另給新資料或含錯誤的追蹤，收取定位、修正與重測紀錄。教師再追問「哪裡不同？你如何修正？」並用紙本或校內既有平台收取。七年級的程式設計評量，依教案檢查作品中事件、迴圈與變數的分工，以及參數測試、修正與重測紀錄。八年級其他單元另依目標收取清單程式、模組作品與處理規則說明，各年級再依單元採集數位表達與倫理理由。</p><ul><li><a href="../STUDENT_RECORDS.md">完整紀錄模板</a></li><li><a href="../lesson-plan-grade-8.html">教案內四級評量規準</a></li></ul></details>
     </article>
     <article class="slide-page" id="slide-13">
       <section class="slide" aria-labelledby="title-13"><header><p class="eyebrow">教師備課</p><h2 id="title-13">教案已提供課綱與任務對照</h2></header><div class="content"><div class="table-wrap"><table class="alignment-table"><thead><tr><th scope="col">課程焦點</th><th scope="col">主要學習內容代碼</th><th scope="col">可收取的成果</th></tr></thead><tbody><tr><td>七年級程式基礎</td><td>資 A-IV-1、資 P-IV-1、資 P-IV-2</td><td>繪圖作品與變數追蹤</td></tr><tr><td>八年級資料與演算法</td><td>資 A-IV-2、資 A-IV-3、資 P-IV-3</td><td>清單程式與追蹤紀錄</td></tr><tr><td>八年級模組化實作</td><td>資 P-IV-4、資 P-IV-5</td><td>自訂積木與測試紀錄</td></tr><tr><td>資訊科技使用責任</td><td>資 H-IV-1／2／3、資 H-IV-5（部分）</td><td>個資、安全與授權理由</td></tr></tbody></table></div><p class="callout">課綱目標以學生作品、過程與說明檢核</p><p class="caveat">運 t-IV-4、運 p-IV-1、運 a-IV-2。資 H-IV-4 未列入。</p></div><footer class="slide-footer"><span>115 學年度資訊科技教材</span><span>13 / 16</span></footer></section>
-      <details class="notes"><summary>講者備註與資料來源</summary><p>我依官方科技領域課綱（107年9月）建立逐課目標、活動與證據對照。學習表現見印刷第7頁（PDF第11頁），學習內容及年級安排見第10～11頁（PDF第14～15頁），細部說明見附錄三第42～44頁（PDF第46～48頁）。這是教材設計者的教學判讀，沒有宣稱官方認證或完整覆蓋各條目。七年級第1課處理個資、合理使用與帳號安全；八年級音符課複習資 H-IV-1、資 H-IV-2，僅部分融入資 H-IV-5 的使用倫理，沒有網路成癮、網路交友等活動，所以不列資 H-IV-4。八年級第3課以資料追蹤為核心，參考積木閱讀不當成學生程式實作證據。運 t-IV-4 看問題解析的理由，運 p-IV-1 須有資訊科技組織與表達的證據，運 a-IV-2 依已教情境的判斷理由採證。四級規準是本教材的任務規準，達成本課目標不表示整項課綱已完成。七年級第5課模組化仍是選做延伸，第6課資 T-IV-1 為入門應用。</p><ul><li><a href="https://stv.naer.edu.tw/data/course_outline/pta_18529_8438379_60115.pdf#page=11" target="_blank" rel="noopener noreferrer">官方課綱：學習表現（印刷第7頁）</a></li><li><a href="https://stv.naer.edu.tw/data/course_outline/pta_18529_8438379_60115.pdf#page=14" target="_blank" rel="noopener noreferrer">官方課綱：學習內容（印刷第10～11頁）</a></li><li><a href="https://stv.naer.edu.tw/data/course_outline/pta_18529_8438379_60115.pdf#page=46" target="_blank" rel="noopener noreferrer">官方附錄三（印刷第42～44頁）</a></li><li><a href="../lesson-plan-grade-7.html">七年級教案與採證</a></li><li><a href="../lesson-plan-grade-8.html">八年級教案與採證</a></li><li><a href="https://github.com/byte-core-su/unforte_115/blob/main/CURRICULUM_ALIGNMENT.md" target="_blank" rel="noopener noreferrer">逐課課綱對照表與來源頁次</a></li></ul></details>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>我依官方科技領域課綱（107年9月）建立逐課目標、活動與證據對照。心智圖以主分類定位整套教材，本表依實際任務列出跨主題對應。七年級的流程推理支援程式建構，八年級的清單程式與模組化實作讓資料處理規則得以執行及驗證，兩者都與各自主軸連結。學習表現見印刷第7頁（PDF第11頁），學習內容及年級安排見第10～11頁（PDF第14～15頁），細部說明見附錄三第42～44頁（PDF第46～48頁）。這是教材設計者的教學判讀，沒有宣稱官方認證或完整覆蓋各條目。七年級第1課處理個資、合理使用與帳號安全；八年級音符課複習資 H-IV-1、資 H-IV-2，僅部分融入資 H-IV-5 的使用倫理，沒有網路成癮、網路交友等活動，所以不列資 H-IV-4。八年級第3課以資料追蹤為核心，參考積木閱讀不當成學生程式實作證據。運 t-IV-4 看問題解析的理由，運 p-IV-1 須有資訊科技組織與表達的證據，運 a-IV-2 依已教情境的判斷理由採證。四級規準是本教材的任務規準，達成本課目標不表示整項課綱已完成。七年級第5課模組化仍是選做延伸，第6課資 T-IV-1 為入門應用。</p><ul><li><a href="https://stv.naer.edu.tw/data/course_outline/pta_18529_8438379_60115.pdf#page=11" target="_blank" rel="noopener noreferrer">官方課綱：學習表現（印刷第7頁）</a></li><li><a href="https://stv.naer.edu.tw/data/course_outline/pta_18529_8438379_60115.pdf#page=14" target="_blank" rel="noopener noreferrer">官方課綱：學習內容（印刷第10～11頁）</a></li><li><a href="https://stv.naer.edu.tw/data/course_outline/pta_18529_8438379_60115.pdf#page=46" target="_blank" rel="noopener noreferrer">官方附錄三（印刷第42～44頁）</a></li><li><a href="../lesson-plan-grade-7.html">七年級教案與採證</a></li><li><a href="../lesson-plan-grade-8.html">八年級教案與採證</a></li><li><a href="https://github.com/byte-core-su/unforte_115/blob/main/CURRICULUM_ALIGNMENT.md" target="_blank" rel="noopener noreferrer">逐課課綱對照表與來源頁次</a></li></ul></details>
     </article>
     <article class="slide-page" id="slide-14">
       <section class="slide " aria-labelledby="title-14">
@@ -330,7 +369,7 @@
         <div class="content "><div class="adoption-grid"><div class="package-card"><h3>課前選好一課</h3><p>看先備、讀教案<br>試走案例與 Scratch 環境</p></div><div class="package-card"><h3>課中帶著提問</h3><p>先預測，再操作核對<br>依表現調整提示與任務</p></div><div class="package-card"><h3>課後留下一筆證據</h3><p>收取紀錄或作品<br>依規準回饋下一步</p></div></div><p class="callout">成套資源提供起點，教師依班級做教學判斷</p><p class="caveat"><a href="../index.html">開啟教材入口</a>　<a href="../lesson-plan-grade-7.html">七年級教案</a>　<a href="../lesson-plan-grade-8.html">八年級教案</a></p></div>
         <footer class="slide-footer"><span>115 學年度 Scratch 教材包</span><span>16 / 16</span></footer>
       </section>
-      <details class="notes"><summary>講者備註與資料來源</summary><p>以現場採用收尾。教師先選符合學生先備的一個單元，課前讀教案並試走案例，課中依提問要求學生先預測、再核對與解釋，課後留下紀錄或作品並給下一步回饋。成套配套希望讓教師將備課重點放在班級需要與教學判斷。可依試用回饋逐步調整教材的語句、支援程度、時間安排與評量工具。</p><ul><li><a href="../index.html">教材入口</a></li><li><a href="../scratch_educators.html">Scratch 教師帳號支援</a></li></ul></details>
+      <details class="notes"><summary>講者備註與資料來源</summary><p>以現場採用收尾。教師可依教學需要選用七年級的結構化程式與互動作品，或八年級的資料結構與演算法應用。選符合學生先備的一個單元，課前讀教案並試走案例，課中依提問要求學生先預測、再核對與解釋，課後留下紀錄或作品並給下一步回饋。成套配套希望讓教師將備課重點放在班級需要與教學判斷。可依試用回饋逐步調整教材的語句、支援程度、時間安排與評量工具。</p><ul><li><a href="../index.html">教材入口</a></li><li><a href="../scratch_educators.html">Scratch 教師帳號支援</a></li></ul></details>
     </article>
   </main>
   <p class="help">鍵盤 ← → 翻頁，Home／End 跳到首末頁，N 切換備註，F 全螢幕。手機可使用上方按鈕。列印會輸出全部 16 頁。</p>
