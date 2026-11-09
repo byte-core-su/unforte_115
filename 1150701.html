@@ -5,6 +5,7 @@
     <script src="adaptive-practice.js" defer></script>
     <script src="curriculum-labs.js" defer></script>
     <meta charset="UTF-8">
+    <script src="course-scenarios.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LESSON 1 - 起步診斷與資訊安全</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -29,8 +30,8 @@
                 </a>
             </div>
             <p class="text-sm font-medium text-indigo-500 mb-2 tracking-widest uppercase">演算法與程式設計</p>
-            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight">星際防禦工程師：<br class="hidden md:block">用程式編織能量防護網</h1>
-            <p class="text-lg text-slate-500 font-light max-w-2xl">結合「IPO 思維」與「重複結構」，循序漸進建立邏輯思維與幾何繪圖能力，並透過實作防禦網任務，體驗程式設計的強大魔力。</p>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight"><span data-scenario-text="name">星際防禦工程師</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用程式編織能量防護網</span></h1>
+            <p data-scenario-text="intro" class="text-lg text-slate-500 font-light max-w-2xl">結合「IPO 思維」與「重複結構」，循序漸進建立邏輯思維與幾何繪圖能力，並透過實作防禦網任務，體驗程式設計的強大魔力。</p>
         </div>
     </header>
 
@@ -41,7 +42,7 @@
         
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-10 mb-8 relative min-h-[500px] flex flex-col slide-up-fade">
             <span class="text-sm font-semibold text-slate-400 tracking-wider block mb-2">LESSON 1</span>
-            <h2 class="text-3xl font-bold text-slate-800 mb-2">起步診斷：Scratch 積木大考驗</h2>
+            <h2 data-scenario-text="cards.0.title" class="text-3xl font-bold text-slate-800 mb-2">起步診斷：Scratch 積木大考驗</h2>
             <p class="text-slate-500 font-light text-base mb-8 pb-6 border-b border-slate-100">先用 10 題了解自己的 Scratch 起點，包含 <strong class="text-emerald-600">5 題核心基本題</strong> 與 <strong class="text-indigo-600">5 題隨機進階題</strong>。滿 80 分可取得紀念證書；這是練習用診斷，不是正式作品評量，也不限制進入下一課。請選一題說明判斷理由，不只記住選項。</p>
             
             <div id="quiz-start-screen" class="flex-grow flex flex-col items-center justify-center text-center pb-8 slide-up-fade">

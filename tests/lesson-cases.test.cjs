@@ -2,6 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const path = require('node:path');
+const CourseScenarios = require('../course-scenarios.js');
 
 function loadLesson(filename) {
   const html = fs.readFileSync(path.join(__dirname, '..', filename), 'utf8');
@@ -16,7 +17,7 @@ function loadLesson(filename) {
     });
     return elements.get(id);
   };
-  const context = { document: { getElementById: get, addEventListener() {} }, window: {}, Math, clearInterval() {} };
+  const context = { document: { getElementById: get, addEventListener() {} }, window: { CourseScenarios }, Math, clearInterval() {} };
   scripts.forEach(script => vm.runInNewContext(script, context, { filename }));
   return { context, get };
 }

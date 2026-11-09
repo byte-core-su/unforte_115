@@ -1,5 +1,7 @@
 // Rule-based practice for the twelve lessons. No account, network request or saved score.
 (() => {
+  const { active, escapeHtml } = typeof module !== 'undefined' && module.exports
+    ? require('./course-scenarios.js') : window.CourseScenarios;
   const lessonPages = /^1150[78]0[1-6]\.html$/;
   const labels = ['基礎', '標準', '挑戰'];
   const rand = (min, max, random) => min + Math.floor(random() * (max - min + 1));
@@ -22,7 +24,7 @@
     return question(prompt, choices, answer, hints, explanation, random);
   };
 
-  function createQuestion(page, level, random = Math.random) {
+  function createQuestion(page, level, random = Math.random, scenario = active) {
     const n = rand(3, level === 3 ? 8 : 6, random);
     const step = rand(2, 6, random);
     const start = rand(2, 12, random);
@@ -65,26 +67,29 @@
         return numeric(`自訂積木的「旋轉角度」設為 ${360 / copies} 度。重複呼叫幾次才會繞完一圈？`, copies, ['角度總和要達到 360 度。', `算 360 ÷ ${360 / copies}。`], '參數不同時，呼叫次數也要跟著調整。', random);
       }
       case '1150706.html': {
+        const { practiceThreshold, shortOutcome, advancedCondition } = scenario.defense;
         const threshold = rand(12, 20, random);
         const costs = [threshold - rand(2, 5, random), threshold + rand(1, 3, random), threshold + rand(5, 8, random), threshold + rand(10, 14, random)];
         const shuffled = shuffle(costs, random);
         const labelsByIndex = ['A', 'B', 'C', 'D'];
         const detail = shuffled.map((cost, index) => `${labelsByIndex[index]}：消耗量 ${cost}`).join('；');
-        if (level === 1) return question(`防護門檻 ${threshold}，${detail}。哪組消耗量最少且能擋住？`, labelsByIndex, labelsByIndex[shuffled.indexOf(costs[1])], ['先排除低於門檻的組合。', '再比較剩下通過門檻的消耗量。'], `消耗量達到 ${threshold} 才有效；最小有效值為 ${costs[1]}。`, random);
+        if (level === 1) return question(`${practiceThreshold} ${threshold}，${detail}。哪組消耗量最少且能${shortOutcome}？`, labelsByIndex, labelsByIndex[shuffled.indexOf(costs[1])], ['先排除低於門檻的組合。', '再比較剩下通過門檻的消耗量。'], `消耗量達到 ${threshold} 才有效；最小有效值為 ${costs[1]}。`, random);
         const base = rand(2, 4, random);
         const pairs = shuffle([0, 1, 2, 3].map(offset => ({ count: base + offset, width: offset + 2 })), random);
         const actualCosts = pairs.map(item => item.count * item.width);
-        const required = level === 3 ? threshold + 5 : threshold;
+        const increase = level === 3 ? 5 : 0;
+        const required = threshold + increase;
         const viable = actualCosts.map((cost, index) => ({ cost, index })).filter(item => item.cost >= required).sort((a, b) => a.cost - b.cost);
         const best = viable[0];
         const options = labelsByIndex.map(label => `${label} 組`);
         const rows = labelsByIndex.map((label, index) => `${label}：${pairs[index].count} 個圖形 × 寬度 ${pairs[index].width}`).join('；');
-        return question(`防護門檻 ${threshold}${level === 3 ? '，警報升級後門檻再增加 5' : ''}；${rows}。哪組有效且消耗量最少？`, options, `${labelsByIndex[best.index]} 組`, ['每組消耗量＝圖形數 × 寬度。', '先找出達到目前門檻的組合，再比較消耗量。'], `目前門檻是 ${required}，有效組合的最小消耗量是 ${best.cost}。`, random);
+        return question(`${practiceThreshold} ${threshold}${increase ? `，${advancedCondition}門檻再增加 ${increase}` : ''}；${rows}。哪組有效且消耗量最少？`, options, `${labelsByIndex[best.index]} 組`, ['每組消耗量＝圖形數 × 寬度。', '先找出達到目前門檻的組合，再比較消耗量。'], `目前門檻是 ${required}，有效組合的最小消耗量是 ${best.cost}。`, random);
       }
       case '1150801.html': {
-        const items = shuffle(['電池', '護盾', '雷射', '晶片'], random);
+        const { items: inventory, supplement } = scenario.inventory;
+        const items = shuffle(['supply', 'priority', 'tool', 'chip'].map(key => inventory[key].practice ?? inventory[key].name), random);
         if (level === 1) return question(`清單是 [${items.join('、')}]，第 2 項是什麼？`, items, items[1], ['Scratch 清單索引從 1 開始。', '從左邊數第 2 個項目。'], '清單第 2 項對應第二個位置。', random);
-        if (level === 2) return question(`清單是 [${items.join('、')}]，在第 2 項插入「補給」。插入後第 3 項是什麼？`, [...items.slice(0, 3), '補給'], items[1], ['插入會讓原本第 2 項往後移。', '插入後第 2 項是補給，第 3 項是原第 2 項。'], '插入會改變後續項目的索引。', random);
+        if (level === 2) return question(`清單是 [${items.join('、')}]，在第 2 項插入「${supplement}」。插入後第 3 項是什麼？`, [...items.slice(0, 3), supplement], items[1], ['插入會讓原本第 2 項往後移。', `插入後第 2 項是${supplement}，第 3 項是原第 2 項。`], '插入會改變後續項目的索引。', random);
         return question(`清單是 [${items.join('、')}]，刪掉第 2 項後，新的第 2 項是什麼？`, items, items[2], ['刪除後，後面的項目往前移。', '原本第 3 項會變成第 2 項。'], '刪除一項後，後續索引往前移一格。', random);
       }
       case '1150802.html': {
@@ -100,7 +105,8 @@
           const even = [rand(2, 6, random) * 2, rand(2, 6, random) * 2];
           return numeric(`清單 [${even.join('、')}] 的平均是多少？`, (even[0] + even[1]) / 2, ['先求總和，再除以筆數。', '此清單有 2 筆資料。'], '平均＝總和 ÷ 筆數。', random);
         }
-        const listName = ['能源', '得分', '庫存'][rand(0, 2, random)];
+        const { exampleListNames } = scenario.statistics;
+        const listName = exampleListNames[rand(0, exampleListNames.length - 1, random)];
         return question(`「${listName}」清單是空的，要計算平均時程式應如何處理？`, ['先檢查筆數是否為 0，再顯示無法計算', '直接用總和除以 0', '直接顯示平均為 0', '複製上一筆平均'], '先檢查筆數是否為 0，再顯示無法計算', ['平均需要非零筆數。', '除法前先檢查清單長度。'], '空清單沒有可作為除數的筆數，應先處理邊界情況。', random);
       }
       case '1150804.html': {
@@ -132,12 +138,13 @@
       }
       case '1150806.html':
         if (level === 1) {
-          const before = ['洗牌裝備', '分配裝備', '逐一對決'][rand(0, 2, random)];
-          const prior = { 洗牌裝備: '建立裝備庫', 分配裝備: '洗牌裝備', 逐一對決: '分配裝備' };
-          return question(`主程式要執行「${before}」，緊接在它之前應完成哪個自訂積木？`, ['建立裝備庫', '洗牌裝備', '分配裝備', '逐一對決'], prior[before], ['想想每一步需要前一步產生什麼資料。', '建立、洗牌、分配、對決有先後依賴。'], `「${prior[before]}」應在「${before}」之前完成。`, random);
+          const { modules, activity } = scenario.duel;
+          const index = rand(1, modules.length - 1, random);
+          const before = modules[index], prior = modules[index - 1];
+          return question(`主程式要執行「${before}」，緊接在它之前應完成哪個自訂積木？`, modules, prior, ['想想每一步需要前一步產生什麼資料。', `建立、洗牌、分配、${activity}有先後依賴。`], `「${prior}」應在「${before}」之前完成。`, random);
         }
-        if (level === 2) return numeric(`裝備庫有 ${n * 2 + step} 件，兩隊各分 ${n} 件後還剩幾件？`, step, ['兩隊各取相同數量。', `總共分出 ${n} × 2 件。`], '剩餘量＝原庫存 − 兩隊分配總量。', random);
-        return question(`兩隊各需要 ${n} 件裝備，但庫存只有 ${n * 2 - 1} 件。分配積木應先做什麼？`, ['檢查庫存是否足夠並處理不足情況', '照常抽取直到清單為空', '重複使用最後一件裝備', '直接開始對決'], '檢查庫存是否足夠並處理不足情況', ['先比較需求量與庫存量。', '不能讓抽取次數超過候選清單長度。'], '模組應先處理資料不足的邊界案例，再執行分配。', random);
+        if (level === 2) return numeric(`${scenario.duel.inventory}有 ${n * 2 + step} 件，兩隊各分 ${n} 件後還剩幾件？`, step, ['兩隊各取相同數量。', `總共分出 ${n} × 2 件。`], '剩餘量＝原庫存 − 兩隊分配總量。', random);
+        return question(`兩隊各需要 ${n} 件${scenario.duel.item}，但庫存只有 ${n * 2 - 1} 件。分配積木應先做什麼？`, ['檢查庫存是否足夠並處理不足情況', '照常抽取直到清單為空', `重複使用最後一件${scenario.duel.item}`, `直接開始${scenario.duel.activity}`], '檢查庫存是否足夠並處理不足情況', ['先比較需求量與庫存量。', '不能讓抽取次數超過候選清單長度。'], '模組應先處理資料不足的邊界案例，再執行分配。', random);
       default:
         return null;
     }
@@ -202,7 +209,6 @@
   let state = { level: 1, streak: 0, attempts: 0, resolved: false };
   let current;
   let previous = '';
-  const escapeHtml = value => String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
   const updateStatus = () => {
     status.textContent = `目前：${labels[state.level - 1]}｜連續新題首次答對 ${state.streak}／2`;
     section.querySelectorAll('[data-level]').forEach(button => {

@@ -5,8 +5,9 @@
     <script src="adaptive-practice.js" defer></script>
     <script src="curriculum-labs.js" defer></script>
     <meta charset="UTF-8">
+    <script src="course-scenarios.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LESSON 6 - 星際防禦網</title>
+    <title data-scenario-text="tabTitle">LESSON 6 - 星際防禦網</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
@@ -48,8 +49,8 @@
                 </a>
             </div>
             <p class="text-sm font-medium text-indigo-500 mb-2 tracking-widest uppercase">演算法與程式設計</p>
-            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight">星際防禦工程師：<br class="hidden md:block">用程式編織能量防護網</h1>
-            <p class="text-lg text-slate-500 font-light max-w-2xl">結合「IPO 思維」與「重複結構」，循序漸進建立邏輯思維與幾何繪圖能力，並透過實作防禦網任務，體驗程式設計的強大魔力。</p>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight"><span data-scenario-text="name">星際防禦工程師</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用程式編織能量防護網</span></h1>
+            <p data-scenario-text="intro" class="text-lg text-slate-500 font-light max-w-2xl">結合「IPO 思維」與「重複結構」，循序漸進建立邏輯思維與幾何繪圖能力，並透過實作防禦網任務，體驗程式設計的強大魔力。</p>
         </div>
     </header>
 
@@ -65,7 +66,7 @@
                 <div class="lg:col-span-6 relative z-10 flex flex-col justify-center">
                     <span class="text-xs font-bold bg-rose-500/20 text-rose-400 px-3 py-1 rounded-full uppercase tracking-wider block w-max mb-4 animate-pulse">🚨 Phase 0：危機發布與系統診斷</span>
                     <h2 class="text-2xl md:text-3xl font-black mb-4 flex items-center text-orange-400">
-                        <span class="text-2xl mr-2">💥</span> 基地遭重創！防禦系統啟動太慢？
+                        <span class="text-2xl mr-2">💥</span> <span data-scenario-text="defense.simulation.briefingTitle">基地遭重創！防禦系統啟動太慢？</span>
                     </h2>
                     
                     <p class="text-slate-300 font-light text-sm leading-relaxed mb-6">
@@ -273,7 +274,7 @@
                                 </div>
 
                                 <button onclick="runLabAnimation()" class="w-full mt-4 bg-orange-500 text-slate-950 py-3 rounded-xl font-black hover:bg-orange-400 shadow-[0_0_15px_rgba(234,88,12,0.3)] transition-all flex items-center justify-center gap-2 transform active:scale-95">
-                                    <span>🛡️ 一鍵瞬間啟動防禦網</span>
+                                    <span data-scenario-text="defense.simulation.launch">🛡️ 一鍵瞬間啟動防禦網</span>
                                 </button>
 
                                 <!-- 由教師指定繳交方式，不連結未設定的外部平台 -->
@@ -288,10 +289,10 @@
                             <!-- 即時星際防禦雷達畫布 -->
                             <div class="lg:col-span-3 flex flex-col h-full">
                                 <div class="sim-window bg-slate-950 border border-slate-800 rounded-t-2xl shadow-xl flex-grow min-h-[420px] relative">
-                                    <div class="sim-badge" style="border-color:#EA580C; background: rgba(15,23,42,0.9); color: #FB923C;">阿爾法基地雷達防禦屏</div>
+                                    <div data-scenario-text="defense.simulation.arena" class="sim-badge" style="border-color:#EA580C; background: rgba(15,23,42,0.9); color: #FB923C;">阿爾法基地雷達防禦屏</div>
                                     <svg id="lab-svg" viewBox="0 0 300 200" class="w-full h-full absolute inset-0 z-10" preserveAspectRatio="xMidYMid slice"></svg>
                                 </div>
-                                <div id="lab-feedback" class="bg-slate-800 border-t border-slate-700 text-orange-100 rounded-b-2xl p-4 text-xs font-medium transition-colors duration-300 text-center shadow-lg">
+                                <div data-scenario-text="defense.simulation.waiting" id="lab-feedback" class="bg-slate-800 border-t border-slate-700 text-orange-100 rounded-b-2xl p-4 text-xs font-medium transition-colors duration-300 text-center shadow-lg">
                                     等待啟動！請留意防禦網是否存在「孔洞」讓隕石穿透，以及「筆跡寬度」的強度影響。
                                 </div>
                             </div>
@@ -370,11 +371,13 @@
 
         <div class="flex justify-between items-center mt-8">
             <a href="1150705.html" class="text-sm text-slate-400 hover:text-slate-800 transition-colors">⬅ 上一個單元</a>
-            <a href="1150700.html" class="inline-block text-center text-sm font-semibold text-slate-950 bg-orange-400 px-6 py-3 rounded-full hover:bg-orange-300 hover:shadow-lg hover:shadow-orange-400/20 transition-all shadow-sm">🏆 完成防禦工程，回到總覽</a>
+            <a data-scenario-text="defense.simulation.finish" href="1150700.html" class="inline-block text-center text-sm font-semibold text-slate-950 bg-orange-400 px-6 py-3 rounded-full hover:bg-orange-300 hover:shadow-lg hover:shadow-orange-400/20 transition-all shadow-sm">🏆 完成防禦工程，回到總覽</a>
         </div>
     </main>
 
     <script>
+        const { active: defenseScenario, escapeHtml: escapeDefenseText } = window.CourseScenarios;
+        const defenseCopy = defenseScenario.defense.simulation;
         // 幾何共用數學：點到線段的距離 (用於精準判斷隕石是否穿透護盾孔洞)
         function pointToSegmentDistance(px, py, x1, y1, x2, y2) {
             let dx = x2 - x1;
@@ -980,9 +983,9 @@
                     
                     const fb = document.getElementById('lab-feedback');
                     if (broken) {
-                        fb.innerHTML = `💥 警告！防禦網太薄 (強度不足)，被高能隕石輕易貫穿了！請增加筆跡寬度。`;
+                        fb.textContent = defenseCopy.thin;
                     } else {
-                        fb.innerHTML = `💥 警告！防禦網存在幾何孔洞，隕石從死角穿透！請增加陣列圖形數量。`;
+                        fb.textContent = defenseCopy.gap;
                     }
                     fb.className = "bg-rose-600 text-white font-bold rounded-b-2xl p-4 text-xs text-center shadow-md animate-pulse";
                     
@@ -1006,7 +1009,7 @@
                     }
                     fb.className = "bg-rose-600 text-white font-bold rounded-b-2xl p-4 text-sm text-center shadow-md";
                 } else {
-                    fb.innerHTML = `🎉 盲測結束：完美防禦！毫無死角且強度足夠！<br>基地安全無虞！任務大成功！`;
+                    fb.innerHTML = `${escapeDefenseText(defenseCopy.passed)}<br>${escapeDefenseText(defenseCopy.passedDetail)}`;
                     fb.className = "bg-emerald-600 text-white font-bold rounded-b-2xl p-4 text-sm text-center shadow-md";
                 }
             }

@@ -1,10 +1,12 @@
 (() => {
+  const { active, escapeHtml } = window.CourseScenarios;
+  const { defense, inventory, duel } = active;
   const guides = {
     '1150700.html': {
       grade: '七年級課程總覽',
       title: '從積木思考到自主創作',
       goal: '用六個任務建立「讀程式、預測結果、動手實作、除錯說明」的完整學習循環。',
-      action: '先完成起步診斷與資訊安全判斷，再依序挑戰三大結構、迴圈與變數；自訂積木可作進階體驗，最後用防禦網測試與資料分析完成專題。',
+      action: `先完成起步診斷與資訊安全判斷，再依序挑戰三大結構、迴圈與變數；自訂積木可作進階體驗，最後用${defense.project}測試與資料分析完成專題。`,
       evidence: '每課保留作品截圖或程式說明；專題附三組參數測試與資料比較理由。',
       check: '我不只會把積木接起來，也能說出每一段程式為什麼要這樣設計。'
     },
@@ -55,9 +57,9 @@
     },
     '1150706.html': {
       grade: '七年級｜第 6 課',
-      title: '防禦網專題：測試參數並分析資料',
-      goal: '整合事件、迴圈與變數製作防禦網，搜尋與比較測試資料以選出有效且省資源的組合。',
-      action: '先在 Scratch 完成可調參數防禦網；用至少三組參數測試，再完成頁末資料搜尋與平均消耗量分析。',
+      title: `${defense.project}專題：測試參數並分析資料`,
+      goal: `整合事件、迴圈與變數製作${defense.project}，搜尋與比較測試資料以選出有效且省資源的組合。`,
+      action: `先在 Scratch 完成可調參數${defense.project}；用至少三組參數測試，再完成頁末資料搜尋與平均消耗量分析。`,
       evidence: 'Scratch 作品、三組測試表、一次修正與 60 秒作品說明；網頁模擬器不能代替自己的作品。',
       check: '我能說明程式結構、實測結果和選擇最省資源方案的理由。',
       exit: '用自己的三組參數測試表，說明哪組有效且較省資源，並指出一次修正與重測。'
@@ -66,7 +68,7 @@
       grade: '八年級課程總覽',
       title: '把清單當成可追蹤的資料',
       goal: '在每一課都用「執行前、執行中、執行後」追蹤清單狀態，將 Scratch 操作連結到演算法思考。',
-      action: '遇到清單操作、搜尋、排序或洗牌，先寫出資料狀態與停止條件，再執行程式；最後用自訂積木拆解對決流程。',
+      action: `遇到清單操作、搜尋、排序或洗牌，先寫出資料狀態與停止條件，再執行程式；最後用自訂積木拆解${duel.activity}流程。`,
       evidence: '每課留下清單或演算法追蹤表；專題提供模組分工與三組測試案例。',
       check: '我能分辨「資料本身」與「處理資料的步驟」，並用例子驗證程式。'
     },
@@ -74,7 +76,7 @@
       grade: '八年級｜第 1 課',
       title: '清單基本操作：每一步都看得見資料變化',
       goal: '掌握新增、插入、替換、刪除、讀取與長度等操作，並正確理解索引位置。',
-      action: '每次操作後記錄清單結果；再用頁末循序搜尋逐項找裝備，測試找到與找不到。',
+      action: `每次操作後記錄清單結果；再用頁末循序搜尋逐項找${inventory.kind}，測試找到與找不到。`,
       evidence: '四種清單操作對照，以及找到／找不到各一筆搜尋紀錄。',
       check: '我能預測索引變化，並說明搜尋何時停止。',
       exit: '換一個目標項目，先猜位置，再記錄找到或找不到的每次比較與停止原因。'
@@ -117,12 +119,12 @@
     },
     '1150806.html': {
       grade: '八年級｜第 6 課',
-      title: '星際爭霸戰：清單、模組與測試',
+      title: `${active.grades[8].cards[5].title}：清單、模組與測試`,
       goal: '把建立、洗牌、分配及逐回合比大小拆成自訂積木，再驗證清單資料規則。',
       action: '先排列頁末四個自訂積木的呼叫順序；在 Scratch 建立功能，測試數量足夠、不足與抽取後不重複。',
       evidence: '含四個自訂積木的作品、清單流程圖、三組測試及一次修正紀錄。',
       check: '我能解釋各模組的責任和測試結果，而不只展示一場成功對決。',
-      exit: '用一組新的裝備清單，展示自訂積木呼叫順序、邊界測試與一次修正後的結果。'
+      exit: `用一組新的${duel.item}清單，展示自訂積木呼叫順序、邊界測試與一次修正後的結果。`
     }
   };
 
@@ -138,15 +140,15 @@
   section.setAttribute('aria-label', '本課學習導航');
   section.innerHTML = `
     <div class="learning-guide__card">
-      <span class="learning-guide__tag">${guide.grade}｜學習導航</span>
-      <h2>${guide.title}</h2>
-      <p class="learning-guide__goal"><strong>本課目標：</strong>${guide.goal}</p>
+      <span class="learning-guide__tag">${escapeHtml(guide.grade)}｜學習導航</span>
+      <h2>${escapeHtml(guide.title)}</h2>
+      <p class="learning-guide__goal"><strong>本課目標：</strong>${escapeHtml(guide.goal)}</p>
       <div class="learning-guide__grid">
-        <div class="learning-guide__item"><strong>挑戰任務</strong>${guide.action}</div>
-        <div class="learning-guide__item"><strong>完成證據</strong>${guide.evidence}</div>
+        <div class="learning-guide__item"><strong>挑戰任務</strong>${escapeHtml(guide.action)}</div>
+        <div class="learning-guide__item"><strong>完成證據</strong>${escapeHtml(guide.evidence)}</div>
       </div>
-      <p class="learning-guide__check">離堂檢核：${guide.check}</p>
-      ${guide.exit ? `<p class="learning-guide__exit"><strong>本課離堂任務：</strong>${guide.exit}請記下自己的預測、結果與修正；網頁答對或闖關成功不等於正式成績。<a href="#adaptive-practice">前往本課自適應練習 →</a></p>` : ''}
+      <p class="learning-guide__check">離堂檢核：${escapeHtml(guide.check)}</p>
+      ${guide.exit ? `<p class="learning-guide__exit"><strong>本課離堂任務：</strong>${escapeHtml(guide.exit)}請記下自己的預測、結果與修正；網頁答對或闖關成功不等於正式成績。<a href="#adaptive-practice">前往本課自適應練習 →</a></p>` : ''}
     </div>
   `;
   main.parentNode.insertBefore(section, main);

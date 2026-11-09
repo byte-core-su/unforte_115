@@ -5,8 +5,9 @@
     <script src="adaptive-practice.js" defer></script>
     <script src="curriculum-labs.js" defer></script>
     <meta charset="UTF-8">
+    <script src="course-scenarios.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LESSON 1 星艦資料庫基礎</title>
+    <title data-scenario-text="tabTitle">LESSON 1 星艦資料庫基礎</title>
     
     <!-- 引入 React, ReactDOM, Babel -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -58,9 +59,9 @@
                 </a>
             </div>
             <p class="text-sm font-bold text-cyan-600 mb-3 tracking-widest uppercase">演算法與程式設計</p>
-            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight">星際陣列指揮官：<br class="hidden md:block">用清單打造星際任務</h1>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight"><span data-scenario-text="name">星際陣列指揮官</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用清單打造星際任務</span></h1>
             <p class="text-lg text-slate-500 font-light max-w-2xl leading-relaxed">
-                化身星際指揮官，透過任務關卡循序漸進建立邏輯思維，完整掌握 <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span> 的強大威力！
+                <span data-scenario-text="intro">化身星際指揮官，透過任務關卡循序漸進建立邏輯思維，完整掌握</span> <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span> 的強大威力！
             </p>
         </div>
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-cyan-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
@@ -72,13 +73,19 @@
 
     <footer class="bg-slate-50 border-t border-slate-200 mt-10 py-8">
         <div class="max-w-6xl mx-auto px-6 lg:px-8 text-center">
-            <p class="text-sm font-medium text-slate-400">© 演算法與程式設計 - 星際陣列指揮官</p>
+            <p data-scenario-text="footer" class="text-sm font-medium text-slate-400">© 演算法與程式設計 - 星際陣列指揮官</p>
         </div>
     </footer>
 
     <!-- React 互動程式邏輯 -->
     <script type="text/babel" data-type="module">
         const { useState, useEffect, useRef } = React;
+        const { active: scenario, format } = window.CourseScenarios;
+        const { items: scenarioItems, tutorial } = scenario.inventory;
+        const tutorialText = template => format(template, {
+            supply: scenarioItems.supply.label, priority: scenarioItems.priority.label,
+            priorityName: scenarioItems.priority.name, upgrade: scenarioItems.upgrade.label
+        });
 
         // ==========================================
         // 課程介紹標頭 (原網頁的保留資料)
@@ -97,7 +104,7 @@
                             </div>
                             <div>
                                 <span className="text-cyan-500 font-bold text-sm tracking-widest uppercase mb-1 block">LESSON 1</span>
-                                <h2 className="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">星艦資料庫基礎 <span className="text-slate-400 font-medium text-2xl">(清單原理與概念)</span></h2>
+                                <h2 className="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">{window.CourseScenarios.active.grades[8].cards[0].title} <span className="text-slate-400 font-medium text-2xl">(清單原理與概念)</span></h2>
                             </div>
                         </div>
                         <p className="text-slate-600 font-light text-lg leading-relaxed mt-2 max-w-3xl">
@@ -191,44 +198,44 @@
 
             const steps = [
                 {
-                    title: "🛸 任務一：收集能源 (添加)",
-                    desc: "星際旅程即將開始，基地配發了備用能源。請點擊按鈕，把它存入星艦裝備庫中。",
-                    btnText: "存入 🔋 能量電池",
+                    title: tutorial[0].title,
+                    desc: tutorialText(tutorial[0].desc),
+                    btnText: tutorialText(tutorial[0].button),
                     action: () => {
-                        setList([...list, '🔋 能量電池']);
+                        setList([...list, scenarioItems.supply.label]);
                         setMessage("很好！「添加」指令會自動把新物資存放在裝備庫的最底層（清單最後一項）。");
                     }
                 },
                 {
-                    title: "🛸 任務二：緊急防禦 (插入)",
-                    desc: "警告！偵測到前方有碎星石群！你需要馬上啟動防護。請將「🛡️ 基礎防護罩」【插入】到裝備庫的第 1 個位置，取得最高啟動權限！",
-                    btnText: "將 🛡️ 基礎防護罩 插入第 1 項",
+                    title: tutorial[1].title,
+                    desc: tutorialText(tutorial[1].desc),
+                    btnText: tutorialText(tutorial[1].button),
                     action: () => {
                         const newList = [...list];
-                        newList.splice(0, 0, '🛡️ 基礎防護罩');
+                        newList.splice(0, 0, scenarioItems.priority.label);
                         setList(newList);
-                        setMessage("切換迅速！「插入」會把物資硬擠進指定位置，原本在後面的項目（像是能量電池）都會自動往後退一格。");
+                        setMessage(`切換迅速！「插入」會把物資硬擠進指定位置，原本在後面的項目（像是${scenarioItems.supply.name}）都會自動往後退一格。`);
                     }
                 },
                 {
-                    title: "🛸 任務三：裝備升級 (替換)",
-                    desc: "太棒了！指揮艦隊遠端傳送了升級數據。請將第 1 項的基礎防護罩直接【替換】為「✨ 量子力場盾」。",
-                    btnText: "替換第 1 項為 ✨ 量子力場盾",
+                    title: tutorial[2].title,
+                    desc: tutorialText(tutorial[2].desc),
+                    btnText: tutorialText(tutorial[2].button),
                     action: () => {
                         const newList = [...list];
-                        newList[0] = '✨ 量子力場盾';
+                        newList[0] = scenarioItems.upgrade.label;
                         setList(newList);
                         setMessage("升級完成！「替換」會直接覆蓋該位置原本的物資，換成新資料，裝備總數不會改變。");
                     }
                 },
                 {
-                    title: "🛸 任務四：消耗能源 (刪除)",
-                    desc: "穿越碎星石帶消耗了星艦大量能量。請使用掉裝備庫裡的「🔋 能量電池」（將它從清單中刪除）。",
-                    btnText: "消耗(刪除) 🔋 能量電池",
+                    title: tutorial[3].title,
+                    desc: tutorialText(tutorial[3].desc),
+                    btnText: tutorialText(tutorial[3].button),
                     action: () => {
-                        const appleIndex = list.indexOf('🔋 能量電池');
+                        const itemIndex = list.indexOf(scenarioItems.supply.label);
                         const newList = [...list];
-                        if(appleIndex > -1) newList.splice(appleIndex, 1);
+                        if(itemIndex > -1) newList.splice(itemIndex, 1);
                         setList(newList);
                         setMessage("能量已補充！「刪除」會把指定的項目移除，它後方的所有項目都會自動往前遞補空位喔。");
                     }
@@ -348,14 +355,14 @@
             const [removeItemIndex, setRemoveItemIndex] = useState('1');
             const [scenarioInsertIndex, setScenarioInsertIndex] = useState('1');
             const [scenarioReplaceIndex, setScenarioReplaceIndex] = useState('1');
-            const [addValue, setAddValue] = useState('🔧 奈米修復劑');
+            const [addValue, setAddValue] = useState(scenarioItems.repair.label);
             const [deleteIndex, setDeleteIndex] = useState('1');
-            const [insertValue, setInsertValue] = useState('🔫 雷射光槍');
+            const [insertValue, setInsertValue] = useState(scenarioItems.tool.label);
             const [insertIndex, setInsertIndex] = useState('2');
             const [replaceIndex, setReplaceIndex] = useState('1');
-            const [replaceValue, setReplaceValue] = useState('✨ 終極核心');
+            const [replaceValue, setReplaceValue] = useState(scenarioItems.core.label);
             const [getItemIndex, setGetItemIndex] = useState('1');
-            const [containsValue, setContainsValue] = useState('💎 星際礦石');
+            const [containsValue, setContainsValue] = useState(scenarioItems.ore.label);
 
             // --- 情境區專用功能 ---
             const collectItem = (itemName) => {
@@ -370,9 +377,9 @@
                     return;
                 }
                 const newList = [...list];
-                newList.splice(idx - 1, 0, '🛡️ 基礎防護罩');
+                newList.splice(idx - 1, 0, scenarioItems.priority.label);
                 setList(newList);
-                setMessage(`🛡️ 系統將「🛡️ 基礎防護罩」緊急排入第 ${idx} 項！這在程式裡等於使用了【插入】積木。`);
+                setMessage(`🛡️ 系統將「${scenarioItems.priority.label}」緊急排入第 ${idx} 項！這在程式裡等於使用了【插入】積木。`);
             };
 
             const handleScenarioReplace = () => {
@@ -383,9 +390,9 @@
                 }
                 const oldItem = list[idx - 1];
                 const newList = [...list];
-                newList[idx - 1] = '✨ 量子力場盾';
+                newList[idx - 1] = scenarioItems.upgrade.label;
                 setList(newList);
-                setMessage(`✨ 系統把第 ${idx} 項的「${oldItem}」升級成「✨ 量子力場盾」了！這等於使用了【替換】積木。`);
+                setMessage(`✨ 系統把第 ${idx} 項的「${oldItem}」升級成「${scenarioItems.upgrade.label}」了！這等於使用了【替換】積木。`);
             };
 
             const useFirstItem = () => {
@@ -488,7 +495,7 @@
                 <div className="animate-[fadeIn_0.5s_ease-out]">
                     <div className="flex flex-wrap gap-2 mb-4">
                         <button onClick={onNewCase} className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold text-sm">再產生一題</button>
-                        <button onClick={() => { setList(['🔋 能量電池', '🔫 雷射光槍', '🔧 奈米修復劑']); setMessage('已載入固定示範清單；請預測操作後的項目與索引。'); }} className="bg-slate-200 text-slate-700 px-4 py-2 rounded-xl font-bold text-sm">固定示範</button>
+                        <button onClick={() => { setList([scenarioItems.supply.label, scenarioItems.tool.label, scenarioItems.repair.label]); setMessage('已載入固定示範清單；請預測操作後的項目與索引。'); }} className="bg-slate-200 text-slate-700 px-4 py-2 rounded-xl font-bold text-sm">固定示範</button>
                     </div>
                     {/* 區塊 1：真實場景應用 */}
                     <div className="bg-white rounded-2xl shadow-md p-6 mb-8 border-t-8 border-indigo-500">
@@ -503,10 +510,10 @@
                             <div>
                                 <h3 className="text-sm font-bold text-slate-500 mb-2">1. 探索並收集物資 (添加項目)</h3>
                                 <div className="flex flex-wrap gap-2">
-                                    <button onClick={() => collectItem('🔋 能量電池')} className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-4 py-2 rounded-xl font-bold shadow-sm transition-transform active:scale-95 flex items-center gap-1">收集能量電池</button>
-                                    <button onClick={() => collectItem('🔫 雷射光槍')} className="bg-slate-50 hover:bg-slate-200 text-slate-700 border border-slate-300 px-4 py-2 rounded-xl font-bold shadow-sm transition-transform active:scale-95 flex items-center gap-1">裝載雷射槍</button>
-                                    <button onClick={() => collectItem('🔧 奈米修復劑')} className="bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 px-4 py-2 rounded-xl font-bold shadow-sm transition-transform active:scale-95 flex items-center gap-1">取得修復劑</button>
-                                    <button onClick={() => collectItem('💎 星際礦石')} className="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-4 py-2 rounded-xl font-bold shadow-sm transition-transform active:scale-95 flex items-center gap-1">採集礦石</button>
+                                    <button onClick={() => collectItem(scenarioItems.supply.label)} className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-4 py-2 rounded-xl font-bold shadow-sm transition-transform active:scale-95 flex items-center gap-1">{scenarioItems.supply.collect}</button>
+                                    <button onClick={() => collectItem(scenarioItems.tool.label)} className="bg-slate-50 hover:bg-slate-200 text-slate-700 border border-slate-300 px-4 py-2 rounded-xl font-bold shadow-sm transition-transform active:scale-95 flex items-center gap-1">{scenarioItems.tool.collect}</button>
+                                    <button onClick={() => collectItem(scenarioItems.repair.label)} className="bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 px-4 py-2 rounded-xl font-bold shadow-sm transition-transform active:scale-95 flex items-center gap-1">{scenarioItems.repair.collect}</button>
+                                    <button onClick={() => collectItem(scenarioItems.ore.label)} className="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-4 py-2 rounded-xl font-bold shadow-sm transition-transform active:scale-95 flex items-center gap-1">{scenarioItems.ore.collect}</button>
                                 </div>
                             </div>
 
@@ -514,7 +521,7 @@
                                 <h3 className="text-sm font-bold text-slate-500 mb-2">2. 緊急防禦 (插入項目)</h3>
                                 <div className="bg-cyan-50 border border-cyan-200 rounded-xl flex items-center shadow-sm p-1 pr-3 w-max">
                                     <button onClick={handleScenarioInsert} className="hover:bg-cyan-100 text-cyan-700 px-3 py-1.5 rounded-lg font-bold transition-transform active:scale-95 flex items-center gap-1">
-                                        🛡️ 插入 防護罩 到第
+                                        🛡️ 插入 {scenarioItems.priority.search ?? scenarioItems.priority.name} 到第
                                     </button>
                                     <input type="number" min="1" value={scenarioInsertIndex} onChange={(e) => setScenarioInsertIndex(e.target.value)} className="w-12 text-center border border-cyan-300 rounded mx-1 py-1 outline-none font-bold bg-white" />
                                     <span className="text-cyan-700 font-bold">項</span>
@@ -528,7 +535,7 @@
                                         ✨ 將第
                                     </button>
                                     <input type="number" min="1" value={scenarioReplaceIndex} onChange={(e) => setScenarioReplaceIndex(e.target.value)} className="w-12 text-center border border-indigo-300 rounded mx-1 py-1 outline-none font-bold bg-white" />
-                                    <span className="text-indigo-700 font-bold">項升級為 量子力場盾</span>
+                                    <span className="text-indigo-700 font-bold">項升級為 {scenarioItems.upgrade.name}</span>
                                 </div>
                             </div>
                             
@@ -606,7 +613,7 @@
         // ==========================================
         // 主程式 (控制階段切換與版面)
         // ==========================================
-        const practiceItemPool = ['🔋 能量電池', '🔫 雷射光槍', '🔧 奈米修復劑', '💎 星際礦石', '🛡️ 基礎防護罩', '📡 通訊器', '🚀 推進器'];
+        const practiceItemPool = [scenarioItems.supply.label, scenarioItems.tool.label, scenarioItems.repair.label, scenarioItems.ore.label, scenarioItems.priority.label, scenarioItems.signal.label, scenarioItems.engine.label];
         let previousPracticeList = '';
         function makePracticeList() {
             let result;

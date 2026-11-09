@@ -1,4 +1,6 @@
 (() => {
+  const { active, escapeHtml, inventorySearchPool } = window.CourseScenarios;
+  const { defense, inventory, duel } = active;
   const page = window.location.pathname.split('/').pop();
   const main = document.querySelector('main');
   if (!main) return;
@@ -11,16 +13,16 @@
       html: `<div class="curriculum-lab__questions" data-quiz="g7-safety"></div>`
     },
     '1150706.html': {
-      title: '防禦資源資料分析',
+      title: escapeHtml(defense.labTitle),
       codes: '資 T-IV-1｜運 t-IV-4、運 p-IV-1',
-      intro: '使用匿名範例資料，先搜尋指定測試、比較防禦結果，再計算平均資源消耗；將結論用於改良防禦網。',
-      html: `<div class="curriculum-lab__controls"><label>搜尋測試編號 <select id="g7-data-query"></select></label><label>先預測有效且最省資源的編號 <select id="g7-data-prediction"><option value="">先選答案</option><option>A</option><option>B</option><option>C</option><option>D</option></select></label><button type="button" id="g7-data-run">核對預測並分析</button><button type="button" id="g7-data-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g7-data-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g7-data-result" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">Scratch 任務：用清單記錄至少三組「圖形數量、筆跡寬度、是否擋住隕石」，選出通過測試且資源消耗較少的組合，附上表格與理由。新題數值會變，評量看推理與實測，不只看編號。</p>`
+      intro: `使用匿名範例資料，先搜尋指定測試、比較${escapeHtml(defense.labResult)}，再計算平均資源消耗；將結論用於改良${escapeHtml(defense.project)}。`,
+      html: `<div class="curriculum-lab__controls"><label>搜尋測試編號 <select id="g7-data-query"></select></label><label>先預測有效且最省資源的編號 <select id="g7-data-prediction"><option value="">先選答案</option><option>A</option><option>B</option><option>C</option><option>D</option></select></label><button type="button" id="g7-data-run">核對預測並分析</button><button type="button" id="g7-data-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g7-data-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g7-data-result" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">Scratch 任務：用清單記錄至少三組「圖形數量、筆跡寬度、是否${escapeHtml(defense.outcome)}」，選出通過測試且資源消耗較少的組合，附上表格與理由。新題數值會變，評量看推理與實測，不只看編號。</p>`
     },
     '1150801.html': {
       title: '循序搜尋：逐項檢查清單',
       codes: '資 A-IV-3（搜尋）｜資 P-IV-3｜運 t-IV-4',
       intro: '先預測目標位於第幾項，再逐步執行；找不到時，也要能說出停止條件。',
-      html: `<div class="curriculum-lab__controls"><label>尋找裝備 <select id="g8-search-target"></select></label><label>先預測位置 <select id="g8-search-prediction"></select></label><button type="button" id="g8-search-reset">同題重試</button><button type="button" id="g8-search-step">檢查下一項</button><button type="button" id="g8-search-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g8-search-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g8-search-state" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">Scratch 任務：以「索引從 1 開始，逐項比較；找到或超過清單長度就停止」實作搜尋，交出找到與找不到各一筆追蹤紀錄。請記錄比較順序，別只背位置。</p>`
+      html: `<div class="curriculum-lab__controls"><label>尋找${escapeHtml(inventory.kind)} <select id="g8-search-target"></select></label><label>先預測位置 <select id="g8-search-prediction"></select></label><button type="button" id="g8-search-reset">同題重試</button><button type="button" id="g8-search-step">檢查下一項</button><button type="button" id="g8-search-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g8-search-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g8-search-state" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">Scratch 任務：以「索引從 1 開始，逐項比較；找到或超過清單長度就停止」實作搜尋，交出找到與找不到各一筆追蹤紀錄。請記錄比較順序，別只背位置。</p>`
     },
     '1150802.html': {
       title: '音訊與作品使用判斷',
@@ -35,10 +37,10 @@
       html: `<div class="curriculum-lab__controls"><label>先預測第一次比較 <select id="g8-sort-prediction"><option value="">先選答案</option><option value="swap">會交換</option><option value="keep">不交換</option></select></label><button type="button" id="g8-sort-reset">同題重試</button><button type="button" id="g8-sort-step">執行下一次比較</button><button type="button" id="g8-sort-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g8-sort-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g8-sort-state" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">Scratch 任務：將四至六張打亂的數字牌由小到大排序；標出每次比較與交換，確認輸出數量與項目和輸入相同。換一組數字後，仍要能解釋交換規則。</p>`
     },
     '1150806.html': {
-      title: '用自訂積木分工完成對決',
+      title: `用自訂積木分工完成${escapeHtml(duel.activity)}`,
       codes: '資 P-IV-4／5｜運 t-IV-4、運 p-IV-1',
       intro: '把一大段程式拆成具名的自訂積木。先決定呼叫順序，再到 Scratch 建立並測試各段功能。',
-      html: `<div class="curriculum-lab__controls" id="g8-module-options"></div><div id="g8-module-state" class="curriculum-lab__result" aria-live="polite"></div><button type="button" id="g8-module-reset" class="curriculum-lab__secondary">重排呼叫順序</button><p class="curriculum-lab__task">Scratch 任務：建立「建立裝備庫」「洗牌裝備」「分配裝備」「逐一對決」四個自訂積木，分別測試；修改裝備數量後再測一次，交出主程式與一次修正紀錄。</p>`
+      html: `<div class="curriculum-lab__controls" id="g8-module-options"></div><div id="g8-module-state" class="curriculum-lab__result" aria-live="polite"></div><button type="button" id="g8-module-reset" class="curriculum-lab__secondary">重排呼叫順序</button><p class="curriculum-lab__task">Scratch 任務：建立${duel.modules.map(name => `「${escapeHtml(name)}」`).join('')}四個自訂積木，分別測試；修改${escapeHtml(duel.item)}數量後再測一次，交出主程式與一次修正紀錄。</p>`
     }
   };
 
@@ -129,7 +131,7 @@
       const bestCost = Math.min(...records.filter(item => item.blocked).map(item => item.count * item.width));
       const predicted = records.find(item => item.id === prediction.value);
       const feedback = chosen !== 'all' ? '先選「全部」，才能比較哪筆最省資源。' : !prediction.value ? '下次先選預測，再核對結果。' : predicted?.blocked && predicted.count * predicted.width === bestCost ? '預測符合條件；請說明為何其他通過測試的組合消耗更多。' : '預測不同；先排除未通過門檻的組合，再比較其餘的消耗量，重抽新題驗證。';
-      result.innerHTML = `<p>${mode}；本題防護強度門檻為 ${threshold}，圖形數 × 筆跡寬度達到門檻才算擋住隕石。</p><table><caption>測試資料（消耗量＝圖形數 × 筆跡寬度）</caption><thead><tr><th>編號</th><th>圖形數</th><th>寬度</th><th>擋住隕石</th><th>消耗量</th></tr></thead><tbody>${rows.map(item => `<tr><td>${item.id}</td><td>${item.count}</td><td>${item.width}</td><td>${item.blocked ? '是' : '否'}</td><td>${reveal ? item.count * item.width : '？'}</td></tr>`).join('')}</tbody></table><p>${reveal ? `共 ${rows.length} 筆；平均消耗量 ${average.toFixed(1)}。${valid.length ? `目前結果中有效且最省資源的是 ${valid[0].id}（消耗量 ${valid[0].count * valid[0].width}）。` : '目前結果中沒有通過測試的組合。'} ${feedback}` : '先算出各筆消耗量，預測通過測試且最省資源的組合，再按「核對預測並分析」。'}</p>`;
+      result.innerHTML = `<p>${mode}；本題${escapeHtml(defense.labThreshold)}為 ${threshold}，圖形數 × 筆跡寬度達到門檻才算${escapeHtml(defense.outcome)}。</p><table><caption>測試資料（消耗量＝圖形數 × 筆跡寬度）</caption><thead><tr><th>編號</th><th>圖形數</th><th>寬度</th><th>${escapeHtml(defense.outcome)}</th><th>消耗量</th></tr></thead><tbody>${rows.map(item => `<tr><td>${item.id}</td><td>${item.count}</td><td>${item.width}</td><td>${item.blocked ? '是' : '否'}</td><td>${reveal ? item.count * item.width : '？'}</td></tr>`).join('')}</tbody></table><p>${reveal ? `共 ${rows.length} 筆；平均消耗量 ${average.toFixed(1)}。${valid.length ? `目前結果中有效且最省資源的是 ${valid[0].id}（消耗量 ${valid[0].count * valid[0].width}）。` : '目前結果中沒有通過測試的組合。'} ${feedback}` : '先算出各筆消耗量，預測通過測試且最省資源的組合，再按「核對預測並分析」。'}</p>`;
     };
     section.querySelector('#g7-data-run').addEventListener('click', () => run());
     section.querySelector('#g7-data-new').addEventListener('click', newCase);
@@ -145,7 +147,7 @@
   }
 
   if (page === '1150801.html') {
-    const pool = ['能量電池', '防護罩', '修復劑', '雷射槍', '推進器', '導航晶片', '通訊器', '補給包'];
+    const pool = inventorySearchPool(active);
     let list = [];
     let index = 0;
     let done = false;
@@ -159,8 +161,8 @@
     const setCase = (items, chosen, label) => {
       list = [...items];
       mode = label;
-      const missing = pool.find(item => !list.includes(item)) || '未知裝備';
-      target.innerHTML = [...list, missing].map(item => `<option value="${item}">${item}${item === missing ? '（不在清單）' : ''}</option>`).join('');
+      const missing = pool.find(item => !list.includes(item)) || `未知${inventory.kind}`;
+      target.innerHTML = [...list, missing].map(item => `<option value="${escapeHtml(item)}">${escapeHtml(item)}${item === missing ? '（不在清單）' : ''}</option>`).join('');
       target.value = chosen;
       prediction.innerHTML = '<option value="">先選答案</option>' + list.map((_, position) => `<option value="${position + 1}">第 ${position + 1} 項</option>`).join('') + '<option value="missing">找不到</option>';
       prediction.value = '';
@@ -191,7 +193,7 @@
       previous = `${items.join(',')}:${chosen}`;
       setCase(items, chosen, '練習題');
     });
-    section.querySelector('#g8-search-demo').addEventListener('click', () => setCase(['能量電池', '防護罩', '修復劑', '雷射槍'], '防護罩', '固定示範'));
+    section.querySelector('#g8-search-demo').addEventListener('click', () => setCase(pool.slice(0, 4), pool[1], '固定示範'));
     section.querySelector('#g8-search-new').click();
   }
 
@@ -238,12 +240,12 @@
   }
 
   if (page === '1150806.html') {
-    const order = ['建立裝備庫', '洗牌裝備', '分配裝備', '逐一對決'];
+    const order = duel.modules;
     const chosen = [];
     const options = section.querySelector('#g8-module-options');
     const state = section.querySelector('#g8-module-state');
-    options.innerHTML = order.map(name => `<button type="button" data-module="${name}">${name}</button>`).join('');
-    const show = () => { state.textContent = `主程式：綠旗 → ${chosen.join(' → ') || '請依序選擇自訂積木'}。${chosen.length === 4 ? (chosen.every((name, index) => name === order[index]) ? '順序正確，接著在 Scratch 製作與測試各積木。' : '順序不合理：分配前要先建立並洗牌，對決前要先分配。') : ''}`; };
+    options.innerHTML = order.map(name => `<button type="button" data-module="${escapeHtml(name)}">${escapeHtml(name)}</button>`).join('');
+    const show = () => { state.textContent = `主程式：綠旗 → ${chosen.join(' → ') || '請依序選擇自訂積木'}。${chosen.length === order.length ? (chosen.every((name, index) => name === order[index]) ? '順序正確，接著在 Scratch 製作與測試各積木。' : `順序不合理：分配前要先建立並洗牌，${duel.activity}前要先分配。`) : ''}`; };
     options.addEventListener('click', event => {
       const name = event.target.dataset.module;
       if (!name || chosen.includes(name)) return;

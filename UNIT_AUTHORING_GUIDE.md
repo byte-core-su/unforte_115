@@ -10,6 +10,7 @@
 | `1150700.html`～`1150706.html` | 七年級課程總覽與六個單元 |
 | `1150800.html`～`1150806.html` | 八年級課程總覽與六個單元 |
 | `learning-guides.js` | 自動加入各課的學習導航內容 |
+| `course-scenarios.js` | 七、八年級共用情境文案、範例資料及下載路徑；見[課程情境切換指南](COURSE_SCENARIOS_GUIDE.md) |
 | `site-theme.css` | 全站共用外觀規則 |
 | `scratch_educators.html` | 教師資源頁，不是學生單元範本 |
 | `11507.zip`、`11508.zip` | 可下載的 Scratch 範例檔 |
@@ -26,13 +27,14 @@
 - 清單、資料追蹤與模擬：可參考八年級單元。
 - 需要多步驟挑戰、提示與完成回饋：選擇已有相同互動模式的頁面。
 
-複製範本後，先把新檔案命名為符合課程編號的 HTML，例如 `1150707.html` 或未來學期使用的新編號。保留原本載入的 `learning-guides.js`、Tailwind、Noto Sans TC、Lucide 與 `site-theme.css`。
+複製範本後，先把新檔案命名為符合課程編號的 HTML，例如 `1150707.html` 或未來學期使用的新編號。保留原本載入的 `course-scenarios.js`、`learning-guides.js`、Tailwind、Noto Sans TC、Lucide 與 `site-theme.css`。若新增課號，另依[課程情境切換指南](COURSE_SCENARIOS_GUIDE.md)擴充套用範圍。
 
 ### 2. 保留共同外觀與年級主題
 
 每個教材頁都應保留：
 
 ```html
+<script src="course-scenarios.js"></script>
 <script src="learning-guides.js" defer></script>
 <link rel="stylesheet" href="site-theme.css">
 ```

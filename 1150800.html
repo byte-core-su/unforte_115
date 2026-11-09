@@ -3,8 +3,9 @@
 <head>
     <script src="learning-guides.js" defer></script>
     <meta charset="UTF-8">
+    <script src="course-scenarios.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>用清單打造星際任務</title>
+    <title data-scenario-text="tabTitle">用清單打造星際任務</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 Lucide Icons -->
@@ -43,9 +44,9 @@
                 </a>
             </div>
             <p class="text-sm font-bold text-cyan-600 mb-3 tracking-widest uppercase">演算法與程式設計</p>
-            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight">星際陣列指揮官：<br class="hidden md:block">用清單打造星際任務</h1>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight"><span data-scenario-text="name">星際陣列指揮官</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用清單打造星際任務</span></h1>
             <p class="text-lg text-slate-500 font-light max-w-2xl leading-relaxed">
-                化身星際指揮官，透過六大任務關卡，循序漸進建立邏輯思維，完整掌握 <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span> 的強大威力！
+                <span data-scenario-text="intro">化身星際指揮官，透過六大任務關卡，循序漸進建立邏輯思維，完整掌握</span> <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span> 的強大威力！
             </p>
         </div>
         <!-- 裝飾性背景光暈 -->
@@ -61,20 +62,14 @@
     <!-- Footer -->
     <footer class="bg-slate-50 border-t border-slate-200 mt-10 py-8">
         <div class="max-w-5xl mx-auto px-6 lg:px-8 text-center">
-            <p class="text-sm font-medium text-slate-400">© 演算法與程式設計 - 星際陣列指揮官</p>
+            <p data-scenario-text="footer" class="text-sm font-medium text-slate-400">© 演算法與程式設計 - 星際陣列指揮官</p>
         </div>
     </footer>
 
     <!-- JavaScript 邏輯 (僅保留首頁資料與邏輯) -->
     <script>
-        const lessons = [
-            { id: 1, icon: "database", title: "星艦資料庫基礎", subtitle: "(清單原理與概念)", description: "在建立複雜的系統前，我們必須先了解星艦資料庫的最基本單位：數據陣列（清單）。認識什麼是「索引值」，並學會基本操作。" },
-            { id: 2, icon: "radio", title: "星際通訊", subtitle: "(小星星廣播)", description: "總部傳來了一段名為《小星星》的神秘頻率。我們需要建立清單來儲存這串音符，並依序播放出來。" },
-            { id: 3, icon: "battery-charging", title: "能源庫存分析", subtitle: "(計算總和與平均)", description: "母艦各艙房的能源指數已匯入清單。請指揮官幫忙計算目前的「總能源量」以及「平均能源」，以確保航行安全。" },
-            { id: 4, icon: "users", title: "招募先遣隊", subtitle: "(隨機抽號不重複)", description: "我們需要從全班同學中隨機選出 4 位優秀隊員執行先遣任務！記住，已經被選中的隊員不能重複被抽到喔。" },
-            { id: 5, icon: "shuffle", title: "武器庫洗牌", subtitle: "(資料移轉與洗牌)", description: "為了對抗外星生物，我們必須將武器庫（撲克牌點數）完全打亂，讓發放順序無法被預測！" },
-            { id: 6, icon: "gamepad-2", title: "星際爭霸戰", subtitle: "(綜合應用實戰)", description: "警報！敵軍艦隊來襲！運用我們前五課學到的清單技巧，打造一個星際爭霸遊戲系統，管理敵人生命值與分數吧！" }
-        ];
+        const { active, applyPage, escapeHtml } = window.CourseScenarios;
+        const lessons = active.grades[8].cards.map((card, index) => ({ ...card, id: index + 1 }));
 
         // 連結至單元頁面
         window.openLesson = function(id) {
@@ -94,19 +89,19 @@
                     </div>
 
                     <h2 class="text-3xl font-bold text-slate-800 mb-4 flex items-center gap-3">
-                        <span class="text-4xl group-hover:-translate-y-1 transition-transform duration-300">🚀</span> 
-                        情境模擬任務：啟動星艦數據陣列
+                        <span data-scenario-text="briefing.icon" class="text-4xl group-hover:-translate-y-1 transition-transform duration-300">🚀</span>
+                        <span data-scenario-text="briefing.title"></span>
                     </h2>
 
                     <p class="text-slate-600 font-medium text-lg mb-8 leading-relaxed">
-                        在浩瀚的宇宙中航行，母艦的電腦必須要記錄數百名船員的資料、記錄每一個跳躍座標，甚至是敵方戰機的血量。一般的「變數」一次只能裝一個資料，早就無法負荷了！這時候，我們就需要動用星艦系統的核心技術——<strong class="text-cyan-600">「數據陣列 (清單)」</strong>！
+                        <span data-scenario-text="briefing.intro"></span><strong class="text-cyan-600">「數據陣列 (清單)」</strong>！
                     </p>
 
                     <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-10 flex items-center gap-4 shadow-inner">
-                        <div class="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-3xl shadow-sm">👨‍🚀</div>
+                        <div data-scenario-text="briefing.roleIcon" class="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-3xl shadow-sm"></div>
                         <div>
                             <div class="text-xs text-slate-400 font-bold mb-1 tracking-wider">你的角色</div>
-                            <div class="text-xl font-bold text-slate-700">星艦陣列首席指揮官</div>
+                            <div data-scenario-text="briefing.role" class="text-xl font-bold text-slate-700"></div>
                         </div>
                     </div>
 
@@ -133,7 +128,7 @@
                         <div class="bg-emerald-100 text-emerald-600 w-12 h-12 flex-shrink-0 rounded-full flex items-center justify-center text-2xl">🌍</div>
                         <div>
                             <h3 class="text-emerald-800 font-bold mb-1 text-lg">現實生活應用</h3>
-                            <p class="text-emerald-600 text-sm font-medium">購物車清單、遊戲排行榜、班級點名系統、大數據資料收集。</p>
+                            <p data-scenario-text="briefing.application" class="text-emerald-600 text-sm font-medium"></p>
                         </div>
                     </div>
                 </div>
@@ -145,7 +140,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                         <div class="flex items-center gap-4">
                             <h2 class="text-2xl font-bold text-slate-800">任務關卡導覽</h2>
-                            <a href="11508.zip" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700 rounded-lg text-sm font-bold transition-colors border border-indigo-200 shadow-sm group active:scale-95">
+                            <a data-scenario-download href="11508.zip" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700 rounded-lg text-sm font-bold transition-colors border border-indigo-200 shadow-sm group active:scale-95">
                                 <i data-lucide="download-cloud" class="w-4 h-4 group-hover:-translate-y-0.5 transition-transform"></i>
                                 範例程式下載
                             </a>
@@ -180,8 +175,8 @@
                             <span class="${tagClass} text-xs font-bold px-3 py-1 rounded-full transition-colors">${tagText}</span>
                             <svg class="w-5 h-5 ${iconColor} transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                         </div>
-                        <h3 class="text-xl font-bold ${titleColor} mb-2 relative z-10">${lesson.title}</h3>
-                        <p class="text-slate-500 text-sm font-light relative z-10">${lesson.description}</p>
+                        <h3 class="text-xl font-bold ${titleColor} mb-2 relative z-10">${escapeHtml(lesson.title)}</h3>
+                        <p class="text-slate-500 text-sm font-light relative z-10">${escapeHtml(lesson.description)}</p>
                     </button>
                 `;
             });
@@ -191,6 +186,7 @@
 
         window.onload = function() {
             document.getElementById('app-container').innerHTML = renderHomeGrid();
+            applyPage(document, window.location.pathname, active);
             lucide.createIcons();
         };
     </script>

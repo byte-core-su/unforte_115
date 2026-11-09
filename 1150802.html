@@ -5,8 +5,9 @@
     <script src="adaptive-practice.js" defer></script>
     <script src="curriculum-labs.js" defer></script>
     <meta charset="UTF-8">
+    <script src="course-scenarios.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>用清單打造星際任務 - LESSON 2</title>
+    <title data-scenario-text="tabTitle">用清單打造星際任務 - LESSON 2</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 Lucide Icons -->
@@ -48,9 +49,9 @@
                 </a>
             </div>
             <p class="text-sm font-bold text-cyan-600 mb-3 tracking-widest uppercase">演算法與程式設計</p>
-            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight">星際陣列指揮官：<br class="hidden md:block">用清單打造星際任務</h1>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight"><span data-scenario-text="name">星際陣列指揮官</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用清單打造星際任務</span></h1>
             <p class="text-lg text-slate-500 font-light max-w-2xl leading-relaxed">
-                化身星際指揮官，透過六大任務關卡，循序漸進建立邏輯思維，完整掌握 <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span> 的強大威力！
+                <span data-scenario-text="intro">化身星際指揮官，透過六大任務關卡，循序漸進建立邏輯思維，完整掌握</span> <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span> 的強大威力！
             </p>
         </div>
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-cyan-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
@@ -61,7 +62,7 @@
 
     <footer class="bg-slate-50 border-t border-slate-200 mt-10 py-8">
         <div class="max-w-5xl mx-auto px-6 lg:px-8 text-center">
-            <p class="text-sm font-medium text-slate-400">© 演算法與程式設計 - 星際陣列指揮官</p>
+            <p data-scenario-text="footer" class="text-sm font-medium text-slate-400">© 演算法與程式設計 - 星際陣列指揮官</p>
         </div>
     </footer>
 
@@ -127,7 +128,7 @@
 
         // ================= 教學內容資料 =================
         const lesson = {
-            id: 2, icon: "radio", title: "星際通訊", subtitle: "(小星星廣播)",
+            id: 2, icon: "radio", title: window.CourseScenarios.active.grades[8].cards[1].title, subtitle: "(小星星廣播)",
             description: "總部傳來了一段名為《小星星》的神秘頻率。我們需要建立清單來儲存這串音符，並依序播放出來。",
             objective: "學習清單的序列播放應用。透過將音樂簡譜資料輸入清單，練習連續資料的儲存方法，實作結合計次迴圈依序取出資料執行播放的高效管理邏輯。",
             pseudoCode: `WHEN SPRITE CLICKED\nSAY "現在開始為您演奏「小星星」"\nSET 第幾個音 TO 1\nREPEAT LENGTH("小星星") TIMES:\n    BROADCAST GET_ITEM(第幾個音) FROM "小星星"\n    PLAY NOTE GET_ITEM(第幾個音) FROM "小星星" FOR 0.5 BEATS\n    CHANGE 第幾個音 BY 1`,
@@ -190,7 +191,7 @@
                                 </div>
                                 <div>
                                     <span class="${dt.tagText} font-bold text-sm tracking-widest uppercase mb-1 block">LESSON ${lesson.id}</span>
-                                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">${lesson.title} <span class="text-slate-400 font-medium text-2xl">${lesson.subtitle}</span></h2>
+                                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">${window.CourseScenarios.escapeHtml(lesson.title)} <span class="text-slate-400 font-medium text-2xl">${lesson.subtitle}</span></h2>
                                 </div>
                             </div>
                             <p class="text-slate-600 font-light text-lg leading-relaxed mt-2 max-w-3xl">${lesson.description}</p>
