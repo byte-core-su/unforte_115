@@ -5,8 +5,9 @@
     <script src="adaptive-practice.js" defer></script>
     <script src="curriculum-labs.js" defer></script>
     <meta charset="UTF-8">
+    <script src="course-scenarios.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>用清單打造星際任務 - LESSON 6</title>
+    <title data-scenario-text="tabTitle">用清單打造星際任務 - LESSON 6</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 Lucide Icons -->
@@ -40,9 +41,9 @@
                 </a>
             </div>
             <p class="text-sm font-bold text-purple-600 mb-3 tracking-widest uppercase">演算法與程式設計</p>
-            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight">星際陣列指揮官：<br class="hidden md:block">用清單打造星際任務</h1>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight"><span data-scenario-text="name">星際陣列指揮官</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用清單打造星際任務</span></h1>
             <p class="text-lg text-slate-500 font-light max-w-2xl leading-relaxed">
-                化身星際指揮官，透過六大任務關卡，循序漸進建立邏輯思維，完整掌握 <span class="font-bold text-purple-700 bg-purple-50 px-2 py-1 rounded-lg border border-purple-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span> 的強大威力！
+                <span data-scenario-text="intro">化身星際指揮官，透過六大任務關卡，循序漸進建立邏輯思維，完整掌握</span> <span class="font-bold text-purple-700 bg-purple-50 px-2 py-1 rounded-lg border border-purple-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span> 的強大威力！
             </p>
         </div>
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-purple-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
@@ -53,11 +54,13 @@
 
     <footer class="bg-slate-50 border-t border-slate-200 mt-10 py-8">
         <div class="max-w-5xl mx-auto px-6 lg:px-8 text-center">
-            <p class="text-sm font-medium text-slate-400">© 演算法與程式設計 - 星際陣列指揮官</p>
+            <p data-scenario-text="footer" class="text-sm font-medium text-slate-400">© 演算法與程式設計 - 星際陣列指揮官</p>
         </div>
     </footer>
 
     <script>
+        const { active: activeScenario, escapeHtml: escapeDuelText } = window.CourseScenarios;
+        const duelScenario = activeScenario.duel;
         // ==========================================
         // ⚡ 星際爭霸戰：雙陣列對決模擬器 (Plain JS)
         // ==========================================
@@ -86,7 +89,7 @@
                         <div class="px-2 py-1.5 border rounded-lg font-bold text-xs flex justify-between items-center transition-all ${cls} group">
                             <div class="flex items-center gap-1.5 overflow-hidden">
                                 <span class="text-[9px] font-mono w-3 text-right opacity-50 shrink-0">${idx+1}</span>
-                                <span class="truncate">${item.text}</span>
+                                <span class="truncate">${escapeDuelText(item.text)}</span>
                             </div>
                             <span class="bg-black/30 px-1.5 py-0.5 rounded text-[10px] font-mono group-hover:bg-black/40 shrink-0">戰力 ${item.power}</span>
                         </div>
@@ -106,7 +109,7 @@
                         <div class="px-2 py-1.5 border rounded-lg font-bold text-xs flex justify-between items-center transition-all ${cls} group">
                             <div class="flex items-center gap-1.5 overflow-hidden">
                                 <span class="text-[9px] font-mono w-3 text-right opacity-50 shrink-0">${idx+1}</span>
-                                <span class="truncate">${item.text}</span>
+                                <span class="truncate">${escapeDuelText(item.text)}</span>
                             </div>
                             <span class="bg-black/30 px-1.5 py-0.5 rounded text-[10px] font-mono group-hover:bg-black/40 shrink-0">戰力 ${item.power}</span>
                         </div>
@@ -160,8 +163,9 @@
             btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 建立中...';
             btn.className = "w-full sm:w-auto bg-slate-700 text-slate-400 font-bold py-2.5 px-6 rounded-xl transition-all shadow-inner flex items-center justify-center gap-2 text-sm shrink-0 cursor-not-allowed";
             
-            const types = ["🛡️能量盾", "🔫雷射槍", "🚀追蹤彈", "⚔️激光劍"];
-            const grades = ["F", "E", "D", "C", "B", "A"];
+            const types = duelScenario.types;
+            // Match the costume numbers in both downloadable Scratch projects.
+            const grades = ["A", "B", "C", "D", "E", "F"];
             prepPool = [];
             let p = 1;
             const deckEl = document.getElementById('prep-modal-deck');
@@ -171,7 +175,7 @@
                     prepPool.push({ text: `${types[i]} ${grades[j]}`, power: p });
                     deckEl.innerHTML = prepPool.map((item, idx) => `
                         <div class="flex items-center justify-between bg-white border border-slate-300 shadow-sm rounded px-1.5 py-1 animate-[popIn_0.1s_ease-out] w-full">
-                            <span class="text-[10px] font-bold text-slate-700 truncate flex-1">${item.text}</span>
+                            <span class="text-[10px] font-bold text-slate-700 truncate flex-1">${escapeDuelText(item.text)}</span>
                             <span class="bg-slate-900 text-cyan-300 text-[10px] px-1 rounded font-mono font-bold shrink-0 ml-1">戰力 ${item.power}</span>
                         </div>
                     `).join('');
@@ -213,7 +217,7 @@
                 prepPool.sort(() => Math.random() - 0.5);
                 deckEl.innerHTML = prepPool.map((item, idx) => `
                     <div class="flex items-center justify-between bg-amber-50 border border-amber-300 shadow-sm rounded px-1.5 py-1 animate-[popIn_0.1s_ease-out] w-full ring-1 ring-amber-300">
-                        <span class="text-[10px] font-bold text-amber-700 truncate flex-1">${item.text}</span>
+                        <span class="text-[10px] font-bold text-amber-700 truncate flex-1">${escapeDuelText(item.text)}</span>
                         <span class="bg-slate-900 text-amber-300 text-[10px] px-1 rounded font-mono font-bold shrink-0 ml-1">戰力 ${item.power}</span>
                     </div>
                 `).join('');
@@ -221,7 +225,7 @@
             }
             deckEl.innerHTML = prepPool.map((item, idx) => `
                 <div class="flex items-center justify-between bg-white border border-slate-300 shadow-sm rounded px-1.5 py-1 w-full animate-[popIn_0.2s_ease-out]">
-                    <span class="text-[10px] font-bold text-slate-700 truncate flex-1">${item.text}</span>
+                    <span class="text-[10px] font-bold text-slate-700 truncate flex-1">${escapeDuelText(item.text)}</span>
                     <span class="bg-slate-900 text-cyan-300 text-[10px] px-1 rounded font-mono font-bold shrink-0 ml-1">戰力 ${item.power}</span>
                 </div>
             `).join('');
@@ -261,14 +265,14 @@
                 
                 deckEl.innerHTML = prepPool.map((item, idx) => `
                     <div class="flex items-center justify-between bg-white border border-slate-300 shadow-sm rounded px-1.5 py-1 w-full">
-                        <span class="text-[10px] font-bold text-slate-700 truncate flex-1">${item.text}</span>
+                        <span class="text-[10px] font-bold text-slate-700 truncate flex-1">${escapeDuelText(item.text)}</span>
                         <span class="bg-slate-900 text-cyan-300 text-[10px] px-1 rounded font-mono font-bold shrink-0 ml-1">戰力 ${item.power}</span>
                     </div>
                 `).join('');
                 
                 squadEl.innerHTML = simSquadWeapons.map((item, idx) => `
                     <div class="flex items-center justify-between bg-indigo-600 border border-indigo-400 shadow-sm rounded px-1.5 py-1 animate-[popIn_0.2s_ease-out] w-[48%] sm:w-[31%] shrink-0">
-                        <span class="text-[10px] font-bold text-white truncate flex-1">${item.text}</span>
+                        <span class="text-[10px] font-bold text-white truncate flex-1">${escapeDuelText(item.text)}</span>
                         <span class="bg-slate-900 text-cyan-300 text-[10px] px-1 rounded font-mono font-bold shrink-0 ml-1">${item.power}</span>
                     </div>
                 `).join('');
@@ -315,7 +319,7 @@
                 } else {
                     let r = Math.floor(Math.random() * 24) + 1;
                     while (simEnemyFleet.find(item => item.power === r)) r = Math.floor(Math.random() * 24) + 1;
-                    simEnemyFleet.push({ text: `👾 未知戰艦`, power: r });
+                    simEnemyFleet.push({ text: duelScenario.opponent, power: r });
                 }
             }
             
@@ -489,7 +493,7 @@
         // 隱藏密技 Quiz 控制邏輯
         // ==========================================
         const quizPool = [
-            { q: "為什麼我們要在「洗牌」之前，先建立一個包含 1 到 24 的初始裝備庫清單？", opts: ["讓畫面看起來比較好看", "對應 Scratch 中 24 個武器的造型編號", "用來隨機選擇武器名稱"], ans: 1 },
+            { q: "為什麼我們要在「洗牌」之前，先建立一個包含 1 到 24 的初始裝備庫清單？", opts: ["讓畫面看起來比較好看", `對應 Scratch 中 24 個${escapeDuelText(duelScenario.costumeLabel)}的造型編號`, "用來隨機選擇武器名稱"], ans: 1 },
             { q: "當我們從「裝備分配」清單提取裝備給小隊時，為什麼取出「第 1 項」後要立刻將它「刪除」？", opts: ["為了避免敵人拿到重複的裝備", "因為系統規定小隊只能有 6 個裝備", "為了節省電腦記憶體空間"], ans: 0 },
             { q: "在陣列走訪進行「火力對決」時，我們用了哪個變數來同步讀取我方與敵方的清單？", opts: ["對決回合", "戰鬥力", "戰鬥紀錄"], ans: 0 },
             { q: "在 Scratch 中，如果要將一個原本整齊的陣列完全打散，我們最常使用哪種方法？", opts: ["將所有數字按照大小重新排序", "將數字隨機加減乘除", "隨機抽取項目後轉移到另一個新清單"], ans: 2 },
@@ -560,11 +564,11 @@
         const lesson = {
             id: 6, 
             icon: "swords", 
-            title: "星際爭霸戰", 
+            title: window.CourseScenarios.active.grades[8].cards[5].title,
             subtitle: "(陣列綜合應用：總複習與對決)",
             description: "指揮官，最終考驗來了！我們將把前面學過的技巧大結合：建立連續數字的武裝清單、洗牌打散，然後取出前 6 項作為先遣隊的裝備。最後，利用迴圈將我們的裝備與敵方艦隊逐一比對，展開最終的星際決戰！",
             objectives: [
-                { title: "建立武裝清單", desc: "自動生成 1 到 24 的連續數字陣列。在 Scratch 中，這剛好能對應到 24 種不同戰鬥力的武器造型！(模擬器以圖文輔助呈現)" },
+                { title: "建立武裝清單", desc: `自動生成 1 到 24 的連續數字陣列。在 Scratch 中，這剛好能對應到 24 種不同戰鬥力的${escapeDuelText(duelScenario.costumeLabel)}造型！(模擬器以圖文輔助呈現)` },
                 { title: "亂數洗牌打散", desc: "將「裝備庫存」內的 24 個數字徹底打散，確保我們拿到的武器是完全隨機的。" },
                 { title: "提取對決裝備", desc: "從洗好的裝備分配中取出前 6 項存入「小隊裝備」；接著偵測雷達，隨機生成 6 個「外星裝備」。" },
                 { title: "陣列火力對決", desc: "利用迴圈，逐一讀取兩個清單的對應數值，比較大小並顯示每回合的戰鬥結果！" }
@@ -779,10 +783,14 @@
                                 </div>
                                 <div>
                                     <span class="${dt.tagText} font-bold text-sm tracking-widest uppercase mb-1 block">LESSON ${lesson.id}</span>
-                                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">${lesson.title} <span class="text-slate-400 font-medium text-2xl">${lesson.subtitle}</span></h2>
+                                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">${window.CourseScenarios.escapeHtml(lesson.title)} <span class="text-slate-400 font-medium text-2xl">${lesson.subtitle}</span></h2>
                                 </div>
                             </div>
                             <p class="text-slate-600 font-light text-lg leading-relaxed mt-2 max-w-3xl">${lesson.description}</p>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <a href="1150806-demo.sb3" download class="inline-flex items-center gap-2 rounded-lg bg-purple-700 px-4 py-2 text-sm font-bold text-white hover:bg-purple-800"><i data-lucide="download" class="w-4 h-4"></i>下載 Scratch 模組化示範</a>
+                                <span class="text-sm text-slate-600">在 Scratch 開啟後，綠旗或 1 測試足夠、2 測試不足、3 修正後重測。</span>
+                            </div>
                         </div>
                         
                         <div class="p-8 md:p-10 flex flex-col gap-10">

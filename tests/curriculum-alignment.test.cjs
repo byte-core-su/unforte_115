@@ -2,6 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const CourseScenarios = require('../course-scenarios.js');
 const { test } = require('node:test');
 
 const root = path.resolve(__dirname, '..');
@@ -96,7 +97,7 @@ test('dynamic lesson rendering does not replace the attached curriculum lab', ()
     };
     vm.runInNewContext(read('curriculum-labs.js'), {
       document: { querySelector: () => main, createElement: () => section },
-      window: { location: { pathname: `/${page}` } }, Math
+      window: { CourseScenarios, location: { pathname: `/${page}` } }, Math
     });
     main.innerHTML = '<article>rendered lesson</article>';
     assert.equal(sibling, section);

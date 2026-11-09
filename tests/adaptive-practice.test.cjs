@@ -2,6 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const CourseScenarios = require('../course-scenarios.js');
 const { createQuestion, gradeAttempt } = require('../adaptive-practice.js');
 
 const root = path.resolve(__dirname, '..');
@@ -69,7 +70,7 @@ const main = { nextSibling: null, parentNode: { insertBefore(node) { inserted = 
 const document = { querySelector: selector => selector === 'main' ? main : null, createElement: tag => tag === 'section' ? section : { querySelector: element }, hasFocus: () => true, addEventListener() {} };
 const predictableMath = Object.create(Math);
 predictableMath.random = () => 0;
-vm.runInNewContext(source, { document, window: { location: { pathname: '/1150703.html' }, addEventListener() {} }, Math: predictableMath });
+vm.runInNewContext(source, { document, window: { CourseScenarios, location: { pathname: '/1150703.html' }, addEventListener() {} }, Math: predictableMath });
 assert.ok(inserted, 'practice card should be inserted beside the lesson main');
 assert.match(element('.adaptive-practice__prompt').textContent, /正 .*邊形/);
 let item = createQuestion('1150703.html', 1, () => 0);

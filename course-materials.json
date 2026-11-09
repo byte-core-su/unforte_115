@@ -1,0 +1,76 @@
+{
+  "space": {
+    "1150706.html": {
+      "grade": 7,
+      "lesson": 6,
+      "overview": "1150700.html",
+      "animation": {
+        "kind": "inline-svg",
+        "config": "defense.simulation",
+        "hostIds": ["top-sim-svg", "fast-deploy-svg", "lab-svg"],
+        "functions": ["initTopSimulation", "playFastDeploymentAnimation", "runLabAnimation", "createPrecisionMeteor"],
+        "replaceable": "背景星空、基地與隕石外觀、模擬標籤與回饋",
+        "shared": "幾何繪圖、碰撞判定、參數控制與測試紀錄"
+      },
+      "scratch": {
+        "entry": "11507/unfoter11507_L6.sb3",
+        "role": "reference",
+        "sprites": ["防護所", "太空隕石", "太空基地"],
+        "stageVariables": ["幾個圖形", "正幾邊形"],
+        "broadcasts": ["GameOver"]
+      },
+      "lessonPlan": {
+        "source": "LESSON_PLAN_GRADE_7.md",
+        "html": "lesson-plan-grade-7.html",
+        "sectionId": "section-3",
+        "heading": "第 6 課｜防禦網測試與資料應用",
+        "assessmentId": "section-4"
+      },
+      "record": { "file": "STUDENT_RECORDS.md", "heading": "七年級：防禦網參數與資料分析" },
+      "presentation": {
+        "file": "presentations/20261110.html",
+        "references": [
+          { "fragment": "title-4", "kind": "slide", "text": "6 防禦網專題" },
+          { "fragment": "ratio-grade7", "kind": "table", "text": "6 防禦網專題" }
+        ]
+      }
+    },
+    "1150806.html": {
+      "grade": 8,
+      "lesson": 6,
+      "overview": "1150800.html",
+      "animation": {
+        "kind": "inline-dom",
+        "config": "duel",
+        "hostIds": ["prep-modal-deck", "arena-squad", "arena-enemy", "arena-log"],
+        "functions": ["prepGenerate", "prepShuffle", "prepExtract", "renderBattleArena", "doBattle"],
+        "replaceable": "裝備卡類別、敵方外觀、結果文字與圖示",
+        "shared": "建立資料、洗牌、抽取、對應位置比較與結果紀錄"
+      },
+      "scratch": {
+        "entry": "11508/unfoter11508_L6.sb3",
+        "role": "reference",
+        "sprites": ["地球防衛軍", "外星人太空船", "地球防衛武器", "外星人太空武器", "check"],
+        "stageLists": ["裝備庫存", "小隊裝備", "裝備分配", "外星裝備"],
+        "broadcasts": ["逐一決", "check"],
+        "costumeMapping": { "sprites": ["地球防衛武器", "外星人太空武器"], "count": 24 },
+        "demo": { "file": "1150806-demo.sb3", "role": "assessment-demo" }
+      },
+      "lessonPlan": {
+        "source": "LESSON_PLAN_GRADE_8.md",
+        "html": "lesson-plan-grade-8.html",
+        "sectionId": "section-3",
+        "heading": "第 6 課｜星際爭霸戰：清單與模組化測試",
+        "assessmentId": "section-4"
+      },
+      "record": { "file": "STUDENT_RECORDS.md", "heading": "八年級：自訂積木與對決測試" },
+      "presentation": {
+        "file": "presentations/20261110.html",
+        "references": [
+          { "fragment": "title-5", "kind": "slide", "text": "6 對決專題" },
+          { "fragment": "ratio-grade8", "kind": "table", "text": "6 對決專題" }
+        ]
+      }
+    }
+  }
+}

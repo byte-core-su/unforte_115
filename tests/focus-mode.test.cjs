@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const CourseScenarios = require('../course-scenarios.js');
 const { createFocusMode, createQuestion } = require('../adaptive-practice.js');
 const source = fs.readFileSync(path.join(__dirname, '../adaptive-practice.js'), 'utf8');
 
@@ -52,7 +53,7 @@ function mount(page) {
     querySelector: selector => selector === 'main' ? main : null,
     createElement: tag => tag === 'section' ? section : { ...node(), querySelector: element },
     addEventListener(type, callback) { this.listeners[type] = callback; } };
-  const window = { location: { pathname: `/${page}` }, listeners: {},
+  const window = { CourseScenarios, location: { pathname: `/${page}` }, listeners: {},
     addEventListener(type, callback) { this.listeners[type] = callback; } };
   const math = Object.create(Math);
   math.random = () => random;

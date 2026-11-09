@@ -66,6 +66,7 @@
 | `lesson-plan-grade-7.html`、`lesson-plan-grade-8.html` | 可在首頁課程小卡開啟的七、八年級教案 |
 | `scratch_educators.html` | Scratch 教師帳戶、班級與學生管理操作圖解 |
 | `11507.zip`、`11508.zip` | 可下載的 Scratch `.sb3` 教材範例 |
+| `1150806-demo.sb3` | 八年級第 6 課的[四個自訂積木示範](SCRATCH_L6_DEMO_GUIDE.md)，含足夠、不足與修正後重測 |
 
 ## 使用方式
 
@@ -81,6 +82,8 @@ Python 的十二個單元依序為輸出、變數與輸入、型態與運算、�
 
 ## 技術概況
 
+- 七、八年級共用情境設定 `course-scenarios.js`，預設仍為星際版。共用頁首、總覽、範例下載路徑、清單資料與部分專題用語可集中替換，不必改動教學規則。新增情境的步驟及仍需同步調整的教材見[課程情境切換指南](COURSE_SCENARIOS_GUIDE.md)。
+- 兩個第 6 課的網頁動畫、Scratch 範例、教案、學習紀錄和簡報位置列入 `course-materials.json`；可執行 `npm run check:materials`，詳細對照與待同步事項見[課程資源清單](COURSE_MATERIALS_GUIDE.md)。
 - 靜態 HTML、CSS、原生 JavaScript 為主
 - 使用 Tailwind CSS、Lucide、Font Awesome 等 CDN 資源
 - `1150801.html` 使用 React 與 Babel 的瀏覽器端版本
