@@ -101,8 +101,10 @@
             }
             // Keep the robot visible throughout the move, including between tiles and
             // behind tall platforms. Tile depth only orders the board, never the robot.
-            this.paintRobot(ctx, position.x, position.y - lift, (robot.direction + this.rotation) % 4);
-            this.paintHeading(ctx, position.x, position.y, robot.direction + this.rotation);
+            const robotY = position.y - lift;
+            const facing = robot.direction + this.rotation;
+            this.paintRobot(ctx, position.x, robotY, facing % 4);
+            this.paintHeading(ctx, position.x, robotY, facing);
             ctx.restore();
             const direction = (this.snapshot.robot.direction + this.rotation) % 4;
             const turning = this.snapshot.last?.command === 'left' || this.snapshot.last?.command === 'right';
