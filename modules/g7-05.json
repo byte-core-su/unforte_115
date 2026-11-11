@@ -1,0 +1,25 @@
+{
+  "id": "g7-05",
+  "grade": 7,
+  "lesson": 5,
+  "title": "幾何曼陀羅",
+  "entry": "1150705.html",
+  "periods": 2,
+  "goal": "先運用迴圈與變數繪圖；進階再將重複程式整理成自訂積木與參數。",
+  "evidence": "兩組不同設定的圖形及迴圈／變數說明；進階者再附帶參數的自訂積木。",
+  "priorKnowledge": "基本電腦操作與 Scratch 介面",
+  "prerequisites": [
+    "g7-03",
+    "g7-04"
+  ],
+  "tags": [
+    "巢狀迴圈",
+    "參數",
+    "創作"
+  ],
+  "resources": {
+    "lessonPlan": "lesson-plan-grade-7.html#section-3",
+    "records": "STUDENT_RECORDS.md",
+    "scratchArchive": "11507.zip"
+  }
+}

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>課程組合工具｜V-2 資訊科技課程</title>
+  <meta name="description" content="依七、八年級課程地圖挑選單元，調整順序，建立自己的資訊科技課程。">
+  <link rel="stylesheet" href="course-composer.css">
+  <script type="module" src="course-builder.mjs"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到組課工具</a>
+  <header class="composer-header"><div class="container"><a href="index.html" class="back-link">← 完整課程地圖</a><p class="eyebrow">V-2 · 教師組課工具</p><h1>把需要的單元，組成自己的課程</h1><p>先看七、八年級的完整地圖，再挑選單元、調整順序。每個模組保留原有操作、練習與完成證據。</p></div></header>
+  <main id="main" class="container composer-main">
+    <p id="status" class="notice" role="status" aria-live="polite">正在載入課程模組…</p>
+    <script>
+      // Classic inline script: it still runs when the browser blocks module scripts on file://.
+      if (location.protocol === 'file:') {
+        document.getElementById('status').innerHTML = '<strong>組課工具需要用網址開啟。</strong>你現在是直接從資料夾開啟檔案，瀏覽器會擋下組課功能。<br>'
+          + '做法：在含有 <code>package.json</code> 的專案資料夾開啟終端機，輸入 <code>node scripts/preview.cjs</code> 並保持視窗開著，再開啟 <a href="http://127.0.0.1:4173/course-builder.html">http://127.0.0.1:4173/course-builder.html</a>。<br>'
+          + '只是要上課的話不必組課：回到<a href="index.html">首頁課程地圖</a>直接點單元即可。';
+      }
+    </script>
+    <noscript><p class="notice">請啟用 JavaScript 使用組課工具。</p></noscript>
+    <div id="composer" hidden>
+      <section class="panel course-settings" aria-labelledby="settings-title">
+        <h2 id="settings-title">1. 定義這門課</h2>
+        <label for="course-title">課程名稱<input id="course-title" maxlength="80" value="我的資訊科技課程" autocomplete="off"></label>
+        <label for="course-description">課程說明<textarea id="course-description" maxlength="500" rows="2" placeholder="例如：八年級資料處理短課程，預計 8 節。"></textarea></label>
+        <div class="actions"><label for="preset">快速起點</label><select id="preset"><option value="g7">七年級完整六單元</option><option value="g8">八年級完整六單元</option><option value="geometry">幾何創作課程</option><option value="data">資料與演算法課程</option></select><button id="apply-preset" type="button">套用起點（取代已選）</button></div>
+      </section>
+      <div class="composition-layout">
+        <section aria-labelledby="catalog-title"><div class="section-heading"><p class="eyebrow">完整課程地圖</p><h2 id="catalog-title">2. 挑選需要的模組</h2><p>地圖按年級分開，卡片依原課序排列。可跨年級組合；建議先備只提醒，不會鎖住單元。</p></div><div id="module-catalog"></div></section>
+        <aside class="panel selection-panel" aria-labelledby="selection-title">
+          <h2 id="selection-title">3. 排出你的上課順序</h2><p id="course-summary"></p><ol id="selected-modules" class="selected-list"></ol>
+          <div id="prerequisite-notes" class="notice" hidden></div>
+          <div class="actions stacked"><button id="open-course" class="primary" type="button">開啟組合課程 →</button><button id="export-course" type="button">下載課程設定 JSON</button><label class="file-button" for="import-course">匯入課程設定 JSON</label><input id="import-course" type="file" accept=".json,application/json" hidden></div>
+          <p class="small">草稿只存於此瀏覽器。下載 JSON 可留存或給其他教師匯入；JSON 記錄名稱與選課順序，教材檔案由同一套 V-2 網站提供。</p>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <footer class="container composer-footer">12 個 Scratch 單元模組 · 建議節數可依學生程度調整 · <a href="https://github.com/byte-core-su/unforte_115#readme" target="_blank" rel="noopener">README 與主題改編指令（GitHub）</a></footer>
+</body>
+</html>

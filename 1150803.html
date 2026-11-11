@@ -3,6 +3,9 @@
 <head>
     <script src="learning-guides.js" defer></script>
     <script src="adaptive-practice.js" defer></script>
+    <link rel="stylesheet" href="lesson-route.css">
+    <script src="lesson-route.js" defer></script>
+    <script src="lesson-routes.js" defer></script>
     <meta charset="UTF-8">
     <script src="course-scenarios.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,12 +13,13 @@
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@1.72.0"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #F8F9FA; color: #333333; }
         .slide-up-fade { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
         @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        #energy-trace { scroll-margin-top: 48px; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
@@ -479,7 +483,13 @@
                 document.getElementById('sim-repeat-count').textContent = simData.length;
                 simReset();
             });
-            document.getElementById('sim-data-new').click();
+            const example = new URLSearchParams(window.location.search).get('example');
+            if (example === 'multiple' || example === 'empty') {
+                document.getElementById('sim-data-input').value = example === 'multiple' ? '12,18,30' : '';
+                applyButton.click();
+            } else {
+                document.getElementById('sim-data-new').click();
+            }
         }
 
         function renderSimulatorHTML() {
@@ -766,7 +776,7 @@
                             </section>
 
                             <!-- ⭐ 互動模擬器 -->
-                            <section>
+                            <section id="energy-trace">
                                 <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-emerald-100 text-emerald-600 p-1.5 rounded-lg"><i data-lucide="play" class="w-5 h-5"></i></span>⚡ 能源加總模擬器 (陣列特訓)</h3>
                                 ${renderSimulatorHTML()}
                             </section>
@@ -954,6 +964,9 @@
             
             // 初始化圖示
             lucide.createIcons();
+            if (['#energy-trace', '#adaptive-practice'].includes(window.location.hash)) {
+                document.getElementById(window.location.hash.slice(1))?.scrollIntoView({ behavior: 'instant' });
+            }
         };
     </script>
 </body>

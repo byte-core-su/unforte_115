@@ -173,3 +173,6 @@ th { background:#f4f6fb; position:sticky; top:0; }
     .save-summary button { font-size:.75rem; padding:6px 8px; }
 }
 @media(prefers-reduced-motion:reduce) { .slot,.command-button,.card-icon { animation:none!important; transition:none!important; } * { scroll-behavior:auto; } }
+
+/* 單一路線：尚未開啟的關卡 */
+.level-button.is-locked { opacity:.45; cursor:not-allowed; }

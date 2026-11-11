@@ -1,0 +1,26 @@
+{
+  "id": "g8-06",
+  "grade": 8,
+  "lesson": 6,
+  "title": "自訂積木與清單專題",
+  "entry": "1150806.html",
+  "periods": 2,
+  "goal": "把建立、洗牌、分配及逐回合比大小拆成自訂積木，再驗證清單資料規則。",
+  "evidence": "含四個自訂積木的作品、清單流程圖、三組測試及一次修正紀錄。",
+  "priorKnowledge": "Scratch 事件、變數與迴圈基礎",
+  "prerequisites": [
+    "g8-01",
+    "g8-04",
+    "g8-05"
+  ],
+  "tags": [
+    "自訂積木",
+    "模組化",
+    "邊界測試"
+  ],
+  "resources": {
+    "lessonPlan": "lesson-plan-grade-8.html#section-3",
+    "records": "STUDENT_RECORDS.md",
+    "scratchArchive": "11508.zip"
+  }
+}

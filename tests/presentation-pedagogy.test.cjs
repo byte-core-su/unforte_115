@@ -25,7 +25,7 @@ test('detailed task counts and calculation definitions remain in the speaker app
 
 test('presentation states both course progressions on the slides, not only in notes', () => {
   assert.match(visible(4), /七年級｜結構化程式與互動作品/);
-  for (const topic of ['讀懂積木', '預測結果', '迴圈', '變數', '多組資料測試', '自訂積木與參數為進階延伸', '教師可收取的成果']) {
+  for (const topic of ['讀懂積木', '預測結果', '迴圈', '變數', '多組資料測試', '自訂積木與參數為進階延伸', '六個單元與學習成果']) {
     assert.ok(visible(4).includes(topic), topic);
   }
   assert.match(visible(5), /八年級｜資料結構與演算法應用/);
@@ -41,7 +41,7 @@ test('activity rhythm and interactive examples connect operations with reasoning
   for (const phase of ['情境任務與目標', '概念示範與引導', '獨立任務與驗證', '成果證據', '離堂檢核']) {
     assert.ok(visible(8).includes(phase), phase);
   }
-  assert.match(visible(9), /一次只改次數或轉角/);
+  assert.match(visible(9), /只改轉角，試跑後說明如何修正/);
   for (const stage of ['執行前', '執行中', '執行後']) assert.ok(visible(10).includes(stage));
   assert.match(visible(10), /空清單/);
   assert.match(visible(11), /同題重試/);
@@ -74,10 +74,10 @@ test('package resources, classroom use and assessment examples support teacher a
   for (const stage of ['課前準備', '第一節引導', '第一節操作', '第二節延伸', '收取與回饋']) {
     assert.ok(visible(7).includes(stage), stage);
   }
-  assert.match(visible(9), /畫三角形，應轉幾度/);
-  assert.match(visible(10), /第二輪累計是 18 還是 30/);
+  assert.match(visible(9), /畫三角形時，哪一組指令在重複/);
+  assert.match(visible(10), /第二輪讀到多少？累計又是多少/);
   assert.match(visible(11), /部分完成的追蹤表/);
   assert.match(visible(12), /教師填寫示例/);
   assert.match(visible(12), /遷移與改善/);
-  assert.match(visible(14), /先用紙卡與追蹤表預測/);
+  assert.match(visible(14).replace(/<[^>]+>/g, ''), /先用紙卡與追蹤表預測/);
 });

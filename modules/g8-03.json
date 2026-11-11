@@ -1,0 +1,24 @@
+{
+  "id": "g8-03",
+  "grade": 8,
+  "lesson": 3,
+  "title": "清單統計：總和與平均",
+  "entry": "1150803.html",
+  "periods": 2,
+  "goal": "使用累加器與清單走訪，計算總和與平均，並理解每一步的中間值。",
+  "evidence": "用正常資料、單筆資料與空清單三種案例測試，說明哪些情況需要額外處理。",
+  "priorKnowledge": "Scratch 事件、變數與迴圈基礎",
+  "prerequisites": [
+    "g8-01"
+  ],
+  "tags": [
+    "累加",
+    "平均",
+    "空清單"
+  ],
+  "resources": {
+    "lessonPlan": "lesson-plan-grade-8.html#section-3",
+    "records": "STUDENT_RECORDS.md",
+    "scratchArchive": "11508.zip"
+  }
+}

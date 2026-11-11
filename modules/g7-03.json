@@ -1,0 +1,24 @@
+{
+  "id": "g7-03",
+  "grade": 7,
+  "lesson": 3,
+  "title": "迴圈多邊形",
+  "entry": "1150703.html",
+  "periods": 2,
+  "goal": "利用重複執行與轉角規律，畫出可預測的正多邊形。",
+  "evidence": "至少完成一個三角形與一個五邊形，並在作品中標註「重複次數」和「轉向角度」。",
+  "priorKnowledge": "基本電腦操作與 Scratch 介面",
+  "prerequisites": [
+    "g7-02"
+  ],
+  "tags": [
+    "迴圈",
+    "外角",
+    "繪圖"
+  ],
+  "resources": {
+    "lessonPlan": "lesson-plan-grade-7.html#section-3",
+    "records": "STUDENT_RECORDS.md",
+    "scratchArchive": "11507.zip"
+  }
+}

@@ -17,7 +17,7 @@ function loadLesson(filename) {
     });
     return elements.get(id);
   };
-  const context = { document: { getElementById: get, addEventListener() {} }, window: { CourseScenarios }, Math, clearInterval() {} };
+  const context = { document: { getElementById: get, addEventListener() {} }, window: { CourseScenarios, addEventListener() {} }, Math, clearInterval() {} };
   scripts.forEach(script => vm.runInNewContext(script, context, { filename }));
   return { context, get };
 }

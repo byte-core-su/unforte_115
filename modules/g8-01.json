@@ -1,0 +1,22 @@
+{
+  "id": "g8-01",
+  "grade": 8,
+  "lesson": 1,
+  "title": "清單基本操作與搜尋",
+  "entry": "1150801.html",
+  "periods": 2,
+  "goal": "掌握新增、插入、替換、刪除、讀取與長度等操作，並正確理解索引位置。",
+  "evidence": "四種清單操作對照，以及找到／找不到各一筆搜尋紀錄。",
+  "priorKnowledge": "Scratch 事件、變數與迴圈基礎",
+  "prerequisites": [],
+  "tags": [
+    "清單",
+    "索引",
+    "循序搜尋"
+  ],
+  "resources": {
+    "lessonPlan": "lesson-plan-grade-8.html#section-3",
+    "records": "STUDENT_RECORDS.md",
+    "scratchArchive": "11508.zip"
+  }
+}

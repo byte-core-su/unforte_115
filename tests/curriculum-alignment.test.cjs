@@ -64,11 +64,11 @@ test('presentation uses formal prefixes and consistent partial ethics coverage',
   const deck = read('presentations/20261110.html');
   const slide = deck.match(/<section class="slide" aria-labelledby="title-13">([\s\S]*?)<\/section>/)?.[1];
   assert.ok(slide);
-  const table = slide.match(/<tbody>([\s\S]*?)<\/tbody>/)?.[1];
-  assert.match(table, /資 A-IV-1、資 P-IV-1、資 P-IV-2/);
-  assert.match(table, /資 A-IV-2、資 A-IV-3、資 P-IV-3/);
-  assert.match(table, /資 H-IV-1／2／3、資 H-IV-5（部分）/);
-  assert.doesNotMatch(table, /H-IV-4/);
+  const cards = slide.match(/<ul[^>]*aria-label="課綱對應與學習成果"[^>]*>([\s\S]*?)<\/ul>/)?.[1];
+  assert.match(cards, /資 A-IV-1、資 P-IV-1、資 P-IV-2/);
+  assert.match(cards, /資 A-IV-2、資 A-IV-3、資 P-IV-3/);
+  assert.match(cards, /資 H-IV-1／2／3、資 H-IV-5（部分）/);
+  assert.doesNotMatch(cards, /H-IV-4/);
   assert.match(slide, /運 t-IV-4、運 p-IV-1、運 a-IV-2/);
   assert.match(deck, /官方課綱：學習表現（印刷第7頁）/);
   assert.equal((deck.match(/class="slide-page"/g) || []).length, 16);

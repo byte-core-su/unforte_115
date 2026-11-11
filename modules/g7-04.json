@@ -1,0 +1,25 @@
+{
+  "id": "g7-04",
+  "grade": 7,
+  "lesson": 4,
+  "title": "變數螺旋圖騰",
+  "entry": "1150704.html",
+  "periods": 2,
+  "goal": "理解變數是可記錄、可更新的資料，並用它控制螺旋圖形的邊長或角度。",
+  "evidence": "交出一張變數追蹤表與一個螺旋作品，並說明一次「放錯位置」造成的差異。",
+  "priorKnowledge": "基本電腦操作與 Scratch 介面",
+  "prerequisites": [
+    "g7-02",
+    "g7-03"
+  ],
+  "tags": [
+    "變數",
+    "追蹤",
+    "螺旋"
+  ],
+  "resources": {
+    "lessonPlan": "lesson-plan-grade-7.html#section-3",
+    "records": "STUDENT_RECORDS.md",
+    "scratchArchive": "11507.zip"
+  }
+}

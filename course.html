@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>我的組合課程｜V-2</title>
+  <link rel="stylesheet" href="course-composer.css">
+  <script type="module" src="course-viewer.mjs"></script>
+</head>
+<body>
+  <a class="skip-link" href="#course-outline">跳到課程目錄</a>
+  <header class="composer-header compact"><div class="container"><a id="edit-course" href="course-builder.html" class="back-link">← 編輯課程組合</a><p class="eyebrow">V-2 · 我的組合課程</p><h1 id="course-name">載入課程中…</h1><p id="course-description"></p><div class="actions"><button id="copy-link" type="button" disabled>複製課程連結</button><button id="download-config" type="button" disabled>下載課程設定 JSON</button><a href="index.html">完整課程地圖</a></div></div></header>
+  <main class="container viewer-main">
+    <p id="status" class="notice" role="status" aria-live="polite">正在載入課程…</p>
+    <script>
+      // Classic inline script: it still runs when the browser blocks module scripts on file://.
+      if (location.protocol === 'file:') {
+        var previewUrl = 'http://127.0.0.1:4173/course.html' + location.hash;
+        var statusBox = document.getElementById('status');
+        statusBox.innerHTML = '<strong>組合課程需要用網址開啟。</strong>你現在是直接從資料夾開啟檔案，瀏覽器會擋下課程功能。<br>'
+          + '做法：在含有 <code>package.json</code> 的專案資料夾開啟終端機，輸入 <code>node scripts/preview.cjs</code> 並保持視窗開著，再<a id="preview-course-link">用本機預覽開啟這門課</a>。<br>'
+          + '也可以回到<a href="index.html">首頁課程地圖</a>直接點單元上課。';
+        document.getElementById('preview-course-link').href = previewUrl;
+      }
+    </script>
+    <noscript><p class="notice">請啟用 JavaScript 使用組合課程。</p></noscript>
+    <section id="share-fallback" class="panel" hidden><label for="share-url">複製下方完整網址即可分享<input id="share-url" readonly></label></section>
+    <div id="viewer" hidden>
+      <section id="course-outline" class="panel" aria-labelledby="outline-title"><h2 id="outline-title">這門課的學習地圖</h2><ol id="course-modules" class="course-outline"></ol><div id="prerequisite-notes" class="notice" hidden></div></section>
+      <section class="lesson-workspace" aria-labelledby="current-title"><div class="lesson-toolbar"><div><p id="current-position" class="eyebrow"></p><h2 id="current-title"></h2></div><div class="actions"><button id="previous-module" type="button">← 上一個選課單元</button><button id="next-module" type="button">下一個選課單元 →</button><a id="standalone-module" target="_blank" rel="noopener">另開完整單元 ↗</a></div></div><p class="small">請使用上方按鈕依這份課程的順序前進。教材內部分導覽會集中至上方；另開完整單元可使用原版導覽。</p><iframe id="lesson-frame" title="目前單元互動教材" allow="autoplay; fullscreen" referrerpolicy="same-origin"></iframe></section>
+    </div>
+  </main>
+</body>
+</html>

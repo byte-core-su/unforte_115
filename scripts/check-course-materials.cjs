@@ -147,7 +147,8 @@ function inspectMaterials({ root = path.resolve(__dirname, '..'), registry = mat
         const start = planHtml.indexOf(`id="${lessonPlan.sectionId}"`);
         const end = planHtml.indexOf(`id="${lessonPlan.assessmentId}"`);
         check(source.split(/\r?\n/).includes(`### ${lessonPlan.heading}`), '教案 Markdown 缺少指定單元標題');
-        check(start !== -1 && end > start && planHtml.slice(start, end).includes(`<h3>${lessonPlan.heading}</h3>`), 'HTML 教案與指定單元或評量段落不符');
+        const headingTag = new RegExp(`<h3(?: id="lesson-[1-6]")?>${lessonPlan.heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}</h3>`);
+        check(start !== -1 && end > start && headingTag.test(planHtml.slice(start, end)), 'HTML 教案與指定單元或評量段落不符');
         check(readText(record.file).split(/\r?\n/).includes(`## ${record.heading}`), '學習紀錄表缺少指定段落');
 
         const deck = readText(presentation.file);

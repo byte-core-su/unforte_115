@@ -130,17 +130,28 @@
 
   const page = window.location.pathname.split('/').pop() || 'index.html';
   const guide = guides[page];
+  // Shared with lesson-route.js, which turns the exit task and evidence into route steps.
+  if (guide) window.LearningGuide = { page, ...guide };
   const main = document.querySelector('main');
   if (!guide || !main) return;
 
   const section = document.createElement('section');
+  section.id = 'learning-guide';
   const gradeClass = page.startsWith('11508') ? 'site-course--g8' : 'site-course--g7';
   document.body.classList.add('site-course', gradeClass);
   section.className = 'learning-guide';
   section.setAttribute('aria-label', '本課學習導航');
+  // Teachers land on student-facing pages; give them a direct way to the matching lesson plan.
+  const planGrade = page.startsWith('11508') ? 8 : 7;
+  const lessonNumber = Number(page.slice(6, 7));
+  const planHref = `lesson-plan-grade-${planGrade}.html${lessonNumber ? `#lesson-${lessonNumber}` : ''}`;
+  const planLabel = lessonNumber ? '教師備課：本課教案' : `教師備課：${planGrade === 7 ? '七' : '八'}年級教案`;
   section.innerHTML = `
     <div class="learning-guide__card">
-      <span class="learning-guide__tag">${escapeHtml(guide.grade)}｜學習導航</span>
+      <div class="learning-guide__top">
+        <span class="learning-guide__tag">${escapeHtml(guide.grade)}｜學習導航</span>
+        <a class="learning-guide__teacher" href="${planHref}" target="_blank" rel="noopener">${planLabel} ↗</a>
+      </div>
       <h2>${escapeHtml(guide.title)}</h2>
       <p class="learning-guide__goal"><strong>本課目標：</strong>${escapeHtml(guide.goal)}</p>
       <div class="learning-guide__grid">
@@ -148,7 +159,21 @@
         <div class="learning-guide__item"><strong>完成證據</strong>${escapeHtml(guide.evidence)}</div>
       </div>
       <p class="learning-guide__check">離堂檢核：${escapeHtml(guide.check)}</p>
-      ${guide.exit ? `<p class="learning-guide__exit"><strong>本課離堂任務：</strong>${escapeHtml(guide.exit)}請記下自己的預測、結果與修正；網頁答對或闖關成功不等於正式成績。<a href="#adaptive-practice">前往本課自適應練習 →</a></p>` : ''}
+      ${lessonNumber ? '' : `
+        <nav class="learning-guide__units" aria-label="本課程單元">
+          <strong>直接進入單元</strong>
+          <ol>${active.grades[planGrade].cards.map((card, index) => `<li><a href="1150${planGrade}0${index + 1}.html"><span>${index + 1}</span>${escapeHtml(card.title)}</a></li>`).join('')}</ol>
+        </nav>
+      `}
+      ${guide.exit ? `
+        <p class="learning-guide__exit">
+          <strong>本課離堂任務：</strong>${escapeHtml(guide.exit)}
+          請在教師發的線上作業副本填寫預測、結果與修正，完成後回班級平台繳交。
+          網頁答對或闖關成功不等於正式成績。
+          <a href="student-records.html" target="_blank" rel="noopener">查看學習紀錄模板 ↗</a>
+          <a href="#adaptive-practice">前往本課自適應練習 →</a>
+        </p>
+      ` : ''}
     </div>
   `;
   main.parentNode.insertBefore(section, main);

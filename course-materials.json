@@ -30,7 +30,7 @@
       "presentation": {
         "file": "presentations/20261110.html",
         "references": [
-          { "fragment": "title-4", "kind": "slide", "text": "6 防禦網專題" },
+          { "fragment": "title-4", "kind": "slide", "text": "防禦網專題" },
           { "fragment": "ratio-grade7", "kind": "table", "text": "6 防禦網專題" }
         ]
       }
@@ -67,7 +67,7 @@
       "presentation": {
         "file": "presentations/20261110.html",
         "references": [
-          { "fragment": "title-5", "kind": "slide", "text": "6 對決專題" },
+          { "fragment": "title-5", "kind": "slide", "text": "對決專題" },
           { "fragment": "ratio-grade8", "kind": "table", "text": "6 對決專題" }
         ]
       }

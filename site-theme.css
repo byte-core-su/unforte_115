@@ -85,6 +85,72 @@ button { transition: transform .18s ease, box-shadow .18s ease, background-color
   letter-spacing: .08em;
 }
 
+.learning-guide__top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: .4rem 1rem;
+}
+
+.learning-guide__teacher {
+  margin-bottom: .6rem;
+  border: 1px solid var(--grade-border);
+  border-radius: .6rem;
+  background: #fff;
+  padding: .25rem .65rem;
+  color: #475569;
+  font-size: .8rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.learning-guide__teacher:hover,
+.learning-guide__teacher:focus-visible { color: var(--grade-primary); border-color: var(--grade-primary); }
+
+.learning-guide__units {
+  margin-top: 1rem;
+  border-top: 1px solid var(--grade-border);
+  padding-top: .9rem;
+}
+
+.learning-guide__units strong { color: var(--site-text); font-size: .95rem; }
+
+.learning-guide__units ol {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  gap: .5rem;
+  margin: .6rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.learning-guide__units a {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  height: 100%;
+  border: 1px solid var(--grade-border);
+  border-radius: .6rem;
+  background: #fff;
+  padding: .55rem .75rem;
+  color: var(--site-text);
+  font-size: .92rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.learning-guide__units a:hover,
+.learning-guide__units a:focus-visible { border-color: var(--grade-primary); color: var(--grade-primary); }
+
+.learning-guide__units a span {
+  color: var(--grade-primary);
+  font-size: 1.15rem;
+  font-weight: 800;
+  min-width: 1.2rem;
+  text-align: center;
+}
+
 .learning-guide h2 {
   margin: 0 0 .55rem;
   color: var(--site-text);

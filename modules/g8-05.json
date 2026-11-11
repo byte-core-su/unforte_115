@@ -1,0 +1,25 @@
+{
+  "id": "g8-05",
+  "grade": 8,
+  "lesson": 5,
+  "title": "洗牌與相鄰比較排序",
+  "entry": "1150805.html",
+  "periods": 2,
+  "goal": "理解洗牌讓順序隨機，排序依比較規則排列；兩者都不能遺漏或重複資料。",
+  "evidence": "一次洗牌紀錄、一張排序追蹤表與資料項目不變的驗證。",
+  "priorKnowledge": "Scratch 事件、變數與迴圈基礎",
+  "prerequisites": [
+    "g8-01",
+    "g8-04"
+  ],
+  "tags": [
+    "洗牌",
+    "排序",
+    "停止條件"
+  ],
+  "resources": {
+    "lessonPlan": "lesson-plan-grade-8.html#section-3",
+    "records": "STUDENT_RECORDS.md",
+    "scratchArchive": "11508.zip"
+  }
+}

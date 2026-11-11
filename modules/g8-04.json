@@ -1,0 +1,24 @@
+{
+  "id": "g8-04",
+  "grade": 8,
+  "lesson": 4,
+  "title": "不重複的隨機抽取",
+  "entry": "1150804.html",
+  "periods": 2,
+  "goal": "以「候選清單」與「已選清單」控制隨機抽取，確保同一位同學不會重複被選到。",
+  "evidence": "完成四次不重複抽取，並用資料表證明候選數量每次都少一人。",
+  "priorKnowledge": "Scratch 事件、變數與迴圈基礎",
+  "prerequisites": [
+    "g8-01"
+  ],
+  "tags": [
+    "隨機",
+    "候選清單",
+    "不重複"
+  ],
+  "resources": {
+    "lessonPlan": "lesson-plan-grade-8.html#section-3",
+    "records": "STUDENT_RECORDS.md",
+    "scratchArchive": "11508.zip"
+  }
+}

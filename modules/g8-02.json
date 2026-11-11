@@ -1,0 +1,24 @@
+{
+  "id": "g8-02",
+  "grade": 8,
+  "lesson": 2,
+  "title": "音符清單與索引走訪",
+  "entry": "1150802.html",
+  "periods": 2,
+  "goal": "理解清單可儲存一連串資料，程式必須依索引順序讀取，才能播放正確旋律。",
+  "evidence": "短旋律、索引對照表及一則錄音或素材授權的判斷理由。",
+  "priorKnowledge": "Scratch 事件、變數與迴圈基礎",
+  "prerequisites": [
+    "g8-01"
+  ],
+  "tags": [
+    "清單走訪",
+    "音樂",
+    "素材授權"
+  ],
+  "resources": {
+    "lessonPlan": "lesson-plan-grade-8.html#section-3",
+    "records": "STUDENT_RECORDS.md",
+    "scratchArchive": "11508.zip"
+  }
+}

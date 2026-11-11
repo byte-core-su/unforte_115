@@ -21,6 +21,10 @@
         commit: plan => applyPlan(plan),
         cancelled: () => status('未放入圖卡，原指令仍保留。')
     });
+    // 單一路線：第 1 關之後，要過前一關才開啟下一關。教師可在網址加 ?route=all 全部開啟。
+    const teacherView = /[?&]route=all\b/.test(location.search);
+    function levelOpen(item) { const index = levels.indexOf(item); return teacherView || index <= 0 || Boolean(record.levels[levels[index - 1].id]?.completed) || Boolean(record.levels[item.id]?.completed); }
+    function firstOpenUnfinished() { return levels.find(item => levelOpen(item) && !record.levels[item.id]?.completed) || [...levels].reverse().find(levelOpen); }
     function entry() { return record.levels[level.id] ||= { programs: { main: [], p1: [], p2: [] }, attempts: 0, elapsedMs: 0, completed: false, bestCommands: null, bestProgram: null, completedAt: null, lastRun: null }; }
     function collectTime() { const now = performance.now(); if (!document.hidden) { const elapsed = Math.max(0, Math.round(now - checkpoint)); sessionMs += elapsed; entry().elapsedMs += elapsed; } checkpoint = now; }
     const duration = ms => { const seconds = Math.floor(ms / 1000); return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`; };
@@ -36,8 +40,8 @@
             const section = document.createElement('section'); section.className = 'level-group'; const heading = document.createElement('h3'); heading.textContent = `${index + 1} · ${name}`; section.append(heading);
             const buttons = document.createElement('div'); buttons.className = 'level-buttons';
             levels.filter(item => item.group === index + 1).forEach(item => {
-                const button = document.createElement('button'); button.type = 'button'; button.className = 'level-button'; button.textContent = `${item.number}${record.levels[item.id]?.completed ? ' ✓' : ''}`;
-                button.title = `${item.id} ${item.title}`; button.setAttribute('aria-label', `${button.title}${record.levels[item.id]?.completed ? '，已完成' : ''}`); if (item.id === level.id) button.setAttribute('aria-current', 'true');
+                const open = levelOpen(item), button = document.createElement('button'); button.type = 'button'; button.className = `level-button${open ? '' : ' is-locked'}`; button.textContent = `${item.number}${record.levels[item.id]?.completed ? ' ✓' : open ? '' : ' 🔒'}`;
+                button.title = open ? `${item.id} ${item.title}` : `${item.id} ${item.title}：過前一關後開啟`; button.setAttribute('aria-label', `${button.title}${record.levels[item.id]?.completed ? '，已完成' : ''}`); if (item.id === level.id) button.setAttribute('aria-current', 'true'); button.disabled = !open;
                 button.addEventListener('click', () => selectLevel(item.id)); buttons.append(button);
             }); section.append(buttons); fragment.append(section);
         }); $('level-list').replaceChildren(fragment); $('total-complete').textContent = `${levels.filter(item => record.levels[item.id]?.completed).length} / 20`;
@@ -83,7 +87,7 @@
     function updateRecord() { const item = entry(); $('level-complete').textContent = item.completed ? '✓ 已完成' : '尚未完成'; $('attempt-count').textContent = `嘗試 ${item.attempts} 次`; $('best-count').textContent = `最佳 ${item.bestCommands ?? '—'}${item.bestCommands ? ' 個' : ''}`; $('next-level').hidden = !item.completed; $('next-level').disabled = level === levels[levels.length - 1]; $('next-level').textContent = level === levels[levels.length - 1] ? '已到最後一關' : '前往下一關'; }
     function updateBoard() { const snapshot = machine.snapshot(); $('light-count').textContent = `已點亮 ${snapshot.lit.length} / ${level.goals.length}`; $('step-count').textContent = `執行 ${snapshot.steps} 步`; $('robot-position').textContent = `第 ${snapshot.robot.row + 1} 列、${snapshot.robot.col + 1} 欄`; $('robot-facing').textContent = `朝${['東', '南', '西', '北'][snapshot.robot.direction]}`; }
     function selectLevel(id) {
-        cardDrag.cancel(); collectTime(); stop(); const next = levels.find(item => item.id === id); if (!next) return; level = next; record.currentLevel = id; selected = { section: 'main', index: 0 };
+        cardDrag.cancel(); collectTime(); stop(); let next = levels.find(item => item.id === id); if (!next) return; if (!levelOpen(next)) next = firstOpenUnfinished(); level = next; record.currentLevel = id; selected = { section: 'main', index: 0 };
         $('level-group').textContent = `${groups[level.group - 1]} · ${level.id}`; $('level-title').textContent = level.title; $('level-tip').textContent = level.group === 1 ? '排列動作，點亮所有藍色目標。橘色箭頭是機器人的前方。' : level.group === 2 ? '把重複的動作放入 P1 或 P2，在主程式中呼叫。' : '主程式只有一格。讓程序呼叫自己，重複動作直到所有燈亮起。';
         $('board-description').textContent = level.board.map((row, index) => `第 ${index + 1} 列：${row.map((height, col) => height === null ? '空洞' : `${height} 層${level.goals.some(([r, c]) => r === index && c === col) ? '目標' : ''}`).join('、')}`).join('；');
         renderNav(); renderPalette(); updateRecord(); reset(entry().completed ? '這關已完成，仍可修改程式再練習。' : '拖曳或點選圖卡，排好後執行程式。'); save();
@@ -97,6 +101,13 @@
         if (plan) { applyPlan(plan); cardDrag.animateMoves(before, plan.moves); }
     }
     function beginAttempt() { if (!['ready', 'running'].includes(machine.status)) reset(); if (machine.status === 'ready') { entry().attempts++; updateRecord(); save(); } }
+    // 分層提示：同一關試了 3 次還沒過，打開關卡提示；6 次後再給拆解方法。
+    function stuckHint() {
+        const item = entry(); if (item.completed) return '';
+        if (item.attempts >= 6) return '提示：先只排前兩、三個動作，按「單步」確認方向和位置對了，再往下排。';
+        if (item.attempts >= 3) { const tip = $('level-tip').closest('details'); if (tip) tip.open = true; return '試了好幾次還沒過關：看看上方「關卡提示」，或改用「單步」找出機器人第一個走錯的地方。'; }
+        return '';
+    }
     function executeStep() {
         const before = machine.robot.direction;
         const snapshot = machine.step(); renderer.set(level, snapshot, true, Math.min(650, Number($('run-speed').value) * .65)); updateBoard(); renderPrograms();
@@ -104,7 +115,7 @@
             stop(); const item = entry(), count = Object.values(item.programs).reduce((sum, list) => sum + list.length, 0); if (!item.completed) item.completedAt = new Date().toISOString(); item.completed = true;
             if (item.bestCommands === null || count < item.bestCommands) { item.bestCommands = count; item.bestProgram = copyPrograms(item.programs); } item.lastRun = { status: 'won', steps: snapshot.steps }; collectTime(); save(); renderNav(); updateRecord(); status(`過關！${level.goals.length} 個目標全部亮起，共執行 ${snapshot.steps} 步。`, 'won');
         } else if (snapshot.status === 'ended' || snapshot.status === 'limit') {
-            stop(); entry().lastRun = { status: snapshot.status, steps: snapshot.steps }; save(); status(snapshot.status === 'limit' ? '已執行 10,000 步仍未完成，程式已停止。請檢查迴圈。' : `程式執行完畢，還有 ${level.goals.length - snapshot.lit.length} 個目標未點亮。`, 'warning');
+            stop(); entry().lastRun = { status: snapshot.status, steps: snapshot.steps }; save(); status((snapshot.status === 'limit' ? '已執行 10,000 步仍未完成，程式已停止。請檢查迴圈。' : `程式執行完畢，還有 ${level.goals.length - snapshot.lit.length} 個目標未點亮。`) + (stuckHint() ? ` ${stuckHint()}` : ''), 'warning');
         } else {
             const turn = ['left', 'right'].includes(snapshot.last.command) ? `（朝${['東', '南', '西', '北'][before]} → 朝${['東', '南', '西', '北'][snapshot.robot.direction]}）` : '';
             status(snapshot.last?.reason || `執行 ${snapshot.last.section === 'main' ? '主程式' : snapshot.last.section.toUpperCase()} 第 ${snapshot.last.index + 1} 格：${actions[snapshot.last.command][1]}${turn}`);
@@ -140,4 +151,5 @@
     window.addEventListener('pagehide', () => { collectTime(); save(); }); let pulses = 0; setInterval(() => { collectTime(); $('session-time').textContent = duration(sessionMs); if (++pulses % 5 === 0) save(); }, 1000);
     $('session-date').textContent = new Intl.DateTimeFormat('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' }).format(new Date());
     window.LightbotLearning = { setStudent, getStudent: () => ({ ...student }), getProgress: () => exportData().progress, exportData }; renderStudent(); selectLevel(record.currentLevel);
+    if (student.source === '示範學生') status('開始前，先按上方「設定學生資料」填入自己的姓名、學號和班級，紀錄才會是你的。接著從第 1 關開始，過關才會開啟下一關。');
 })();

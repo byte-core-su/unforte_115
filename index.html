@@ -4,74 +4,126 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="115 學年度資訊科技課程教材，提供七、八年級 Scratch 互動學習資源。">
-    <title>資訊科技課程教材</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest" defer></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = { theme: { extend: { fontFamily: { sans: ['"Noto Sans TC"', 'sans-serif'] } } } };
-        window.addEventListener('DOMContentLoaded', () => window.lucide?.createIcons());
-    </script>
+    <title>資訊科技課程教材｜V-2</title>
     <link rel="stylesheet" href="site-theme.css">
+    <link rel="stylesheet" href="course-map.css">
+    <script src="course-home.js" defer></script>
 </head>
-<body class="site-home flex min-h-screen flex-col bg-slate-50 font-sans text-slate-800">
-    <header class="overflow-hidden bg-gradient-to-br from-indigo-700 via-blue-600 to-cyan-500 px-6 pb-24 pt-20 text-white">
-        <div class="mx-auto max-w-5xl text-center">
-            <p class="mb-5 inline-flex rounded-full border border-white/30 bg-white/15 px-4 py-2 text-sm font-bold">115 學年度・資訊科技</p>
-            <h1 class="text-4xl font-extrabold tracking-tight md:text-5xl">資訊科技課程教材</h1>
-            <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-blue-100">以 Scratch 為核心，提供七、八年級的互動式程式設計教材、任務練習與教學資源。</p>
+<body class="site-home">
+    <header class="home-header">
+        <div class="home-wrap home-header-inner">
+            <div>
+                <h1>資訊科技課程教材</h1>
+                <p>115 學年度 V-2｜七、八年級 Scratch 課程、CodeGame 指令解謎與 Python Lab</p>
+            </div>
+            <nav class="home-nav" aria-label="頁面導覽">
+                <a href="#course-map">選擇課程</a>
+                <a href="#teacher-resources">教師備課</a>
+                <a href="#customize-course">自訂課程</a>
+            </nav>
         </div>
     </header>
 
-    <main class="relative z-10 mx-auto -mt-10 mb-16 w-full max-w-5xl flex-grow space-y-12 px-6">
-        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6" aria-label="教材導覽">
-            <p class="text-sm font-bold tracking-wide text-indigo-600">學習與教學入口</p>
-            <h2 class="mt-1 text-2xl font-bold text-slate-800">選擇教材專區</h2>
-            <div class="mt-5 grid gap-3 md:grid-cols-3">
-                <a href="#grade-7" class="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-4 transition hover:bg-indigo-100">
-                    <span class="block text-xs font-bold text-indigo-600">第一區</span><span class="mt-1 block font-bold">七年級課程</span><span class="mt-1 block text-sm text-slate-500">程式結構、迴圈、變數與專題創作</span>
-                </a>
-                <a href="#grade-8" class="rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-4 transition hover:bg-cyan-100">
-                    <span class="block text-xs font-bold text-cyan-700">第二區</span><span class="mt-1 block font-bold">八年級課程</span><span class="mt-1 block text-sm text-slate-500">清單、資料處理、演算法與遊戲應用</span>
-                </a>
-                <a href="#teacher-resources" class="rounded-xl border border-violet-200 bg-violet-50 px-4 py-4 transition hover:bg-violet-100">
-                    <span class="block text-xs font-bold text-violet-700">教師資源</span><span class="mt-1 block font-bold">Scratch Educators</span><span class="mt-1 block text-sm text-slate-500">教師帳戶與班級管理操作圖解</span>
-                </a>
+    <main class="home-wrap home-main">
+        <section id="course-map" class="curriculum-map" aria-labelledby="course-map-title">
+            <div class="section-head">
+                <h2 id="course-map-title">選擇課程</h2>
+                <p>點課程進入，再選單元開始上課。</p>
+            </div>
+            <div class="course-grid">
+                <article class="curriculum-grade curriculum-grade-7" aria-labelledby="map-grade-7-title">
+                    <a class="course-link" href="1150700.html">
+                        <span class="course-kind">Scratch 七年級</span>
+                        <h3 id="map-grade-7-title">程式思維與幾何創作</h3>
+                        <p>從讀懂積木、程式三大結構，到迴圈、變數與幾何創作，最後完成參數測試與資料應用專題。</p>
+                        <span class="course-meta">6 單元，建議 12 節</span>
+                    </a>
+                </article>
+                <article class="curriculum-grade curriculum-grade-8" aria-labelledby="map-grade-8-title">
+                    <a class="course-link" href="1150800.html">
+                        <span class="course-kind">Scratch 八年級</span>
+                        <h3 id="map-grade-8-title">清單與資料演算法</h3>
+                        <p>以清單為主軸：搜尋、音符走訪、總和與平均、不重複抽取、洗牌排序，最後用自訂積木完成模組化專題。</p>
+                        <span class="course-meta">6 單元，建議 12 節</span>
+                    </a>
+                </article>
+                <article class="course-entry course-entry-codegame" aria-labelledby="codegame-title">
+                    <a class="course-link" href="codegame/index.html">
+                        <span class="course-kind">指令解謎</span>
+                        <h3 id="codegame-title">CodeGame 點亮任務</h3>
+                        <p>機器人指令解謎，練習循序、程序（P1、P2）與遞迴。學生草稿與通關紀錄保存在這台電腦的瀏覽器。</p>
+                        <span class="course-meta">20 關</span>
+                    </a>
+                </article>
+                <article class="course-entry course-entry-python" aria-labelledby="python-title">
+                    <a class="course-link" href="pythonlab/index.html">
+                        <span class="course-kind">文字式程式</span>
+                        <h3 id="python-title">Python Lab</h3>
+                        <p>Python 引導式課程，從輸出、變數到清單、函式與字典，在網頁內直接執行程式。需要連網。</p>
+                        <span class="course-meta">12 單元</span>
+                        <span class="course-note" data-local-help hidden>從資料夾開啟時無法執行，請先啟動本機預覽（<code>node scripts/preview.cjs</code>）。</span>
+                    </a>
+                </article>
             </div>
         </section>
 
-        <section class="grid gap-6 md:grid-cols-2">
-            <article id="grade-7" class="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
-                <a href="1150700.html" class="group block" aria-label="進入七年級課程">
-                    <div class="flex items-start justify-between"><span class="flex h-14 w-14 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600"><i data-lucide="book-open" class="h-7 w-7"></i></span><span class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">基礎篇</span></div>
-                    <h2 class="mt-6 text-xl font-bold transition group-hover:text-indigo-600">七年級課程</h2>
-                    <p class="mt-3 leading-7 text-slate-500">從讀懂積木與三大程式結構開始，逐步認識迴圈、變數、自訂積木，完成可測試的互動作品。</p>
-                    <span class="mt-6 inline-flex font-semibold text-indigo-600">進入課程 →</span>
-                </a>
-                <div class="mt-5 border-t border-slate-100 pt-4"><a href="lesson-plan-grade-7.html" class="inline-flex rounded-lg px-2 py-1 font-semibold text-indigo-700 hover:bg-indigo-50">查看七年級教案 →</a></div>
-            </article>
-            <article id="grade-8" class="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
-                <a href="1150800.html" class="group block" aria-label="進入八年級課程">
-                    <div class="flex items-start justify-between"><span class="flex h-14 w-14 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600"><i data-lucide="list-tree" class="h-7 w-7"></i></span><span class="rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-700">進階篇</span></div>
-                    <h2 class="mt-6 text-xl font-bold transition group-hover:text-cyan-600">八年級課程</h2>
-                    <p class="mt-3 leading-7 text-slate-500">以清單資料追蹤與演算法理解為主軸，透過音樂、排序與遊戲任務練習資料處理與問題解決。</p>
-                    <span class="mt-6 inline-flex font-semibold text-cyan-600">進入課程 →</span>
-                </a>
-                <div class="mt-5 border-t border-slate-100 pt-4"><a href="lesson-plan-grade-8.html" class="inline-flex rounded-lg px-2 py-1 font-semibold text-cyan-700 hover:bg-cyan-50">查看八年級教案 →</a></div>
-            </article>
-        </section>
+        <div class="tool-cards">
+            <section id="teacher-resources" class="tool-card" aria-labelledby="teacher-resources-title">
+                <h2 id="teacher-resources-title">教師備課</h2>
+                <p class="tool-card-intro">課前準備用的教案、Scratch 範例與學習紀錄表。</p>
+                <div id="grade-7" class="prep-row">
+                    <h3>七年級</h3>
+                    <span class="prep-links"><a href="lesson-plan-grade-7.html">教案</a><a href="11507.zip" download>範例 ZIP<small>0.9 MB</small></a></span>
+                </div>
+                <div id="grade-8" class="prep-row">
+                    <h3>八年級</h3>
+                    <span class="prep-links"><a href="lesson-plan-grade-8.html">教案</a><a href="11508.zip" download>範例 ZIP<small>15 MB</small></a><a href="1150806-demo.sb3" download>第 6 課示範<small>5.6 MB</small></a></span>
+                </div>
+                <div class="prep-row">
+                    <h3>共用</h3>
+                    <span class="prep-links"><a href="student-records.html">學習紀錄表</a><a href="curriculum-alignment.html">課綱對照</a><a href="scratch_educators.html">Scratch 教師帳戶</a></span>
+                </div>
+            </section>
 
-        <section id="teacher-resources" class="rounded-2xl border border-violet-200 bg-white p-6 shadow-sm md:p-8">
-            <p class="text-sm font-bold tracking-wide text-violet-700">教師資源</p>
-            <div class="mt-3 flex flex-col justify-between gap-6 md:flex-row md:items-center">
-                <div><h2 class="text-2xl font-bold">Scratch Educators 教師資源圖解</h2><p class="mt-2 max-w-2xl leading-7 text-slate-500">整理教師帳戶申請、信箱驗證、班級建立與學生名單管理的操作畫面，方便課程使用前參考。</p></div>
-                <a href="scratch_educators.html" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-violet-600 px-5 py-3 font-bold text-white transition hover:bg-violet-700">查看教師資源圖解 →</a>
-            </div>
-        </section>
+            <section id="customize-course" class="tool-card" aria-labelledby="customize-course-title">
+                <h2 id="customize-course-title">自訂課程</h2>
+                <p class="tool-card-intro">重新挑選單元組成新課程，或把星際情境改成自己的主題。</p>
+                <div class="custom-option">
+                    <p><strong>重新排課</strong>從 12 個單元挑選、排序，不改教材。</p>
+                    <a href="course-builder.html" class="home-button">挑選單元組課</a>
+                </div>
+                <p id="local-compose-help" class="home-local-help" data-local-help hidden>從資料夾開啟時無法組課，請先在專案資料夾執行 <code>node scripts/preview.cjs</code>，再開啟<a href="http://127.0.0.1:4173/course-builder.html">本機組課工具</a>。</p>
+                <details id="rewrite-course" class="custom-option rewrite-guide">
+                    <summary><strong>改寫主題<span class="level-tag">進階</span></strong>換成自己的情境，程式概念與評量不變。</summary>
+                    <p class="rewrite-tools">需能修改檔案的 AI 工具，例如 OpenAI Codex、Claude Code，或已連結專案資料夾的 Claude 桌面應用程式；預覽與檢查需安裝 Node.js。</p>
+                    <ol class="rewrite-steps">
+                        <li><strong>下載並解壓縮。</strong>確認 README 標示 V-2。<a href="https://github.com/byte-core-su/unforte_115/archive/refs/heads/main.zip">下載原始碼 ZIP ↗</a></li>
+                        <li><strong>開啟專案資料夾。</strong>在 AI 工具中選擇含有 <code>index.html</code> 與 <code>package.json</code> 的整個資料夾。</li>
+                        <li><strong>貼上改寫指令。</strong>把「海洋探索」換成你的主題，<code>ocean</code> 換成簡短英文代碼。</li>
+                        <li><strong>預覽並檢查。</strong>執行 <code>node scripts/preview.cjs</code>，開啟<a href="http://127.0.0.1:4173/">本機預覽</a>核對教材。</li>
+                    </ol>
+                    <label class="rewrite-prompt-label" for="rewrite-prompt">快速更換情境指令（與 README 方法一相同）</label>
+                    <textarea id="rewrite-prompt" rows="12" readonly>請直接修改目前的 V-2 課程，將七、八年級 Scratch 課程改成【海洋探索】主題。
+先閱讀 README.md、COURSE_SCENARIOS_GUIDE.md、MODULES_GUIDE.md 與 course-scenarios.js。
+請自行擬定適合國中生的角色、七八年級課名、每課任務、清單項目及專題名稱，然後完成修改。
+優先在 course-scenarios.js 新增完整的 ocean 情境並設為 activeId，保留 space 可切回。
+逐層定義 grades、briefing、cards、inventory、defense、statistics、duel，保留識別鍵與資料規則。
+同步更新首頁、課程地圖、模組目錄、學習導航中有涉及情境的文字及 HTML 備援內容。
+保留 12 個模組 ID、入口路徑、課號順序、學習目標、演算法與判分結果，僅調整故事與資料名稱。
+不改 V-1；Python Lab、CodeGame 與歷史文件維持原樣。
+此步先不修改圖片、語音、網頁動畫圖像或 .sb3，請在完成說明列出仍保留舊素材的位置。
+執行既有測試與資源檢查；測試若綁定星際文字，確認是文案差異後才更新對應文字斷言，保留功能驗證。
+最後提供預覽方式、修改清單、仍需同步的素材，以及如何切回 space。</textarea>
+                    <div class="rewrite-actions">
+                        <button type="button" id="copy-rewrite-prompt" hidden>複製改寫指令</button>
+                        <a href="https://github.com/byte-core-su/unforte_115#readme" target="_blank" rel="noopener">連同動畫與 Scratch 作品改編：README 方法二 ↗</a>
+                    </div>
+                    <p id="rewrite-copy-status" role="status"></p>
+                </details>
+            </section>
+        </div>
     </main>
 
-    <footer class="border-t border-slate-200 bg-white px-6 py-9 text-center text-sm text-slate-500">115 學年度資訊科技課程教材</footer>
+    <footer class="home-footer"><div class="home-wrap">115 學年度資訊科技課程教材 V-2｜<a href="https://github.com/byte-core-su/unforte_115#readme" target="_blank" rel="noopener">完整使用說明（GitHub）</a></div></footer>
 </body>
 </html>
