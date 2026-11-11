@@ -50,4 +50,10 @@ assert.match(pythonlab, /function unitOpen\(lesson\)/);
 assert.match(pythonlab, /function stageOpen\(lesson, stage\)/);
 assert.match(pythonlab, /route=all/);
 
+// Teacher demo mode: one switch on the home page, read by every route, CodeGame and Python Lab.
+const demoKey = 'unforte115:teacher-demo';
+for (const file of ['lesson-route.js', 'course-home.js', 'codegame/lightbot.js', 'pythonlab/app.js']) assert.ok(read(file).includes(demoKey), `${file} should honour teacher demo mode`);
+assert.match(read('index.html'), /id="teacher-demo-toggle"/);
+assert.match(read('lesson-route.js'), /const missing = demo \? \[\]/, 'demo mode should not require ticking completion checks');
+
 console.log('learning routes: 12 Scratch lessons, CodeGame and Python Lab follow one guided path');

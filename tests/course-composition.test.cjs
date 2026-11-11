@@ -62,28 +62,36 @@ test('embedded original navigation resolves to custom previous/next without foll
   assert.equal(resolveCourseNavigation({ tagName:'BUTTON', textContent:'重新測試' },current,modules),null);
 });
 
-test('the homepage opens with a course chooser and each Scratch course lists its units in order', () => {
+test('the homepage opens with a course chooser that links each course', () => {
   const home = fs.readFileSync(path.join(root,'index.html'),'utf8');
   assert.match(home, /<main[^>]*>\s*<section id="course-map"/);
   const chooser = home.match(/<section id="course-map"[\s\S]*?<\/section>/)[0];
   for (const href of ['1150700.html', '1150800.html', 'codegame/index.html', 'pythonlab/index.html']) assert.match(chooser, new RegExp(`href="${href}"`));
-  const guides = fs.readFileSync(path.join(root,'learning-guides.js'),'utf8');
-  const CourseScenarios = require('../course-scenarios.js');
   for (const grade of [7,8]) {
     const card = home.match(new RegExp(`<article class="curriculum-grade curriculum-grade-${grade}"[\\s\\S]*?<\\/article>`))?.[0];
     assert.ok(card, `grade ${grade} course card`);
     assert.match(card, new RegExp(`href="1150${grade}00.html"`));
-    // The overview page (second layer) offers every unit near the top, in curriculum order.
-    const section = { setAttribute() {} };
-    const main = { parentNode: { insertBefore() {} } };
-    const document = { querySelector: () => main, createElement: () => section, body: { classList: { add() {} } } };
-    vm.runInNewContext(guides, { document, window: { CourseScenarios, location: { pathname: `/1150${grade}00.html` } } });
+  }
+  assert.match(home, /href="course-builder.html"/);
+});
+
+test('the curriculum map page keeps both grade maps in curriculum order and is linked from teacher prep', () => {
+  const home = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const prep = home.match(/<section id="teacher-resources"[\s\S]*?<\/section>/)?.[0];
+  assert.match(prep, /href="curriculum-map.html"/);
+  const map = fs.readFileSync(path.join(root, 'curriculum-map.html'), 'utf8');
+  for (const file of ['curriculum-map.css', 'curriculum-map.js']) assert.ok(map.includes(`"${file}"`) && fs.existsSync(path.join(root, file)), `${file} should be loaded`);
+  for (const grade of [7, 8]) {
+    const article = map.match(new RegExp(`<article class="curriculum-grade curriculum-grade-${grade}"[\\s\\S]*?<\\/article>`))?.[0];
+    assert.ok(article, `grade ${grade} map`);
+    assert.equal((article.match(/<li><a /g) || []).length, 6);
+    assert.ok((article.match(/<li data-from=/g) || []).length >= 4, `grade ${grade} should keep its concept relations`);
     let previous = -1;
     for (const module of modules.filter(item => item.grade === grade)) {
-      const position = section.innerHTML.indexOf(`href="${module.entry}"`);
-      assert.ok(position > previous, `overview order for ${module.id}`);
+      assert.ok(article.includes(module.title), `${module.title} on the map`);
+      const position = article.indexOf(`href="${module.entry}"`);
+      assert.ok(position > previous, `map order for ${module.id}`);
       previous = position;
     }
   }
-  assert.match(home, /href="course-builder.html"/);
 });

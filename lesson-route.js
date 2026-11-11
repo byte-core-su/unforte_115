@@ -2,13 +2,23 @@
 // - 依序解鎖：還沒輪到的步驟區塊先隱藏，完成這一步（勾選完成標準）才開啟下一步。
 // - 引導面板固定在畫面下方：要做什麼、完成標準、分層提示、完成按鈕。
 // - 進度只存在本頁，重新整理就從頭開始；不保存、不傳送任何資料。
-// - 教師示範：網址加上 ?route=all 會全部展開，面板仍可逐步點選。
+// - 教師示範模式：首頁「教師備課」開啟，或網址加 ?teacher=1／?route=all。只在目前分頁有效，
+//   可直接跳到任一步、不必勾選完成標準，也可一鍵全部展開。
 // 使用：LessonRoute.start({ steps: [...], next: { href, label } })
 (() => {
   'use strict';
 
   const text = node => (node.textContent || '').replace(/\s+/g, ' ').trim();
   const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  // 教師示範模式：存在 sessionStorage，只在這個分頁有效；CodeGame、Python Lab 讀同一個鍵。
+  const TEACHER_KEY = 'unforte115:teacher-demo';
+  const teacher = {
+    isOn() {
+      if (/[?&](route=all|teacher=1)\b/.test(location.search)) teacher.set(true);
+      try { return sessionStorage.getItem(TEACHER_KEY) === '1'; } catch { return /[?&](route=all|teacher=1)\b/.test(location.search); }
+    },
+    set(on) { try { if (on) sessionStorage.setItem(TEACHER_KEY, '1'); else sessionStorage.removeItem(TEACHER_KEY); } catch { /* 無法保存時只在網址參數下有效 */ } }
+  };
   const reduceMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function findAnchor(locator) {
@@ -40,7 +50,8 @@
   }
 
   function start(config) {
-    const teacherView = /[?&]route=all\b/.test(location.search) || location.hash === '#route-all';
+    const demo = teacher.isOn();
+    let showAll = demo && /[?&]route=all\b/.test(location.search);
     const steps = config.steps.map((step, index) => ({ ...step, index, regions: [] }));
     let current = 0;
     let finished = false;
@@ -63,13 +74,13 @@
 
     function apply() {
       const visible = new Set();
-      steps.forEach(step => { if (teacherView || finished || step.index <= current) step.regions.forEach(region => visible.add(region)); });
+      steps.forEach(step => { if (showAll || finished || step.index <= current) step.regions.forEach(region => visible.add(region)); });
       steps.forEach(step => step.regions.forEach(region => {
         if (visible.has(region)) region.removeAttribute('data-route-locked');
         else region.setAttribute('data-route-locked', '');
       }));
       nextLinks().forEach(link => {
-        if (teacherView || finished) link.removeAttribute('data-route-locked');
+        if (demo || finished) link.removeAttribute('data-route-locked');
         else link.setAttribute('data-route-locked', '');
       });
       document.querySelectorAll('.learning-guide__exit').forEach(node => node.setAttribute('data-route-moved', ''));
@@ -116,8 +127,8 @@
     function chips() {
       return steps.map(step => {
         const state = finished || step.index < current ? 'done' : step.index === current ? 'current' : 'locked';
-        const mark = state === 'done' ? '✓' : state === 'locked' && !teacherView ? '🔒' : step.index + 1;
-        const clickable = teacherView || state === 'done' || state === 'current';
+        const mark = state === 'done' ? '✓' : state === 'locked' && !demo ? '🔒' : step.index + 1;
+        const clickable = demo || state === 'done' || state === 'current';
         return `<li><button type="button" class="lesson-route__chip is-${state}${step.optional ? ' is-optional' : ''}" data-chip="${step.index}" ${clickable ? '' : 'disabled'} aria-label="第 ${step.index + 1} 步：${escapeHtml(step.title)}${step.optional ? '（選做）' : ''}${state === 'done' ? '，已完成' : state === 'locked' ? '，尚未開啟' : '，目前步驟'}"><span>${mark}</span>${escapeHtml(step.title)}</button></li>`;
       }).join('');
     }
@@ -145,7 +156,7 @@
       const hints = step.hints || [];
       panel.innerHTML = `
         <div class="lesson-route__bar">
-          <span class="lesson-route__count">第 ${current + 1}／${steps.length} 步${teacherView ? '・教師檢視' : ''}</span>
+          <span class="lesson-route__count">第 ${current + 1}／${steps.length} 步</span>${demo ? '<span class="lesson-route__teacher">教師示範</span>' : ''}
           <strong class="lesson-route__title">${escapeHtml(step.title)}${step.optional ? '<span class="lesson-route__tag">選做</span>' : ''}</strong>
           <div class="lesson-route__actions">
             <button type="button" data-action="toggle" aria-expanded="${expanded}">${expanded ? '收合 ▾' : '說明 ▴'}</button>
@@ -154,6 +165,7 @@
             <button type="button" class="lesson-route__primary" data-action="done">${current === steps.length - 1 ? '完成本課' : '完成這一步'}</button>
           </div>
         </div>
+        ${demo ? `<div class="lesson-route__demo"><span>教師示範模式：點上方步驟可直接跳過去，不必勾選完成標準。</span><button type="button" data-action="show-all">${showAll ? '恢復逐步路線' : '全部展開'}</button><button type="button" data-action="end-demo">結束示範</button></div>` : ''}
         <div class="lesson-route__body" ${expanded ? '' : 'hidden'}>
           <ol class="lesson-route__chips">${chips()}</ol>
           <p class="lesson-route__todo"><b>要做什麼</b>${escapeHtml(step.todo || '')}</p>
@@ -175,19 +187,21 @@
       const chip = event.target.closest('[data-chip]');
       if (chip) {
         const step = steps[Number(chip.dataset.chip)];
-        if (teacherView && !finished && step.index !== current) enter(step.index);
+        if (demo && step.index !== current) { finished = false; enter(step.index); }
         else scrollToStep(step);
         return;
       }
       const action = event.target.closest('[data-action]')?.dataset.action;
       if (!action) return;
       if (action === 'toggle') { expanded = !expanded; render(); return; }
+      if (action === 'show-all') { showAll = !showAll; apply(); render(); window.dispatchEvent(new Event('resize')); return; }
+      if (action === 'end-demo') { teacher.set(false); location.href = location.pathname + location.hash; return; }
       if (action === 'goto') { scrollToStep(steps[current]); return; }
       if (action === 'hint') { hintsShown += 1; render(); return; }
       if (action === 'skip') { advance(); return; }
       if (action === 'done') {
         const boxes = [...panel.querySelectorAll('[data-check]')];
-        const missing = boxes.filter(box => !box.checked);
+        const missing = demo ? [] : boxes.filter(box => !box.checked);
         if (missing.length) {
           if (!expanded) { expanded = true; render(); }
           const message = panel.querySelector('.lesson-route__msg');
@@ -234,5 +248,5 @@
     })();
   }
 
-  window.LessonRoute = { start: startWhenReady };
+  window.LessonRoute = { start: startWhenReady, teacher };
 })();

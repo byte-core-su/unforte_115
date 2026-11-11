@@ -159,12 +159,6 @@
         <div class="learning-guide__item"><strong>完成證據</strong>${escapeHtml(guide.evidence)}</div>
       </div>
       <p class="learning-guide__check">離堂檢核：${escapeHtml(guide.check)}</p>
-      ${lessonNumber ? '' : `
-        <nav class="learning-guide__units" aria-label="本課程單元">
-          <strong>直接進入單元</strong>
-          <ol>${active.grades[planGrade].cards.map((card, index) => `<li><a href="1150${planGrade}0${index + 1}.html"><span>${index + 1}</span>${escapeHtml(card.title)}</a></li>`).join('')}</ol>
-        </nav>
-      `}
       ${guide.exit ? `
         <p class="learning-guide__exit">
           <strong>本課離堂任務：</strong>${escapeHtml(guide.exit)}

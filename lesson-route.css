@@ -55,6 +55,41 @@
   white-space: nowrap;
 }
 
+.lesson-route__teacher {
+  border-radius: 999px;
+  background: #fef3c7;
+  padding: .1rem .6rem;
+  color: #92400e;
+  font-size: .82rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.lesson-route__demo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .4rem .6rem;
+  border-top: 1px dashed #f59e0b;
+  background: #fffbeb;
+  padding: .45rem 1rem;
+  color: #92400e;
+  font-size: .85rem;
+  font-weight: 700;
+}
+
+.lesson-route__demo span { flex: 1 1 16rem; }
+
+.lesson-route__demo button {
+  border: 1px solid #f59e0b;
+  border-radius: .5rem;
+  background: #fff;
+  padding: .2rem .7rem;
+  color: #92400e;
+  font: inherit;
+  cursor: pointer;
+}
+
 .lesson-route__title { flex: 1 1 14rem; font-size: 1.02rem; font-weight: 800; }
 
 .lesson-route__tag {

@@ -176,3 +176,7 @@ th { background:#f4f6fb; position:sticky; top:0; }
 
 /* 單一路線：尚未開啟的關卡 */
 .level-button.is-locked { opacity:.45; cursor:not-allowed; }
+
+/* 教師示範模式提示 */
+.teacher-demo-badge { position:fixed; right:12px; bottom:12px; z-index:50; display:flex; align-items:center; gap:8px; border:1px solid #f59e0b; border-radius:10px; background:#fffbeb; padding:6px 10px; color:#92400e; font-size:13px; font-weight:700; box-shadow:0 6px 18px rgba(0,0,0,.12); }
+.teacher-demo-badge button { border:1px solid #f59e0b; border-radius:6px; background:#fff; padding:2px 8px; color:#92400e; font:inherit; cursor:pointer; }

@@ -223,6 +223,23 @@
   font-weight: 400;
 }
 
+#teacher-demo-note { flex-basis: 100%; margin: 0; color: var(--muted); font-size: .8rem; line-height: 1.6; }
+
+.demo-toggle {
+  border: 1px solid #d97706;
+  border-radius: .5rem;
+  background: #fff;
+  padding: .2rem .7rem;
+  color: #92400e;
+  font: inherit;
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.demo-toggle:hover { background: #fffbeb; }
+.demo-toggle.is-on { background: #d97706; color: #fff; }
+
 .custom-option {
   border-top: 1px solid var(--line);
   padding-top: .75rem;
