@@ -6,7 +6,8 @@
   "entry": "1150706.html",
   "periods": 2,
   "goal": "整合事件、迴圈與變數製作防禦網，搜尋與比較測試資料以選出有效且省資源的組合。",
-  "evidence": "Scratch 作品、三組測試表、一次修正與 60 秒作品說明；網頁模擬器不能代替自己的作品。",
+  "evidence": "一份可調參數的 Scratch 作品、至少 3 組實測、一筆修正後的重測，以及約 60 秒的作品說明。",
+  "successCriteria": "作品能啟動並依參數改變圖形。紀錄清楚區分 Scratch 實測和網頁資料，能從有效組合中選出實測消耗最少的一組，並用數據說明理由與修正結果。",
   "priorKnowledge": "基本電腦操作與 Scratch 介面",
   "prerequisites": [
     "g7-03",
@@ -18,8 +19,8 @@
     "資料分析"
   ],
   "resources": {
-    "lessonPlan": "lesson-plan-grade-7.html#section-3",
-    "records": "STUDENT_RECORDS.md",
+    "lessonPlan": "lesson-plan-grade-7.html#lesson-6",
+    "records": "student-records.html#g7-06",
     "scratchArchive": "11507.zip"
   }
 }

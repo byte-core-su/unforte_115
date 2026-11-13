@@ -29,7 +29,9 @@ function loadLab(page, scenario = CourseScenarios.active) {
     querySelector(selector) { return selector === 'main' ? main : null; },
     createElement() { return section; }
   };
-  vm.runInNewContext(source, { document, window: { CourseScenarios: { ...CourseScenarios, active: scenario }, location: { pathname: `/${page}` } }, Math });
+  const window = { CourseScenarios: { ...CourseScenarios, active: scenario }, location: { pathname: `/${page}` } };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../lesson-labels.js'), 'utf8'), { window });
+  vm.runInNewContext(source, { document, window, Math });
   return element;
 }
 

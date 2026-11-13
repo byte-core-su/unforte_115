@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+    <script src="lesson-assessments.js" defer></script>
     <script src="learning-guides.js" defer></script>
+    <script src="lesson-labels.js" defer></script>
     <script src="adaptive-practice.js" defer></script>
     <link rel="stylesheet" href="lesson-route.css">
+    <script src="teacher-demo.js" defer></script>
     <script src="lesson-route.js" defer></script>
     <script src="lesson-routes.js" defer></script>
     <meta charset="UTF-8">
     <script src="course-scenarios.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LESSON 4 - 魔法變數：螺旋圖騰</title>
+    <title>變數螺旋圖騰｜資訊科技課程</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght=300;400;500;700&display=swap');
@@ -28,19 +31,19 @@
     <header class="bg-white border-b border-gray-100 pt-8 pb-12 slide-up-fade">
         <div class="max-w-5xl mx-auto px-6 lg:px-8">
             <div class="mb-6">
-                <a href="index.html" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+                <a data-course-direction="outline" href="index.html" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> 
                     返回網站首頁
                 </a>
             </div>
             <p class="text-sm font-medium text-indigo-500 mb-2 tracking-widest uppercase">演算法與程式設計</p>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight"><span data-scenario-text="name">星際防禦工程師</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用程式編織能量防護網</span></h1>
-            <p data-scenario-text="intro" class="text-lg text-slate-500 font-light max-w-2xl">結合「IPO 思維」與「重複結構」，循序漸進建立邏輯思維與幾何繪圖能力，並透過實作防禦網任務，體驗程式設計的強大魔力。</p>
+            <p data-scenario-text="intro" class="text-lg text-slate-500 font-light max-w-2xl">先練習讀積木和排程式，再用迴圈與變數畫圖。最後做出防禦網，換幾組設定測試。</p>
         </div>
     </header>
 
     <main class="max-w-5xl mx-auto px-6 lg:px-8 py-12 relative">
-        <a href="1150700.html" class="mb-8 inline-flex items-center text-sm font-medium text-slate-400 hover:text-slate-800 transition-colors">
+        <a data-course-direction="outline" href="1150700.html" class="mb-8 inline-flex items-center text-sm font-medium text-slate-400 hover:text-slate-800 transition-colors">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 返回課程總覽
         </a>
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12 mb-8 slide-up-fade">
@@ -54,7 +57,7 @@
                 <div class="border-b-2 border-dashed border-slate-100 pb-16">
                     <div class="flex items-center mb-8">
                         <span class="bg-emerald-100 text-emerald-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">1</span>
-                        <h3 class="text-2xl font-bold text-slate-800">第一階段：挑戰手動繪製螺旋方形</h3>
+                        <h3 id="route-manual-spiral" class="text-2xl font-bold text-slate-800">第一階段：挑戰手動繪製螺旋方形</h3>
                     </div>
                     
                     <div class="grid grid-cols-1 gap-8 mb-8">
@@ -108,7 +111,7 @@
                 <div class="border-b-2 border-dashed border-slate-100 pb-16">
                     <div class="flex items-center mb-8">
                         <span class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">2</span>
-                        <h3 class="text-2xl font-bold text-slate-800">第二階段：變數與重複結構的魔法</h3>
+                        <h3 id="route-variable-spiral" class="text-2xl font-bold text-slate-800">第二階段：用變數和迴圈畫螺旋</h3>
                     </div>
                     
                     <div class="grid grid-cols-1 gap-8 mb-8">
@@ -117,7 +120,7 @@
                                 <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">A</span> 挑戰：用「變數與迴圈」簡化並畫出無限螺旋
                             </h4>
                             <p class="text-slate-600 font-light text-sm mb-6">
-                                剛剛手動寫了好多行程式碼，如果要畫 40 個邊，程式碼會長到看不完！這時就是<strong>「重複迴圈」</strong>搭配<strong>「變數」</strong>登場的完美時機！請將 4 塊核心積木排入重複框中，讓線條利用變數自動長大，最後停筆。
+                                把 4 塊積木放進<strong>「重複執行」</strong>。每畫一段，就用<strong>「長度」變數</strong>調整下一段的距離。迴圈跑完再停筆。
                             </p>
                             
                             <div class="flex flex-col md:flex-row gap-6 mb-4">
@@ -236,11 +239,11 @@
                         </div>
                     </div>
 
-                    <!-- 最終完美積木組合 -->
+                    <!-- 螺旋圖形的積木範例 -->
                     <div id="spiral-formula-reveal" class="hidden mt-8 slide-up-fade">
                         <div class="bg-white/90 backdrop-blur-sm p-6 rounded-2xl border-2 border-indigo-200 shadow-lg flex flex-col items-center">
                             <h5 class="text-xl font-bold text-indigo-900 mb-5 flex items-center gap-2">
-                                <span>🧩</span> 最終完美積木組合：千變萬化的螺旋圖騰
+                                <span>🧩</span> 螺旋圖形的積木範例
                             </h5>
                             <p class="text-sm text-slate-600 mb-6 text-center max-w-lg">我們將剛才組裝的所有積木合而為一，加上「詢問」與「變數」，這就是一個完整的螺旋繪圖程式碼！</p>
                             
@@ -294,8 +297,8 @@
             </div>
         </div>
         <div class="flex justify-between items-center">
-            <a href="1150703.html" class="text-sm text-slate-400 hover:text-slate-800 transition-colors">⬅ 上一個單元</a>
-            <a href="1150705.html" class="inline-block text-center text-sm font-medium text-slate-600 bg-white border border-gray-200 px-6 py-3 rounded-full hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm">下一個單元 ➔</a>
+            <a data-course-direction="previous" href="1150703.html" class="text-sm text-slate-400 hover:text-slate-800 transition-colors">⬅ 上一個單元</a>
+            <a data-course-direction="next" href="1150705.html" class="inline-block text-center text-sm font-medium text-slate-600 bg-white border border-gray-200 px-6 py-3 rounded-full hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm">下一個單元 ➔</a>
         </div>
     </main>
 
@@ -338,7 +341,7 @@
                 msg.className = "text-sm font-bold text-emerald-600";
                 
                 if (tVar.length === 7) {
-                    msg.innerHTML = "🎉 挑戰成功！成功手動拼出四邊螺旋！準備解鎖右側模擬圖 ➔";
+                    msg.innerHTML = "✅ 四邊螺旋的積木排好了。到右側播放動畫，看看每次移動的距離怎麼變。";
                     document.getElementById('var-sim-container').innerHTML = `
                         <div class="sim-badge">手動四邊螺旋模擬</div>
                         <svg viewBox="0 0 200 150" class="w-full h-full bg-slate-50 rounded-2xl" preserveAspectRatio="xMidYMid meet">

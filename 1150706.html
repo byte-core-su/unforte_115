@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+    <script src="lesson-assessments.js" defer></script>
     <script src="learning-guides.js" defer></script>
+    <script src="lesson-labels.js" defer></script>
     <script src="adaptive-practice.js" defer></script>
     <script src="curriculum-labs.js" defer></script>
     <link rel="stylesheet" href="lesson-route.css">
+    <script src="teacher-demo.js" defer></script>
     <script src="lesson-route.js" defer></script>
     <script src="lesson-routes.js" defer></script>
     <meta charset="UTF-8">
     <script src="course-scenarios.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-scenario-text="tabTitle">LESSON 6 - 星際防禦網</title>
+    <title>參數測試與資料應用｜資訊科技課程</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
@@ -46,19 +49,19 @@
     <header class="bg-white border-b border-gray-100 pt-8 pb-12 slide-up-fade">
         <div class="max-w-5xl mx-auto px-6 lg:px-8">
             <div class="mb-6">
-                <a href="index.html" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-orange-600 transition-colors">
+                <a data-course-direction="outline" href="index.html" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-orange-600 transition-colors">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> 
                     返回網站首頁
                 </a>
             </div>
             <p class="text-sm font-medium text-indigo-500 mb-2 tracking-widest uppercase">演算法與程式設計</p>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight"><span data-scenario-text="name">星際防禦工程師</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用程式編織能量防護網</span></h1>
-            <p data-scenario-text="intro" class="text-lg text-slate-500 font-light max-w-2xl">結合「IPO 思維」與「重複結構」，循序漸進建立邏輯思維與幾何繪圖能力，並透過實作防禦網任務，體驗程式設計的強大魔力。</p>
+            <p data-scenario-text="intro" class="text-lg text-slate-500 font-light max-w-2xl">先練習讀積木和排程式，再用迴圈與變數畫圖。最後做出防禦網，換幾組設定測試。</p>
         </div>
     </header>
 
     <main class="max-w-5xl mx-auto px-6 lg:px-8 py-12 relative">
-        <a href="1150700.html" class="mb-8 inline-flex items-center text-sm font-medium text-slate-400 hover:text-slate-800 transition-colors">
+        <a data-course-direction="outline" href="1150700.html" class="mb-8 inline-flex items-center text-sm font-medium text-slate-400 hover:text-slate-800 transition-colors">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 返回課程總覽
         </a>
         
@@ -67,26 +70,26 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
                 <!-- 左側：危機診斷與任務目標說明 -->
                 <div class="lg:col-span-6 relative z-10 flex flex-col justify-center">
-                    <span class="text-xs font-bold bg-rose-500/20 text-rose-400 px-3 py-1 rounded-full uppercase tracking-wider block w-max mb-4 animate-pulse">🚨 Phase 0：危機發布與系統診斷</span>
-                    <h2 class="text-2xl md:text-3xl font-black mb-4 flex items-center text-orange-400">
-                        <span class="text-2xl mr-2">💥</span> <span data-scenario-text="defense.simulation.briefingTitle">基地遭重創！防禦系統啟動太慢？</span>
+                    <span class="text-xs font-bold bg-rose-500/20 text-rose-400 px-3 py-1 rounded-full uppercase tracking-wider block w-max mb-4 animate-pulse">先看範例：程式在哪裡停下來？</span>
+                    <h2 id="defense-briefing-title" class="text-2xl md:text-3xl font-black mb-4 flex items-center text-orange-400">
+                        <span class="text-2xl mr-2">💥</span> <span data-scenario-text="defense.simulation.briefingTitle">防禦網為什麼還沒啟動？</span>
                     </h2>
                     
                     <p class="text-slate-300 font-light text-sm leading-relaxed mb-6">
                         「警報！密集隕石群逼近！」剛才測試時，指揮官按下啟動鍵，畫面竟跳出對話框：<br>
                         <span class="inline-block bg-slate-800/80 px-2 py-1 rounded text-cyan-300 mt-1.5 mb-1.5 text-xs border border-cyan-800 shadow-inner">💬 「請輸入要畫正幾邊形？」、「請輸入要幾個圖形？」</span><br>
-                        就在指揮官慌忙打字輸入的幾秒鐘，隕石已經無情地砸中了基地！我們發現了系統的致命漏洞：<strong class="text-rose-400">「互動式提問」太耗時了！</strong> 在分秒必爭的危機中，根本沒時間手動輸入參數。
+                        程式遇到<strong class="text-rose-400">「詢問並等待」</strong>會停下來等答案。試著把邊數和圖形數量先寫在程式裡，看看按下啟動後能不能直接畫圖。
                     </p>
 
                     <!-- 三大任務目標 -->
                     <div class="space-y-3">
                         <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl transition hover:border-orange-500/50">
                             <div class="font-bold text-orange-300 text-sm mb-1.5 flex items-center gap-2"><span class="text-lg">🛠️</span> 核心概念實作</div>
-                            <p class="text-xs text-slate-400 leading-relaxed">捨棄耗時的「詢問」積木，改用預先寫好的<strong class="text-slate-300">參數變數</strong>與<strong class="text-slate-300">雙層陣列迴圈</strong>，讓程式一鍵瞬間啟動全自動防禦網。</p>
+                            <p class="text-xs text-slate-400 leading-relaxed">把「詢問並等待」換成「變數設為數字」，再把邊數和圖形數量傳給自訂積木。按下啟動就能開始畫。</p>
                         </div>
                         <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl transition hover:border-emerald-500/50">
                             <div class="font-bold text-emerald-400 text-sm mb-1.5 flex items-center gap-2"><span class="text-lg">🧠</span> 運算邏輯梳理</div>
-                            <p class="text-xs text-slate-400 leading-relaxed">重新規劃「環繞地球」的雙層防禦陣列，精準計算圖形的邊數與旋轉角度，確保防護網交織且毫無死角。</p>
+                            <p class="text-xs text-slate-400 leading-relaxed">改變邊數和圖形數量，看看哪些排法會留下空隙。</p>
                         </div>
                         <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl transition hover:border-orange-500/50">
                             <div class="font-bold text-orange-400 text-sm mb-1.5 flex items-center gap-2"><span class="text-lg">🛡️</span> 能量防護網強度</div>
@@ -104,11 +107,11 @@
             </div>
         </div>
 
-        <!-- Phase 1: 創造 (Creation) —— 代碼優化與防禦網重構 -->
+        <!-- 第一步：改排防禦網主程式 -->
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12 mb-12 slide-up-fade">
             <div class="flex items-center mb-8">
                 <span class="bg-orange-100 text-orange-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">1</span>
-                <h3 class="text-2xl font-bold text-slate-800">Phase 1: 創造 (Creation) —— 代碼優化與防禦網重構</h3>
+                <h3 id="route-defense-program" class="text-2xl font-bold text-slate-800">第一步：改排防禦網主程式</h3>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -127,7 +130,7 @@
                         </li>
                         <li class="flex items-start">
                             <svg class="w-5 h-5 text-emerald-500 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span>如何改由程式內部直接給予變數數值（將 Input 從手動輸入改為宣告常數），讓防禦網能「一鍵瞬間啟動」？</span>
+                            <span>怎麼在程式一開始就設定邊數和圖形數量，讓防禦網可以直接啟動？</span>
                         </li>
                     </ul>
                 </div>
@@ -144,7 +147,7 @@
                         <li>刪除「詢問」積木。</li>
                         <li>加上<strong class="text-orange-500">「筆跡寬度設為 ( )」</strong>積木，設定防禦網的強度。</li>
                         <li>改用「變數設定」積木，<strong class="text-rose-500">保持空白</strong>讓大家自己決定「正幾邊形」與「幾個圖形」的常數。</li>
-                        <li>一鍵呼叫函式並佈署。</li>
+                        <li>呼叫自訂積木，畫出防禦網。</li>
                     </ol>
                 </div>
             </div>
@@ -154,7 +157,7 @@
                 <div class="lg:col-span-3">
                     <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
                         <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
-                            <span class="text-2xl mr-2">🧩</span> 極速防禦主程式重構
+                            <span class="text-2xl mr-2">🧩</span> 排出防禦網的主程式
                         </h4>
                         <div class="flex flex-col md:flex-row gap-6 mb-4">
                             <div class="w-full md:w-5/12 bg-slate-50 border border-slate-200 rounded-xl p-4 shadow-inner min-h-[320px]" id="main-source-container"></div>
@@ -166,19 +169,19 @@
                 
                 <div class="lg:col-span-2 flex flex-col h-full">
                     <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3">
-                        <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">▶</span> 一鍵瞬間啟動模擬
+                        <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">▶</span> 播放主程式動畫
                     </h4>
                     <div class="sim-window bg-slate-950 border border-slate-800 rounded-2xl shadow-lg flex-grow min-h-[320px] relative" id="main-sim-container">
                         <div class="absolute inset-0 flex flex-col items-center justify-center text-orange-500/60 font-bold text-sm">
                             <span class="text-4xl mb-3">🔒</span>
-                            請先完成左側的主程式重構<br>解鎖極速佈署模擬
+                            先把左側的主程式排好，再播放動畫。
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Phase 2: 分析 (Analysis) —— 參數盲測與視覺調整 -->
+        <!-- 第二步：測試防禦網 (Analysis) —— 參數盲測與視覺調整 -->
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12 mb-8 slide-up-fade">
             <div class="space-y-16">
                 <section class="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-10 text-white relative overflow-hidden">
@@ -186,10 +189,10 @@
                     <div class="relative z-10">
                         <div class="flex items-center mb-6">
                             <span class="bg-orange-100 text-orange-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">2</span>
-                            <h3 class="text-2xl font-bold text-orange-400">Phase 2: 分析 (Analysis) —— 防禦強度與參數盲測</h3>
+                            <h3 id="route-defense-test" class="text-2xl font-bold text-orange-400">第二步：測試防禦網</h3>
                         </div>
                         <div class="space-y-4 mb-8 text-sm text-slate-300 font-light leading-relaxed max-w-3xl">
-                            <p><strong class="text-orange-300">防禦參數盲測：</strong>程式碼重構完成後，防禦網已能瞬間啟動。請開始進行「數字組合實驗」，直接在變數欄修改數字，測試不同的「正幾邊形」與「幾個圖形」，觀察動態隕石是否會穿透孔洞。</p>
+                            <p><strong class="text-orange-300">怎麼測：</strong>改邊數或圖形數量，再按「啟動防禦網」。記下隕石有沒有穿過。比較兩組設定時，可以一次只改一個數值。</p>
                             <p><strong class="text-orange-300">防禦網強度測試：</strong>想一想：「如果防禦網太薄，會發生什麼情況？」請在下方測試不同的強度，並將「筆跡寬度」參數加大，體會強度對防禦效果的關鍵影響。</p>
                         </div>
 
@@ -212,7 +215,7 @@
                                         </div>
 
                                         <div>
-                                            <label class="block text-xs font-bold text-slate-400 mb-2">變數：幾個圖形 (陣列數量 X)</label>
+                                            <label class="block text-xs font-bold text-slate-400 mb-2">圖形數量（X）</label>
                                             <input type="range" id="shield-count" min="2" max="15" value="5" oninput="updateLabBlocks()" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-orange-500">
                                             <div class="flex justify-between text-xs text-slate-400 mt-1">
                                                 <span>2 組</span>
@@ -245,7 +248,7 @@
 
                                 <!-- 動態積木預覽區 -->
                                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner overflow-x-auto min-h-[280px] flex flex-col gap-4 text-xs">
-                                    <div class="text-[10px] text-slate-500 font-bold">▼ 基地防禦核心：重構後的主程式</div>
+                                    <div class="text-[10px] text-slate-500 font-bold">▼ 防禦網主程式範例</div>
                                     
                                     <div class="flex flex-col items-start font-bold">
                                         <div class="block-hat border-b-[3px] px-3 py-1 rounded-t-lg rounded-b shadow-sm mb-1.5 w-full max-w-[260px] flex items-center gap-1.5 text-[10px]">
@@ -277,7 +280,7 @@
                                 </div>
 
                                 <button onclick="runLabAnimation()" class="w-full mt-4 bg-orange-500 text-slate-950 py-3 rounded-xl font-black hover:bg-orange-400 shadow-[0_0_15px_rgba(234,88,12,0.3)] transition-all flex items-center justify-center gap-2 transform active:scale-95">
-                                    <span data-scenario-text="defense.simulation.launch">🛡️ 一鍵瞬間啟動防禦網</span>
+                                    <span data-scenario-text="defense.simulation.launch">🛡️ 啟動防禦網</span>
                                 </button>
 
                                 <!-- 由教師指定繳交方式，不連結未設定的外部平台 -->
@@ -295,9 +298,7 @@
                                     <div data-scenario-text="defense.simulation.arena" class="sim-badge" style="border-color:#EA580C; background: rgba(15,23,42,0.9); color: #FB923C;">阿爾法基地雷達防禦屏</div>
                                     <svg id="lab-svg" viewBox="0 0 300 200" class="w-full h-full absolute inset-0 z-10" preserveAspectRatio="xMidYMid slice"></svg>
                                 </div>
-                                <div data-scenario-text="defense.simulation.waiting" id="lab-feedback" class="bg-slate-800 border-t border-slate-700 text-orange-100 rounded-b-2xl p-4 text-xs font-medium transition-colors duration-300 text-center shadow-lg">
-                                    等待啟動！請留意防禦網是否存在「孔洞」讓隕石穿透，以及「筆跡寬度」的強度影響。
-                                </div>
+                                <div data-scenario-text="defense.simulation.waiting" id="lab-feedback" class="bg-slate-800 border-t border-slate-700 text-orange-100 rounded-b-2xl p-4 text-xs font-medium transition-colors duration-300 text-center shadow-lg">等待啟動！請留意防禦網是否存在「孔洞」讓隕石穿透，以及「筆跡寬度」的強度影響。</div>
                             </div>
                         </div>
                     </div>
@@ -305,11 +306,11 @@
             </div>
         </div>
         
-        <!-- Phase 3: 反思 (Reflection) —— 資源最佳化與生活對接 -->
+        <!-- 第三步：比較資源消耗 -->
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12 mb-8 slide-up-fade">
             <div class="flex items-center mb-8">
                 <span class="bg-emerald-100 text-emerald-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">3</span>
-                <h3 class="text-2xl font-bold text-slate-800">Phase 3: 反思 (Reflection) —— 資源最佳化與生活對接</h3>
+                <h3 id="route-defense-cost" class="text-2xl font-bold text-slate-800">第三步：比較資源消耗</h3>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -352,7 +353,7 @@
                                     <span class="text-2xl mr-3">🛡️</span>
                                     <div>
                                         <strong class="text-indigo-700 block mb-0.5">裝甲車的防護鋼板厚度計算</strong>
-                                        如同調整筆跡寬度，工程師必須在「防禦強度」與「車體重量（機動性/耗能）」之間取得完美平衡！
+                                        筆跡加寬可能擋得住隕石，也會增加消耗。先找出擋得住的設定，再比較哪一組最省。
                                     </div>
                                 </li>
                             </ul>
@@ -373,8 +374,8 @@
         </div>
 
         <div class="flex justify-between items-center mt-8">
-            <a href="1150705.html" class="text-sm text-slate-400 hover:text-slate-800 transition-colors">⬅ 上一個單元</a>
-            <a data-scenario-text="defense.simulation.finish" href="1150700.html" class="inline-block text-center text-sm font-semibold text-slate-950 bg-orange-400 px-6 py-3 rounded-full hover:bg-orange-300 hover:shadow-lg hover:shadow-orange-400/20 transition-all shadow-sm">🏆 完成防禦工程，回到總覽</a>
+            <a data-course-direction="previous" href="1150705.html" class="text-sm text-slate-400 hover:text-slate-800 transition-colors">⬅ 上一個單元</a>
+            <a data-course-direction="outline" data-route-finish data-scenario-text="defense.simulation.finish" href="1150700.html" class="inline-block text-center text-sm font-semibold text-slate-950 bg-orange-400 px-6 py-3 rounded-full hover:bg-orange-300 hover:shadow-lg hover:shadow-orange-400/20 transition-all shadow-sm">🏆 完成防禦工程，回到總覽</a>
         </div>
     </main>
 
@@ -566,7 +567,7 @@
             }, 120);
         }
 
-        // ====== Phase 1: 創造 (主程式重構積木) ======
+        // ====== 第一步：改排防禦網主程式 (主程式重構積木) ======
         const mainData = {
             1: '<div class="block-green border-b-[3px] px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left flex items-center gap-1">筆跡寬度設為 <span class="bg-white border border-slate-300 w-6 h-4 inline-block rounded shadow-inner align-middle"></span></div>',
             2: '<div class="bg-[#FF8C1A] border-b-[3px] border-[#DB6E00] text-white px-3 py-1.5 rounded-md font-bold text-[11px] shadow-sm w-full text-left flex items-center gap-2">變數 <span class="bg-white text-orange-600 font-bold px-1.5 py-0.5 rounded-full shadow-inner text-[10px]">正幾邊形</span> 設為 <span class="bg-white border border-slate-300 w-6 h-4 inline-block rounded shadow-inner align-middle"></span></div>',
@@ -577,10 +578,10 @@
         };
         const mainDesc = {
             1: "設定防禦強度：加強筆跡寬度避免貫穿", 
-            2: "宣告常數：直接設定圖形邊數(空白處自己決定)", 
-            3: "宣告常數：直接設定陣列數量(空白處自己決定)", 
+            2: "設定邊數",
+            3: "設定圖形數量",
             4: "準備：落下筆尖",
-            5: "一鍵啟動：呼叫第二層函式並傳入變數",
+            5: "把圖形數量傳給「畫幾個圖形」自訂積木",
             6: "結束：抬起筆尖"
         };
         let cMain = []; let tMain = [];
@@ -602,12 +603,12 @@
                 msg.className = "text-sm font-bold text-emerald-600";
                 
                 if (tMain.length === 6) {
-                    msg.innerHTML = "🎉 重構完成！再也不用等待詢問，防禦網已準備好極速佈署！ <button onclick='playFastDeploymentAnimation()' class='ml-2 bg-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-orange-700 shadow-sm transition'>觀看一鍵啟動 ➔</button>";
+                    msg.innerHTML = "✅ 主程式排好了。播放動畫，看看兩組變數怎麼傳進自訂積木。 <button onclick='playFastDeploymentAnimation()' class='ml-2 bg-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-orange-700 shadow-sm transition'>觀看一鍵啟動 ➔</button>";
                     playFastDeploymentAnimation();
                 }
                 renderMainGame();
             } else {
-                msg.textContent = "❌ 順序不對！請先設定寬度 ➔ 宣告兩個變數 ➔ 下筆 ➔ 呼叫函式 ➔ 停筆。";
+                msg.textContent = "❌ 順序不對！請先設定寬度 ➔ 設定兩個變數 ➔ 下筆 ➔ 呼叫自訂積木 ➔ 停筆。";
                 msg.className = "text-sm font-bold text-rose-500";
             }
         }
@@ -626,7 +627,7 @@
                 src.appendChild(b);
             });
 
-            tgt.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-2 w-full text-center border-b border-slate-200 pb-2">重構主程式組裝區</p>';
+            tgt.innerHTML = '<p class="text-xs font-bold text-slate-400 mb-2 w-full text-center border-b border-slate-200 pb-2">主程式組裝區</p>';
             for (let i = 1; i <= 6; i++) {
                 const row = document.createElement('div');
                 row.className = `flex items-center gap-2 w-full mb-1.5`;
@@ -650,7 +651,7 @@
             if(!svgContainer) return;
             
             svgContainer.innerHTML = `
-                <div class="sim-badge" style="border-color:#EA580C; background: rgba(15,23,42,0.9); color: #FB923C;">極速圓形護盾佈署</div>
+                <div class="sim-badge" style="border-color:#EA580C; background: rgba(15,23,42,0.9); color: #FB923C;">防禦網繪製動畫</div>
                 <svg id="fast-deploy-svg" viewBox="0 0 300 200" class="w-full h-full absolute inset-0 z-10" preserveAspectRatio="xMidYMid slice"></svg>
             `;
             
@@ -773,7 +774,7 @@
             thicknessBlockNum.textContent = thickness;
 
             const fb = document.getElementById('lab-feedback');
-            fb.innerHTML = `參數設定更新：即將佈署 <strong>${count}</strong> 組 <strong>正${shapeSides}邊形</strong> 防禦網，筆跡強度為 <strong>${thickness}</strong>。點擊啟動進行盲測！`;
+            fb.innerHTML = `這次要畫 <strong>${count}</strong> 組 <strong>正${shapeSides}邊形</strong> 防禦網，筆跡寬度為 <strong>${thickness}</strong>。按「啟動防禦網」開始測試。`;
             fb.className = "bg-slate-800 text-orange-300 border-t border-slate-700 rounded-b-2xl p-4 text-xs font-semibold text-center";
         }
 
@@ -824,7 +825,7 @@
                 starsLayer.appendChild(star);
             }
 
-            fb.textContent = `🛡️ 防禦罩極速環繞建構中... 變數自動帶入，無需等待回答！`;
+            fb.textContent = `正在按設定的邊數和圖形數量畫防禦網。`;
             fb.className = "bg-orange-600 text-slate-950 font-bold rounded-b-2xl p-4 text-xs text-center animate-pulse";
 
             const L = shieldSize;
@@ -892,7 +893,7 @@
                     activePath.setAttribute("d", ""); 
                     sprite.remove(); 
                     
-                    fb.innerHTML = `🟢 陣列部署完畢！<br>準備迎擊隕石，請觀察防護網是否能承受衝擊！`;
+                    fb.innerHTML = `防禦網畫好了。接下來看看有沒有隕石穿過。`;
                     fb.className = "bg-slate-700 text-white font-bold rounded-b-2xl p-4 text-xs text-center shadow-md";
 
                     triggerAsteroidAttack(svg.querySelector('#meteor-layer'), arrayPoints, hexColor, cx, cy, thickness);
@@ -1006,9 +1007,9 @@
                 
                 if (totalHits > 0) {
                     if (window.meteorsPenetrated > 0) {
-                        fb.innerHTML = `💥 盲測結束：基地遭受 <strong>${totalHits}</strong> 次撞擊！<br>主因：【強度太弱被貫穿】。請加大筆跡寬度！`;
+                        fb.innerHTML = `💥 測試結束，基地受到 <strong>${totalHits}</strong> 次撞擊！<br>隕石穿過了防禦網。試著加大筆跡寬度。`;
                     } else {
-                        fb.innerHTML = `💥 盲測結束：基地遭受 <strong>${totalHits}</strong> 次撞擊！<br>主因：【陣列孔洞死角】。請增加形狀數量或變更邊數！`;
+                        fb.innerHTML = `💥 測試結束，基地受到 <strong>${totalHits}</strong> 次撞擊！<br>隕石從空隙穿過。試著增加圖形數量或改變邊數。`;
                     }
                     fb.className = "bg-rose-600 text-white font-bold rounded-b-2xl p-4 text-sm text-center shadow-md";
                 } else {

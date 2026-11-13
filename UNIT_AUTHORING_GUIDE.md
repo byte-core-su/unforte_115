@@ -15,7 +15,7 @@
 | `scratch_educators.html` | 教師資源頁，不是學生單元範本 |
 | `11507.zip`、`11508.zip` | 可下載的 Scratch 範例檔 |
 
-一般新增一個學生課程單元時，主要會調整三個位置：單元 HTML、`learning-guides.js` 的學習導航資料，以及前後單元的連結。
+改寫現有單元時，先更新模組資料，再依需要調整單元活動、學習路線或情境。
 
 ## 建立新單元的建議流程
 
@@ -35,7 +35,14 @@
 
 ```html
 <script src="course-scenarios.js"></script>
+<script src="lesson-assessments.js" defer></script>
 <script src="learning-guides.js" defer></script>
+<script src="lesson-labels.js" defer></script>
+<script src="adaptive-practice.js" defer></script>
+<link rel="stylesheet" href="lesson-route.css">
+<script src="teacher-demo.js" defer></script>
+<script src="lesson-route.js" defer></script>
+<script src="lesson-routes.js" defer></script>
 <link rel="stylesheet" href="site-theme.css">
 ```
 
@@ -76,50 +83,27 @@
 
 撰寫互動時，讓每一個按鈕都回答一個學習問題，例如「下一步會讓清單怎麼變？」或「為什麼這個條件要放在迴圈裡？」。完成提示除了寫「答對了」，也應指出學生剛剛驗證了哪個規則。
 
-## 更新學習導航
+## 更新單元資料與學習導航
 
-`learning-guides.js` 會依檔名自動在課程內容前加入學習導航。新增頁面後，必須在 `guides` 物件加入對應資料，例如：
-
-```javascript
-'1150707.html': {
-  grade: '七年級｜第 7 課',
-  title: '新單元名稱',
-  goal: '學生要理解的核心概念。',
-  action: '學生需要完成的挑戰任務。',
-  evidence: '可觀察或繳交的完成證據。',
-  check: '學生離堂前能用自己的話回答的問題。'
-}
-```
-
-欄位寫法建議：
-
-- `goal` 聚焦一個核心概念，不堆疊多個技能。
-- `action` 使用可執行的動詞，例如「預測、追蹤、比較、修改、測試」。
-- `evidence` 寫出可看見的成果，例如截圖、資料表、程式說明或測試紀錄。
-- `check` 使用「我能……」句型，讓學生知道自己要能解釋什麼。
-
-## 更新學習路線
-
-新增或改寫單元後，在 `lesson-routes.js` 為該頁設定路線步驟，並在頁面 `<head>` 依序載入 `lesson-route.css`、`lesson-route.js`、`lesson-routes.js`（放在 `learning-guides.js` 之後）。
-
-- 每一步寫清楚 `title`（步驟名稱）、`todo`（要做什麼）、`checks`（完成標準，至少一項）與 `hints`（分層提示，至少一則）。
-- `anchors` 指出這一步在頁面上的區塊：用標題文字 `{ h: '第一階段：…' }`，或 CSS 選擇器（例如 `'section.curriculum-lab'`）。沒有頁面區塊的步驟（例如到 Scratch 實作）不寫 `anchors`，只在面板顯示說明。
-- 進階或加分活動加上 `optional: true`，學生可以略過。
-- 路線開頭固定為「認識任務」，結尾固定為「換題練習」與「離堂任務」，由 `route()` 自動加上。
-- 改完執行 `npm test`，並在瀏覽器從第一步走到最後一步，確認每一步都會開啟正確的區塊；用 `?route=all` 可一次看到全部內容。
+- 在 `modules/` 的單元 JSON 設定正式課名 `title`、目標 `goal`、建議節數 `periods`、標籤 `tags`、必交項目 `evidence` 及達標條件 `successCriteria`。各入口顯示相同資料。故事標題仍由 `course-scenarios.js` 提供。
+- 在 `learning-guides.js` 寫學生本課要做的事 `action` 和教師可指定的離堂提問 `exit`。在 `STUDENT_RECORDS.md` 維護表格，保留各課的 `<!-- assessment:單元 ID -->` 標記。
+- 在 `lesson-routes.js` 設定步驟名稱、操作、檢核與提示。區塊本身有 ID 時，可直接用 `'#energy-trace'`。若 ID 在標題上，用 `{ up: '#route-energy-total' }` 找到包含標題和活動的區塊。使用既有連結的 ID 時保留原名。
+- 選做活動只在路線步驟設 `optional: true`。學生面板、頁面區塊標示和教案的選做清單會沿用這個設定。共用練習按鈕文字在 `lesson-labels.js` 維護。
+- 執行 `npm run build:lesson-plans`，同步課程地圖、學習導航資料、教案、紀錄頁、站內導覽和情境預設文字。執行 `npm test`，確認固定 ID 與產出檔已更新。
+- 目前支援七、八年級各六課。增加課號時須先擴充模組目錄、路線、情境與建置，細節見[課程模組與組課指南](MODULES_GUIDE.md)。
 
 ## 連結與資源規則
 
 網站是靜態教材，新增內容時請使用相對路徑：
 
 ```html
-<a href="1150706.html">上一單元</a>
-<a href="1150708.html">下一單元</a>
+<a data-course-direction="previous" href="1150706.html">上一單元</a>
+<a data-course-direction="next" href="1150708.html">下一單元</a>
 <a href="11507.zip">下載教材範例</a>
 <img src="imgs/example.png" alt="範例操作畫面">
 ```
 
-避免把網站網域直接寫進站內連結。相對路徑可以讓教材同時適用於 GitHub Pages、本機資料夾與日後的其他部署位置。
+單元導覽以 `data-course-direction` 標記 `previous`、`next` 或 `outline`，組課頁依所選順序處理。簡報若要直達互動活動，可用 `?route=all#區塊ID` 展開示範。請使用站內相對連結。相對路徑可以讓教材同時適用於 GitHub Pages、本機資料夾與日後的其他部署位置。
 
 新圖片請放入 `imgs/` 下有意義的子資料夾，檔名採用英文小寫與連字號，例如 `imgs/grade-7/loop-polygon-example.png`。圖片需要提供能說明畫面的 `alt` 文字。
 
@@ -128,7 +112,7 @@
 完成後，逐項檢查：
 
 - [ ] 新頁面保留 `learning-guides.js` 與 `site-theme.css`。
-- [ ] HTML 標題、頁首標題與學習導航的單元名稱一致。
+- [ ] 學習導航顯示模組的正式課名，頁首故事標題符合課程情境。
 - [ ] 課程目標、互動步驟與完成回饋指向同一個核心概念。
 - [ ] 前後單元、首頁、下載檔與圖片連結都能找到檔案。
 - [ ] 成功、提醒與錯誤狀態仍分別使用綠、橘、紅等既有語意色。

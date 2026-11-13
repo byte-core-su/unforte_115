@@ -6,7 +6,8 @@
   "entry": "1150801.html",
   "periods": 2,
   "goal": "掌握新增、插入、替換、刪除、讀取與長度等操作，並正確理解索引位置。",
-  "evidence": "四種清單操作對照，以及找到／找不到各一筆搜尋紀錄。",
+  "evidence": "新增、插入、替換、刪除四種操作的前後對照，一份 Scratch 循序搜尋程式，以及找到和找不到各一筆搜尋紀錄。",
+  "successCriteria": "四種操作的順序和長度變化正確。程式從第 1 項逐項比對，找到就停，全部比完才判定找不到；兩筆紀錄都寫出停止原因。",
   "priorKnowledge": "Scratch 事件、變數與迴圈基礎",
   "prerequisites": [],
   "tags": [
@@ -15,8 +16,8 @@
     "循序搜尋"
   ],
   "resources": {
-    "lessonPlan": "lesson-plan-grade-8.html#section-3",
-    "records": "STUDENT_RECORDS.md",
+    "lessonPlan": "lesson-plan-grade-8.html#lesson-1",
+    "records": "student-records.html#g8-01",
     "scratchArchive": "11508.zip"
   }
 }

@@ -16,7 +16,7 @@
       title: escapeHtml(defense.labTitle),
       codes: '資 T-IV-1｜運 t-IV-4、運 p-IV-1',
       intro: `使用匿名範例資料，先搜尋指定測試、比較${escapeHtml(defense.labResult)}，再計算平均資源消耗；將結論用於改良${escapeHtml(defense.project)}。`,
-      html: `<div class="curriculum-lab__controls"><label>搜尋測試編號 <select id="g7-data-query"></select></label><label>先預測有效且最省資源的編號 <select id="g7-data-prediction"><option value="">先選答案</option><option>A</option><option>B</option><option>C</option><option>D</option></select></label><button type="button" id="g7-data-run">核對預測並分析</button><button type="button" id="g7-data-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g7-data-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g7-data-result" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">Scratch 任務：用清單記錄至少三組「圖形數量、筆跡寬度、是否${escapeHtml(defense.outcome)}」，選出通過測試且資源消耗較少的組合，附上表格與理由。新題數值會變，評量看推理與實測，不只看編號。</p>`
+      html: `<div class="curriculum-lab__controls"><label>搜尋測試編號 <select id="g7-data-query"></select></label><label>先預測有效且最省資源的編號 <select id="g7-data-prediction"><option value="">先選答案</option><option>A</option><option>B</option><option>C</option><option>D</option></select></label><button type="button" id="g7-data-run">核對預測並分析</button><button type="button" id="g7-data-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g7-data-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g7-data-result" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">Scratch 測試提示：在自己的作品試不同的邊數、圖形數量和筆跡寬度。把參數及是否${escapeHtml(defense.outcome)}的結果填進本課紀錄表，再比較通過測試的組合。</p>`
     },
     '1150801.html': {
       title: '循序搜尋：逐項檢查清單',
@@ -40,13 +40,14 @@
       title: `用自訂積木分工完成${escapeHtml(duel.activity)}`,
       codes: '資 P-IV-4／5｜運 t-IV-4、運 p-IV-1',
       intro: '把一大段程式拆成具名的自訂積木。先決定呼叫順序，再到 Scratch 建立並測試各段功能。',
-      html: `<div class="curriculum-lab__controls" id="g8-module-options"></div><div id="g8-module-state" class="curriculum-lab__result" aria-live="polite"></div><button type="button" id="g8-module-reset" class="curriculum-lab__secondary">重排呼叫順序</button><p class="curriculum-lab__task">Scratch 任務：建立${duel.modules.map(name => `「${escapeHtml(name)}」`).join('')}四個自訂積木，分別測試；修改${escapeHtml(duel.item)}數量後再測一次，交出主程式與一次修正紀錄。</p>`
+      html: `<div class="curriculum-lab__controls" id="g8-module-options"></div><div id="g8-module-state" class="curriculum-lab__result" aria-live="polite"></div><button type="button" id="g8-module-reset" class="curriculum-lab__secondary">重排呼叫順序</button><p class="curriculum-lab__task">Scratch 實作提示：建立${duel.modules.map(name => `「${escapeHtml(name)}」`).join('')}四個自訂積木，分別測試。改變${escapeHtml(duel.item)}數量，看看裝備不足時程式怎麼處理。</p>`
     }
   };
 
   const lab = labs[page];
   if (!lab) return;
   const section = document.createElement('section');
+  section.id = 'curriculum-lab';
   section.className = 'curriculum-lab';
   section.setAttribute('aria-label', '課綱補強實作');
   section.innerHTML = `<div class="curriculum-lab__card"><p class="curriculum-lab__code">課綱補強實作｜${lab.codes}</p><h2>${lab.title}</h2><p>${lab.intro}</p>${lab.html}</div>`;
@@ -76,7 +77,7 @@
   const quizRoot = section.querySelector('[data-quiz]');
   if (quizRoot) {
     const questions = quizRoot.dataset.quiz === 'g7-safety' ? safety : ethics;
-    quizRoot.innerHTML = questions.map(([question, options], index) => `<fieldset><legend>${index + 1}. ${question}</legend>${options.map((option, choice) => `<label><input type="radio" name="lab-q-${index}" value="${choice}"> ${option}</label>`).join('')}<output aria-live="polite"></output></fieldset>`).join('') + '<button type="button">檢查判斷並閱讀原因</button>';
+    quizRoot.innerHTML = questions.map(([question, options], index) => `<fieldset><legend>${index + 1}. ${question}</legend>${options.map((option, choice) => `<label><input type="radio" name="lab-q-${index}" value="${choice}"> ${option}</label>`).join('')}<output aria-live="polite"></output></fieldset>`).join('') + '<button type="button">${window.LessonLabels.checkJudgment}</button>';
     quizRoot.querySelector('button').addEventListener('click', () => {
       questions.forEach(([, , answer, explanation], index) => {
         const fieldset = quizRoot.querySelectorAll('fieldset')[index];

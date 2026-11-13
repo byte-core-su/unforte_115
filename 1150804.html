@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+    <script src="lesson-assessments.js" defer></script>
     <script src="learning-guides.js" defer></script>
+    <script src="lesson-labels.js" defer></script>
     <script src="adaptive-practice.js" defer></script>
     <link rel="stylesheet" href="lesson-route.css">
+    <script src="teacher-demo.js" defer></script>
     <script src="lesson-route.js" defer></script>
     <script src="lesson-routes.js" defer></script>
     <meta charset="UTF-8">
     <script src="course-scenarios.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-scenario-text="tabTitle">用清單打造星際任務 - LESSON 4</title>
+    <title>不重複的隨機抽取｜資訊科技課程</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 Lucide Icons -->
@@ -42,7 +45,7 @@
     <header id="main-header" class="bg-white border-b border-gray-100 pt-12 pb-12 slide-up-fade relative overflow-hidden">
         <div class="max-w-5xl mx-auto px-6 lg:px-8 relative z-10">
             <div class="mb-6">
-                <a href="index.html" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+                <a data-course-direction="outline" href="index.html" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> 
                     返回網站首頁
                 </a>
@@ -50,7 +53,7 @@
             <p class="text-sm font-bold text-cyan-600 mb-3 tracking-widest uppercase">演算法與程式設計</p>
             <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight"><span data-scenario-text="name">星際陣列指揮官</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用清單打造星際任務</span></h1>
             <p class="text-lg text-slate-500 font-light max-w-2xl leading-relaxed">
-                <span data-scenario-text="intro">化身星際指揮官，透過六大任務關卡，循序漸進建立邏輯思維，完整掌握</span> <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span> 的強大威力！
+                <span data-scenario-text="intro">在六個星際任務中練習</span> <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span>，從管理裝備到做出對決遊戲。
             </p>
         </div>
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-cyan-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
@@ -372,7 +375,7 @@
             {
                 title: "Q5：把這支籤丟掉！這樣下次就不會重複抽到了！",
                 desc: "A：刪除籤筒（全班同學）裡的第 [剛才找出的那個位置] 項。",
-                note: "💡 提示：把 Q4 組合進 Q5 裡，這就是我們常說的「不重複抽籤法」（抽出後移除）的核心秘密喔！",
+                note: "💡 提示：把 Q4 的抽籤步驟放進 Q5 的迴圈。每抽到一人，就從候選清單刪掉他。",
                 expectedPieceId: 4,
                 action: (html) => {
                     spLines[1] = html.replace('__INNER__', spStaging);
@@ -442,8 +445,8 @@
                         <div class="bg-emerald-900/40 border border-emerald-500 p-6 rounded-xl text-center mb-6 shadow-inner relative overflow-hidden">
                             <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500 rounded-full mix-blend-screen filter blur-[50px] opacity-20 pointer-events-none"></div>
                             <i data-lucide="party-popper" class="w-12 h-12 text-emerald-400 mx-auto mb-3 animate-bounce"></i>
-                            <h4 class="text-emerald-400 font-bold text-2xl mb-2">挑戰成功！</h4>
-                            <p class="text-emerald-200 text-sm">您已透過 Q&A 完美還原了「隨機抽籤與防重複」的陣列演算法！</p>
+                            <h4 class="text-emerald-400 font-bold text-2xl mb-2">抽籤步驟排好了</h4>
+                            <p class="text-emerald-200 text-sm">你排對了抽籤步驟。看看每抽到一人後，候選清單和已選清單各怎麼變。</p>
                         </div>
                         <div class="text-slate-400 text-xs font-bold mb-2 flex items-center gap-1.5"><i data-lucide="code-2" class="w-4 h-4"></i> 完整程式積木：</div>
                         <div class="bg-[#F9F9F9] p-6 rounded-xl border border-slate-200 shadow-inner overflow-x-auto custom-scrollbar w-full">
@@ -738,7 +741,7 @@
                     <!-- 控制面板 (左) -->
                     <div class="w-full lg:w-1/3 flex flex-col gap-4 relative z-10 shrink-0">
                         <h4 class="text-emerald-400 font-bold flex items-center gap-2 text-lg mb-2">
-                            <i data-lucide="settings-2" class="w-5 h-5"></i> 陣列操作控制台
+                            <i data-lucide="settings-2" class="w-5 h-5"></i> 操作清單
                         </h4>
                         
                         <div class="bg-slate-800/80 p-5 rounded-xl border border-slate-700 shadow-inner flex flex-col gap-3">
@@ -772,7 +775,7 @@
                     <div class="w-full lg:w-2/3 bg-slate-950/50 rounded-xl p-5 border border-slate-800 shadow-inner z-10 flex flex-col h-[500px] sm:h-[550px] relative overflow-hidden">
                         <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800 shrink-0">
                             <h4 class="text-cyan-400 font-bold flex items-center gap-2 text-lg">
-                                <i data-lucide="users" class="w-5 h-5"></i> 陣列：全班同學 (清單)
+                                <i data-lucide="users" class="w-5 h-5"></i> 全班座號清單
                             </h4>
                             <div class="text-sm text-slate-400 font-bold bg-slate-900 px-3 py-1 rounded-lg border border-slate-700">
                                 總長度: <span id="list-length-display" class="text-cyan-300 ml-1">0</span>
@@ -800,8 +803,8 @@
             title: window.CourseScenarios.active.grades[8].cards[3].title,
             subtitle: "(隨機不重複抽籤)",
             description: "指揮官！我們需要從星際新兵庫中隨機招募先遣隊員。請運用清單建立名單，並透過「不重複抽籤」邏輯，隨機挑選出指定的勇士加入我們的隊伍。",
-            objective: "學習清單（陣列）與隨機取數的綜合應用。透過建立全班座號清單，練習資料初始化與不重複抽籤邏輯，實作從大量資料中隨機挑選特定人數的程式運算。",
-            learningPointsSummary: "本單元將帶領指揮官實作「隨機且不重複」的陣列抽籤演算法：",
+            objective: "先把全班座號放進清單，再寫一個隨機抽出 4 人的程式。每抽到一人，就從候選清單刪掉他的座號。",
+            learningPointsSummary: "這一課會做一個不重複的抽籤程式。",
             learningPoints: [
                 { title: "資料建立", desc: "利用計次迴圈配合變數累加，將 1 至特定號碼依序添加至清單中建立名單。" },
                 { title: "隨機抽籤", desc: "結合隨機取數積木，從 1 到「目前的清單長度」中隨機抽出一個索引值。" },
@@ -876,7 +879,7 @@
 
             return `
                 <div class="slide-up-fade">
-                    <button onclick="goToHome()" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors px-4 py-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm mb-6">
+                    <button data-course-direction="outline" onclick="window.location.href='1150800.html'" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors px-4 py-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm mb-6">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回任務儀表板
                     </button>
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
@@ -897,13 +900,13 @@
                             
                             <!-- 任務目標 -->
                             <section>
-                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-indigo-100 text-indigo-600 p-1.5 rounded-lg"><i data-lucide="target" class="w-5 h-5"></i></span>任務目標</h3>
+                                <h3 id="route-lesson-objectives" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-indigo-100 text-indigo-600 p-1.5 rounded-lg"><i data-lucide="target" class="w-5 h-5"></i></span>任務目標</h3>
                                 <div class="bg-indigo-50 text-indigo-900 p-5 rounded-2xl border border-indigo-100/50 leading-relaxed font-medium">${lesson.objective}</div>
                             </section>
 
                             <!-- 單元學習重點 -->
                             <section>
-                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-teal-100 text-teal-600 p-1.5 rounded-lg"><i data-lucide="book-open" class="w-5 h-5"></i></span>單元學習重點</h3>
+                                <h3 id="route-lesson-key-points" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-teal-100 text-teal-600 p-1.5 rounded-lg"><i data-lucide="book-open" class="w-5 h-5"></i></span>單元學習重點</h3>
                                 <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
                                     <p class="text-slate-600 font-medium mb-6 leading-relaxed">${lesson.learningPointsSummary}</p>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -914,7 +917,7 @@
                             
                             <!-- 🚀 陣列建立與刪除模擬器 -->
                             <section>
-                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-emerald-100 text-emerald-600 p-1.5 rounded-lg"><i data-lucide="play" class="w-5 h-5"></i></span>⚡ 條件篩選模擬器</h3>
+                                <h3 id="route-draw-simulator" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-emerald-100 text-emerald-600 p-1.5 rounded-lg"><i data-lucide="play" class="w-5 h-5"></i></span>⚡ 條件篩選模擬器</h3>
                                 
                                 ${renderSimulatorHTML()}
                             </section>
@@ -923,7 +926,7 @@
                             <section class="mb-4">
                                 <div class="flex items-center gap-3 mb-6">
                                     <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-black text-sm shadow-sm">1</span>
-                                    <h3 class="text-xl font-bold text-slate-800">建立初始資料</h3>
+                                    <h3 id="route-initialize-list" class="text-xl font-bold text-slate-800">建立初始資料</h3>
                                 </div>
                                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                     
@@ -981,7 +984,7 @@
                             <section>
                                 <div class="flex items-center gap-3 mb-6">
                                     <span class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-700 font-black text-sm shadow-sm">2</span>
-                                    <h3 class="text-xl font-bold text-slate-800">隨機抽籤與刪除</h3>
+                                    <h3 id="route-draw-and-remove" class="text-xl font-bold text-slate-800">隨機抽籤與刪除</h3>
                                 </div>
                                 
                                 <div class="flex flex-col gap-8">
@@ -1044,11 +1047,11 @@
 
                             <!-- 單元導覽按鈕 -->
                             <div class="mt-8 pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-                                <a href="1150803.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 hover:text-cyan-600 transition-colors shadow-sm">
+                                <a data-course-direction="previous" href="1150803.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 hover:text-cyan-600 transition-colors shadow-sm">
                                     <i data-lucide="arrow-left" class="w-5 h-5"></i>
                                     上一單元
                                 </a>
-                                <a href="1150805.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-cyan-600 text-white font-bold rounded-xl hover:bg-cyan-700 transition-colors shadow-sm">
+                                <a data-course-direction="next" href="1150805.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-cyan-600 text-white font-bold rounded-xl hover:bg-cyan-700 transition-colors shadow-sm">
                                     下一單元
                                     <i data-lucide="arrow-right" class="w-5 h-5"></i>
                                 </a>

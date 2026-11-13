@@ -6,7 +6,8 @@
   "entry": "1150704.html",
   "periods": 2,
   "goal": "理解變數是可記錄、可更新的資料，並用它控制螺旋圖形的邊長或角度。",
-  "evidence": "交出一張變數追蹤表與一個螺旋作品，並說明一次「放錯位置」造成的差異。",
+  "evidence": "Scratch 螺旋作品，以及一張寫出初始值、每次增加量和前 3 輪移動長度的追蹤表。表內比較更新積木放在「移動」前和後兩種做法。",
+  "successCriteria": "螺旋的邊長會依設定改變。追蹤表的數值與作品相符，能指出更新積木換位置後，第一輪移動長度怎麼變。",
   "priorKnowledge": "基本電腦操作與 Scratch 介面",
   "prerequisites": [
     "g7-02",
@@ -18,8 +19,8 @@
     "螺旋"
   ],
   "resources": {
-    "lessonPlan": "lesson-plan-grade-7.html#section-3",
-    "records": "STUDENT_RECORDS.md",
+    "lessonPlan": "lesson-plan-grade-7.html#lesson-4",
+    "records": "student-records.html#g7-04",
     "scratchArchive": "11507.zip"
   }
 }

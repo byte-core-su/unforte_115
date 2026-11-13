@@ -49,17 +49,19 @@ test('prerequisite reminders distinguish omitted, later and already preceding mo
   assert.equal(prerequisiteWarnings(fixture(['g7-01','g7-02','g7-03','g7-04','g7-05','g7-06']), modules).length, 0);
 });
 
-test('embedded original navigation resolves to custom previous/next without following the original course order', async () => {
-  const { resolveCourseNavigation } = await kit;
-  const current = modules.find(module => module.id === 'g7-03');
-  assert.equal(resolveCourseNavigation({ href: '1150704.html' }, current, modules), 'next');
-  assert.equal(resolveCourseNavigation({ href: '1150702.html' }, current, modules), 'previous');
-  assert.equal(resolveCourseNavigation({ href: '1150700.html' }, current, modules), 'outline');
-  assert.equal(resolveCourseNavigation({ onclick: "window.location.href='1150800.html'" }, current, modules), 'outline');
-  assert.equal(resolveCourseNavigation({ onclick: 'goToHome()' }, current, modules), 'outline');
-  assert.equal(resolveCourseNavigation({ tagName:'BUTTON', textContent:'返回任務儀表板' }, current, modules), 'outline');
-  for (const href of ['#adaptive-practice','11507.zip','https://scratch.mit.edu/','lesson-plan-grade-7.html']) assert.equal(resolveCourseNavigation({href},current,modules),null);
-  assert.equal(resolveCourseNavigation({ tagName:'BUTTON', textContent:'重新測試' },current,modules),null);
+test('standalone and embedded lesson controls share explicit navigation roles', () => {
+  const viewer = fs.readFileSync(path.join(root, 'course-viewer.mjs'), 'utf8');
+  assert.match(viewer, /closest\('\[data-course-direction\]'\)/);
+  assert.match(viewer, /go\(position \+ \(direction === 'next' \? 1 : -1\)\)/);
+  const engine = fs.readFileSync(path.join(root, 'lesson-route.js'), 'utf8');
+  assert.match(engine, /data-course-direction="next"/);
+  for (const item of modules) {
+    const html = fs.readFileSync(path.join(root, item.entry), 'utf8');
+    assert.match(html, /data-course-direction="outline"/);
+    const next = modules.find(candidate => candidate.grade === item.grade && candidate.lesson === item.lesson + 1);
+    if (next) assert.ok(html.includes(`data-course-direction="next" href="${next.entry}"`), item.id);
+    else assert.match(html, /data-course-direction="outline" data-route-finish/);
+  }
 });
 
 test('the homepage opens with a course chooser that links each course', () => {

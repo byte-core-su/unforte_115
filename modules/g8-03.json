@@ -6,7 +6,8 @@
   "entry": "1150803.html",
   "periods": 2,
   "goal": "使用累加器與清單走訪，計算總和與平均，並理解每一步的中間值。",
-  "evidence": "用正常資料、單筆資料與空清單三種案例測試，說明哪些情況需要額外處理。",
+  "evidence": "多筆、單筆、空清單三種案例的追蹤表，寫出每輪累計值、總和、筆數和平均。",
+  "successCriteria": "多筆與單筆的累計值和平均正確。空清單記為 0 筆，說明除數是 0，所以不能直接算平均。",
   "priorKnowledge": "Scratch 事件、變數與迴圈基礎",
   "prerequisites": [
     "g8-01"
@@ -17,8 +18,8 @@
     "空清單"
   ],
   "resources": {
-    "lessonPlan": "lesson-plan-grade-8.html#section-3",
-    "records": "STUDENT_RECORDS.md",
+    "lessonPlan": "lesson-plan-grade-8.html#lesson-3",
+    "records": "student-records.html#g8-03",
     "scratchArchive": "11508.zip"
   }
 }

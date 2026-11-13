@@ -6,7 +6,8 @@
   "entry": "1150702.html",
   "periods": 2,
   "goal": "區分循序、選擇與重複結構，並用輸入、處理、輸出描述程式邏輯。",
-  "evidence": "完成三種結構的配對，並能舉出一個「條件不成立」時程式會走向何處的例子。",
+  "evidence": "循序、選擇、重複三種配對結果，以及一則 Scratch 分支或迴圈的測試紀錄。",
+  "successCriteria": "三種配對正確。測試紀錄有預測與實際結果，能說明條件不成立時走哪一支，或哪段指令會重複、會做幾次。結果不同時，指出從哪一塊積木開始不同。",
   "priorKnowledge": "基本電腦操作與 Scratch 介面",
   "prerequisites": [
     "g7-01"
@@ -17,8 +18,8 @@
     "重複"
   ],
   "resources": {
-    "lessonPlan": "lesson-plan-grade-7.html#section-3",
-    "records": "STUDENT_RECORDS.md",
+    "lessonPlan": "lesson-plan-grade-7.html#lesson-2",
+    "records": "student-records.html#g7-02",
     "scratchArchive": "11507.zip"
   }
 }

@@ -57,6 +57,7 @@ function mount(page) {
     addEventListener(type, callback) { this.listeners[type] = callback; } };
   const math = Object.create(Math);
   math.random = () => random;
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../lesson-labels.js'), 'utf8'), { window });
   vm.runInNewContext(source, { window, document, Math: math, performance: { now: () => time } });
   return { element, section,
     enable(value) { element('.adaptive-practice__focus-enabled').checked = value; element('.adaptive-practice__focus-enabled').listeners.change(); },

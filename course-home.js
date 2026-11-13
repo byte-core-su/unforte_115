@@ -26,19 +26,17 @@ copyButton.addEventListener('click', async () => {
   }
 });
 
-// 教師示範模式：只存在這個分頁（sessionStorage），各課的學習路線、CodeGame、Python Lab 會讀取同一個鍵。
-const demoKey = 'unforte115:teacher-demo';
 const demoToggle = document.querySelector('#teacher-demo-toggle');
-function demoOn() { try { return sessionStorage.getItem(demoKey) === '1'; } catch { return false; } }
+const teacher = window.TeacherDemo;
 function renderDemo() {
-  const on = demoOn();
+  const on = teacher.isOn();
   demoToggle.setAttribute('aria-pressed', String(on));
   demoToggle.textContent = on ? '結束教師示範模式' : '開啟教師示範模式';
   demoToggle.classList.toggle('is-on', on);
 }
 if (demoToggle) {
   demoToggle.addEventListener('click', () => {
-    try { if (demoOn()) sessionStorage.removeItem(demoKey); else sessionStorage.setItem(demoKey, '1'); } catch { /* 無法保存時改用網址參數 ?teacher=1 */ }
+    teacher.toggle();
     renderDemo();
   });
   renderDemo();

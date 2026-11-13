@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+    <script src="lesson-assessments.js" defer></script>
     <script src="learning-guides.js" defer></script>
+    <script src="lesson-labels.js" defer></script>
     <script src="adaptive-practice.js" defer></script>
     <script src="curriculum-labs.js" defer></script>
     <link rel="stylesheet" href="lesson-route.css">
+    <script src="teacher-demo.js" defer></script>
     <script src="lesson-route.js" defer></script>
     <script src="lesson-routes.js" defer></script>
     <meta charset="UTF-8">
     <script src="course-scenarios.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LESSON 1 - 起步診斷與資訊安全</title>
+    <title>起步診斷：讀懂積木｜資訊科技課程</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
@@ -27,25 +30,25 @@
         <div class="max-w-5xl mx-auto px-6 lg:px-8">
             <!-- 返回網站首頁按鈕 -->
             <div class="mb-6">
-                <a href="index.html" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+                <a data-course-direction="outline" href="index.html" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> 
                     返回網站首頁
                 </a>
             </div>
             <p class="text-sm font-medium text-indigo-500 mb-2 tracking-widest uppercase">演算法與程式設計</p>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight"><span data-scenario-text="name">星際防禦工程師</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用程式編織能量防護網</span></h1>
-            <p data-scenario-text="intro" class="text-lg text-slate-500 font-light max-w-2xl">結合「IPO 思維」與「重複結構」，循序漸進建立邏輯思維與幾何繪圖能力，並透過實作防禦網任務，體驗程式設計的強大魔力。</p>
+            <p data-scenario-text="intro" class="text-lg text-slate-500 font-light max-w-2xl">先練習讀積木和排程式，再用迴圈與變數畫圖。最後做出防禦網，換幾組設定測試。</p>
         </div>
     </header>
 
     <main class="max-w-4xl mx-auto px-6 lg:px-8 py-12 relative">
-        <a href="1150700.html" class="mb-6 inline-flex items-center text-sm font-medium text-slate-400 hover:text-slate-800 transition-colors">
+        <a data-course-direction="outline" href="1150700.html" class="mb-6 inline-flex items-center text-sm font-medium text-slate-400 hover:text-slate-800 transition-colors">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 返回課程總覽
         </a>
         
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-10 mb-8 relative min-h-[500px] flex flex-col slide-up-fade">
             <span class="text-sm font-semibold text-slate-400 tracking-wider block mb-2">LESSON 1</span>
-            <h2 data-scenario-text="cards.0.title" class="text-3xl font-bold text-slate-800 mb-2">起步診斷：Scratch 積木大考驗</h2>
+            <h2 id="route-scratch-diagnostic" data-scenario-text="cards.0.title" class="text-3xl font-bold text-slate-800 mb-2">起步診斷：Scratch 積木大考驗</h2>
             <p class="text-slate-500 font-light text-base mb-8 pb-6 border-b border-slate-100">先用 10 題了解自己的 Scratch 起點，包含 <strong class="text-emerald-600">5 題核心基本題</strong> 與 <strong class="text-indigo-600">5 題隨機進階題</strong>。滿 80 分可取得紀念證書；這是練習用診斷，不是正式作品評量，也不限制進入下一課。請選一題說明判斷理由，不只記住選項。</p>
             
             <div id="quiz-start-screen" class="flex-grow flex flex-col items-center justify-center text-center pb-8 slide-up-fade">
@@ -84,7 +87,7 @@
 
                 <div class="flex gap-4">
                     <button onclick="startQuiz()" class="bg-white border-2 border-indigo-200 text-indigo-600 px-6 py-2.5 rounded-full font-bold hover:bg-indigo-50 transition-all">再挑戰一次</button>
-                    <a href="1150702.html" class="bg-indigo-600 text-white px-6 py-2.5 rounded-full font-bold hover:bg-indigo-700 shadow-md transition-all hidden flex items-center" id="quiz-next-btn">前往 Lesson 2 ➔</a>
+                    <a data-course-direction="next" href="1150702.html" class="bg-indigo-600 text-white px-6 py-2.5 rounded-full font-bold hover:bg-indigo-700 shadow-md transition-all hidden flex items-center" id="quiz-next-btn">前往 Lesson 2 ➔</a>
                 </div>
             </div>
         </div>
@@ -94,14 +97,14 @@
     <div id="cert-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-slate-900/60 backdrop-blur-sm transition-opacity opacity-0 rounded-3xl">
         <div class="bg-white p-10 rounded-3xl shadow-2xl text-center border-4 border-amber-400 max-w-lg transform scale-90 transition-transform duration-500 mx-4" id="cert-content">
             <div class="text-6xl mb-4">🏆</div>
-            <h2 class="text-3xl font-bold text-amber-600 mb-4">恭喜通關！</h2>
+            <h2 class="text-3xl font-bold text-amber-600 mb-4">積木測驗完成</h2>
             <div id="cert-student-info" class="hidden mb-6">
                 <div class="inline-block bg-indigo-50 border border-indigo-100 text-indigo-800 px-5 py-2.5 rounded-xl text-lg font-bold shadow-sm">
                     <span id="cert-display-class"></span> <span class="mx-2 text-indigo-300">|</span> 座號：<span id="cert-display-seat"></span> <span class="mx-2 text-indigo-300">|</span> <span id="cert-display-name"></span>
                 </div>
             </div>
             <h3 class="text-xl font-bold text-slate-800 mb-4">Scratch 積木大師 證書</h3>
-            <p class="text-slate-600 mb-8 text-sm leading-relaxed">你以優異的成績通過了隨機題庫的嚴格考驗，成功證明了你對 Scratch 積木的熟練度！準備好進入邏輯大腦的訓練了嗎？</p>
+            <p class="text-slate-600 mb-8 text-sm leading-relaxed">選一題答錯或拿不準的題目，試著說說那塊積木有什麼用途。</p>
             <button onclick="closeCertificate()" class="bg-amber-500 text-white px-8 py-3 rounded-full font-bold hover:bg-amber-600 shadow-md transition-all">收下證書並繼續</button>
         </div>
     </div>
@@ -116,7 +119,7 @@
         ];
 
         const advancedPool = [
-            { cat: "motion", catName: "動作", q: "探測車降落後，必須放在舞台正中央作為起點。請選出能讓角色精準回到中心點的積木：", options: [{t: "移動 [10] 點", c: "motion"}, {t: "面朝 [90] 度", c: "motion"}, {t: "定位到 x: [0] y: [0]", c: "motion"}, {t: "滑行 [1] 秒到 (隨機位置)", c: "motion"}], ans: 2 },
+            { cat: "motion", catName: "動作", q: "探測車降落後，必須放在舞台正中央作為起點。請選出能讓角色回到舞台正中央的積木：", options: [{t: "移動 [10] 點", c: "motion"}, {t: "面朝 [90] 度", c: "motion"}, {t: "定位到 x: [0] y: [0]", c: "motion"}, {t: "滑行 [1] 秒到 (隨機位置)", c: "motion"}], ans: 2 },
             { cat: "motion", catName: "動作", q: "畫正方形前，我們希望畫筆「朝向右邊」準備畫第一條線。代表朝向右邊的積木是？", options: [{t: "面朝 [-90] 度", c: "motion"}, {t: "面朝 [0] 度", c: "motion"}, {t: "右轉 ↻ [90] 度", c: "motion"}, {t: "面朝 [90] 度", c: "motion"}], ans: 3 },
             { cat: "motion", catName: "動作", q: "探測車畫完正方形的第一條邊後，必須在角落進行「直角轉彎」。正確積木是？", options: [{t: "左轉 ↺ [90] 度", c: "motion"}, {t: "面朝 [180] 度", c: "motion"}, {t: "右轉 ↻ [90] 度", c: "motion"}, {t: "移動 [-90] 點", c: "motion"}], ans: 2 },
             { cat: "motion", catName: "動作", q: "在製作自動導航系統時，希望無人機永遠面向著玩家（滑鼠游標）的方向，應該使用？", options: [{t: "面朝 (滑鼠指標) 向", c: "motion"}, {t: "定位到 (滑鼠指標)", c: "motion"}, {t: "右轉 ↻ [15] 度", c: "motion"}, {t: "碰到邊緣就反彈", c: "motion"}], ans: 0 },
@@ -146,8 +149,8 @@
             { q: "如果希望星際探測車每次畫出的多邊形邊長都充滿驚喜，介於 50 到 100 之間，應該把哪一個積木塞入「移動點數」的格子中？", cat: "operator", catName: "運算", options: [{t: "((字串組合 [50] 和 [100]))", c: "operator"}, {t: "(( [50] / [100] ))", c: "operator"}, {t: "(( [50] 到 [100] 隨機取數 ))", c: "operator"}, {t: "(( [100] 除以 [50] 的餘數 ))", c: "operator"}], ans: 2 },
             { q: "在防呆機制中，如果規定輸入的長度「必須大於 0」，我們可以用哪一個綠色六角形積木來做為「如果...那麼」的條件？", cat: "operator", catName: "運算", options: [{t: "<((詢問的答案)) > [0]>", c: "operator"}, {t: "<((詢問的答案)) = [0]>", c: "operator"}, {t: "<((詢問的答案)) < [0]>", c: "operator"}, {t: "(( [0] + ((詢問的答案)) ))", c: "operator"}], ans: 0 },
             { q: "如果一場考驗規定「分數要及格 (大於60)」而且「時間不能超時 (小於100)」，我們要用哪一個邏輯積木把這兩個判斷綁在一起？", cat: "operator", catName: "運算", options: [{t: "< < > 或 < > >", c: "operator"}, {t: "< < > 不成立 >", c: "operator"}, {t: "((字串組合 [字串1] 和 [字串2]))", c: "operator"}, {t: "< < > 且 < > >", c: "operator"}], ans: 3 },
-            { q: "若要畫一個完美的「正三角形」，重複 3 次的迴圈內，畫筆每次右轉的角度應該設定為多少度？（提示：360 ÷ 邊數）", cat: "motion", catName: "動作", options: [{t: "右轉 ↻ [60] 度", c: "motion"}, {t: "右轉 ↻ [90] 度", c: "motion"}, {t: "右轉 ↻ [120] 度", c: "motion"}, {t: "右轉 ↻ [180] 度", c: "motion"}], ans: 2 },
-            { q: "當我們畫完美麗的幾何圖騰後，發現探測車角色擋住了圖案的中心。若想讓探測車跑到圖形最下方，應該使用哪個外觀積木？", cat: "looks", catName: "外觀", options: [{t: "移到 (最上層)", c: "looks"}, {t: "移到 (最下層)", c: "looks"}, {t: "隱藏", c: "looks"}, {t: "尺寸設為 [50] %", c: "looks"}], ans: 1 },
+            { q: "若要畫一個正三角形，重複 3 次的迴圈內，畫筆每次右轉的角度應該設定為多少度？（提示：360 ÷ 邊數）", cat: "motion", catName: "動作", options: [{t: "右轉 ↻ [60] 度", c: "motion"}, {t: "右轉 ↻ [90] 度", c: "motion"}, {t: "右轉 ↻ [120] 度", c: "motion"}, {t: "右轉 ↻ [180] 度", c: "motion"}], ans: 2 },
+            { q: "畫完圖形後，發現探測車角色擋住了圖案的中心。若想讓探測車跑到圖形最下方，應該使用哪個外觀積木？", cat: "looks", catName: "外觀", options: [{t: "移到 (最上層)", c: "looks"}, {t: "移到 (最下層)", c: "looks"}, {t: "隱藏", c: "looks"}, {t: "尺寸設為 [50] %", c: "looks"}], ans: 1 },
             { q: "如果我們希望在不點擊綠旗的情況下，玩家一按下鍵盤的「空白鍵」就會清空畫布，應該使用哪一個事件帽子積木？", cat: "event", catName: "事件", options: [{t: "當 🟢 綠旗被點擊", c: "event"}, {t: "當 (空白鍵) 鍵被按下", c: "event"}, {t: "當這個角色被點擊", c: "event"}, {t: "<(空白鍵) 鍵被按下 ?>", c: "sensing"}], ans: 1 },
             { q: "當程式需要告訴使用者「計算完成！」的訊息，且不希望文字框立刻消失，應該使用哪一個積木最合適？", cat: "looks", catName: "外觀", options: [{t: "說出 [計算完成！] [2] 秒", c: "looks"}, {t: "說出 [計算完成！]", c: "looks"}, {t: "詢問 [計算完成！] 並等待", c: "sensing"}, {t: "想著 [計算完成！] [2] 秒", c: "looks"}], ans: 0 },
             { q: "當背景音樂播放完畢，想要通知另一個「煙火」角色開始播放動畫，最好的溝通方式是使用哪一個積木發送訊號？", cat: "event", catName: "事件", options: [{t: "變數 (訊號) 設為 [1]", c: "variable"}, {t: "當收到訊息 (播放煙火)", c: "event"}, {t: "廣播訊息 (播放煙火)", c: "event"}, {t: "說出 [播放煙火]", c: "looks"}], ans: 2 },
@@ -323,8 +326,8 @@
 
             if (finalScore >= 80) {
                 emoji.textContent = "🎉";
-                title.textContent = "太棒了！測驗通關";
-                msg.textContent = "你具備了扎實的 Scratch 基礎！如有需要，可選擇在自己的裝置製作紀念證書；不填寫資料也能直接進入下一課。";
+                title.textContent = "積木測驗完成";
+                msg.textContent = "這次測驗達到 80 分，可以在這台裝置製作紀念證書。證書是選做，可以直接進入下一課。";
                 msg.className = "text-emerald-600 font-bold mb-6 bg-emerald-50 px-6 py-3 rounded-xl border border-emerald-200";
                 
                 certForm.classList.remove('hidden');
@@ -334,8 +337,8 @@
                 try { localStorage.setItem('unforte115_l1QuizPassed', 'true'); } catch(e){}
             } else {
                 emoji.textContent = "💪";
-                title.textContent = "再接再厲！";
-                msg.textContent = "差一點點就 80 分囉！建議再挑戰一次，加深對積木的印象！";
+                title.textContent = "積木測驗完成";
+                msg.textContent = "這次未達 80 分。可以先想想哪一類積木容易搞混，再做一次。";
                 msg.className = "text-rose-600 font-bold mb-8 bg-rose-50 px-6 py-3 rounded-xl border border-rose-200";
             }
         }

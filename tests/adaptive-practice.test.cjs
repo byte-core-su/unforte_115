@@ -70,7 +70,9 @@ const main = { nextSibling: null, parentNode: { insertBefore(node) { inserted = 
 const document = { querySelector: selector => selector === 'main' ? main : null, createElement: tag => tag === 'section' ? section : { querySelector: element }, hasFocus: () => true, addEventListener() {} };
 const predictableMath = Object.create(Math);
 predictableMath.random = () => 0;
-vm.runInNewContext(source, { document, window: { CourseScenarios, location: { pathname: '/1150703.html' }, addEventListener() {} }, Math: predictableMath });
+const window = { CourseScenarios, location: { pathname: '/1150703.html' }, addEventListener() {} };
+vm.runInNewContext(fs.readFileSync(path.join(root, 'lesson-labels.js'), 'utf8'), { window });
+vm.runInNewContext(source, { document, window, Math: predictableMath });
 assert.ok(inserted, 'practice card should be inserted beside the lesson main');
 assert.match(element('.adaptive-practice__prompt').textContent, /正 .*邊形/);
 let item = createQuestion('1150703.html', 1, () => 0);

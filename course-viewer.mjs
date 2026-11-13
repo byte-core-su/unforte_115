@@ -1,4 +1,4 @@
-import { escapeHtml as e, loadCatalog, decodeCourse, encodeCourse, prerequisiteWarnings, resolveCourseNavigation, downloadCourse } from './course-kit.mjs';
+import { escapeHtml as e, loadCatalog, decodeCourse, encodeCourse, prerequisiteWarnings, downloadCourse } from './course-kit.mjs';
 const $ = id => document.getElementById(id);
 let modules, course, selected, position = 0, navigationObserver;
 const status = message => { $('status').textContent = message; };
@@ -29,24 +29,18 @@ function attachCourseNavigation() {
   const doc = $('lesson-frame').contentDocument;
   if (!doc || !selected) return;
   const module = selected[position];
-  function navigationFor(control) {
-    if (control?.dataset.courseDirection) return control.dataset.courseDirection;
-    return control ? resolveCourseNavigation({ href: control.getAttribute('href'), onclick: control.getAttribute('onclick') || '', tagName: control.tagName, textContent: control.textContent }, module, modules) : null;
-  }
   function adapt() {
-    for (const control of doc.querySelectorAll('a,button')) {
-      const direction = navigationFor(control);
-      if (!direction) continue;
+    for (const control of doc.querySelectorAll('[data-course-direction]')) {
+      const direction = control.dataset.courseDirection;
       // React owns these child nodes. Keep that tree intact; use the outer course toolbar.
       if (module.entry === '1150801.html' && control.closest('#app-container')) { control.hidden = true; continue; }
       const label = direction === 'outline' ? '查看本課程地圖 ↑' : direction === 'next' ? (position === selected.length - 1 ? '本課程最後一個單元，查看地圖 ↑' : '下一個選課單元 →') : (position === 0 ? '查看本課程地圖 ↑' : '← 上一個選課單元');
-      control.dataset.courseDirection = direction;
       if (control.textContent !== label) control.textContent = label;
     }
   }
   doc.addEventListener('click', event => {
-    const control = event.target.closest('a,button');
-    const direction = navigationFor(control);
+    const control = event.target.closest('[data-course-direction]');
+    const direction = control?.dataset.courseDirection;
     if (!direction) return;
     event.preventDefault(); event.stopImmediatePropagation();
     if (direction === 'outline') showOutline();

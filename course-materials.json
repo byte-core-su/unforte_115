@@ -21,12 +21,9 @@
       },
       "lessonPlan": {
         "source": "LESSON_PLAN_GRADE_7.md",
-        "html": "lesson-plan-grade-7.html",
-        "sectionId": "section-3",
-        "heading": "第 6 課｜防禦網測試與資料應用",
         "assessmentId": "section-4"
       },
-      "record": { "file": "STUDENT_RECORDS.md", "heading": "七年級：防禦網參數與資料分析" },
+      "record": { "source": "STUDENT_RECORDS.md" },
       "presentation": {
         "file": "presentations/20261110.html",
         "references": [
@@ -58,12 +55,9 @@
       },
       "lessonPlan": {
         "source": "LESSON_PLAN_GRADE_8.md",
-        "html": "lesson-plan-grade-8.html",
-        "sectionId": "section-3",
-        "heading": "第 6 課｜星際爭霸戰：清單與模組化測試",
         "assessmentId": "section-4"
       },
-      "record": { "file": "STUDENT_RECORDS.md", "heading": "八年級：自訂積木與對決測試" },
+      "record": { "source": "STUDENT_RECORDS.md" },
       "presentation": {
         "file": "presentations/20261110.html",
         "references": [

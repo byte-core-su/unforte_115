@@ -6,7 +6,8 @@
   "entry": "1150802.html",
   "periods": 2,
   "goal": "理解清單可儲存一連串資料，程式必須依索引順序讀取，才能播放正確旋律。",
-  "evidence": "短旋律、索引對照表及一則錄音或素材授權的判斷理由。",
+  "evidence": "一份 Scratch 短旋律、前 4 個音符的索引表，以及一則錄音或素材使用的判斷與理由。",
+  "successCriteria": "旋律照清單順序播放。改一項後，能指出哪個索引和音符改變、聽到什麼差異。素材使用的理由說明何時應先徵得同意或確認授權。",
   "priorKnowledge": "Scratch 事件、變數與迴圈基礎",
   "prerequisites": [
     "g8-01"
@@ -17,8 +18,8 @@
     "素材授權"
   ],
   "resources": {
-    "lessonPlan": "lesson-plan-grade-8.html#section-3",
-    "records": "STUDENT_RECORDS.md",
+    "lessonPlan": "lesson-plan-grade-8.html#lesson-2",
+    "records": "student-records.html#g8-02",
     "scratchArchive": "11508.zip"
   }
 }

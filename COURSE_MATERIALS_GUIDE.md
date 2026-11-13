@@ -9,7 +9,7 @@
 | Scratch 參考範例 | `11507.zip` 內的 `11507/unfoter11507_L6.sb3` | `11508.zip` 內的 `11508/unfoter11508_L6.sb3` |
 | Scratch 模組化示範 | 不適用 | [下載四個自訂積木示範](1150806-demo.sb3)、[操作與測試說明](SCRATCH_L6_DEMO_GUIDE.md) |
 | 教案與評量 | [Markdown](LESSON_PLAN_GRADE_7.md)、[HTML 教案](lesson-plan-grade-7.html#section-3)；第 6 課及評量方式 | [Markdown](LESSON_PLAN_GRADE_8.md)、[HTML 教案](lesson-plan-grade-8.html#section-3)；第 6 課及評量方式 |
-| 學習紀錄 | [學生學習紀錄表](STUDENT_RECORDS.md)的「防禦網參數與資料分析」 | 同一份紀錄表的「自訂積木與對決測試」 |
+| 學習紀錄 | [防禦網參數與資料分析](student-records.html#g7-06) | [自訂積木與對決測試](student-records.html#g8-06) |
 | 簡報 | [HTML 簡報](presentations/20261110.html)第 4 頁與第 6 頁的七年級逐課計數 | 同一份簡報第 5 頁與第 6 頁的八年級逐課計數 |
 
 網頁動畫目前沒有獨立素材包。清單記錄所在頁、區塊 ID、程式入口、可替換內容及可沿用規則。簡報的期末專題目前以表列說明，沒有專屬操作截圖；第 9、10 頁的圖片是兩個年級的第 3 課案例，不列作第 6 課素材。

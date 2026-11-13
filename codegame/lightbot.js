@@ -22,7 +22,7 @@
         cancelled: () => status('未放入圖卡，原指令仍保留。')
     });
     // 單一路線：第 1 關之後，要過前一關才開啟下一關。教師示範模式（首頁「教師備課」開啟，或網址加 ?teacher=1）會全部開啟。
-    const teacherView = (() => { const param = /[?&](route=all|teacher=1)\b/.test(location.search); try { if (param) sessionStorage.setItem('unforte115:teacher-demo', '1'); return sessionStorage.getItem('unforte115:teacher-demo') === '1'; } catch { return param; } })();
+    const teacherView = window.TeacherDemo.isOn();
     function levelOpen(item) { const index = levels.indexOf(item); return teacherView || index <= 0 || Boolean(record.levels[levels[index - 1].id]?.completed) || Boolean(record.levels[item.id]?.completed); }
     function firstOpenUnfinished() { return levels.find(item => levelOpen(item) && !record.levels[item.id]?.completed) || [...levels].reverse().find(levelOpen); }
     function entry() { return record.levels[level.id] ||= { programs: { main: [], p1: [], p2: [] }, attempts: 0, elapsedMs: 0, completed: false, bestCommands: null, bestProgram: null, completedAt: null, lastRun: null }; }
@@ -154,7 +154,7 @@
     if (teacherView) {
         const badge = document.createElement('div'); badge.className = 'teacher-demo-badge'; badge.setAttribute('role', 'status');
         badge.innerHTML = '教師示範模式：全部開啟 <button type="button">結束示範</button>';
-        badge.querySelector('button').addEventListener('click', () => { try { sessionStorage.removeItem('unforte115:teacher-demo'); } catch { /* 無法保存時改用網址參數 */ } location.href = location.pathname + location.hash; });
+        badge.querySelector('button').addEventListener('click', window.TeacherDemo.end);
         document.body.append(badge);
     }
     if (student.source === '示範學生') status('開始前，先按上方「設定學生資料」填入自己的姓名、學號和班級，紀錄才會是你的。接著從第 1 關開始，過關才會開啟下一關。');

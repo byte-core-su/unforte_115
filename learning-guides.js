@@ -12,56 +12,32 @@
     },
     '1150701.html': {
       grade: '七年級｜第 1 課',
-      title: '起步診斷：讀懂積木並啟動專案',
-      goal: '辨識事件、動作、控制、外觀與變數積木，確認自己已具備進入課程的 Scratch 基礎。',
-      action: '完成診斷後說明一題答錯或猶豫的積木；再完成頁末個資、授權與可疑連結情境判斷。',
-      evidence: '一則積木用途說明與三題資訊使用判斷理由；診斷分數不作為進入下一課的唯一條件。',
-      check: '我能找到程式起點，也知道公開作品前要檢查個資與素材授權。',
-      exit: '選一題答錯或猶豫的積木，說明它的用途；再舉一個公開作品前要檢查的資訊安全情境。'
+      action: '做完積木測驗後，選一塊積木說明何時執行、會改變什麼。可以從答錯或拿不準的題目選。再做個資、授權和可疑連結三題。',
+      exit: '選一塊積木，說明何時執行、會改變什麼；再舉一個公開作品前要檢查的資訊安全情境。'
     },
     '1150702.html': {
       grade: '七年級｜第 2 課',
-      title: '程式三大結構：先預測，再執行，再除錯',
-      goal: '區分循序、選擇與重複結構，並用輸入、處理、輸出描述程式邏輯。',
-      action: '每個練習先在執行前寫下預測；結果不同時，圈出第一個造成差異的積木並修正。',
-      evidence: '完成三種結構的配對，並能舉出一個「條件不成立」時程式會走向何處的例子。',
-      check: '我能用「如果……否則……」解釋分支，也能說明迴圈省下了哪些重複指令。',
+      action: '先寫下你猜程式會怎麼跑，再執行。結果不同時，找出哪一塊積木讓結果開始不一樣，改完再試。',
       exit: '選一段分支或迴圈，先預測更改條件或次數後的結果，再執行並指出第一個差異。'
     },
     '1150703.html': {
       grade: '七年級｜第 3 課',
-      title: '迴圈繪圖：把重複指令變成多邊形',
-      goal: '利用重複執行與轉角規律，畫出可預測的正多邊形。',
-      action: '先手算邊數與每次轉角，再用迴圈完成圖形；改變邊數後觀察哪些量必須一起改。',
-      evidence: '至少完成一個三角形與一個五邊形，並在作品中標註「重複次數」和「轉向角度」。',
-      check: '我能解釋為什麼正 N 邊形每次要轉 360 ÷ N 度。',
+      action: '選一個邊數，先算要重複幾次、每次轉幾度，再用迴圈畫出來。換一個邊數，看看哪兩個設定要一起改。挑一個圖形把轉角改錯，再改回來，記下差異。',
       exit: '換一個邊數，寫出重複次數與轉角，實際繪圖後說明圖形是否閉合。'
     },
     '1150704.html': {
       grade: '七年級｜第 4 課',
-      title: '變數控制：讓圖形在迴圈中持續改變',
-      goal: '理解變數是可記錄、可更新的資料，並用它控制螺旋圖形的邊長或角度。',
-      action: '先追蹤前三圈變數的值，再決定更新積木應放在迴圈的前面還是後面，最後比較兩種結果。',
-      evidence: '交出一張變數追蹤表與一個螺旋作品，並說明一次「放錯位置」造成的差異。',
-      check: '我能指出變數的初始值、更新規則，以及它如何改變每一輪的畫面。',
+      action: '先記下前三次重複時的長度。把改變長度的積木分別放在「移動」前和後，看看畫出的螺旋有什麼不同。',
       exit: '自選初始值與增加量，預測前三輪數值；移動更新積木後比較第一輪的差異。'
     },
     '1150705.html': {
       grade: '七年級｜第 5 課',
-      title: '幾何曼陀羅：複習迴圈，進階體驗自訂積木',
-      goal: '先運用迴圈與變數繪圖；進階再將重複程式整理成自訂積木與參數。',
-      action: '先用迴圈與變數畫出兩種圖形；進階再把重複積木群命名為自訂積木，只改參數觀察輸出。',
-      evidence: '兩組不同設定的圖形及迴圈／變數說明；進階者再附帶參數的自訂積木。',
-      check: '我能指出重複動作與控制輸出的數值；進階者能解釋參數如何讓程式重複使用。',
+      action: '在 Scratch 用迴圈和變數畫兩組不同設定的曼陀羅。選做時，把反覆用到的程式做成自訂積木，只改參數，看看圖形怎麼變。',
       exit: '比較兩組不同設定，指出哪個數值改變圖形；進階者說明參數如何重複使用積木。'
     },
     '1150706.html': {
       grade: '七年級｜第 6 課',
-      title: `${defense.project}專題：測試參數並分析資料`,
-      goal: `整合事件、迴圈與變數製作${defense.project}，搜尋與比較測試資料以選出有效且省資源的組合。`,
-      action: `先在 Scratch 完成可調參數${defense.project}；用至少三組參數測試，再完成頁末資料搜尋與平均消耗量分析。`,
-      evidence: 'Scratch 作品、三組測試表、一次修正與 60 秒作品說明；網頁模擬器不能代替自己的作品。',
-      check: '我能說明程式結構、實測結果和選擇最省資源方案的理由。',
+      action: `先在 Scratch 做出能調整參數的${defense.project}。至少試三組設定，記下結果，再做頁末的搜尋與平均消耗量練習。`,
       exit: '用自己的三組參數測試表，說明哪組有效且較省資源，並指出一次修正與重測。'
     },
     '1150800.html': {
@@ -74,66 +50,45 @@
     },
     '1150801.html': {
       grade: '八年級｜第 1 課',
-      title: '清單基本操作：每一步都看得見資料變化',
-      goal: '掌握新增、插入、替換、刪除、讀取與長度等操作，並正確理解索引位置。',
-      action: `每次操作後記錄清單結果；再用頁末循序搜尋逐項找${inventory.kind}，測試找到與找不到。`,
-      evidence: '四種清單操作對照，以及找到／找不到各一筆搜尋紀錄。',
-      check: '我能預測索引變化，並說明搜尋何時停止。',
+      action: `每操作一次，就記下清單變成什麼樣子。再到「循序搜尋」從第 1 項開始找${inventory.kind}，各試一次找得到和找不到的情況，再到 Scratch 寫搜尋程式並測試。`,
       exit: '換一個目標項目，先猜位置，再記錄找到或找不到的每次比較與停止原因。'
     },
     '1150802.html': {
       grade: '八年級｜第 2 課',
-      title: '音符清單：依序走訪資料',
-      goal: '理解清單可儲存一連串資料，程式必須依索引順序讀取，才能播放正確旋律。',
-      action: '先以四個音符預測播放順序，再修改一項並聽出差異；完成頁末錄音與素材使用判斷。',
-      evidence: '短旋律、索引對照表及一則錄音或素材授權的判斷理由。',
-      check: '我能說明索引如何逐項讀取清單，也知道分享錄音前須檢查個資與授權。',
+      action: '先猜四個音符會怎麼播，再改其中一個音符，聽聽哪裡不同。最後完成頁末的錄音與素材使用題。',
       exit: '改動一個音符或交換兩項，預測播放順序並驗證，說明清單索引如何控制旋律。'
     },
     '1150803.html': {
       grade: '八年級｜第 3 課',
-      title: '資料統計：追蹤加總與平均的過程',
-      goal: '使用累加器與清單走訪，計算總和與平均，並理解每一步的中間值。',
-      action: '建立「目前項目、累計總和、已處理筆數」追蹤表；在可編輯模擬器中測試多筆、單筆與空清單。',
-      evidence: '用正常資料、單筆資料與空清單三種案例測試，說明哪些情況需要額外處理。',
-      check: '我能區分總和與平均，也能解釋空清單為何不能直接拿來除。',
+      action: '用模擬器試多筆、單筆、空清單三種情況。每次按「讀取並加總」，記下目前加到多少、讀了幾筆。',
       exit: '換一組數值，追蹤每輪累計值；再用空清單說明平均值為何不能直接計算。'
     },
     '1150804.html': {
       grade: '八年級｜第 4 課',
-      title: '隨機抽取：建立不重複的選人規則',
-      goal: '以「候選清單」與「已選清單」控制隨機抽取，確保同一位同學不會重複被選到。',
-      action: '每抽一次都記錄兩個清單的狀態；先說出不變條件，再檢查程式是否真的維持它。',
-      evidence: '完成四次不重複抽取，並用資料表證明候選數量每次都少一人。',
-      check: '我能說出「抽到後從候選清單移除」為什麼是避免重複的關鍵。',
+      action: '先看網頁示範，再到 Scratch 寫抽籤程式。每抽一次，記下座號及兩份清單的人數變化。',
       exit: '記錄一次抽取前後兩個清單，指出候選數量與已選數量各變多少，以及避免重複的原因。'
     },
     '1150805.html': {
       grade: '八年級｜第 5 課',
-      title: '洗牌與排序：比較兩種演算法',
-      goal: '理解洗牌讓順序隨機，排序依比較規則排列；兩者都不能遺漏或重複資料。',
-      action: '先追蹤洗牌的選取與移除；再於頁末逐步執行相鄰比較排序，記錄每次交換。',
-      evidence: '一次洗牌紀錄、一張排序追蹤表與資料項目不變的驗證。',
-      check: '我能分別說出洗牌與排序的目標、步驟及停止條件。',
+      action: '先在網頁記錄洗牌過程。到「排序與洗牌比較」觀察哪兩項會交換，再用 Scratch 做相鄰比較排序。',
       exit: '用新數字牌預測第一次比較是否交換，執行後核對；再說明洗牌與排序的目標差別。'
     },
     '1150806.html': {
       grade: '八年級｜第 6 課',
-      title: `${active.grades[8].cards[5].title}：清單、模組與測試`,
-      goal: '把建立、洗牌、分配及逐回合比大小拆成自訂積木，再驗證清單資料規則。',
-      action: '先排列頁末四個自訂積木的呼叫順序；在 Scratch 建立功能，測試數量足夠、不足與抽取後不重複。',
-      evidence: '含四個自訂積木的作品、清單流程圖、三組測試及一次修正紀錄。',
-      check: '我能解釋各模組的責任和測試結果，而不只展示一場成功對決。',
+      action: '先在頁末排好四個自訂積木的呼叫順序，再到 Scratch 做出程式。試試裝備夠用、不夠用的情況，再檢查分出去的裝備有沒有重複。',
       exit: `用一組新的${duel.item}清單，展示自訂積木呼叫順序、邊界測試與一次修正後的結果。`
     }
   };
 
   const page = window.location.pathname.split('/').pop() || 'index.html';
-  const guide = guides[page];
+  const info = guides[page];
+  if (!info) return;
+  const assessment = window.LessonAssessments?.[page];
+  const guide = assessment ? { ...info, ...assessment } : info;
   // Shared with lesson-route.js, which turns the exit task and evidence into route steps.
-  if (guide) window.LearningGuide = { page, ...guide };
+  window.LearningGuide = { page, ...guide };
   const main = document.querySelector('main');
-  if (!guide || !main) return;
+  if (!main) return;
 
   const section = document.createElement('section');
   section.id = 'learning-guide';
@@ -144,28 +99,28 @@
   // Teachers land on student-facing pages; give them a direct way to the matching lesson plan.
   const planGrade = page.startsWith('11508') ? 8 : 7;
   const lessonNumber = Number(page.slice(6, 7));
-  const planHref = `lesson-plan-grade-${planGrade}.html${lessonNumber ? `#lesson-${lessonNumber}` : ''}`;
+  const planHref = guide.lessonPlan || `lesson-plan-grade-${planGrade}.html${lessonNumber ? `#lesson-${lessonNumber}` : ''}`;
   const planLabel = lessonNumber ? '教師備課：本課教案' : `教師備課：${planGrade === 7 ? '七' : '八'}年級教案`;
   section.innerHTML = `
     <div class="learning-guide__card">
       <div class="learning-guide__top">
-        <span class="learning-guide__tag">${escapeHtml(guide.grade)}｜學習導航</span>
+        <span class="learning-guide__tag">${escapeHtml(guide.grade)}｜學習導航${guide.periods ? '｜建議 ' + guide.periods + ' 節' : ''}</span>
         <a class="learning-guide__teacher" href="${planHref}" target="_blank" rel="noopener">${planLabel} ↗</a>
       </div>
-      <h2>${escapeHtml(guide.title)}</h2>
-      <p class="learning-guide__goal"><strong>本課目標：</strong>${escapeHtml(guide.goal)}</p>
+      <h2>${escapeHtml(guide.title || '本課學習導航')}</h2>
+      <p class="learning-guide__goal"><strong>本課目標：</strong>${escapeHtml(guide.goal || '請參考本課教案。')}</p>
       <div class="learning-guide__grid">
-        <div class="learning-guide__item"><strong>挑戰任務</strong>${escapeHtml(guide.action)}</div>
-        <div class="learning-guide__item"><strong>完成證據</strong>${escapeHtml(guide.evidence)}</div>
+        <div class="learning-guide__item"><strong>${lessonNumber ? '這一課要做什麼' : '上課順序'}</strong>${escapeHtml(guide.action)}</div>
+        <div class="learning-guide__item"><strong>${lessonNumber ? '必交項目' : '各課要交的作品與紀錄'}</strong>${escapeHtml(guide.evidence || '請參考本課教案。')}</div>
       </div>
-      <p class="learning-guide__check">離堂檢核：${escapeHtml(guide.check)}</p>
+      <p class="learning-guide__check"><strong>${lessonNumber ? '怎樣算達標' : '學完後確認一下'}</strong> ${escapeHtml(guide.successCriteria || guide.check || '請參考本課教案。')}</p>
+      ${lessonNumber ? `<p><a href="${escapeHtml(guide.records || 'student-records.html')}" target="_blank" rel="noopener">打開學習紀錄表 ↗</a></p>` : ''}
       ${guide.exit ? `
         <p class="learning-guide__exit">
-          <strong>本課離堂任務：</strong>${escapeHtml(guide.exit)}
-          請在教師發的線上作業副本填寫預測、結果與修正，完成後回班級平台繳交。
-          網頁答對或闖關成功不等於正式成績。
-          <a href="student-records.html" target="_blank" rel="noopener">查看學習紀錄模板 ↗</a>
-          <a href="#adaptive-practice">前往本課自適應練習 →</a>
+          <strong>離堂檢核（老師指定時做）</strong> ${escapeHtml(guide.exit)}
+          依上方必交項目回班級平台繳交。
+          網頁作答用來練習，正式成績依老師說明。
+          <a href="#adaptive-practice">換一題練習 →</a>
         </p>
       ` : ''}
     </div>

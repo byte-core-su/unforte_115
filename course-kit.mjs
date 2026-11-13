@@ -11,6 +11,7 @@ export function validateCatalog(modules) {
     if (![7, 8].includes(item.grade) || !Number.isInteger(item.lesson) || item.lesson < 1 || item.lesson > 6) throw new Error('模組年級或單元編號無效。');
     if (!/^1150[78]0[1-6]\.html$/.test(item.entry) || item.entry !== `1150${item.grade}0${item.lesson}.html`) throw new Error('模組入口必須對應站內單元。');
     if (typeof item.title !== 'string' || !item.title.trim() || typeof item.goal !== 'string' || typeof item.evidence !== 'string') throw new Error('模組缺少名稱、目標或完成證據。');
+    if (!item.evidence.trim() || typeof item.successCriteria !== 'string' || !item.successCriteria.trim()) throw new Error(`模組 ${item.id} 缺少必交項目或達標條件。`);
     if (!Array.isArray(item.tags) || item.tags.some(tag => typeof tag !== 'string') || !Array.isArray(item.prerequisites)) throw new Error('模組標籤或先備設定無效。');
     if (!Number.isInteger(item.periods) || item.periods < 1) throw new Error('模組建議節數無效。');
   }
@@ -55,17 +56,6 @@ export function prerequisiteWarnings(course, modules) {
     seen.add(id);
   }
   return warnings;
-}
-
-export function resolveCourseNavigation({ href, onclick = '', tagName, textContent = '' }, currentModule, modules) {
-  const destination = href || onclick.match(/(?:location\.href\s*=\s*)['"]([^'"]+)['"]/)?.[1];
-  if (destination === 'index.html' || /^1150[78]00\.html$/.test(destination || '') || /goToHome\(/.test(onclick)) return 'outline';
-  if (/^1150[78]0[1-6]\.html$/.test(destination || '')) {
-    const target = modules.find(item => item.entry === destination);
-    return target && target.grade === currentModule.grade ? (target.lesson > currentModule.lesson ? 'next' : 'previous') : 'outline';
-  }
-  if (tagName === 'BUTTON' && /(?:返回|回到|回).*?(?:課程總覽|總覽|任務儀表板)/.test(textContent)) return 'outline';
-  return null;
 }
 
 export function encodeCourse(course) {

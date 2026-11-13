@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+    <script src="lesson-assessments.js" defer></script>
     <script src="learning-guides.js" defer></script>
+    <script src="lesson-labels.js" defer></script>
     <script src="adaptive-practice.js" defer></script>
     <link rel="stylesheet" href="lesson-route.css">
+    <script src="teacher-demo.js" defer></script>
     <script src="lesson-route.js" defer></script>
     <script src="lesson-routes.js" defer></script>
     <meta charset="UTF-8">
     <script src="course-scenarios.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LESSON 3 - 基礎繪圖與偷懶的藝術</title>
+    <title>迴圈多邊形｜資訊科技課程</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
@@ -29,32 +32,32 @@
     <header class="bg-white border-b border-gray-100 pt-8 pb-12 slide-up-fade">
         <div class="max-w-5xl mx-auto px-6 lg:px-8">
             <div class="mb-6">
-                <a href="index.html" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+                <a data-course-direction="outline" href="index.html" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> 
                     返回網站首頁
                 </a>
             </div>
             <p class="text-sm font-medium text-indigo-500 mb-2 tracking-widest uppercase">演算法與程式設計</p>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight"><span data-scenario-text="name">星際防禦工程師</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用程式編織能量防護網</span></h1>
-            <p data-scenario-text="intro" class="text-lg text-slate-500 font-light max-w-2xl">結合「IPO 思維」與「重複結構」，循序漸進建立邏輯思維與幾何繪圖能力，並透過實作防禦網任務，體驗程式設計的強大魔力。</p>
+            <p data-scenario-text="intro" class="text-lg text-slate-500 font-light max-w-2xl">先練習讀積木和排程式，再用迴圈與變數畫圖。最後做出防禦網，換幾組設定測試。</p>
         </div>
     </header>
 
     <main class="max-w-5xl mx-auto px-6 lg:px-8 py-12 relative">
-        <a href="1150700.html" class="mb-8 inline-flex items-center text-sm font-medium text-slate-400 hover:text-slate-800 transition-colors">
+        <a data-course-direction="outline" href="1150700.html" class="mb-8 inline-flex items-center text-sm font-medium text-slate-400 hover:text-slate-800 transition-colors">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 返回課程總覽
         </a>
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12 mb-8 slide-up-fade">
             <span class="text-sm font-semibold text-slate-400 tracking-wider block mb-2">LESSON 3</span>
             <h2 data-scenario-text="cards.2.title" class="text-3xl font-bold text-slate-800 mb-4">基礎防禦單元：迴圈多邊形</h2>
-            <p class="text-slate-500 font-light text-lg mb-10">防護盾發生器需要完美的幾何圖形！我們將先學習牽引能量畫出第一條直線，接著運用「重複結構」尋找多邊形外角的共通密碼，畫出完美的基礎能量盾。</p>
+            <p class="text-slate-500 font-light text-lg mb-10">先讓探測車用畫筆畫一條直線，再排出正方形的積木。接著用迴圈試畫正多邊形，看看邊數改了以後，每次要轉幾度。</p>
             
             <div class="space-y-16">
                 <!-- 第一階段：互動組裝畫線積木 -->
                 <div class="border-b-2 border-dashed border-slate-100 pb-16">
                     <div class="flex items-center mb-8">
                         <span class="bg-emerald-100 text-emerald-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">1</span>
-                        <h3 class="text-2xl font-bold text-slate-800">第一階段：喚醒畫筆，畫出第一條直線</h3>
+                        <h3 id="route-pen-line" class="text-2xl font-bold text-slate-800">第一階段：用畫筆畫直線，畫出第一條直線</h3>
                     </div>
                     
                     <div class="grid grid-cols-1 gap-8 mb-8">
@@ -111,7 +114,7 @@
                 <div class="border-b-2 border-dashed border-slate-100 pb-16">
                     <div class="flex items-center mb-8">
                         <span class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">2</span>
-                        <h3 class="text-2xl font-bold text-slate-800">第二階段：從線條到轉彎 (手動繪製正方形)</h3>
+                        <h3 id="route-manual-square" class="text-2xl font-bold text-slate-800">第二階段：手動畫正方形 (手動繪製正方形)</h3>
                     </div>
                     
                     <div class="grid grid-cols-1 gap-8 mb-8">
@@ -169,11 +172,11 @@
                     </div>
                 </div>
 
-                <!-- 第三階段：偷懶的藝術 -->
+                <!-- 第三階段：用迴圈畫正方形 -->
                 <div>
                     <div class="flex items-center mb-8">
                         <span class="bg-orange-100 text-orange-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">3</span>
-                        <h3 class="text-2xl font-bold text-slate-800">第三階段：偷懶的藝術 (導入重複結構)</h3>
+                        <h3 id="route-repeat-square" class="text-2xl font-bold text-slate-800">第三階段：用迴圈畫正方形 (導入重複結構)</h3>
                     </div>
                     
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -212,13 +215,13 @@
                         </div>
                     </div>
 
-                    <!-- 第四階段：實戰程式設計區 -->
+                    <!-- 第四階段：試畫正多邊形 -->
                     <section id="polygon-simulator" class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 mt-12 slide-up-fade">
-                        <h4 class="text-xl font-bold text-slate-800 mb-3 flex items-center">
-                            <span class="text-2xl mr-2">📐</span> 第四階段：實戰程式設計區 (尋找多邊形密碼)
+                        <h4 id="route-polygon" class="text-xl font-bold text-slate-800 mb-3 flex items-center">
+                            <span class="text-2xl mr-2">📐</span> 第四階段：試畫正多邊形 (尋找多邊形密碼)
                         </h4>
                         <p class="text-sm text-slate-500 font-light mb-6 leading-relaxed">
-                            現在換你來當工程師了！請透過設定迴圈的<strong class="text-orange-600">「次數」</strong>與右轉的<strong class="text-indigo-600">「角度」</strong>，引導探測車畫出完美的<strong class="text-slate-700">正三角形、正五邊形、正六邊形</strong>。如果設定錯誤，圖形將無法閉合喔！
+                            選一個圖形，設定迴圈的<strong class="text-orange-600">「次數」</strong>與右轉的<strong class="text-indigo-600">「角度」</strong>，用探測車試畫<strong class="text-slate-700">正三角形、正五邊形、正六邊形</strong>。按下啟動後，看看線條能不能回到起點。
                         </p>
 
                         <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
@@ -286,10 +289,10 @@
                         <!-- 最終公式揭曉 -->
                         <div id="poly-formula-reveal" class="hidden mt-8 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 p-6 md:p-8 rounded-2xl shadow-md slide-up-fade relative overflow-hidden">
                             <div class="absolute -right-10 -bottom-10 text-9xl opacity-10">💡</div>
-                            <h4 class="text-xl md:text-2xl font-bold text-amber-800 mb-3">🎉 恭喜你發現了「幾何與角度的黃金法則」！</h4>
+                            <h4 class="text-xl md:text-2xl font-bold text-amber-800 mb-3">畫正多邊形時，每次要轉幾度？</h4>
                             <p class="text-base text-slate-700 leading-relaxed mb-6">
                                 無論是畫哪一種正多邊形，探測車只要繞著邊緣轉完一圈回到原本的方向，它總共就轉了 <strong>360 度</strong>。<br>
-                                這就是數學上著名的「外角和定理」！所以我們可以推導出一個超級萬用的公式：
+                                這就是數學上著名的「外角和定理」！用一圈的角度除以邊數，就能算出每次的轉角。
                             </p>
                             <div class="bg-white px-6 py-5 rounded-xl border border-amber-200 font-mono text-lg md:text-xl text-center font-bold text-slate-800 shadow-inner mb-8">
                                 <span class="text-orange-600">重複次數 (邊數 N)</span> × <span class="text-indigo-600">每次旋轉角度</span> ＝ <span class="text-rose-600 text-2xl">360°</span>
@@ -300,7 +303,7 @@
                             <!-- 最終程式碼總覽 -->
                             <div class="bg-white/80 backdrop-blur-sm p-6 rounded-xl border border-amber-200 shadow-sm flex flex-col items-center">
                                 <h5 class="text-lg font-bold text-amber-900 mb-5 flex items-center gap-2">
-                                    <span>🧩</span> 最終完美積木組合
+                                    <span>🧩</span> 正多邊形積木範例
                                 </h5>
                                 
                                 <div class="flex flex-col items-start font-bold text-sm w-full max-w-sm">
@@ -367,8 +370,8 @@
         </div>
         
         <div class="flex justify-between items-center">
-            <a href="1150702.html" class="text-sm text-slate-400 hover:text-slate-800 transition-colors">⬅ 上一個單元</a>
-            <a href="1150704.html" class="inline-block text-center text-sm font-medium text-slate-600 bg-white border border-gray-200 px-6 py-3 rounded-full hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm">下一個單元 ➔</a>
+            <a data-course-direction="previous" href="1150702.html" class="text-sm text-slate-400 hover:text-slate-800 transition-colors">⬅ 上一個單元</a>
+            <a data-course-direction="next" href="1150704.html" class="inline-block text-center text-sm font-medium text-slate-600 bg-white border border-gray-200 px-6 py-3 rounded-full hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm">下一個單元 ➔</a>
         </div>
     </main>
 
@@ -683,7 +686,7 @@
             }
 
             if (timesInput === '4' && angleInput === '90') {
-                feedback.textContent = "太厲害了！回答正確！🎉 正方形共有 4 條邊，外角旋轉 360° ÷ 4 = 90°！";
+                feedback.textContent = "答對了。正方形有 4 條邊，每次轉 360° ÷ 4 = 90°。";
                 feedback.className = "text-xs font-semibold text-emerald-600 self-center animate-pulse";
             } else {
                 feedback.textContent = "哎呀，再想一想喔！往下方的「實戰設計區」實驗看看吧！💡";
@@ -788,7 +791,7 @@
                     clearInterval(polyInterval);
                     const totalRotation = nInput * angleInput;
                     if (Math.abs(totalRotation - 360) < 0.1 || (totalRotation > 360 && totalRotation % 360 === 0)) {
-                        fb.textContent = `🎉 完美閉合！ ${nInput} 次 × ${angleInput}° 剛好轉了 ${totalRotation} 度！`;
+                        fb.textContent = `✅ 圖形閉合了。重複 ${nInput} 次，每次轉 ${angleInput}°，一共轉了 ${totalRotation}°。`;
                         fb.className = "bg-emerald-500 text-white rounded-b-2xl p-4 text-sm font-bold transition-colors duration-300 text-center shadow-lg";
                         if(formulaReveal) formulaReveal.classList.remove('hidden');
                     } else {

@@ -142,14 +142,14 @@ function inspectMaterials({ root = path.resolve(__dirname, '..'), registry = mat
           if (mismatches.length) warn('costume-order', `${mismatches.join('；')}。`);
         }
 
+        const unit = JSON.parse(readText(`modules/g${grade}-0${lesson}.json`));
+        const [planFile, planId] = unit.resources.lessonPlan.split('#');
+        const [recordFile, recordId] = unit.resources.records.split('#');
         const source = readText(lessonPlan.source);
-        const planHtml = readText(lessonPlan.html);
-        const start = planHtml.indexOf(`id="${lessonPlan.sectionId}"`);
-        const end = planHtml.indexOf(`id="${lessonPlan.assessmentId}"`);
-        check(source.split(/\r?\n/).includes(`### ${lessonPlan.heading}`), '教案 Markdown 缺少指定單元標題');
-        const headingTag = new RegExp(`<h3(?: id="lesson-[1-6]")?>${lessonPlan.heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}</h3>`);
-        check(start !== -1 && end > start && headingTag.test(planHtml.slice(start, end)), 'HTML 教案與指定單元或評量段落不符');
-        check(readText(record.file).split(/\r?\n/).includes(`## ${record.heading}`), '學習紀錄表缺少指定段落');
+        const planHtml = readText(planFile);
+        check(source.split(/\r?\n/).some(line => line.startsWith(`### 第 ${lesson} 課`)), '教案 Markdown 缺少指定單元');
+        check(hasId(planHtml, planId) && hasId(planHtml, lessonPlan.assessmentId), 'HTML 教案缺少本課或評量區塊');
+        check(readText(record.source).includes(`<!-- assessment:${recordId} -->`) && hasId(readText(recordFile), recordId), '學習紀錄表缺少本課區塊');
 
         const deck = readText(presentation.file);
         for (const { fragment, kind, text } of presentation.references) {

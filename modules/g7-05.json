@@ -6,7 +6,8 @@
   "entry": "1150705.html",
   "periods": 2,
   "goal": "先運用迴圈與變數繪圖；進階再將重複程式整理成自訂積木與參數。",
-  "evidence": "兩組不同設定的圖形及迴圈／變數說明；進階者再附帶參數的自訂積木。",
+  "evidence": "一份用迴圈和變數繪圖的 Scratch 作品，附兩組不同設定的曼陀羅和簡短說明。",
+  "successCriteria": "兩組圖形都能畫出來。能指出哪段程式在重複、改了哪個數值，以及圖形哪裡跟著改變。",
   "priorKnowledge": "基本電腦操作與 Scratch 介面",
   "prerequisites": [
     "g7-03",
@@ -18,8 +19,8 @@
     "創作"
   ],
   "resources": {
-    "lessonPlan": "lesson-plan-grade-7.html#section-3",
-    "records": "STUDENT_RECORDS.md",
+    "lessonPlan": "lesson-plan-grade-7.html#lesson-5",
+    "records": "student-records.html#g7-05",
     "scratchArchive": "11507.zip"
   }
 }

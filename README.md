@@ -35,7 +35,7 @@
 
 | 想做的事 | 使用方式 |
 | --- | --- |
-| 完整授課 | 選七年級或八年級完整六單元，各建議 12 節。 |
+| 完整授課 | 選七年級或八年級完整六單元，建議節數見組課頁。 |
 | 幾何創作課程 | 例如七年級第 2、3、4、5 課，依序學結構、迴圈、變數與幾何創作。 |
 | 短期資料統計課 | 選八年級第 1、3 課，先學清單操作，再學總和、平均與空資料處理。 |
 | 跨年級銜接課 | 自選七年級程式結構，加上八年級清單與資料處理單元，依學生先備能力排序。 |
@@ -127,7 +127,7 @@ npm run check:materials
 
 > 想從零建立一套相同類型的教材網站，請閱讀[從零復刻教材系統：新手開發手冊](SYSTEM_REPLICATION_GUIDE.md)；想了解本網站如何從課程整理、教材設計調整到目前定位，可閱讀[系統開發過程](DEVELOPMENT.md)；要新增或復刻單一教材單元時，請參考[新增教材單元指南](UNIT_AUTHORING_GUIDE.md)。
 
-授課規劃可在網站閱讀[七年級教案](lesson-plan-grade-7.html)與[八年級教案](lesson-plan-grade-8.html)，也可參考[108 課綱逐課對照](curriculum-alignment.html)與可複製到班級線上作業的[學生學習紀錄表](student-records.html)（每個表格都有「複製表格」按鈕）。兩份教案各為六單元、建議 12 節的主題教材，不代表已涵蓋各年級全學年的課程。這四個頁面由 Markdown 原始檔 `LESSON_PLAN_GRADE_7.md`、`LESSON_PLAN_GRADE_8.md`、`CURRICULUM_ALIGNMENT.md`、`STUDENT_RECORDS.md` 產生；修改任何一份後執行 `npm install` 與 `npm run build:lesson-plans`，即可更新對應 HTML 頁面。教案每課有固定錨點，例如 `lesson-plan-grade-7.html#lesson-3`。
+授課規劃可在網站閱讀[七年級教案](lesson-plan-grade-7.html)與[八年級教案](lesson-plan-grade-8.html)，也可參考[108 課綱逐課對照](curriculum-alignment.html)與可複製到班級線上作業的[學生學習紀錄表](student-records.html)（各課提供「複製本課紀錄與要求」）。兩份教案各為六單元的主題教材，建議節數由模組資料加總，不代表已涵蓋各年級全學年的課程。這四個頁面由 Markdown 原始檔 `LESSON_PLAN_GRADE_7.md`、`LESSON_PLAN_GRADE_8.md`、`CURRICULUM_ALIGNMENT.md`、`STUDENT_RECORDS.md` 產生；修改任何一份後執行 `npm install` 與 `npm run build:lesson-plans`，即可更新對應 HTML 頁面。各課的正式課名、目標、建議節數、必交項目與達標條件請改 `modules/` 中的單元 JSON，然後執行同一指令。教案每課有固定錨點，例如 `lesson-plan-grade-7.html#lesson-3`。
 
 ## 課程內容
 

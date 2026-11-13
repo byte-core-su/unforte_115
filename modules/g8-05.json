@@ -6,7 +6,8 @@
   "entry": "1150805.html",
   "periods": 2,
   "goal": "理解洗牌讓順序隨機，排序依比較規則排列；兩者都不能遺漏或重複資料。",
-  "evidence": "一次洗牌紀錄、一張排序追蹤表與資料項目不變的驗證。",
+  "evidence": "一次洗牌紀錄、一張相鄰比較的排序追蹤表，以及一份 Scratch 排序程式。",
+  "successCriteria": "排序輸出由小到大，前項大於後項才交換。能說明排序何時停止，並比對洗牌與排序前後的項目，確認每個數值出現的次數都相同。",
   "priorKnowledge": "Scratch 事件、變數與迴圈基礎",
   "prerequisites": [
     "g8-01",
@@ -18,8 +19,8 @@
     "停止條件"
   ],
   "resources": {
-    "lessonPlan": "lesson-plan-grade-8.html#section-3",
-    "records": "STUDENT_RECORDS.md",
+    "lessonPlan": "lesson-plan-grade-8.html#lesson-5",
+    "records": "student-records.html#g8-05",
     "scratchArchive": "11508.zip"
   }
 }

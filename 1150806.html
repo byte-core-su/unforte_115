@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+    <script src="lesson-assessments.js" defer></script>
     <script src="learning-guides.js" defer></script>
+    <script src="lesson-labels.js" defer></script>
     <script src="adaptive-practice.js" defer></script>
     <script src="curriculum-labs.js" defer></script>
     <link rel="stylesheet" href="lesson-route.css">
+    <script src="teacher-demo.js" defer></script>
     <script src="lesson-route.js" defer></script>
     <script src="lesson-routes.js" defer></script>
     <meta charset="UTF-8">
     <script src="course-scenarios.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-scenario-text="tabTitle">用清單打造星際任務 - LESSON 6</title>
+    <title>自訂積木與清單專題｜資訊科技課程</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 Lucide Icons -->
@@ -38,7 +41,7 @@
     <header id="main-header" class="bg-white border-b border-gray-100 pt-12 pb-12 slide-up-fade relative overflow-hidden">
         <div class="max-w-5xl mx-auto px-6 lg:px-8 relative z-10">
             <div class="mb-6">
-                <a href="index.html" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-purple-600 transition-colors">
+                <a data-course-direction="outline" href="index.html" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-purple-600 transition-colors">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> 
                     返回網站首頁
                 </a>
@@ -46,7 +49,7 @@
             <p class="text-sm font-bold text-purple-600 mb-3 tracking-widest uppercase">演算法與程式設計</p>
             <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight"><span data-scenario-text="name">星際陣列指揮官</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用清單打造星際任務</span></h1>
             <p class="text-lg text-slate-500 font-light max-w-2xl leading-relaxed">
-                <span data-scenario-text="intro">化身星際指揮官，透過六大任務關卡，循序漸進建立邏輯思維，完整掌握</span> <span class="font-bold text-purple-700 bg-purple-50 px-2 py-1 rounded-lg border border-purple-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span> 的強大威力！
+                <span data-scenario-text="intro">在六個星際任務中練習</span> <span class="font-bold text-purple-700 bg-purple-50 px-2 py-1 rounded-lg border border-purple-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span>，從管理裝備到做出對決遊戲。
             </p>
         </div>
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-purple-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
@@ -153,7 +156,7 @@
             document.getElementById('prep-modal-desc').innerHTML = '首先，我們依序建立 24 件裝備，每件裝備都會對應一個不同的戰鬥力數值！';
             
             const btn = document.getElementById('prep-modal-btn');
-            btn.innerHTML = '<i data-lucide="play" class="w-4 h-4"></i> 建立裝備陣列';
+            btn.innerHTML = '<i data-lucide="play" class="w-4 h-4"></i> 建立裝備清單';
             btn.className = "w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-6 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm shrink-0";
             btn.onclick = prepGenerate;
             btn.disabled = false;
@@ -385,7 +388,7 @@
             simBattleIndex = 0;
 
             renderBattleArena();
-            document.getElementById('arena-status').innerHTML = '點擊「整備清單」開始執行任務前置作業。';
+            document.getElementById('arena-status').innerHTML = '按「整備清單」，開始建立裝備清單。';
             
             document.getElementById('btn-sim-prep').classList.remove('hidden');
             document.getElementById('btn-sim-prep').disabled = false;
@@ -471,7 +474,7 @@
                     <!-- 狀態列與控制按鈕 -->
                     <div class="flex flex-col sm:flex-row items-center justify-between bg-slate-800 p-4 rounded-xl border border-slate-700 gap-4 relative z-10 shrink-0 mt-2">
                         <div id="arena-status" class="text-sm font-bold text-slate-300 flex-1 text-center sm:text-left min-h-[2.5rem] flex flex-col justify-center">
-                            點擊「整備清單」開始執行任務前置作業。
+                            按「整備清單」，開始建立裝備清單。
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto shrink-0 flex-wrap justify-center">
                             <button id="btn-sim-prep" onclick="openPrepModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm">
@@ -500,7 +503,7 @@
             { q: "當我們從「裝備分配」清單提取裝備給小隊時，為什麼取出「第 1 項」後要立刻將它「刪除」？", opts: ["為了避免敵人拿到重複的裝備", "因為系統規定小隊只能有 6 個裝備", "為了節省電腦記憶體空間"], ans: 0 },
             { q: "在陣列走訪進行「火力對決」時，我們用了哪個變數來同步讀取我方與敵方的清單？", opts: ["對決回合", "戰鬥力", "戰鬥紀錄"], ans: 0 },
             { q: "在 Scratch 中，如果要將一個原本整齊的陣列完全打散，我們最常使用哪種方法？", opts: ["將所有數字按照大小重新排序", "將數字隨機加減乘除", "隨機抽取項目後轉移到另一個新清單"], ans: 2 },
-            { q: "在抽籤程式中，我們透過變數一直 +1 來拿取資料，為什麼在『刪除』項目後依然能順利拿到所有資料？", opts: ["因為 Scratch 陣列會自動將後方資料往前遞補空位", "因為有隱藏的積木幫我們處理", "因為迴圈會自動跳過已經刪除的資料"], ans: 0 }
+            { q: "刪除清單的第 1 項後，原本的第 2 項會移到哪裡？", opts: ["往前移，變成第 1 項", "留在第 2 項", "移到清單最後一項"], ans: 0 }
         ];
 
         let activeQuizIndices = [];
@@ -546,7 +549,7 @@
 
             const feedback = document.getElementById('quiz-feedback');
             if(allCorrect) {
-                feedback.innerHTML = '<span class="text-emerald-400 font-bold"><i data-lucide="unlock" class="w-4 h-4 inline mr-1"></i> 解鎖成功！密技面板已開啟。</span>';
+                feedback.innerHTML = '<span class="text-emerald-400 font-bold"><i data-lucide="unlock" class="w-4 h-4 inline mr-1"></i> ✅ 答對了。下方可以看防止重複抽取的程式。</span>';
                 lucide.createIcons();
                 
                 setTimeout(() => {
@@ -568,7 +571,7 @@
             id: 6, 
             icon: "swords", 
             title: window.CourseScenarios.active.grades[8].cards[5].title,
-            subtitle: "(陣列綜合應用：總複習與對決)",
+            subtitle: "（用清單做對決遊戲）",
             description: "指揮官，最終考驗來了！我們將把前面學過的技巧大結合：建立連續數字的武裝清單、洗牌打散，然後取出前 6 項作為先遣隊的裝備。最後，利用迴圈將我們的裝備與敵方艦隊逐一比對，展開最終的星際決戰！",
             objectives: [
                 { title: "建立武裝清單", desc: `自動生成 1 到 24 的連續數字陣列。在 Scratch 中，這剛好能對應到 24 種不同戰鬥力的${escapeDuelText(duelScenario.costumeLabel)}造型！(模擬器以圖文輔助呈現)` },
@@ -576,12 +579,12 @@
                 { title: "提取對決裝備", desc: "從洗好的裝備分配中取出前 6 項存入「小隊裝備」；接著偵測雷達，隨機生成 6 個「外星裝備」。" },
                 { title: "陣列火力對決", desc: "利用迴圈，逐一讀取兩個清單的對應數值，比較大小並顯示每回合的戰鬥結果！" }
             ],
-            learningPointsSummary: "本單元是陣列 (清單) 技巧的終極總複習：",
+            learningPointsSummary: "這一課會用到建立清單、洗牌、分配裝備和逐回合比大小。",
             learningPoints: [
-                { title: "清單初始化", desc: "使用迴圈與變數累加，快速建立 1 到 24 的陣列資料。" },
-                { title: "陣列洗牌", desc: "透過隨機取數與項目交換，實作陣列資料的無序打散。" },
-                { title: "資料提取", desc: "利用迴圈將大陣列中的部分資料（前 6 項）搬移到新的清單中。" },
-                { title: "雙陣列走訪比對", desc: "使用單一指標變數，同步讀取兩個戰力清單中對應的數值，進行大小比較並記錄結果。" }
+                { title: "清單初始化", desc: "每次把變數加 1，再將數字加入清單，直到放入 1 到 24。" },
+                { title: "清單洗牌", desc: "隨機挑選清單的位置並交換項目，打亂裝備順序。" },
+                { title: "分配裝備", desc: "用迴圈把 6 件裝備移到小隊清單。比一比模擬器和下方積木範例，看看兩種做法每次取第幾項。" },
+                { title: "比較兩份清單", desc: "用同一個回合數讀取兩份清單的同一位置，比較數字大小，再記下結果。" }
             ],
             // 程式教學積木 (依圖片內容拆解)
             scratchBlocksPart1: [
@@ -681,8 +684,8 @@
             return `
                 <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col gap-8">
                     <div class="text-center w-full pb-4 border-b border-slate-100">
-                        <h4 class="text-2xl font-black text-purple-600 mb-2">程式實作教學：陣列總複習</h4>
-                        <p class="text-slate-500 font-medium">我們將利用三個清單與單一變數，完整實作「建立、洗牌、提取」的陣列經典操作！</p>
+                        <h4 class="text-2xl font-black text-purple-600 mb-2">程式實作：建立清單、洗牌、分配裝備</h4>
+                        <p class="text-slate-500 font-medium">看下面三段程式，找出每一步用了哪個清單。</p>
                     </div>
 
                     <!-- Step 1: 建立初始裝備庫存 -->
@@ -703,7 +706,7 @@
                         </div>
                     </div>
 
-                    <!-- Step 2: 陣列隨機洗牌 -->
+                    <!-- Step 2: 打亂裝備順序 -->
                     <div class="flex flex-col lg:flex-row items-center lg:items-start gap-6 w-full">
                         <div class="flex-shrink-0 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 flex flex-col items-center lg:items-start min-w-[250px] lg:max-w-[55%] custom-scrollbar">
                             <div class="bg-[#F9F9F9] border border-slate-200 p-4 rounded-xl shadow-inner w-max flex flex-col gap-0 items-start">
@@ -712,7 +715,7 @@
                         </div>
                         <div class="flex-1 w-full bg-amber-50 p-5 sm:p-6 rounded-2xl border border-amber-200 relative shadow-sm h-full">
                             <h5 class="font-bold text-amber-800 text-lg mb-3 flex items-center gap-2">
-                                <span class="bg-amber-200 text-amber-800 w-7 h-7 rounded-full flex items-center justify-center font-black text-sm">2</span> 陣列隨機洗牌
+                                <span class="bg-amber-200 text-amber-800 w-7 h-7 rounded-full flex items-center justify-center font-black text-sm">2</span> 打亂裝備順序
                             </h5>
                             <p class="text-amber-900/80 text-sm leading-relaxed mb-4">接著，我們將裝備庫存的數字徹底打散！</p>
                             <ul class="list-disc list-inside text-amber-900/80 text-sm space-y-2.5 font-medium ml-1">
@@ -737,10 +740,9 @@
                             <p class="text-emerald-900/80 text-sm leading-relaxed mb-4">洗牌完成後，我們要從「裝備分配」清單中，挑選 6 個裝備給先遣隊。</p>
                             
                             <div class="bg-white/60 p-4 rounded-xl border border-emerald-200 text-sm text-slate-700 leading-relaxed font-medium">
-                                💡 <strong>程式彩蛋：動態遞補效應！</strong><br>
-                                注意看程式碼！變數從 1 開始遞增，每次都 <strong>「添加第 N 項」然後「刪除第 N 項」</strong>。當刪除第 1 項後，後面的資料會往前遞補！<br>
-                                所以當變數變成 2 時，拿到的其實是原本的第 3 項！<br><br>
-                                <span class="text-emerald-700">這代表系統實際上是抽出原本陣列裡的第 1, 3, 5, 7, 9, 11 項。不過別擔心，因為陣列已經洗亂過了，這樣跳著拿，結果依然是完全隨機的喔！這就是 Scratch 陣列特有的有趣現象！</span>
+                                <strong>刪除一項後，後面的項目會往前移。</strong><br>
+                                這段積木先取第 1 項並刪除，再取當時的第 2 項。因為清單已往前移，第二次取到的是原來的第 3 項。<br><br>
+                                <span class="text-emerald-700">這段積木會取到洗好後清單原來的第 1、3、5、7、9、11 項。上方模擬器每次都取當時的第 1 項，所以取到的是原來的前 6 項。</span>
                             </div>
                         </div>
                     </div>
@@ -775,7 +777,7 @@
 
             return `
                 <div class="slide-up-fade">
-                    <button onclick="window.location.href='1150800.html'" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-purple-600 transition-colors px-4 py-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm mb-6">
+                    <button data-course-direction="outline" onclick="window.location.href='1150800.html'" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-purple-600 transition-colors px-4 py-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm mb-6">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回任務儀表板
                     </button>
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
@@ -798,7 +800,7 @@
                         
                         <div class="p-8 md:p-10 flex flex-col gap-10">
                             <section>
-                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-purple-100 text-purple-600 p-1.5 rounded-lg"><i data-lucide="target" class="w-5 h-5"></i></span>任務目標</h3>
+                                <h3 id="route-lesson-objectives" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-purple-100 text-purple-600 p-1.5 rounded-lg"><i data-lucide="target" class="w-5 h-5"></i></span>任務目標</h3>
                                 <div class="bg-purple-50 p-6 rounded-2xl border border-purple-100/50">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
                                         ${objectivesHtml}
@@ -807,7 +809,7 @@
                             </section>
 
                             <section>
-                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-orange-100 text-orange-600 p-1.5 rounded-lg"><i data-lucide="book-open" class="w-5 h-5"></i></span>單元學習重點</h3>
+                                <h3 id="route-lesson-key-points" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-orange-100 text-orange-600 p-1.5 rounded-lg"><i data-lucide="book-open" class="w-5 h-5"></i></span>單元學習重點</h3>
                                 <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
                                     <p class="text-slate-600 font-medium mb-6 leading-relaxed">${lesson.learningPointsSummary}</p>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
@@ -818,13 +820,13 @@
                             
                             <!-- ⭐ 星際爭霸戰模擬器 -->
                             <section>
-                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-purple-100 text-purple-600 p-1.5 rounded-lg"><i data-lucide="swords" class="w-5 h-5"></i></span>⚡ 星際對決模擬器 (陣列總複習)</h3>
+                                <h3 id="route-duel-simulator" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-purple-100 text-purple-600 p-1.5 rounded-lg"><i data-lucide="swords" class="w-5 h-5"></i></span>⚡ 星際對決模擬器 (陣列總複習)</h3>
                                 ${renderSimulatorArea()}
                             </section>
 
                             <!-- ⭐ 程式實作教學 -->
                             <section>
-                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-purple-100 text-purple-600 p-1.5 rounded-lg"><i data-lucide="code-2" class="w-5 h-5"></i></span>⚡ 程式教學：由零開始實作對決系統</h3>
+                                <h3 id="route-duel-program" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-purple-100 text-purple-600 p-1.5 rounded-lg"><i data-lucide="code-2" class="w-5 h-5"></i></span>⚡ 程式教學：由零開始實作對決系統</h3>
                                 ${renderTutorialHTML()}
                             </section>
                             
@@ -832,7 +834,7 @@
                             <section class="mt-4 pt-10 border-t border-slate-200">
                                 <div class="flex items-center gap-3 mb-6">
                                     <span class="flex items-center justify-center w-8 h-8 rounded-full bg-rose-100 text-rose-700 font-black text-sm shadow-sm"><i data-lucide="key" class="w-4 h-4"></i></span>
-                                    <h3 class="text-xl font-bold text-slate-800">隱藏密技：防止敵軍裝備重複 (通關解鎖)</h3>
+                                    <h3 id="route-unique-equipment" class="text-xl font-bold text-slate-800">怎麼避免抽到重複的裝備？</h3>
                                 </div>
 
                                 <!-- 鎖定狀態畫面 (答題區) -->
@@ -844,8 +846,8 @@
                                         <div class="bg-slate-800/80 p-4 rounded-full shadow-lg mb-6 border border-slate-700">
                                             <i data-lucide="lock" class="w-10 h-10 text-indigo-400"></i>
                                         </div>
-                                        <h4 class="text-2xl font-black text-white mb-2">系統已鎖定密技模組</h4>
-                                        <p class="text-slate-400 mb-8 text-center max-w-lg">完成下方的隨機練習題，即可解鎖這段隱藏的程式代碼。解鎖不等於正式評量；仍需用自己的清單說明演算法與測試結果。</p>
+                                        <h4 class="text-2xl font-black text-white mb-2">先做一題練習</h4>
+                                        <p class="text-slate-400 mb-8 text-center max-w-lg">答對後可以看程式範例。接著換成自己的清單試一次，看看每次抽取後，原清單少了哪一項。</p>
                                         
                                         <div class="w-full max-w-2xl bg-slate-950/80 p-6 sm:p-8 rounded-2xl border border-slate-700 shadow-inner">
                                             <div id="quiz-questions-container" class="flex flex-col w-full">
@@ -854,7 +856,7 @@
                                             
                                             <div class="mt-6 flex flex-col items-center gap-3 border-t border-slate-800 pt-6">
                                                 <button onclick="checkSecretQuiz()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 px-8 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-base">
-                                                    <i data-lucide="unlock" class="w-5 h-5"></i> 驗證答案解鎖
+                                                    <i data-lucide="unlock" class="w-5 h-5"></i> 檢查答案
                                                 </button>
                                                 <div id="quiz-feedback" class="text-sm text-center h-5 mt-1"></div>
                                             </div>
@@ -870,7 +872,7 @@
                                         <div class="flex items-center gap-3 border-b border-slate-700 pb-4 mb-6">
                                             <i data-lucide="unlock" class="w-8 h-8 text-emerald-400"></i>
                                             <div>
-                                                <h4 class="text-2xl font-black text-white">解鎖成功！外星裝備防重複陣列</h4>
+                                                <h4 class="text-2xl font-black text-white">怎麼避免抽到重複的裝備？</h4>
                                                 <p class="text-emerald-400 text-sm mt-1">這就是模擬器背後確保敵人裝備不重複的隱藏寫法！</p>
                                             </div>
                                         </div>
@@ -883,18 +885,17 @@
                                             </div>
                                             <div class="flex-1 w-full bg-slate-800/80 p-5 sm:p-6 rounded-2xl border border-slate-700 relative shadow-sm h-full">
                                                 <h5 class="font-bold text-indigo-400 text-lg mb-3 flex items-center gap-2">
-                                                    <i data-lucide="lightbulb" class="w-5 h-5"></i> 密技解說
+                                                    <i data-lucide="lightbulb" class="w-5 h-5"></i> 程式怎麼避免重複
                                                 </h5>
                                                 <p class="text-slate-300 text-sm leading-relaxed mb-4">
-                                                    有沒有想過，為什麼外星敵軍的裝備絕對不會和我們先遣隊拿到的裝備重複呢？
+                                                    為什麼兩隊分到的裝備不會重複？
                                                 </p>
                                                 <ul class="list-disc list-inside text-slate-300 text-sm space-y-3 font-medium ml-1">
-                                                    <li>這段程式其實是接在「提取小隊裝備」的後面。</li>
-                                                    <li>此時，「裝備分配」清單中，已經移除了先遣隊拿走的前 6 項，裡面剩下的是還沒被抽走的 18 個隨機裝備。</li>
-                                                    <li>所以，我們只要繼續使用一樣的「提取邏輯」：<strong class="text-indigo-400 mx-1">從剩餘的「裝備分配」清單裡，再拿 6 個給「外星裝備」</strong>，保證絕對不會拿到重複的！</li>
+                                                    <li>先分 6 件給小隊，每取一件就從「裝備分配」清單刪掉。</li>
+                                                    <li>接著從剩下的 18 件再取 6 件，放進「外星裝備」清單。</li>
                                                 </ul>
                                                 <div class="mt-5 p-4 bg-emerald-950/40 rounded-xl border border-emerald-900/50 text-emerald-300 text-xs leading-relaxed">
-                                                    🎉 這就是陣列（清單）最迷人的地方：只要管理好源頭的「洗牌陣列」，後續不論怎麼抽取分發，都能完美維持資料的不重複性！
+                                                    這個例子的裝備清單沒有重複項目。每取出一件，就從原清單刪掉它，下一次就抽不到同一件。
                                                 </div>
                                             </div>
                                         </div>
@@ -908,10 +909,10 @@
 
                 <!-- 單元導覽按鈕 -->
                 <div class="mt-8 pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <a href="1150805.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 hover:text-indigo-600 transition-colors shadow-sm">
+                    <a data-course-direction="previous" href="1150805.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 hover:text-indigo-600 transition-colors shadow-sm">
                         <i data-lucide="arrow-left" class="w-5 h-5"></i> 返回上一單元
                     </a>
-                    <a href="1150800.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-sm">
+                    <a data-course-direction="outline" data-route-finish href="1150800.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-sm">
                         返回首頁 <i data-lucide="home" class="w-5 h-5"></i>
                     </a>
                 </div>`;

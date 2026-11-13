@@ -81,3 +81,24 @@ test('package resources, classroom use and assessment examples support teacher a
   assert.match(visible(12), /遷移與改善/);
   assert.match(visible(14).replace(/<[^>]+>/g, ''), /先用紙卡與追蹤表預測/);
 });
+
+test('presentation links reach current local teaching pages and visible example sections', () => {
+  const presentation = path.join(__dirname, '../presentations');
+  assert.doesNotMatch(deck, /href="[^"]*STUDENT_RECORDS\.md/);
+  assert.match(deck, /href="\.\.\/student-records\.html#g8-03"/);
+  for (const [, href] of deck.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)) {
+    const url = new URL(href, 'https://example.test/presentations/20261110.html');
+    if (url.hostname !== 'example.test') continue;
+    const file = path.resolve(presentation, '..', '.' + decodeURIComponent(url.pathname));
+    assert.ok(fs.existsSync(file), href);
+    if (!url.hash || !file.endsWith('.html')) continue;
+    const id = url.hash.slice(1);
+    const html = fs.readFileSync(file, 'utf8');
+    const generated = { 'adaptive-practice': 'adaptive-practice.js', 'learning-guide': 'learning-guides.js' }[id];
+    if (generated) {
+      assert.ok(html.includes(`src="${generated}"`), href);
+      assert.ok(fs.readFileSync(path.join(presentation, '..', generated), 'utf8').includes(`section.id = '${id}'`));
+    } else assert.ok(html.includes(`id="${id}"`), href);
+    if (['adaptive-practice', 'energy-trace', 'polygon-simulator'].includes(id)) assert.equal(url.searchParams.get('route'), 'all', href);
+  }
+});

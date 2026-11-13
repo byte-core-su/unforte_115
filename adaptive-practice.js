@@ -190,12 +190,12 @@
   section.id = 'adaptive-practice';
   section.className = 'adaptive-practice';
   section.setAttribute('aria-label', '本課自適應練習');
-  section.innerHTML = `<div class="adaptive-practice__card"><p class="adaptive-practice__tag">本課自適應練習・不計分</p><h2>換一題，練習同一個規則</h2><p>先預測再檢查；答錯可看提示並同題重試。連續兩道新題首次答對會提高難度；兩次答錯會提供詳解並降低難度。可自行選級或跳題，重新整理後即重置，不保存作答資料。</p><div class="adaptive-practice__levels" role="group" aria-label="手動選擇練習難度"><button type="button" data-level="1">基礎</button><button type="button" data-level="2">標準</button><button type="button" data-level="3">挑戰</button></div><p class="adaptive-practice__status" aria-live="polite"></p><fieldset><legend class="adaptive-practice__prompt"></legend><div class="adaptive-practice__choices"></div></fieldset><div class="adaptive-practice__actions"><button type="button" class="adaptive-practice__check">檢查預測</button><button type="button" class="adaptive-practice__next">換一題（跳過不升級）</button></div><p class="adaptive-practice__feedback" role="status" aria-live="polite"></p><p class="adaptive-practice__note">這是形成性練習，不能取代作品、資料追蹤與教師評量；請在離堂任務中寫下自己的推理。</p></div>`;
+  section.innerHTML = `<div class="adaptive-practice__card"><p class="adaptive-practice__tag">本課自適應練習・不計分</p><h2>換一題，練習同一個規則</h2><p>先預測再檢查；答錯可看提示並同題重試。連續兩道新題首次答對會提高難度；兩次答錯會提供詳解並降低難度。可自行選級或跳題，重新整理後即重置，不保存作答資料。</p><div class="adaptive-practice__levels" role="group" aria-label="手動選擇練習難度"><button type="button" data-level="1">基礎</button><button type="button" data-level="2">標準</button><button type="button" data-level="3">挑戰</button></div><p class="adaptive-practice__status" aria-live="polite"></p><fieldset><legend class="adaptive-practice__prompt"></legend><div class="adaptive-practice__choices"></div></fieldset><div class="adaptive-practice__actions"><button type="button" class="adaptive-practice__check">${window.LessonLabels.checkPrediction}</button><button type="button" class="adaptive-practice__next">換一題（跳過不升級）</button></div><p class="adaptive-practice__feedback" role="status" aria-live="polite"></p><p class="adaptive-practice__note">這是形成性練習，不能取代作品、資料追蹤與教師評量；繳交時請依本課的必交項目準備。</p></div>`;
   main.parentNode.insertBefore(section, main.nextSibling);
 
   const focusControls = document.createElement('div');
   focusControls.className = 'adaptive-practice__focus';
-  focusControls.innerHTML = `<label class="adaptive-practice__focus-toggle"><input type="checkbox" class="adaptive-practice__focus-enabled" aria-describedby="adaptive-focus-help"><span>專注作答模式（預設關閉）</span></label><p id="adaptive-focus-help">開啟後，離開分頁或切換視窗滿 3 秒，返回時會更換尚未按過「檢查預測」的題目，清除本題選擇並保持難度，不扣分。已檢查的題目保留供訂正；需要切到 Scratch 或查資料時，請先關閉。此模式僅作用於本區練習，不影響課程操作，也不是可靠的防作弊機制。</p><p class="adaptive-practice__focus-notice" role="status" aria-live="polite">專注作答模式已關閉，可自由切換視窗。</p>`;
+  focusControls.innerHTML = `<label class="adaptive-practice__focus-toggle"><input type="checkbox" class="adaptive-practice__focus-enabled" aria-describedby="adaptive-focus-help"><span>專注作答模式（預設關閉）</span></label><p id="adaptive-focus-help">開啟後，離開分頁或切換視窗滿 3 秒，返回時會更換尚未按過「${window.LessonLabels.checkPrediction}」的題目，清除本題選擇並保持難度，不扣分。已檢查的題目保留供訂正；需要切到 Scratch 或查資料時，請先關閉。此模式僅作用於本區練習，不影響課程操作，也不是可靠的防作弊機制。</p><p class="adaptive-practice__focus-notice" role="status" aria-live="polite">專注作答模式已關閉，可自由切換視窗。</p>`;
   section.querySelector('.adaptive-practice__card').insertBefore(focusControls, section.querySelector('.adaptive-practice__levels'));
 
   const prompt = section.querySelector('.adaptive-practice__prompt');
@@ -267,8 +267,8 @@
     if (!selected) { feedback.textContent = '請先選一個答案，再說出理由。'; return; }
     const correct = Number(selected.value) === current.answer;
     const nextState = gradeAttempt(state, correct);
-    if (correct) feedback.textContent = `${state.attempts ? '修正後答對。' : '首次答對。'}${current.explanation} ${nextState.level > state.level ? '已提高難度。' : '換一道新題，確認不是只記住答案。'}`;
-    else if (nextState.resolved) feedback.textContent = `這題先停下來整理：${current.hints[1]} ${current.explanation} 正確答案是「${current.choices[current.answer]}」。下一題改用較基礎的資料；請重新預測。`;
+    if (correct) feedback.textContent = `${state.attempts ? '修正後答對。' : '首次答對。'}${current.explanation} ${nextState.level > state.level ? '已提高難度。' : '換一題，用同樣的規則再試一次。'}`;
+    else if (nextState.resolved) feedback.textContent = `先看這一題怎麼做。${current.hints[1]} ${current.explanation} 正確答案是「${current.choices[current.answer]}」。下一題改用較基礎的資料；請重新預測。`;
     else feedback.textContent = `先不要看答案：${current.hints[0]}可修改選擇後再檢查一次。`;
     state = nextState;
     if (state.resolved) { check.disabled = true; next.textContent = '練習下一題'; }

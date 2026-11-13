@@ -6,7 +6,8 @@
   "entry": "1150703.html",
   "periods": 2,
   "goal": "利用重複執行與轉角規律，畫出可預測的正多邊形。",
-  "evidence": "至少完成一個三角形與一個五邊形，並在作品中標註「重複次數」和「轉向角度」。",
+  "evidence": "含三角形和五邊形的 Scratch 作品，標註各自的重複次數與轉角，並附一次改錯角度再修正的紀錄。",
+  "successCriteria": "兩個圖形都閉合。三角形重複 3 次、每次轉 120 度，五邊形重複 5 次、每次轉 72 度。能用「360 ÷ 邊數」解釋轉角，並指出改錯角度前後的差異。",
   "priorKnowledge": "基本電腦操作與 Scratch 介面",
   "prerequisites": [
     "g7-02"
@@ -17,8 +18,8 @@
     "繪圖"
   ],
   "resources": {
-    "lessonPlan": "lesson-plan-grade-7.html#section-3",
-    "records": "STUDENT_RECORDS.md",
+    "lessonPlan": "lesson-plan-grade-7.html#lesson-3",
+    "records": "student-records.html#g7-03",
     "scratchArchive": "11507.zip"
   }
 }

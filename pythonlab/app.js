@@ -38,7 +38,7 @@ const main = $('#main');
 const practiceAttempts = new Map();
 // 單一路線：單元依序開啟（上一單元取得一星），單元內「示範 → 引導 → 初階」每一步先成功執行一次才開啟下一步。
 // 「已執行」只記在本頁，重新整理後需再執行一次；已取得一星的單元可自由練習。教師示範模式（網站首頁開啟，或網址加 ?teacher=1）會全部開啟。
-const teacherView = (() => { const param = /[?&](route=all|teacher=1)\b/.test(location.search); try { if (param) sessionStorage.setItem('unforte115:teacher-demo', '1'); return sessionStorage.getItem('unforte115:teacher-demo') === '1'; } catch { return param; } })();
+const teacherView = window.TeacherDemo.isOn();
 const ranStages = new Set();
 function unitOpen(lesson) {
   return teacherView || lesson.id === 1 || earnedStars(state.completed[lesson.id]) >= 1 || earnedStars(state.completed[lesson.id - 1]) >= 1;
@@ -580,7 +580,7 @@ window.addEventListener('hashchange', route);
 if (teacherView) {
   const badge = document.createElement('div'); badge.className = 'teacher-demo-badge'; badge.setAttribute('role', 'status');
   badge.innerHTML = '教師示範模式：全部開啟 <button type="button">結束示範</button>';
-  badge.querySelector('button').addEventListener('click', () => { try { sessionStorage.removeItem('unforte115:teacher-demo'); } catch { /* 無法保存時改用網址參數 */ } location.href = location.pathname + location.hash; });
+  badge.querySelector('button').addEventListener('click', window.TeacherDemo.end);
   document.body.append(badge);
 }
 document.addEventListener('visibilitychange', () => { syncLearningClock(); save(); });

@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+    <script src="lesson-assessments.js" defer></script>
     <script src="learning-guides.js" defer></script>
+    <script src="lesson-labels.js" defer></script>
     <script src="adaptive-practice.js" defer></script>
     <link rel="stylesheet" href="lesson-route.css">
+    <script src="teacher-demo.js" defer></script>
     <script src="lesson-route.js" defer></script>
     <script src="lesson-routes.js" defer></script>
     <meta charset="UTF-8">
     <script src="course-scenarios.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LESSON 2 - 邏輯的大腦：程式三大結構</title>
+    <title>程式三大結構｜資訊科技課程</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
@@ -26,26 +29,26 @@
         <div class="max-w-5xl mx-auto px-6 lg:px-8">
             <!-- 返回網站首頁按鈕 -->
             <div class="mb-6">
-                <a href="index.html" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+                <a data-course-direction="outline" href="index.html" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> 
                     返回網站首頁
                 </a>
             </div>
             <p class="text-sm font-medium text-indigo-500 mb-2 tracking-widest uppercase">演算法與程式設計</p>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight"><span data-scenario-text="name">星際防禦工程師</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用程式編織能量防護網</span></h1>
-            <p data-scenario-text="intro" class="text-lg text-slate-500 font-light max-w-2xl">結合「IPO 思維」與「重複結構」，循序漸進建立邏輯思維與幾何繪圖能力，並透過實作防禦網任務，體驗程式設計的強大魔力。</p>
+            <p data-scenario-text="intro" class="text-lg text-slate-500 font-light max-w-2xl">先練習讀積木和排程式，再用迴圈與變數畫圖。最後做出防禦網，換幾組設定測試。</p>
         </div>
     </header>
 
     <main class="max-w-5xl mx-auto px-6 lg:px-8 py-12 relative">
-        <a href="1150700.html" class="mb-6 inline-flex items-center text-sm font-medium text-slate-400 hover:text-slate-800 transition-colors">
+        <a data-course-direction="outline" href="1150700.html" class="mb-6 inline-flex items-center text-sm font-medium text-slate-400 hover:text-slate-800 transition-colors">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 返回課程總覽
         </a>
         
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-10 mb-8 relative slide-up-fade">
             <span class="text-sm font-semibold text-slate-400 tracking-wider block mb-2">LESSON 2</span>
-            <h2 data-scenario-text="cards.1.title" class="text-3xl font-bold text-slate-800 mb-4">邏輯的大腦：程式三大結構</h2>
-            <p class="text-slate-500 font-light text-base mb-8">建構防禦網的邏輯大腦！運算思維第一步是「拆解問題」。請依序透過<strong class="text-slate-700">數值實驗</strong>、<strong class="text-slate-700">判斷 IPO</strong>，最後挑戰<strong class="text-slate-700">重組流程圖</strong>，校準防護系統。通關後會獲得系統授權標記喔！</p>
+            <h2 data-scenario-text="cards.1.title" class="text-3xl font-bold text-slate-800 mb-4">程式三大結構</h2>
+            <p class="text-slate-500 font-light text-base mb-8">先改數字試跑範例，再找出程式的<strong class="text-slate-700">輸入、處理和輸出（IPO）</strong>，最後把<strong class="text-slate-700">流程圖</strong>排好。依序練習循序、選擇和重複三種結構。</p>
             
             <div class="flex border-b border-slate-200 mb-8 overflow-x-auto relative z-10">
                 <button id="l2-tab-seq" onclick="switchL2Tab('seq')" class="px-6 py-3 text-sm font-bold border-b-2 transition-all whitespace-nowrap flex items-center text-emerald-600 border-emerald-500">1. 循序結構 <span id="mark-seq" class="ml-1"></span></button>
@@ -346,8 +349,8 @@
         </div>
         
         <div class="flex justify-between items-center">
-            <a href="1150701.html" class="text-sm text-slate-400 hover:text-slate-800 transition-colors">⬅ 上一個單元</a>
-            <a href="1150703.html" class="inline-block bg-white border border-gray-200 px-6 py-3 rounded-full font-medium text-sm hover:bg-slate-50 transition-colors">下一個單元 ➔</a>
+            <a data-course-direction="previous" href="1150701.html" class="text-sm text-slate-400 hover:text-slate-800 transition-colors">⬅ 上一個單元</a>
+            <a data-course-direction="next" href="1150703.html" class="inline-block bg-white border border-gray-200 px-6 py-3 rounded-full font-medium text-sm hover:bg-slate-50 transition-colors">下一個單元 ➔</a>
         </div>
     </main>
 
@@ -355,9 +358,9 @@
     <div id="cert-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-slate-900/60 backdrop-blur-sm transition-opacity opacity-0 rounded-3xl">
         <div class="bg-white p-10 rounded-3xl shadow-2xl text-center border-4 border-amber-400 max-w-lg transform scale-90 transition-transform duration-500 mx-4" id="cert-content">
             <div class="text-6xl mb-4">🏆</div>
-            <h2 class="text-3xl font-bold text-amber-600 mb-4">恭喜通關！</h2>
+            <h2 class="text-3xl font-bold text-amber-600 mb-4">三種程式結構練習完成</h2>
             <h3 class="text-xl font-bold text-slate-800 mb-4">程式思維邏輯大師 證書</h3>
-            <p class="text-slate-600 mb-8 text-sm leading-relaxed">你已成功掌握「循序」、「選擇」與「重複」三大程式核心結構，並具備優異的 IPO 拆解能力！</p>
+            <p class="text-slate-600 mb-8 text-sm leading-relaxed">你完成了循序、選擇和重複的練習。換一組數字或改一個條件，先猜結果，再執行看看。</p>
             <button onclick="closeCertificate()" class="bg-amber-500 text-white px-8 py-3 rounded-full font-bold hover:bg-amber-600 shadow-md transition-all">繼續</button>
         </div>
     </div>
@@ -478,7 +481,7 @@
                 cSeq = cSeq.filter(x=>x!==id); tSeq.push(id);
                 msg.textContent="✅ 正確！請繼續排下一個。"; msg.className="text-sm font-bold text-emerald-600";
                 if(tSeq.length===6) {
-                    msg.textContent="🎉 太棒了！循序結構排序完成！下方已解鎖程式積木！";
+                    msg.textContent="✅ 循序結構的流程排對了。對照下方的 Scratch 積木。";
                 }
                 renderSeqGame();
             } else {
@@ -541,7 +544,7 @@
             }
 
             if (inVal === 'in' && procVal === 'proc' && outVal === 'out') {
-                msg.textContent = "完全正確！你掌握了 循序 的 IPO 概念 🌟";
+                msg.textContent = "✅ 循序結構的輸入、處理和輸出都配對正確。";
                 msg.className = "text-xs font-bold text-emerald-600 animate-pulse";
                 
                 if (!l2Completed.seq) {
@@ -609,7 +612,7 @@
                 cSel = cSel.filter(x=>x!==id); tSel.push(id);
                 msg.textContent="✅ 正確！請繼續排下一個。"; msg.className="text-sm font-bold text-emerald-600";
                 if(tSel.length===10) { 
-                    msg.textContent="🎉 太棒了！選擇結構排序完成！下方已解鎖程式積木！";
+                    msg.textContent="✅ 選擇結構的流程排對了。對照下方的 Scratch 積木。";
                 }
                 renderSelGame();
             } else { msg.textContent="❌ 順序不對喔！別忘了要由上到下符合邏輯。"; msg.className="text-sm font-bold text-rose-500"; }
@@ -674,7 +677,7 @@
             }
 
             if (inVal === 'in' && procVal === 'proc' && outVal === 'out') {
-                msg.textContent = "完全正確！你掌握了 選擇 的 IPO 概念 🌟";
+                msg.textContent = "✅ 選擇結構的輸入、處理和輸出都配對正確。";
                 msg.className = "text-xs font-bold text-emerald-600 animate-pulse";
                 
                 if (!l2Completed.sel) {
@@ -747,7 +750,7 @@
                 cRep = cRep.filter(x=>x!==id); tRep.push(id);
                 msg.textContent="✅ 正確！請繼續排下一個。"; msg.className="text-sm font-bold text-emerald-600";
                 if(tRep.length===9) { 
-                    msg.textContent="🎉 太棒了！重複結構排序完成！下方已解鎖程式積木！"; 
+                    msg.textContent="✅ 重複結構的流程排對了。對照下方的 Scratch 積木。";
                 }
                 renderRepGame();
             } else { msg.textContent="❌ 順序不對喔！請再確認設定與運算的先後次序。"; msg.className="text-sm font-bold text-rose-500"; }
@@ -813,7 +816,7 @@
             }
 
             if (inVal === 'in' && procVal === 'proc' && outVal === 'out') {
-                msg.textContent = "完全正確！你掌握了 重複 的 IPO 概念 🌟";
+                msg.textContent = "✅ 重複結構的輸入、處理和輸出都配對正確。";
                 msg.className = "text-xs font-bold text-emerald-600 animate-pulse";
                 
                 if (!l2Completed.rep) {

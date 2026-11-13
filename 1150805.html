@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+    <script src="lesson-assessments.js" defer></script>
     <script src="learning-guides.js" defer></script>
+    <script src="lesson-labels.js" defer></script>
     <script src="adaptive-practice.js" defer></script>
     <script src="curriculum-labs.js" defer></script>
     <link rel="stylesheet" href="lesson-route.css">
+    <script src="teacher-demo.js" defer></script>
     <script src="lesson-route.js" defer></script>
     <script src="lesson-routes.js" defer></script>
     <meta charset="UTF-8">
     <script src="course-scenarios.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-scenario-text="tabTitle">用清單打造星際任務 - LESSON 5</title>
+    <title>洗牌與相鄰比較排序｜資訊科技課程</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 Lucide Icons -->
@@ -38,14 +41,14 @@
     <header id="main-header" class="bg-white border-b border-gray-100 pt-12 pb-12 slide-up-fade relative overflow-hidden">
         <div class="max-w-5xl mx-auto px-6 lg:px-8 relative z-10">
             <div class="mb-6">
-                <a href="index.html" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+                <a data-course-direction="outline" href="index.html" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
                     <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> 返回網站首頁
                 </a>
             </div>
             <p class="text-sm font-bold text-cyan-600 mb-3 tracking-widest uppercase">演算法與程式設計</p>
             <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight"><span data-scenario-text="name">星際陣列指揮官</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用清單打造星際任務</span></h1>
             <p class="text-lg text-slate-500 font-light max-w-2xl leading-relaxed">
-                <span data-scenario-text="intro">化身星際指揮官，透過六大任務關卡，循序漸進建立邏輯思維，完整掌握</span> <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span> 的強大威力！
+                <span data-scenario-text="intro">在六個星際任務中練習</span> <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span>，從管理裝備到做出對決遊戲。
             </p>
         </div>
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-cyan-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
@@ -282,8 +285,8 @@
                         <div class="bg-emerald-900/40 border border-emerald-500 p-6 rounded-xl text-center mb-6 shadow-inner relative overflow-hidden">
                             <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500 rounded-full mix-blend-screen filter blur-[50px] opacity-20 pointer-events-none"></div>
                             <i data-lucide="party-popper" class="w-12 h-12 text-emerald-400 mx-auto mb-3 animate-bounce"></i>
-                            <h4 class="text-emerald-400 font-bold text-2xl mb-2">挑戰成功！</h4>
-                            <p class="text-emerald-200 text-sm">您已透過 Q&A 完美還原了「陣列洗牌」的核心精神！</p>
+                            <h4 class="text-emerald-400 font-bold text-2xl mb-2">洗牌步驟排好了</h4>
+                            <p class="text-emerald-200 text-sm">你排對了洗牌步驟。想想看，每抽出一張牌後，為什麼要把它從原清單刪掉？</p>
                         </div>
                         <div class="text-slate-400 text-xs font-bold mb-2 flex items-center gap-1.5"><i data-lucide="code-2" class="w-4 h-4"></i> 完整程式積木：</div>
                         <div class="bg-[#F9F9F9] p-6 rounded-xl border border-slate-200 shadow-inner overflow-x-auto custom-scrollbar w-full">
@@ -734,7 +737,7 @@
 
             return `
                 <div class="slide-up-fade">
-                    <button onclick="window.location.href='1150800.html'" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors px-4 py-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm mb-6">
+                    <button data-course-direction="outline" onclick="window.location.href='1150800.html'" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors px-4 py-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm mb-6">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回任務儀表板
                     </button>
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
@@ -754,13 +757,13 @@
                         <div class="p-8 md:p-10 flex flex-col gap-10">
                             <!-- 任務目標 -->
                             <section>
-                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-indigo-100 text-indigo-600 p-1.5 rounded-lg"><i data-lucide="target" class="w-5 h-5"></i></span>任務目標</h3>
+                                <h3 id="route-lesson-objectives" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-indigo-100 text-indigo-600 p-1.5 rounded-lg"><i data-lucide="target" class="w-5 h-5"></i></span>任務目標</h3>
                                 <div class="bg-indigo-50 text-indigo-900 p-5 rounded-2xl border border-indigo-100/50 leading-relaxed font-medium">${lesson.objective}</div>
                             </section>
 
                             <!-- 單元學習重點 -->
                             <section>
-                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-teal-100 text-teal-600 p-1.5 rounded-lg"><i data-lucide="book-open" class="w-5 h-5"></i></span>單元學習重點</h3>
+                                <h3 id="route-lesson-key-points" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-teal-100 text-teal-600 p-1.5 rounded-lg"><i data-lucide="book-open" class="w-5 h-5"></i></span>單元學習重點</h3>
                                 <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
                                     <p class="text-slate-600 font-medium mb-6 leading-relaxed">${lesson.learningPointsSummary}</p>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -771,7 +774,7 @@
                             
                             <!-- 🚀 洗牌模擬器 -->
                             <section>
-                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-emerald-100 text-emerald-600 p-1.5 rounded-lg"><i data-lucide="play" class="w-5 h-5"></i></span>⚡ 洗牌演算法模擬器</h3>
+                                <h3 id="route-shuffle-simulator" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-emerald-100 text-emerald-600 p-1.5 rounded-lg"><i data-lucide="play" class="w-5 h-5"></i></span>⚡ 洗牌演算法模擬器</h3>
                                 ${renderSimulatorHTML()}
                             </section>
 
@@ -779,7 +782,7 @@
                             <section class="mb-4">
                                 <div class="flex items-center gap-3 mb-6">
                                     <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-black text-sm shadow-sm">1</span>
-                                    <h3 class="text-xl font-bold text-slate-800">建立洗牌邏輯</h3>
+                                    <h3 id="route-shuffle-logic" class="text-xl font-bold text-slate-800">建立洗牌邏輯</h3>
                                 </div>
                                 <div class="flex flex-col">
                                     <div class="flex items-center justify-between mb-3">
@@ -818,7 +821,7 @@
                             <section>
                                 <div class="flex items-center gap-3 mb-6">
                                     <span class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-700 font-black text-sm shadow-sm">2</span>
-                                    <h3 class="text-xl font-bold text-slate-800">進階：洗牌積木組裝</h3>
+                                    <h3 id="route-shuffle-blocks" class="text-xl font-bold text-slate-800">進階：洗牌積木組裝</h3>
                                 </div>
                                 
                                 <div class="flex flex-col gap-8">
@@ -840,7 +843,7 @@
                             <section class="mt-8 border-t border-slate-200 pt-10">
                                 <div class="flex items-center gap-3 mb-6">
                                     <span class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-black text-sm shadow-sm"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></span>
-                                    <h3 class="text-xl font-bold text-slate-800">最後複習：如何建立初始牌堆？</h3>
+                                    <h3 id="route-initial-deck" class="text-xl font-bold text-slate-800">最後複習：如何建立初始牌堆？</h3>
                                 </div>
                                 <p class="text-slate-600 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100 font-medium">在成功學會「洗牌」之後，別忘了回顧一下！在洗牌程式執行前，我們必須先清空舊的清單，並利用變數與重複迴圈，自動生成 1 到 13 的點數牌放進「牌堆」中喔。請看下方的逐行積木解析：</p>
                                 
@@ -899,7 +902,7 @@
                             <section class="mt-8 border-t border-slate-200 pt-10">
                                 <div class="flex items-center gap-3 mb-6">
                                     <span class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-black text-sm shadow-sm"><i data-lucide="star" class="w-4 h-4"></i></span>
-                                    <h3 class="text-xl font-bold text-slate-800">進階挑戰：發放手牌 (分牌邏輯) <span class="text-slate-500 font-medium text-lg ml-1">(實作加分題)</span></h3>
+                                    <h3 id="route-deal-cards" class="text-xl font-bold text-slate-800">進階挑戰：發放手牌 (分牌邏輯)</h3>
                                 </div>
                                 <p class="text-slate-600 mb-6 bg-indigo-50 p-4 rounded-xl border border-indigo-100 font-medium leading-relaxed">
                                     在 Scratch 中開發撲克牌遊戲時，我們最常用<strong>「造型編號」</strong>來顯示牌面。因此，陣列裡只需要儲存 1 到 52 的數字！<br>
@@ -1000,10 +1003,10 @@
 
                             <!-- 單元導覽按鈕 -->
                             <div class="mt-8 pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-                                <a href="1150804.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 hover:text-cyan-600 transition-colors shadow-sm">
+                                <a data-course-direction="previous" href="1150804.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 hover:text-cyan-600 transition-colors shadow-sm">
                                     <i data-lucide="arrow-left" class="w-5 h-5"></i> 上一單元
                                 </a>
-                                <a href="1150806.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-cyan-600 text-white font-bold rounded-xl hover:bg-cyan-700 transition-colors shadow-sm">
+                                <a data-course-direction="next" href="1150806.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-cyan-600 text-white font-bold rounded-xl hover:bg-cyan-700 transition-colors shadow-sm">
                                     下一單元 <i data-lucide="arrow-right" class="w-5 h-5"></i>
                                 </a>
                             </div>

@@ -8,25 +8,12 @@
 (() => {
   'use strict';
 
-  const text = node => (node.textContent || '').replace(/\s+/g, ' ').trim();
   const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-  // 教師示範模式：存在 sessionStorage，只在這個分頁有效；CodeGame、Python Lab 讀同一個鍵。
-  const TEACHER_KEY = 'unforte115:teacher-demo';
-  const teacher = {
-    isOn() {
-      if (/[?&](route=all|teacher=1)\b/.test(location.search)) teacher.set(true);
-      try { return sessionStorage.getItem(TEACHER_KEY) === '1'; } catch { return /[?&](route=all|teacher=1)\b/.test(location.search); }
-    },
-    set(on) { try { if (on) sessionStorage.setItem(TEACHER_KEY, '1'); else sessionStorage.removeItem(TEACHER_KEY); } catch { /* 無法保存時只在網址參數下有效 */ } }
-  };
+  const teacher = window.TeacherDemo;
   const reduceMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function findAnchor(locator) {
     if (typeof locator === 'string') return document.querySelector(locator);
-    if (locator.h) {
-      const wanted = locator.h.replace(/\s+/g, ' ');
-      return [...document.querySelectorAll('h1,h2,h3,h4,h5')].find(node => text(node).includes(wanted)) || null;
-    }
     if (locator.up) return document.querySelector(locator.up);
     if (locator.common) {
       const nodes = locator.common.map(selector => document.querySelector(selector));
@@ -51,25 +38,27 @@
 
   function start(config) {
     const demo = teacher.isOn();
-    let showAll = demo && /[?&]route=all\b/.test(location.search);
+    let showAll = demo && teacher.showAll();
     const steps = config.steps.map((step, index) => ({ ...step, index, regions: [] }));
     let current = 0;
     let finished = false;
     let hintsShown = 0;
     let expanded = true;
     let ticked = [];
+    const skipped = new Set();
 
     function resolve() {
       const anchorsByStep = steps.map(step => (step.anchors || []).map(locator => ({ locator, node: findAnchor(locator) })));
       steps.forEach((step, index) => {
         const foreign = anchorsByStep.flatMap((list, other) => other === index ? [] : list.map(item => item.node)).filter(Boolean);
-        step.regions = anchorsByStep[index].filter(item => item.node).map(item => regionFor(item.node, item.locator, foreign));
-        step.missing = (step.anchors || []).length > 0 && step.regions.length === 0;
+        const anchors = anchorsByStep[index];
+        step.regions = anchors.filter(item => item.node).map(item => regionFor(item.node, item.locator, foreign));
+        step.missing = anchors.some(item => !item.node);
       });
     }
 
     function nextLinks() {
-      return [...document.querySelectorAll('a')].filter(link => !link.closest('.lesson-route') && /下一個?單元/.test(text(link)));
+      return document.querySelectorAll('main [data-course-direction="next"], main [data-route-finish]');
     }
 
     function apply() {
@@ -79,6 +68,18 @@
         if (visible.has(region)) region.removeAttribute('data-route-locked');
         else region.setAttribute('data-route-locked', '');
       }));
+      steps.filter(step => step.optional).forEach(step => {
+        for (const locator of step.anchors || []) {
+          const anchor = findAnchor(locator);
+          if (!anchor) continue;
+          const heading = anchor.matches('h2,h3,h4,h5') ? anchor : anchor.querySelector('h2,h3,h4,h5');
+          if (!heading || heading.querySelector('.lesson-route__activity-tag')) continue;
+          const badge = document.createElement('span');
+          badge.className = 'lesson-route__activity-tag lesson-route__tag';
+          badge.textContent = '選做';
+          heading.prepend(badge);
+        }
+      });
       nextLinks().forEach(link => {
         if (demo || finished) link.removeAttribute('data-route-locked');
         else link.setAttribute('data-route-locked', '');
@@ -126,28 +127,28 @@
 
     function chips() {
       return steps.map(step => {
-        const state = finished || step.index < current ? 'done' : step.index === current ? 'current' : 'locked';
+        const state = skipped.has(step.index) ? 'skipped' : finished || step.index < current ? 'done' : step.index === current ? 'current' : 'locked';
         const mark = state === 'done' ? '✓' : state === 'locked' && !demo ? '🔒' : step.index + 1;
-        const clickable = demo || state === 'done' || state === 'current';
-        return `<li><button type="button" class="lesson-route__chip is-${state}${step.optional ? ' is-optional' : ''}" data-chip="${step.index}" ${clickable ? '' : 'disabled'} aria-label="第 ${step.index + 1} 步：${escapeHtml(step.title)}${step.optional ? '（選做）' : ''}${state === 'done' ? '，已完成' : state === 'locked' ? '，尚未開啟' : '，目前步驟'}"><span>${mark}</span>${escapeHtml(step.title)}</button></li>`;
+        const status = { done: '已完成', skipped: '已略過', locked: '尚未開啟', current: '目前步驟' }[state];
+        return `<li><button type="button" class="lesson-route__chip is-${state}${step.optional ? ' is-optional' : ''}" data-chip="${step.index}" ${demo || state !== 'locked' ? '' : 'disabled'} aria-label="第 ${step.index + 1} 步：${escapeHtml(step.title)}${step.optional ? '（選做）' : ''}，${status}"><span>${mark}</span>${escapeHtml(step.title)}${state === 'skipped' ? '（已略過）' : ''}</button></li>`;
       }).join('');
     }
 
     function render() {
       if (finished) {
-        const next = config.next || (nextLinks()[0] && { href: nextLinks()[0].getAttribute('href'), label: '前往下一單元' });
+        const next = config.next;
         panel.innerHTML = `
           <div class="lesson-route__bar">
-            <span class="lesson-route__count">全部完成</span>
-            <strong class="lesson-route__title">${escapeHtml(config.finishTitle || '本課路線完成！')}</strong>
+            <span class="lesson-route__count">本課結束</span>
+            <strong class="lesson-route__title">${escapeHtml(config.finishTitle || '本課學習路線已完成')}</strong>
             <div class="lesson-route__actions">
               <button type="button" data-action="toggle" aria-expanded="${expanded}">${expanded ? '收合 ▾' : '路線 ▴'}</button>
-              ${next ? `<a class="lesson-route__primary" href="${escapeHtml(next.href)}">${escapeHtml(next.label || '前往下一單元')} →</a>` : ''}
+              ${next ? `<a class="lesson-route__primary" data-course-direction="next" href="${escapeHtml(next.href)}">${escapeHtml(next.label || '前往下一單元')} →</a>` : ''}
             </div>
           </div>
           <div class="lesson-route__body" ${expanded ? '' : 'hidden'}>
             <ol class="lesson-route__chips">${chips()}</ol>
-            <p class="lesson-route__todo">${escapeHtml(config.finishText || '你已走完本課每一步。點上方步驟可以回頭複習。')}</p>
+            <p class="lesson-route__todo">${escapeHtml(config.finishText || '可以點上方的步驟，回去看做過的活動。')}</p>
           </div>`;
         return;
       }
@@ -165,12 +166,12 @@
             <button type="button" class="lesson-route__primary" data-action="done">${current === steps.length - 1 ? '完成本課' : '完成這一步'}</button>
           </div>
         </div>
-        ${demo ? `<div class="lesson-route__demo"><span>教師示範模式：點上方步驟可直接跳過去，不必勾選完成標準。</span><button type="button" data-action="show-all">${showAll ? '恢復逐步路線' : '全部展開'}</button><button type="button" data-action="end-demo">結束示範</button></div>` : ''}
+        ${demo ? `<div class="lesson-route__demo"><span>教師示範模式：直接點上方的步驟即可切換。</span><button type="button" data-action="show-all">${showAll ? '恢復逐步路線' : '全部展開'}</button><button type="button" data-action="end-demo">結束示範</button></div>` : ''}
         <div class="lesson-route__body" ${expanded ? '' : 'hidden'}>
           <ol class="lesson-route__chips">${chips()}</ol>
           <p class="lesson-route__todo"><b>要做什麼</b>${escapeHtml(step.todo || '')}</p>
           ${step.link ? `<p class="lesson-route__link"><a href="${escapeHtml(step.link.href)}" target="_blank" rel="noopener">${escapeHtml(step.link.label)}</a></p>` : ''}
-          ${checks.length ? `<fieldset class="lesson-route__checks"><legend>完成標準：全部勾選後，按「${current === steps.length - 1 ? '完成本課' : '完成這一步'}」</legend>${checks.map((check, i) => `<label><input type="checkbox" data-check="${i}" ${ticked[i] ? 'checked' : ''}> ${escapeHtml(check)}</label>`).join('')}</fieldset>` : ''}
+          ${checks.length ? `<fieldset class="lesson-route__checks"><legend>做完一項就勾一項。全部勾好後，按「${current === steps.length - 1 ? '完成本課' : '完成這一步'}」</legend>${checks.map((check, i) => `<label><input type="checkbox" data-check="${i}" ${ticked[i] ? 'checked' : ''}> ${escapeHtml(check)}</label>`).join('')}</fieldset>` : ''}
           ${hints.length ? `<div class="lesson-route__hints">${hints.slice(0, hintsShown).map((hint, i) => `<p><b>提示 ${i + 1}</b>${escapeHtml(hint)}</p>`).join('')}${hintsShown < hints.length ? `<button type="button" data-action="hint">卡住了？看提示 ${hintsShown + 1}／${hints.length}</button>` : ''}</div>` : ''}
           <p class="lesson-route__msg" role="status"></p>
         </div>`;
@@ -195,20 +196,21 @@
       if (!action) return;
       if (action === 'toggle') { expanded = !expanded; render(); return; }
       if (action === 'show-all') { showAll = !showAll; apply(); render(); window.dispatchEvent(new Event('resize')); return; }
-      if (action === 'end-demo') { teacher.set(false); location.href = location.pathname + location.hash; return; }
+      if (action === 'end-demo') { teacher.end(); return; }
       if (action === 'goto') { scrollToStep(steps[current]); return; }
       if (action === 'hint') { hintsShown += 1; render(); return; }
-      if (action === 'skip') { advance(); return; }
+      if (action === 'skip' && steps[current].optional) { skipped.add(current); advance(); return; }
       if (action === 'done') {
         const boxes = [...panel.querySelectorAll('[data-check]')];
         const missing = demo ? [] : boxes.filter(box => !box.checked);
         if (missing.length) {
           if (!expanded) { expanded = true; render(); }
           const message = panel.querySelector('.lesson-route__msg');
-          message.textContent = `還有 ${missing.length} 項完成標準沒勾選。完成後再按一次；卡住可以看提示。`;
+          message.textContent = `還有 ${missing.length} 項沒勾選。做完並勾好後再按一次。卡住了可以看提示。`;
           (panel.querySelector('[data-check]:not(:checked)') || panel).focus();
           return;
         }
+        skipped.delete(current);
         advance();
       }
     });
@@ -234,8 +236,12 @@
     }
 
     resolve();
-    steps.filter(step => step.missing).forEach(step => console.warn(`lesson-route：找不到「${step.title}」的頁面區塊，改為只顯示說明。`));
+    steps.filter(step => step.missing).forEach(step => console.warn(`lesson-route：找不到「${step.title}」的部分頁面區塊。`));
     enter(0, { scroll: false });
+    if (showAll && location.hash) {
+      const target = document.getElementById(location.hash.slice(1));
+      if (target) requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+    }
   }
 
   // Wait until the page (including script-built or React parts) shows the anchors we need.

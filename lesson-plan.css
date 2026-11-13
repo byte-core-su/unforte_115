@@ -118,6 +118,8 @@
 }
 .copy-table-button:hover,
 .copy-table-button:focus-visible { background: var(--grade-soft); }
+.lesson-record { scroll-margin-top: 1rem; }
+.lesson-record > .copy-table-button { margin: 0 0 .5rem; }
 .copy-status:not(:empty) {
   position: sticky;
   top: .5rem;
