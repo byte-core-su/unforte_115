@@ -17,7 +17,7 @@
   const scratch = step => ({
     title: '到 Scratch 動手做',
     ...step,
-    hints: [...(step.hints || []), '做到一半卡住，可以往上看前面的參考積木，或舉手請老師幫忙。']
+    hints: [...(step.hints || []), '做到一半卡住，可以點上方已完成的節點回看參考積木，或舉手請老師幫忙。']
   });
   const practice = {
     title: '換題練習',
@@ -281,9 +281,10 @@
         checks: ['呼叫順序正確'],
         hints: ['先有裝備庫才能洗牌，洗好才能分配，分配完才能對決。'] },
       scratch({
+        anchors: ['#route-scratch-demo'],
         todo: '到 Scratch 用四個自訂積木完成對決，畫出各積木用到的清單。測試足夠、不足和抽取後不重複，修正一次並重測。',
         checks: ['四個自訂積木都能運作，並畫出清單流程圖', '完成三種測試，記下一次修正和重測結果'],
-        hints: ['頁面上方可以下載 Scratch 範例對照。'] })
+        hints: ['可下載這一步的 Scratch 示範檔對照。'] })
     ])
   };
 

@@ -1,5 +1,5 @@
 // 學習路線引導：把一頁教材整理成「一步接一步」的單一路線。
-// - 依序解鎖：還沒輪到的步驟區塊先隱藏，完成這一步（勾選完成標準）才開啟下一步。
+// - 學生一次看一個步驟，完成後才開啟下一步。回看已完成的步驟不影響進度。
 // - 操作說明放在活動前，完成標準和繼續按鈕放在活動後。
 // - 進度只存在本頁，重新整理就從頭開始；不保存、不傳送任何資料。
 // - 教師示範模式：從「教師備課」開啟，或網址加 ?teacher=1／?route=all。只在目前分頁有效，
@@ -41,10 +41,13 @@
     let showAll = demo && teacher.showAll();
     const steps = config.steps.map((step, index) => ({ ...step, index, regions: [] }));
     let current = 0;
+    let viewing = null;
     let finished = false;
     let hintsShown = 0;
     let ticked = [];
     const skipped = new Set();
+    const viewedStep = () => steps[viewing ?? current];
+    const atEnd = () => finished && viewing === null;
 
     function resolve() {
       const anchorsByStep = steps.map(step => (step.anchors || []).map(locator => ({ locator, node: findAnchor(locator) })));
@@ -57,16 +60,11 @@
     }
 
     function apply() {
-      const visible = new Set();
-      steps.forEach(step => {
-        if (showAll || finished || (step.index <= current && !skipped.has(step.index))) {
-          step.regions.forEach(region => visible.add(region));
-        }
-      });
+      const visible = showAll ? steps.flatMap(step => step.regions) : atEnd() ? [] : viewedStep().regions;
       steps.forEach(step => step.regions.forEach(region => {
-        if (visible.has(region)) region.removeAttribute('data-route-locked');
-        else region.setAttribute('data-route-locked', '');
+        region.toggleAttribute('data-route-locked', !visible.some(active => region.contains(active)));
       }));
+      main.toggleAttribute('data-route-locked', !demo && !visible.some(region => main.contains(region)));
       steps.filter(step => step.optional).forEach(step => {
         for (const locator of step.anchors || []) {
           const anchor = findAnchor(locator);
@@ -105,19 +103,23 @@
     main.after(panel, completion);
     const startButton = document.querySelector('[data-lesson-start]');
     const guide = document.querySelector('#learning-guide');
+    const progress = document.createElement('nav');
+    progress.className = 'lesson-route lesson-route--progress';
+    progress.setAttribute('aria-label', '本課進度');
+    (guide || main).before(progress);
 
     function placeControls() {
-      const unique = [...new Set(steps[current].regions)];
+      const unique = [...new Set(viewedStep().regions)];
       const regions = unique.filter(region => !unique.some(other => other !== region && other.contains(region)))
         .sort((a, b) => a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
-      if (!finished && regions.length) {
+      if (!atEnd() && regions.length) {
         // Place beside the current activity without moving any of its existing controls.
         if (regions[0].previousElementSibling !== panel) regions[0].before(panel);
         const last = regions.at(-1);
         if (last.nextElementSibling !== completion) last.after(completion);
       } else {
         const practice = document.querySelector('#adaptive-practice');
-        const anchor = (finished || current === steps.length - 1) && practice ? practice : main;
+        const anchor = practice || main;
         if (anchor.nextElementSibling !== panel) anchor.after(panel);
         if (panel.nextElementSibling !== completion) panel.after(completion);
       }
@@ -145,51 +147,72 @@
           }
           for (const step of steps.slice(1, first.index)) skipped.add(step.index);
           enter(first.index);
-        } else if (finished) reveal(panel.querySelector('.lesson-route__title'));
-        else {
-          steps[current].review?.();
-          reveal(panel.querySelector('.lesson-route__title'), 'start');
-        }
+        } else showStep();
       });
     }
 
-    function scrollToStep(step) {
-      if (step.index === current && !finished) {
-        reveal(panel.querySelector('.lesson-route__title'), 'start');
-        return;
-      }
-      const target = step.regions[0] || guide;
-      if (!target) return;
-      target.scrollIntoView({ behavior: 'instant', block: 'start' });
+    function showStep(index = null) {
+      viewing = index;
+      updateView();
+      if (!atEnd()) viewedStep().review?.();
+      focusStep();
+    }
+
+    function focusStep() {
+      requestAnimationFrame(() => {
+        const heading = panel.hidden ? guide?.querySelector('h1') : panel.querySelector('.lesson-route__title');
+        if (panel.hidden) heading?.setAttribute('tabindex', '-1');
+        heading?.focus({ preventScroll: true });
+        progress.scrollIntoView({ behavior: 'instant', block: 'start' });
+      });
+    }
+
+    function updateView() {
+      apply();
+      renderProgress();
+      render();
+      placeControls();
+      window.dispatchEvent(new Event('resize'));
     }
 
     function enter(index, { focus = true } = {}) {
       current = index;
+      viewing = null;
       hintsShown = 0;
       ticked = [];
-      apply();
       const step = steps[current];
+      updateView();
       if (typeof step.enter === 'function') { try { step.enter(); } catch (error) { console.warn('lesson-route enter', error); } }
-      render();
-      placeControls();
-      window.dispatchEvent(new Event('resize'));
-      if (focus) requestAnimationFrame(() => reveal(panel.querySelector('.lesson-route__title'), 'start'));
+      if (focus) focusStep();
       if (startButton && index > 0) startButton.textContent = '回到目前步驟';
     }
 
-    function chips() {
-      return steps.map(step => {
-        const state = skipped.has(step.index) ? 'skipped' : finished || step.index < current ? 'done' : step.index === current ? 'current' : 'locked';
-        const mark = state === 'done' ? '✓' : step.index + 1;
-        const status = { done: '已完成', skipped: '已略過', locked: '尚未開啟', current: '目前步驟' }[state];
-        return `<li><button type="button" class="lesson-route__chip is-${state}${step.optional ? ' is-optional' : ''}" data-chip="${step.index}" ${demo || state === 'done' || state === 'current' ? '' : 'disabled'} aria-label="第 ${step.index + 1} 步：${escapeHtml(step.title)}${step.optional ? '（選做）' : ''}，${status}"><span>${mark}</span>${escapeHtml(step.title)}${state === 'skipped' ? '（已略過）' : ''}</button></li>`;
+    function renderProgress() {
+      const destination = steps.length;
+      const reached = finished ? destination : current;
+      const displayed = viewing ?? reached;
+      const nodes = [...steps, { index: destination, title: '完成本課' }].map(step => {
+        const { index, title, optional } = step;
+        const endpoint = index === 0 ? '起點' : index === destination ? '終點' : '';
+        const state = skipped.has(index) ? 'skipped' : index < reached ? 'done' : index === reached ? 'current' : 'locked';
+        const mark = { skipped: '–', done: '✓' }[state] || (endpoint ? '●' : index);
+        const status = { done: '已完成', skipped: '已略過', locked: '尚未開啟', current: '目前進度' }[state];
+        const enabled = index === destination ? finished : demo || state === 'done' || state === 'current';
+        return `<li class="is-${state}${endpoint ? ' is-endpoint' : ''}"><button type="button" data-node="${index}" ${enabled ? '' : 'disabled'} ${index === displayed ? 'aria-current="step"' : ''} aria-label="${endpoint ? `${endpoint}，` : ''}${escapeHtml(title)}${optional ? '（選做）' : ''}，${status}"><span class="lesson-route__dot" aria-hidden="true">${mark}</span><span class="lesson-route__node-label" aria-hidden="true">${escapeHtml(endpoint || title)}${optional ? '<small>選做</small>' : ''}</span></button></li>`;
       }).join('');
+      progress.style.setProperty('--route-nodes', destination + 1);
+      progress.innerHTML = `
+        <ol class="lesson-route__nodes" role="list">${nodes}</ol>
+        <div class="lesson-route__position">
+          <p role="status">${atEnd() ? '已到終點，本課完成' : viewing !== null ? `回看：${escapeHtml(viewedStep().title)}` : `目前：${escapeHtml(viewedStep().title)}`}</p>
+          ${viewing !== null ? `<button type="button" data-action="resume">${finished ? '回到終點' : '回到目前步驟'}</button>` : ''}
+        </div>`;
     }
 
     function render() {
-      panel.hidden = Boolean(startButton && !demo && current === 0);
-      completion.hidden = panel.hidden || finished;
-      if (finished) {
+      panel.hidden = Boolean(startButton && !demo && viewedStep().index === 0);
+      completion.hidden = panel.hidden || atEnd() || viewing !== null;
+      if (atEnd()) {
         if (startButton) startButton.textContent = '查看本課完成結果';
         const next = config.next || (demo ? config.teacherFinish : null);
         panel.innerHTML = `
@@ -201,24 +224,22 @@
             </div>
           </div>
           <div class="lesson-route__body">
-            <ol class="lesson-route__chips">${chips()}</ol>
             <p class="lesson-route__todo">${escapeHtml(config.finishText || '可以點上方的步驟，回去看做過的活動。')}</p>
           </div>`;
         return;
       }
-      const step = steps[current];
+      const step = viewedStep();
       const checks = step.checks || [];
-      const hints = step.hints || [];
+      const hints = viewing === null ? step.hints || [] : [];
       const { before, during, after } = step.questions || {};
       panel.innerHTML = `
         <div class="lesson-route__bar">
-          <span class="lesson-route__count">第 ${current + 1}／${steps.length} 步</span>${demo ? '<span class="lesson-route__teacher">教師示範</span>' : ''}
+          <span class="lesson-route__count">${viewing !== null ? '回看步驟' : current === 0 ? '起點' : `第 ${current}／${steps.length - 1} 步`}</span>${demo ? '<span class="lesson-route__teacher">教師示範</span>' : ''}
           <h2 class="lesson-route__title" tabindex="-1">${escapeHtml(step.title)}${step.optional ? '<span class="lesson-route__tag">選做</span>' : ''}</h2>
-          ${!demo && step.optional && step.regions.length ? '<div class="lesson-route__actions"><button type="button" data-action="skip">略過選做</button></div>' : ''}
+          ${!demo && viewing === null && step.optional && step.regions.length ? '<div class="lesson-route__actions"><button type="button" data-action="skip">略過選做</button></div>' : ''}
         </div>
-        ${demo ? `<div class="lesson-route__demo"><span>教師示範模式，可直接選取下方步驟。</span><button type="button" data-action="show-all">${showAll ? '恢復逐步路線' : '全部展開'}</button><button type="button" data-action="end-demo">結束示範</button></div>` : ''}
+        ${demo ? `<div class="lesson-route__demo"><span>教師示範模式，可直接選取上方步驟。</span><button type="button" data-action="show-all">${showAll ? '恢復逐步路線' : '全部展開'}</button><button type="button" data-action="end-demo">結束示範</button></div>` : ''}
         <div class="lesson-route__body">
-          ${demo ? `<ol class="lesson-route__chips">${chips()}</ol>` : ''}
           ${before ? `<p class="lesson-route__todo"><b>操作前先猜</b>${escapeHtml(before)}</p>` : ''}
           <p class="lesson-route__todo"><b>要做什麼</b>${escapeHtml(step.todo || '')}</p>
           ${step.evidence?.length ? `<ul class="evidence-list" role="list">${step.evidence.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''}
@@ -237,28 +258,20 @@
             <button type="button" class="lesson-route__primary" data-action="done">${action}</button>
           </div>
         </div>`;
-      keepCurrentChipVisible();
-    }
-
-    function keepCurrentChipVisible() {
-      const row = panel.querySelector('.lesson-route__chips');
-      const chip = panel.querySelector('.lesson-route__chip.is-current');
-      if (row && chip) row.scrollLeft = chip.parentElement.offsetLeft - row.clientWidth / 2 + chip.offsetWidth / 2;
     }
 
     function handleClick(event) {
-      const chip = event.target.closest('[data-chip]');
-      if (chip) {
-        const step = steps[Number(chip.dataset.chip)];
-        if (demo && step.index !== current) { finished = false; enter(step.index); }
-        else {
-          step.review?.();
-          scrollToStep(step);
-        }
+      const node = event.target.closest('[data-node]');
+      if (node && !node.disabled) {
+        const index = Number(node.dataset.node);
+        if (index === steps.length || (!finished && index === current)) showStep();
+        else if (demo) { finished = false; enter(index); }
+        else showStep(index);
         return;
       }
       const action = event.target.closest('[data-action]')?.dataset.action;
       if (!action) return;
+      if (action === 'resume') { showStep(); return; }
       if (action === 'show-all') { showAll = !showAll; apply(); render(); window.dispatchEvent(new Event('resize')); return; }
       if (action === 'end-demo') { teacher.end(); return; }
       if (action === 'hint') {
@@ -281,6 +294,7 @@
         advance();
       }
     }
+    progress.addEventListener('click', handleClick);
     panel.addEventListener('click', handleClick);
     completion.addEventListener('click', handleClick);
 
@@ -292,10 +306,8 @@
     function advance() {
       if (current < steps.length - 1) { enter(current + 1); return; }
       finished = true;
-      apply();
-      render();
-      placeControls();
-      reveal(panel.querySelector('.lesson-route__primary, .lesson-route__title'));
+      updateView();
+      focusStep();
     }
 
     resolve();
