@@ -17,7 +17,7 @@
   const scratch = step => ({
     title: '到 Scratch 動手做',
     ...step,
-    hints: [...(step.hints || []), '做到一半卡住：點路線上已完成的步驟，回頭看參考積木；還是不懂，就舉手問老師。']
+    hints: [...(step.hints || []), '做到一半卡住，可以往上看前面的參考積木，或舉手請老師幫忙。']
   });
   const practice = {
     title: '換題練習',
@@ -159,7 +159,7 @@
         hints: ['網頁模擬器不能代替自己的作品，請一定要在 Scratch 做一次。'] })
     ]),
     '1150801.html': route(['#route-lesson-objectives'], [
-      { title: '清單操作任務', anchors: [{ up: '#route-list-missions' }],
+      { title: '清單操作任務', anchors: ['#route-list-missions'],
         todo: '跟著左邊的任務一步步按按鈕，觀察右邊裝備庫的項目和長度怎麼變，走完五個航點；完成後再自己試新增、插入、替換、刪除。',
         checks: ['走完星際航線五個航點', '每次操作後，說得出清單的項目與長度'],
         hints: ['索引值從 1 開始：第 1 項就是最上面那一個。', '插入會讓後面的項目往後移一格；刪除後，後面的項目往前補。'] },

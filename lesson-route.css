@@ -6,41 +6,35 @@ html:not([data-teacher-route]) :is(.learning-guide__teacher, .learning-guide__re
   display: none !important;
 }
 
-.lesson-route-flash {
-  outline: 3px solid color-mix(in srgb, var(--grade-primary, #4f46e5) 55%, white);
-  outline-offset: 6px;
-  border-radius: .5rem;
-  transition: outline-color 1.2s ease;
-}
-
 .lesson-route {
   --route-color: var(--grade-primary, #4f46e5);
-  position: fixed;
-  left: 50%;
-  bottom: 0;
-  z-index: 60;
-  width: min(60rem, 100% - 1rem);
-  max-height: min(55vh, 30rem);
-  overflow-y: auto;
-  transform: translateX(-50%);
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  margin: 1rem 0;
   border: 1px solid #d5dbe6;
-  border-bottom: 0;
   border-top: 4px solid var(--route-color);
-  border-radius: .9rem .9rem 0 0;
+  border-radius: .8rem;
   background: #fff;
-  box-shadow: 0 -10px 30px rgba(15, 23, 42, .14);
   color: #1e293b;
   font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
   font-size: .95rem;
   line-height: 1.7;
 }
 
+.site-course > .lesson-route {
+  width: min(72rem, 100% - 2rem);
+  margin-inline: auto;
+}
+
+.lesson-route--completion { border-top: 1px solid #d5dbe6; }
+.lesson-route--completion .lesson-route__body { border-top: 0; }
+.lesson-route--completion .lesson-route__actions { justify-content: flex-end; }
+
 .lesson-route button,
 .lesson-route a { font: inherit; }
 
 .lesson-route__bar {
-  position: sticky;
-  top: 0;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -94,7 +88,7 @@ html:not([data-teacher-route]) :is(.learning-guide__teacher, .learning-guide__re
   cursor: pointer;
 }
 
-.lesson-route__title { flex: 1 1 14rem; font-size: 1.02rem; font-weight: 800; }
+.lesson-route__title { flex: 1 1 14rem; margin: 0; font-size: 1.02rem; font-weight: 800; scroll-margin-top: 1rem; }
 
 .lesson-route__tag {
   margin-left: .45rem;
@@ -139,8 +133,6 @@ html:not([data-teacher-route]) :is(.learning-guide__teacher, .learning-guide__re
   border-top: 1px solid #e2e8f0;
   padding: .75rem 1rem 1rem;
 }
-
-.lesson-route__body[hidden] { display: none; }
 
 .lesson-route__chips {
   display: flex;
@@ -211,7 +203,6 @@ html:not([data-teacher-route]) :is(.learning-guide__teacher, .learning-guide__re
 .lesson-route__msg:empty { display: none; }
 
 @media (max-width: 640px) {
-  .lesson-route { width: 100%; border-radius: .8rem .8rem 0 0; max-height: 65vh; }
   .lesson-route__bar { padding: .55rem .75rem; }
   .lesson-route__title { flex-basis: calc(100% - 6rem); font-size: .95rem; }
   .lesson-route__actions { width: 100%; }

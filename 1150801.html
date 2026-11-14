@@ -308,7 +308,7 @@
 
                     {/* 任務航線 */}
                     <div className="mt-10 pt-6 border-t-2 border-dashed border-slate-200 w-full animate-[fadeIn_0.5s_ease-out]">
-                        <h3 id="route-list-missions" className="text-sm font-bold text-slate-400 mb-8 text-center tracking-widest">🗺️ 星際航線進度</h3>
+                        <h3 className="text-sm font-bold text-slate-400 mb-8 text-center tracking-widest">🗺️ 星際航線進度</h3>
                         <div className="flex items-center w-full px-2 md:px-8">
                             {mapNodes.map((node, i) => {
                                 const isPast = i < step;
@@ -643,7 +643,7 @@
                     <LessonHeader />
 
                     {/* 互動學習區域 */}
-                    <div className="flex flex-col md:flex-row gap-8 relative">
+                    <div id="route-list-missions" className="flex flex-col md:flex-row gap-8 relative">
                         
                         {/* 左側：操作區 (根據階段切換介面) */}
                         <div className="w-full md:w-3/5 pb-20">
