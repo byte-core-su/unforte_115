@@ -10,7 +10,7 @@
     "多筆、單筆、空清單三種案例的追蹤表，記下每輪累計值、總和、筆數和平均"
   ],
   "successCriteria": "多筆與單筆的累計值和平均正確。空清單記為 0 筆，說明除數是 0，所以不能直接算平均。",
-  "priorKnowledge": "Scratch 事件、變數與迴圈基礎",
+  "priorKnowledge": "積木程式事件、變數與迴圈基礎",
   "prerequisites": [
     "g8-01"
   ],

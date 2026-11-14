@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="lesson-route.css">
     <script src="teacher-demo.js" defer></script>
     <script src="lesson-route.js" defer></script>
+    <script src="block-program-tasks.js" defer></script>
+    <script src="block-program.js" defer></script>
     <script src="lesson-routes.js" defer></script>
     <meta charset="UTF-8">
     <script src="course-scenarios.js"></script>
@@ -37,7 +39,7 @@
         input[type="number"]::-webkit-inner-spin-button, 
         input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         
-        /* Scratch 積木樣式 */
+        /* 積木樣式 */
         .scratch-list-color { background-color: #ff661a; }
         .scratch-reporter { background-color: #ff661a; border-radius: 9999px; }
         .scratch-boolean { background-color: #ff661a; clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%); padding-left: 15px; padding-right: 15px;}
@@ -67,7 +69,7 @@
             <p class="text-sm font-bold text-cyan-600 mb-3 tracking-widest uppercase">演算法與程式設計</p>
             <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight"><span data-scenario-text="name">星際陣列指揮官</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用清單打造星際任務</span></h1>
             <p class="text-lg text-slate-500 font-light max-w-2xl leading-relaxed">
-                <span data-scenario-text="intro">在星艦裝備的任務中練習</span> <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span>，從管理裝備到做出對決遊戲。
+                <span data-scenario-text="intro">在星艦裝備的任務中練習</span> <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">清單</span>，從管理裝備到做出對決遊戲。
             </p>
         </div>
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-cyan-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
@@ -232,7 +234,7 @@
                     desc: "你練習了新增、插入、替換和刪除。接下來到控制台自由練習，先猜清單會怎麼變，再按積木看看。",
                     btnText: "🚀 進入控制台實驗室",
                     action: () => {
-                        setMessage("可以點按鈕或 Scratch 積木，試試清單怎麼變。");
+                        setMessage("可以點按鈕或 積木，試試清單怎麼變。");
                         onComplete();
                     }
                 }
@@ -555,13 +557,13 @@
                         </div>
                     </div>
 
-                    {/* 區塊 2：Scratch 積木對應區 */}
+                    {/* 區塊 2：積木對應區 */}
                     <div className="bg-white rounded-2xl shadow-md p-6 border-t-8 border-[#ff661a]">
                         <h2 className="text-2xl font-bold text-slate-800 mb-3 flex items-center gap-2">
-                            🧩 用 Scratch 積木操作清單
+                            🧩 用 積木操作清單
                         </h2>
                         <p className="text-slate-600 mb-6 bg-orange-50 p-3 rounded-lg border border-orange-100 text-sm leading-relaxed">
-                            剛剛在情境裡的操作，其實都可以用 Scratch 的清單積木來完成！點擊下方積木最左邊的「▶」按鈕來模擬執行程式。
+                            剛剛在情境裡的操作，其實都可以用 的清單積木來完成！點擊下方積木最左邊的「▶」按鈕來模擬執行程式。
                         </p>
 
                         <div className="space-y-4 overflow-x-auto pb-4">

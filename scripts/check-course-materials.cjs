@@ -86,7 +86,7 @@ function inspectMaterials({ root = path.resolve(__dirname, '..'), registry = mat
         const html = readText(page);
         const overviewHtml = readText(overview);
         check(html.includes('src="course-scenarios.js"'), '課程頁未載入情境設定');
-        check(overviewHtml.includes('data-scenario-download'), '總覽未接入情境下載路徑');
+        check(html.includes('src="block-program.js"'), '課程頁未載入積木程式模擬器');
         check(overviewHtml.includes(`href="${page}"`), '總覽沒有單元入口');
         const config = animation.config.split('.').reduce((value, part) => value?.[part], scenario);
         check(Boolean(config), `找不到動畫對應設定 ${animation.config}`);
@@ -106,7 +106,6 @@ function inspectMaterials({ root = path.resolve(__dirname, '..'), registry = mat
         let demo;
         if (scratch.demo) {
           check(scratch.demo.role === 'assessment-demo', '模組化示範的用途標記錯誤');
-          check(html.includes(`href="${scratch.demo.file}"`), '課程頁未連結模組化示範');
           const demoZip = openZip(readFile(scratch.demo.file));
           demo = JSON.parse(demoZip.read('project.json').toString('utf8'));
           checkAssets(demo, demoZip, check);

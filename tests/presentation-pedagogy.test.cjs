@@ -68,7 +68,7 @@ test('teacher package revision preserves slide count and audited task counts', (
 });
 
 test('package resources, classroom use and assessment examples support teacher adoption', () => {
-  for (const resource of ['課程總覽', '逐課教案', '互動教材', 'Scratch 範例', '學習紀錄', '評量規準']) {
+  for (const resource of ['課程總覽', '逐課教案', '互動教材', '積木程式模擬器', '學習紀錄', '評量規準']) {
     assert.ok(visible(2).includes(resource), resource);
   }
   for (const stage of ['課前準備', '第一節引導', '第一節操作', '第二節延伸', '收取與回饋']) {
@@ -94,11 +94,11 @@ test('presentation links reach current local teaching pages and visible example 
     if (!url.hash || !file.endsWith('.html')) continue;
     const id = url.hash.slice(1);
     const html = fs.readFileSync(file, 'utf8');
-    const generated = { 'adaptive-practice': 'adaptive-practice.js', 'learning-guide': 'learning-guides.js' }[id];
+    const generated = { 'adaptive-practice': 'adaptive-practice.js', 'learning-guide': 'learning-guides.js', 'block-program': 'lesson-route.js' }[id];
     if (generated) {
       assert.ok(html.includes(`src="${generated}"`), href);
-      assert.ok(fs.readFileSync(path.join(presentation, '..', generated), 'utf8').includes(`section.id = '${id}'`));
+      assert.ok(fs.readFileSync(path.join(presentation, '..', generated), 'utf8').includes(`.id = '${id}'`));
     } else assert.ok(html.includes(`id="${id}"`), href);
-    if (['adaptive-practice', 'energy-trace', 'polygon-simulator'].includes(id)) assert.equal(url.searchParams.get('route'), 'all', href);
+    if (['adaptive-practice', 'energy-trace', 'polygon-simulator', 'block-program'].includes(id)) assert.equal(url.searchParams.get('route'), 'all', href);
   }
 });

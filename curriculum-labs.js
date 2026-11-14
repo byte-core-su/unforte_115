@@ -9,20 +9,20 @@
     '1150701.html': {
       title: '資訊使用情境判斷',
       codes: '資 H-IV-1／2／3｜運 a-IV-2',
-      intro: '完成積木診斷後，再判斷使用 Scratch 與網路資源時，如何保護個資、合理使用素材並維護帳號安全。',
+      intro: '完成積木診斷後，再判斷使用 積木程式與網路資源時，如何保護個資、合理使用素材並維護帳號安全。',
       html: `<div class="curriculum-lab__questions" data-quiz="g7-safety"></div>`
     },
     '1150706.html': {
       title: escapeHtml(defense.labTitle),
       codes: '資 T-IV-1｜運 t-IV-4、運 p-IV-1',
       intro: `使用匿名範例資料，先搜尋指定測試、比較${escapeHtml(defense.labResult)}，再計算平均資源消耗；將結論用於改良${escapeHtml(defense.project)}。`,
-      html: `<div class="curriculum-lab__controls"><label>搜尋測試編號 <select id="g7-data-query"></select></label><label>先預測有效且最省資源的編號 <select id="g7-data-prediction"><option value="">先選答案</option><option>A</option><option>B</option><option>C</option><option>D</option></select></label><button type="button" id="g7-data-run">核對預測並分析</button><button type="button" id="g7-data-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g7-data-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g7-data-result" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">Scratch 測試提示：在自己的作品試不同的邊數、圖形數量和筆跡寬度。把參數及是否${escapeHtml(defense.outcome)}的結果填進本課紀錄表，再比較通過測試的組合。</p>`
+      html: `<div class="curriculum-lab__controls"><label>搜尋測試編號 <select id="g7-data-query"></select></label><label>先預測有效且最省資源的編號 <select id="g7-data-prediction"><option value="">先選答案</option><option>A</option><option>B</option><option>C</option><option>D</option></select></label><button type="button" id="g7-data-run">核對預測並分析</button><button type="button" id="g7-data-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g7-data-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g7-data-result" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">積木程式測試提示：在自己的作品試不同的邊數、圖形數量和筆跡寬度。把參數及是否${escapeHtml(defense.outcome)}的結果填進本課紀錄表，再比較通過測試的組合。</p>`
     },
     '1150801.html': {
       title: '循序搜尋：逐項檢查清單',
       codes: '資 A-IV-3（搜尋）｜資 P-IV-3｜運 t-IV-4',
       intro: '先預測目標位於第幾項，再逐步執行；找不到時，也要能說出停止條件。',
-      html: `<div class="curriculum-lab__controls"><label>尋找${escapeHtml(inventory.kind)} <select id="g8-search-target"></select></label><label>先預測位置 <select id="g8-search-prediction"></select></label><button type="button" id="g8-search-reset">同題重試</button><button type="button" id="g8-search-step">檢查下一項</button><button type="button" id="g8-search-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g8-search-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g8-search-state" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">Scratch 任務：以「索引從 1 開始，逐項比較；找到或超過清單長度就停止」實作搜尋，交出找到與找不到各一筆追蹤紀錄。請記錄比較順序，別只背位置。</p>`
+      html: `<div class="curriculum-lab__controls"><label>尋找${escapeHtml(inventory.kind)} <select id="g8-search-target"></select></label><label>先預測位置 <select id="g8-search-prediction"></select></label><button type="button" id="g8-search-reset">同題重試</button><button type="button" id="g8-search-step">檢查下一項</button><button type="button" id="g8-search-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g8-search-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g8-search-state" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">積木程式任務：以「索引從 1 開始，逐項比較；找到或超過清單長度就停止」實作搜尋，交出找到與找不到各一筆追蹤紀錄。請記錄比較順序，別只背位置。</p>`
     },
     '1150802.html': {
       title: '音訊與作品使用判斷',
@@ -34,13 +34,13 @@
       title: '排序與洗牌比較',
       codes: '資 A-IV-3（排序）｜資 P-IV-3｜運 t-IV-4',
       intro: '洗牌讓順序隨機；排序依明確規則排列。逐步比較相鄰數值，必要時交換，觀察每一輪如何改變清單。',
-      html: `<div class="curriculum-lab__controls"><label>先預測第一次比較 <select id="g8-sort-prediction"><option value="">先選答案</option><option value="swap">會交換</option><option value="keep">不交換</option></select></label><button type="button" id="g8-sort-reset">同題重試</button><button type="button" id="g8-sort-step">執行下一次比較</button><button type="button" id="g8-sort-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g8-sort-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g8-sort-state" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">Scratch 任務：將四至六張打亂的數字牌由小到大排序；標出每次比較與交換，確認輸出數量與項目和輸入相同。換一組數字後，仍要能解釋交換規則。</p>`
+      html: `<div class="curriculum-lab__controls"><label>先預測第一次比較 <select id="g8-sort-prediction"><option value="">先選答案</option><option value="swap">會交換</option><option value="keep">不交換</option></select></label><button type="button" id="g8-sort-reset">同題重試</button><button type="button" id="g8-sort-step">執行下一次比較</button><button type="button" id="g8-sort-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g8-sort-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g8-sort-state" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">積木程式任務：將四至六張打亂的數字牌由小到大排序；標出每次比較與交換，確認輸出數量與項目和輸入相同。換一組數字後，仍要能解釋交換規則。</p>`
     },
     '1150806.html': {
       title: `用自訂積木分工完成${escapeHtml(duel.activity)}`,
       codes: '資 P-IV-4／5｜運 t-IV-4、運 p-IV-1',
-      intro: '把一大段程式拆成具名的自訂積木。先決定呼叫順序，再到 Scratch 建立並測試各段功能。',
-      html: `<div class="curriculum-lab__controls" id="g8-module-options"></div><div id="g8-module-state" class="curriculum-lab__result" aria-live="polite"></div><button type="button" id="g8-module-reset" class="curriculum-lab__secondary">重排呼叫順序</button><p class="curriculum-lab__task">Scratch 實作提示：建立${duel.modules.map(name => `「${escapeHtml(name)}」`).join('')}四個自訂積木，分別測試。改變${escapeHtml(duel.item)}數量，看看裝備不足時程式怎麼處理。</p>`
+      intro: '把一大段程式拆成具名的自訂積木。先決定呼叫順序，再到 積木程式建立並測試各段功能。',
+      html: `<div class="curriculum-lab__controls" id="g8-module-options"></div><div id="g8-module-state" class="curriculum-lab__result" aria-live="polite"></div><button type="button" id="g8-module-reset" class="curriculum-lab__secondary">重排呼叫順序</button><p class="curriculum-lab__task">積木程式實作提示：建立${duel.modules.map(name => `「${escapeHtml(name)}」`).join('')}四個自訂積木，分別測試。改變${escapeHtml(duel.item)}數量，看看裝備不足時程式怎麼處理。</p>`
     }
   };
 
@@ -66,9 +66,9 @@
   };
 
   const safety = [
-    ['準備分享 Scratch 作品時，哪種做法較合適？', ['在作品說明寫出全班真實姓名', '用角色代號，分享前檢查個資', '公開同學的帳號密碼'], 1, '公開作品不應包含可辨識同學的個人資料。'],
+    ['準備分享 積木程式時，哪種做法較合適？', ['在作品說明寫出全班真實姓名', '用角色代號，分享前檢查個資', '公開同學的帳號密碼'], 1, '公開作品不應包含可辨識同學的個人資料。'],
     ['想使用網路上的圖片或音樂，應先做什麼？', ['確認授權並標示來源或改用可使用素材', '只要能下載就直接使用', '刪掉作者名稱再上傳'], 0, '素材的合理使用與授權需要先確認。'],
-    ['收到要求輸入 Scratch 密碼的陌生連結，應如何處理？', ['立即輸入，避免帳號失效', '轉傳全班', '不要輸入，向教師確認並使用官方網站'], 2, '不明連結可能是釣魚頁面；不要洩露密碼。']
+    ['收到要求輸入 積木程式密碼的陌生連結，應如何處理？', ['立即輸入，避免帳號失效', '轉傳全班', '不要輸入，向教師確認並使用官方網站'], 2, '不明連結可能是釣魚頁面；不要洩露密碼。']
   ];
   const ethics = [
     ['要用錄音做旋律比對，哪一種資料最適合？', ['包含其他同學談話的錄音', '自己錄製且不含他人個資的短音檔', '未經同意的班級錄影'], 1, '採用自己的短錄音，避免收進他人聲音與個資。'],
@@ -246,7 +246,7 @@
     const options = section.querySelector('#g8-module-options');
     const state = section.querySelector('#g8-module-state');
     options.innerHTML = order.map(name => `<button type="button" data-module="${escapeHtml(name)}">${escapeHtml(name)}</button>`).join('');
-    const show = () => { state.textContent = `主程式：綠旗 → ${chosen.join(' → ') || '請依序選擇自訂積木'}。${chosen.length === order.length ? (chosen.every((name, index) => name === order[index]) ? '順序正確，接著在 Scratch 製作與測試各積木。' : `順序不合理：分配前要先建立並洗牌，${duel.activity}前要先分配。`) : ''}`; };
+    const show = () => { state.textContent = `主程式：綠旗 → ${chosen.join(' → ') || '請依序選擇自訂積木'}。${chosen.length === order.length ? (chosen.every((name, index) => name === order[index]) ? '順序正確，接著在積木程式模擬器製作與測試各積木。' : `順序不合理：分配前要先建立並洗牌，${duel.activity}前要先分配。`) : ''}`; };
     options.addEventListener('click', event => {
       const name = event.target.dataset.module;
       if (!name || chosen.includes(name)) return;

@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="lesson-route.css">
     <script src="teacher-demo.js" defer></script>
     <script src="lesson-route.js" defer></script>
+    <script src="block-program-tasks.js" defer></script>
+    <script src="block-program.js" defer></script>
     <script src="lesson-routes.js" defer></script>
     <meta charset="UTF-8">
     <script src="course-scenarios.js"></script>
@@ -47,8 +49,8 @@
         </a>
         
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-10 mb-8 relative min-h-[500px] flex flex-col slide-up-fade">
-            <h2 id="route-scratch-diagnostic" class="text-2xl font-bold text-slate-800 mb-2">Scratch 積木大考驗</h2>
-            <p class="text-slate-500 font-light text-base mb-8 pb-6 border-b border-slate-100">先用 10 題了解自己的 Scratch 起點，包含 <strong class="text-emerald-600">5 題核心基本題</strong> 與 <strong class="text-indigo-600">5 題隨機進階題</strong>。滿 80 分可取得紀念證書；這是練習用診斷，不是正式作品評量，也不限制進入下一課。請選一題說明判斷理由，不只記住選項。</p>
+            <h2 id="route-scratch-diagnostic" class="text-2xl font-bold text-slate-800 mb-2">積木大考驗</h2>
+            <p class="text-slate-500 font-light text-base mb-8 pb-6 border-b border-slate-100">先用 10 題了解自己的 起點，包含 <strong class="text-emerald-600">5 題核心基本題</strong> 與 <strong class="text-indigo-600">5 題隨機進階題</strong>。滿 80 分可取得紀念證書；這是練習用診斷，不是正式作品評量，也不限制進入下一課。請選一題說明判斷理由，不只記住選項。</p>
             
             <div id="quiz-start-screen" class="flex-grow flex flex-col items-center justify-center text-center pb-8 slide-up-fade">
                 <div class="text-6xl mb-6 animate-bounce">🧩</div>
@@ -102,7 +104,7 @@
                     <span id="cert-display-class"></span> <span class="mx-2 text-indigo-300">|</span> 座號：<span id="cert-display-seat"></span> <span class="mx-2 text-indigo-300">|</span> <span id="cert-display-name"></span>
                 </div>
             </div>
-            <h3 class="text-xl font-bold text-slate-800 mb-4">Scratch 積木大師 證書</h3>
+            <h3 class="text-xl font-bold text-slate-800 mb-4">積木大師 證書</h3>
             <p class="text-slate-600 mb-8 text-sm leading-relaxed">選一題答錯或拿不準的題目，試著說說那塊積木有什麼用途。</p>
             <button onclick="closeCertificate()" class="bg-amber-500 text-white px-8 py-3 rounded-full font-bold hover:bg-amber-600 shadow-md transition-all">收下證書並繼續</button>
         </div>

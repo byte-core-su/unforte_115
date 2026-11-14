@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="lesson-route.css">
     <script src="teacher-demo.js" defer></script>
     <script src="lesson-route.js" defer></script>
+    <script src="block-program-tasks.js" defer></script>
+    <script src="block-program.js" defer></script>
     <script src="lesson-routes.js" defer></script>
     <meta charset="UTF-8">
     <script src="course-scenarios.js"></script>
@@ -48,7 +50,7 @@
             <p class="text-sm font-bold text-cyan-600 mb-3 tracking-widest uppercase">演算法與程式設計</p>
             <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight"><span data-scenario-text="name">星際陣列指揮官</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用清單打造星際任務</span></h1>
             <p class="text-lg text-slate-500 font-light max-w-2xl leading-relaxed">
-                <span data-scenario-text="intro">在六個星際任務中練習</span> <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span>，從管理裝備到做出對決遊戲。
+                <span data-scenario-text="intro">在六個星際任務中練習</span> <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">清單</span>，從管理裝備到做出對決遊戲。
             </p>
         </div>
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-cyan-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
@@ -182,7 +184,7 @@
         }
 
         // ==========================================
-        // ⭐ 階段二：Scratch 積木引導式提問挑戰
+        // ⭐ 階段二：積木引導式提問挑戰
         // ==========================================
         const notchTop = `<div class="absolute top-[-4px] left-4 w-8 h-2 bg-black/20 rounded-b-full z-30"></div>`;
         const notchBottom = `<div class="absolute -bottom-1 left-4 w-8 h-2 bg-black/20 rounded-b-full z-30"></div>`;
@@ -588,7 +590,7 @@
                 
                 await new Promise(r => setTimeout(r, 400));
                 
-                // 這裡模擬 Scratch 的邏輯，因為陣列會縮短，所以要拿第 advVarSelect 項，在 JS 裡 index 是 advVarSelect - 1
+                // 這裡模擬 的邏輯，因為陣列會縮短，所以要拿第 advVarSelect 項，在 JS 裡 index 是 advVarSelect - 1
                 if (advVarSelect - 1 < advSourceDeck.length) {
                     const item = advSourceDeck[advVarSelect - 1];
                     advPlayerHand.push(item);
@@ -805,10 +807,10 @@
                                 </div>
                                 
                                 <div class="flex flex-col gap-8">
-                                    <!-- ================= 第二關：Scratch 積木組裝 ================= -->
+                                    <!-- ================= 第二關：積木組裝 ================= -->
                                     <div class="flex flex-col relative mt-2 w-full">
                                         <div class="flex items-center justify-between mb-3">
-                                            <h4 class="flex items-center gap-2 text-base font-bold text-slate-600"><i data-lucide="blocks" class="w-4 h-4"></i>第二關：引導式 Scratch 積木組裝挑戰</h4>
+                                            <h4 class="flex items-center gap-2 text-base font-bold text-slate-600"><i data-lucide="blocks" class="w-4 h-4"></i>第二關：引導式 積木組裝挑戰</h4>
                                         </div>
 
                                         <div class="relative w-full">
@@ -885,7 +887,7 @@
                                     <h3 id="route-deal-cards" class="text-xl font-bold text-slate-800">進階挑戰：發放手牌 (分牌邏輯)</h3>
                                 </div>
                                 <p class="text-slate-600 mb-6 bg-indigo-50 p-4 rounded-xl border border-indigo-100 font-medium leading-relaxed">
-                                    在 Scratch 中開發撲克牌遊戲時，我們最常用<strong>「造型編號」</strong>來顯示牌面。因此，陣列裡只需要儲存 1 到 52 的數字！<br>
+                                    在 中開發撲克牌遊戲時，我們最常用<strong>「造型編號」</strong>來顯示牌面。因此，陣列裡只需要儲存 1 到 52 的數字！<br>
                                     現在牌已經洗好了，請試著把「洗牌」清單裡的前 13 張牌發放到玩家手上的「分牌」清單中。
                                 </p>
                                 
@@ -971,7 +973,7 @@
                                                 <div class="bg-white/60 p-4 rounded-xl border border-blue-200 text-sm text-slate-700 leading-relaxed font-medium">
                                                     💡 <strong>進階除錯小教室：跳著拿的錯覺？</strong><br>
                                                     當你執行這段程式時，模擬器會呈現「跳著抽牌」的現象！<br>
-                                                    這是因為 Scratch 陣列的特性：當你刪除第 1 項時，後面的牌會往前遞補。所以當迴圈跑到第 2 次要抽「第 2 項」時，其實抽到的是原本的「第 3 項」喔！<br><br>
+                                                    這是因為 陣列的特性：當你刪除第 1 項時，後面的牌會往前遞補。所以當迴圈跑到第 2 次要抽「第 2 項」時，其實抽到的是原本的「第 3 項」喔！<br><br>
                                                     <span class="text-blue-600">（雖然因為牌已經洗亂了，抽到的還是亂數，但最標準的「發牌」寫法應該是永遠拿「洗牌」的第 1 項，這樣才不會漏牌喔！）</span>
                                                 </div>
                                             </div>

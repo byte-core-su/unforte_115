@@ -101,6 +101,13 @@
     completion.setAttribute('aria-label', '完成這一步');
     const main = document.querySelector('main');
     main.classList.add('lesson-activity');
+    if (config.program && window.BlockProgram) {
+      const simulator = document.createElement('section');
+      simulator.id = 'block-program';
+      simulator.className = 'block-program';
+      main.after(simulator);
+      window.BlockProgram.mount(simulator, config.program);
+    }
     main.after(panel, completion);
     const startButton = document.querySelector('[data-lesson-start]');
     const guide = document.querySelector('#learning-guide');
@@ -330,7 +337,8 @@
 
   // Wait until the page (including script-built or React parts) shows the anchors we need.
   function startWhenReady(config, timeout = 8000) {
-    const needed = [...config.steps.flatMap(step => step.anchors || []), ...(config.references || [])];
+    const needed = [...config.steps.flatMap(step => step.anchors || []), ...(config.references || [])]
+      .filter(locator => locator !== '#block-program');
     const began = Date.now();
     (function poll() {
       if (needed.every(locator => findAnchor(locator)) || Date.now() - began > timeout) start(config);

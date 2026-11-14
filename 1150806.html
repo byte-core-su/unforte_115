@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="lesson-route.css">
     <script src="teacher-demo.js" defer></script>
     <script src="lesson-route.js" defer></script>
+    <script src="block-program-tasks.js" defer></script>
+    <script src="block-program.js" defer></script>
     <script src="lesson-routes.js" defer></script>
     <meta charset="UTF-8">
     <script src="course-scenarios.js"></script>
@@ -49,7 +51,7 @@
             <p class="text-sm font-bold text-purple-600 mb-3 tracking-widest uppercase">演算法與程式設計</p>
             <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight"><span data-scenario-text="name">星際陣列指揮官</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用清單打造星際任務</span></h1>
             <p class="text-lg text-slate-500 font-light max-w-2xl leading-relaxed">
-                <span data-scenario-text="intro">在六個星際任務中練習</span> <span class="font-bold text-purple-700 bg-purple-50 px-2 py-1 rounded-lg border border-purple-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span>，從管理裝備到做出對決遊戲。
+                <span data-scenario-text="intro">在六個星際任務中練習</span> <span class="font-bold text-purple-700 bg-purple-50 px-2 py-1 rounded-lg border border-purple-200 mx-1 shadow-sm inline-block whitespace-nowrap">清單</span>，從管理裝備到做出對決遊戲。
             </p>
         </div>
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-purple-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
@@ -170,7 +172,7 @@
             btn.className = "w-full sm:w-auto bg-slate-700 text-slate-400 font-bold py-2.5 px-6 rounded-xl transition-all shadow-inner flex items-center justify-center gap-2 text-sm shrink-0 cursor-not-allowed";
             
             const types = duelScenario.types;
-            // Match the costume numbers in both downloadable Scratch projects.
+            // Match the costume numbers in both downloadable 積木程式 projects.
             const grades = ["A", "B", "C", "D", "E", "F"];
             prepPool = [];
             let p = 1;
@@ -499,10 +501,10 @@
         // 隱藏密技 Quiz 控制邏輯
         // ==========================================
         const quizPool = [
-            { q: "為什麼我們要在「洗牌」之前，先建立一個包含 1 到 24 的初始裝備庫清單？", opts: ["讓畫面看起來比較好看", `對應 Scratch 中 24 個${escapeDuelText(duelScenario.costumeLabel)}的造型編號`, "用來隨機選擇武器名稱"], ans: 1 },
+            { q: "為什麼我們要在「洗牌」之前，先建立一個包含 1 到 24 的初始裝備庫清單？", opts: ["讓畫面看起來比較好看", `對應 中 24 個${escapeDuelText(duelScenario.costumeLabel)}的造型編號`, "用來隨機選擇武器名稱"], ans: 1 },
             { q: "當我們從「裝備分配」清單提取裝備給小隊時，為什麼取出「第 1 項」後要立刻將它「刪除」？", opts: ["為了避免敵人拿到重複的裝備", "因為系統規定小隊只能有 6 個裝備", "為了節省電腦記憶體空間"], ans: 0 },
             { q: "在陣列走訪進行「火力對決」時，我們用了哪個變數來同步讀取我方與敵方的清單？", opts: ["對決回合", "戰鬥力", "戰鬥紀錄"], ans: 0 },
-            { q: "在 Scratch 中，如果要將一個原本整齊的陣列完全打散，我們最常使用哪種方法？", opts: ["將所有數字按照大小重新排序", "將數字隨機加減乘除", "隨機抽取項目後轉移到另一個新清單"], ans: 2 },
+            { q: "在 中，如果要將一個原本整齊的陣列完全打散，我們最常使用哪種方法？", opts: ["將所有數字按照大小重新排序", "將數字隨機加減乘除", "隨機抽取項目後轉移到另一個新清單"], ans: 2 },
             { q: "刪除清單的第 1 項後，原本的第 2 項會移到哪裡？", opts: ["往前移，變成第 1 項", "留在第 2 項", "移到清單最後一項"], ans: 0 }
         ];
 
@@ -569,7 +571,7 @@
         // ==========================================
         const lesson = {
             objectives: [
-                { title: "建立武裝清單", desc: `自動生成 1 到 24 的連續數字陣列。在 Scratch 中，這剛好能對應到 24 種不同戰鬥力的${escapeDuelText(duelScenario.costumeLabel)}造型！(模擬器以圖文輔助呈現)` },
+                { title: "建立武裝清單", desc: `自動生成 1 到 24 的連續數字陣列。在 中，這剛好能對應到 24 種不同戰鬥力的${escapeDuelText(duelScenario.costumeLabel)}造型！(模擬器以圖文輔助呈現)` },
                 { title: "亂數洗牌打散", desc: "將「裝備庫存」內的 24 個數字徹底打散，確保我們拿到的武器是完全隨機的。" },
                 { title: "提取對決裝備", desc: "從洗好的裝備分配中取出前 6 項存入「小隊裝備」；接著偵測雷達，隨機生成 6 個「外星裝備」。" },
                 { title: "陣列火力對決", desc: "利用迴圈，逐一讀取兩個清單的對應數值，比較大小並顯示每回合的戰鬥結果！" }
@@ -696,7 +698,7 @@
                             </h5>
                             <p class="text-indigo-900/80 text-sm leading-relaxed mb-4">清空舊資料後，我們利用重複迴圈與 <strong>[戰鬥力]</strong> 變數的累加，依序將 1 到 24 放入「裝備庫存」清單中。</p>
                             <div class="bg-white/60 p-3 rounded-xl border border-indigo-100 text-xs text-slate-700 leading-relaxed font-medium">
-                                💡 <strong>提示：</strong> 這 24 個數字，剛好可以對應 Scratch 裡面的 24 種不同武器造型編號喔！
+                                💡 <strong>提示：</strong> 這 24 個數字，剛好可以對應 裡面的 24 種不同武器造型編號喔！
                             </div>
                         </div>
                     </div>
@@ -776,10 +778,6 @@
                     </button>
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                         <div class="p-8 md:p-10 flex flex-col gap-10">
-                            <div id="route-scratch-demo" class="flex flex-wrap items-center gap-3">
-                                <a href="1150806-demo.sb3" download class="inline-flex items-center gap-2 rounded-lg bg-purple-700 px-4 py-2 text-sm font-bold text-white hover:bg-purple-800"><i data-lucide="download" class="w-4 h-4"></i>下載 Scratch 模組化示範</a>
-                                <span class="text-sm text-slate-600">在 Scratch 開啟後，綠旗或 1 測試足夠、2 測試不足、3 修正後重測。</span>
-                            </div>
                             <details id="route-lesson-objectives" class="lesson-reference"><summary>任務說明</summary>
                                 <div class="bg-purple-50 p-6 rounded-2xl border border-purple-100/50">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">

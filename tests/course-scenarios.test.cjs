@@ -29,29 +29,24 @@ test('all 14 pages load the catalog and preserve their default fallback copy', (
   }
 });
 
-test('grade overviews keep alternative scenarios and local archives with static lesson links', () => {
+test('grade overviews keep alternative scenarios and local lesson links', () => {
   for (const grade of [7, 8]) {
     const page = `1150${grade}00.html`;
     const html = read(page);
     const story = html.match(/<details class="course-overview__story">[\s\S]*?<\/details>/)[0];
     const nodes = [...story.matchAll(/data-scenario-text="([\w.]+)"/g)]
       .map(([, key]) => ({ dataset: { scenarioText: key } }));
-    assert.match(html, /<a data-scenario-download href="[^"]+"/);
-    const link = { setAttribute(name, value) { this[name] = value; } };
-    const root = { querySelectorAll: selector => selector === '[data-scenario-text]' ? nodes : [link] };
+    assert.doesNotMatch(html, /data-scenario-download|scratch\.mit\.edu/i);
+    const root = { querySelectorAll: selector => selector === '[data-scenario-text]' ? nodes : [] };
     applyPage(root, page, campus);
     const text = key => nodes.find(node => node.dataset.scenarioText === key)?.textContent;
     assert.equal(text('briefing.title'), campus.grades[grade].briefing.title);
-    assert.equal(link.href, campus.grades[grade].archive);
     for (const [index, card] of campus.grades[grade].cards.entries()) {
       assert.equal(text(`cards.${index}.title`), card.title);
       assert.equal(text(`cards.${index}.description`), card.description);
     }
     assert.deepEqual([...html.matchAll(/class="course-overview__card" href="([^"]+)"/g)].map(([, href]) => href),
       Array.from({ length: 6 }, (_, index) => `1150${grade}0${index + 1}.html`));
-    const external = { ...campus, grades: { ...campus.grades, [grade]: { ...campus.grades[grade], archive: 'https://other.example/files.zip' } } };
-    applyPage(root, page, external);
-    assert.equal(link.href, campus.grades[grade].archive, 'invalid destinations must not override the local archive');
   }
 });
 

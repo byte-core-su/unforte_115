@@ -28,14 +28,17 @@ for (const page of pages) {
     LearningGuide: catalog.window.LessonAssessments[page],
     LessonRoute: { start: config => { started = config; } }
   };
+  vm.runInNewContext(read('block-program-tasks.js'), { window });
   vm.runInNewContext(read('lesson-routes.js'), { window, location: { pathname: `/${page}` } });
   assert.ok(started, `${page} should start a learning route`);
-  const { steps, references = [], next, teacherFinish } = started;
+  const { steps, references = [], program, next, teacherFinish } = started;
   assert.equal(steps[0].title, '認識任務');
   assert.equal(steps[0].anchors[0], '#learning-guide');
   assert.equal(steps[0].checks, undefined, `${page}: introduction has no completion checklist`);
   assert.deepEqual(Array.from(steps.slice(-2), step => step.title), ['換題練習', '離堂任務'], `${page} should end with practice and the exit task`);
-  assert.ok(steps.some(step => /Scratch/.test(step.title)), `${page} should include a Scratch hands-on step`);
+  assert.ok(program?.cases.length && steps.at(-3).anchors.includes('#block-program'), `${page} should include the simulator step`);
+  assert.match(html, /src="block-program\.js"/);
+  assert.doesNotMatch(html, /scratch\.mit\.edu|href="[^"]*\.sb3/i);
   assert.equal(steps.at(-2).optional, true, `${page}: practice can be skipped without blocking submission`);
   assert.ok(!steps.at(-1).optional, `${page}: submission is the last required step`);
   const referenceIds = [...html.matchAll(/<details id="(route-lesson-(?:objectives|key-points))"/g)].map(([, id]) => `#${id}`);
@@ -47,7 +50,7 @@ for (const page of pages) {
     assert.ok(Array.isArray(step.hints) && step.hints.length, `${page} / ${step.title}: needs at least one hint`);
   }
   if (html.includes('curriculum-labs.js')) assert.ok(steps.some(step => (step.anchors || []).includes('#curriculum-lab')));
-  const generated = new Map([['#learning-guide', 'learning-guides.js'], ['#adaptive-practice', 'adaptive-practice.js'], ['#curriculum-lab', 'curriculum-labs.js']]);
+  const generated = new Map([['#learning-guide', 'learning-guides.js'], ['#adaptive-practice', 'adaptive-practice.js'], ['#curriculum-lab', 'curriculum-labs.js'], ['#block-program', 'lesson-route.js']]);
   for (const locator of steps.flatMap(step => step.anchors || [])) {
     const selectors = typeof locator === 'string' ? [locator] : locator.common || [locator.up];
     for (const selector of selectors) {
@@ -55,7 +58,7 @@ for (const page of pages) {
       if (generated.has(selector)) {
         const file = generated.get(selector);
         assert.ok(html.includes(`src="${file}"`));
-        assert.ok(read(file).includes(`section.id = '${selector.slice(1)}'`));
+        assert.ok(read(file).includes(`.id = '${selector.slice(1)}'`));
       } else {
         assert.equal(html.split(`id="${selector.slice(1)}"`).length - 1, 1, `${page}: missing or duplicate ${selector}`);
       }
@@ -97,4 +100,4 @@ for (const folder of ['codegame', 'pythonlab']) {
 assert.match(read('teacher-resources.html'), /id="teacher-demo-toggle"/);
 assert.match(read('lesson-route.js'), /const missing = demo \? \[\]/, 'demo mode should not require ticking completion checks');
 
-console.log('learning routes: 12 Scratch lessons, CodeGame and Python Lab follow one guided path');
+console.log('learning routes: 12 block programming lessons, CodeGame and Python Lab follow one guided path');

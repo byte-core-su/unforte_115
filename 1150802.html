@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="lesson-route.css">
     <script src="teacher-demo.js" defer></script>
     <script src="lesson-route.js" defer></script>
+    <script src="block-program-tasks.js" defer></script>
+    <script src="block-program.js" defer></script>
     <script src="lesson-routes.js" defer></script>
     <meta charset="UTF-8">
     <script src="course-scenarios.js"></script>
@@ -57,7 +59,7 @@
             <p class="text-sm font-bold text-cyan-600 mb-3 tracking-widest uppercase">演算法與程式設計</p>
             <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight"><span data-scenario-text="name">星際陣列指揮官</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用清單打造星際任務</span></h1>
             <p class="text-lg text-slate-500 font-light max-w-2xl leading-relaxed">
-                <span data-scenario-text="intro">在六個星際任務中練習</span> <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">Scratch 清單</span>，從管理裝備到做出對決遊戲。
+                <span data-scenario-text="intro">在六個星際任務中練習</span> <span class="font-bold text-cyan-700 bg-cyan-50 px-2 py-1 rounded-lg border border-cyan-200 mx-1 shadow-sm inline-block whitespace-nowrap">清單</span>，從管理裝備到做出對決遊戲。
             </p>
         </div>
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-cyan-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
@@ -199,7 +201,7 @@
                                     </div>
                                 </section>
                                 <section class="h-full flex flex-col">
-                                    <h3 id="route-music-blocks" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-orange-100 text-orange-600 p-1.5 rounded-lg"><i data-lucide="blocks" class="w-5 h-5"></i></span>Scratch 實作積木</h3>
+                                    <h3 id="route-music-blocks" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-orange-100 text-orange-600 p-1.5 rounded-lg"><i data-lucide="blocks" class="w-5 h-5"></i></span>實作積木</h3>
                                     <div class="bg-[#F9F9F9] border border-slate-200 p-6 rounded-2xl flex flex-col gap-2 overflow-x-auto grow items-start no-scrollbar shadow-inner">
                                         ${lesson.scratchBlocks.map(renderScratchBlock).join('')}
                                     </div>
@@ -218,7 +220,7 @@
                         </div>
                         <button id="btn-scratch-toggle" class="flex items-center gap-1.5 sm:gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all border shadow-sm bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200 whitespace-nowrap">
                             <i data-lucide="code" class="w-4 h-4 sm:w-5 sm:h-5"></i>
-                            <span id="scratch-toggle-text">Scratch 數值 (OFF)</span>
+                            <span id="scratch-toggle-text">音符數值 (OFF)</span>
                         </button>
                     </div>
 
@@ -448,10 +450,10 @@
                 isScratchMode = !isScratchMode;
                 if (isScratchMode) {
                     els.scratchToggleBtn.className = "flex items-center gap-1.5 sm:gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all border shadow-sm bg-orange-100 text-orange-700 border-orange-200 animate-pulse whitespace-nowrap";
-                    els.scratchToggleText.textContent = "Scratch 數值 (ON)";
+                    els.scratchToggleText.textContent = "音符數值 (ON)";
                 } else {
                     els.scratchToggleBtn.className = "flex items-center gap-1.5 sm:gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all border shadow-sm bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200 whitespace-nowrap";
-                    els.scratchToggleText.textContent = "Scratch 數值 (OFF)";
+                    els.scratchToggleText.textContent = "音符數值 (OFF)";
                 }
                 renderAll();
             });
@@ -509,7 +511,7 @@
         function renderJianpuDisplay() {
             if (!selectedSong) return;
             els.songTitle.textContent = selectedSong.title;
-            els.songArtist.textContent = isScratchMode ? "讀取模式：Scratch 音階資料" : "讀取模式：標準數字簡譜";
+            els.songArtist.textContent = isScratchMode ? "讀取模式：音階資料" : "讀取模式：標準數字簡譜";
             
             els.jianpuContainer.innerHTML = '';
             const lines = selectedSong.notation.split('/');

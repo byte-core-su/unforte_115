@@ -38,7 +38,7 @@ const pages = [
     source: 'LESSON_PLAN_GRADE_7.md',
     course: '1150700.html',
     companion: 'lesson-plan-grade-8.html',
-    summary: 'Scratch 程式結構、迴圈、變數與防禦網專題'
+    summary: '積木程式結構、迴圈、變數與防禦網專題'
   },
   {
     kind: 'lesson-plan',
@@ -293,7 +293,7 @@ for (const page of [...pages, ...modules.map(item => ({ kind: 'record', source: 
       lessons.push(number);
       const item = byId.get(`g${page.grade}-0${number}`);
       const optional = routes[item.entry].filter(step => step.optional).map(step => escapeHtml(step.title));
-      const activity = item.activity ? `\n<p><strong>網頁示範</strong> ${escapeHtml(item.activity.preview)}</p>\n<p><strong>Scratch 實作</strong> ${escapeHtml(item.activity.practice)}</p>\n${activityQuestions(item.activity)}` : '';
+      const activity = item.activity ? `\n<p><strong>網頁示範</strong> ${escapeHtml(item.activity.preview)}</p>\n<p><strong>積木程式實作</strong> ${escapeHtml(item.activity.practice)}</p>\n${activityQuestions(item.activity)}` : '';
       return `<h3 id="lesson-${number}">第 ${number} 課｜${escapeHtml(item.title)}</h3>\n<p><strong>建議節數</strong> ${item.periods} 節</p>\n${assessment(item)}\n<p><strong>選做活動</strong> ${optional.join('、')}</p>\n<p><a href="${item.resources.records}">開啟本課學習紀錄 ↗</a></p>${activity}`;
     });
   }
