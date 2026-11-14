@@ -11,7 +11,7 @@ function svgElement(tag, attributes) {
 
 function setupConceptMap(diagram, index) {
   const list = diagram.querySelector('.curriculum-steps');
-  const nodes = [...list.querySelectorAll('li > a')];
+  const nodes = [...list.querySelectorAll(':scope > li > a')];
   const relations = [...diagram.querySelectorAll('.course-relations li')];
   const svg = svgElement('svg', { class: 'course-diagram-lines', 'aria-hidden': 'true', focusable: 'false' });
   const markerId = 'course-relation-arrow-' + index;
@@ -69,4 +69,16 @@ function setupConceptMap(diagram, index) {
 
 if ('ResizeObserver' in window) {
   document.querySelectorAll('.course-diagram').forEach(setupConceptMap);
+}
+
+const teacherMap = document.querySelector('.teacher-map');
+if (teacherMap) {
+  const cards = teacherMap.querySelector('#course-map-cards');
+  teacherMap.addEventListener('click', event => {
+    const unit = event.target.closest('.teacher-map__lesson');
+    if (!unit || cards.checked || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    cards.checked = true;
+    unit.parentElement.querySelector('.teacher-map__links a').focus();
+  });
 }

@@ -4,7 +4,7 @@
 document.querySelectorAll('[data-local-help]').forEach(note => { note.hidden = location.protocol !== 'file:'; });
 
 // Preserve links to the former teacher section on the course homepage.
-if (document.querySelector('#course-map') && /^#(?:teacher-resources|grade-[78])$/.test(location.hash)) {
+if (!document.querySelector('#teacher-resources') && /^#(?:teacher-resources|grade-[78])$/.test(location.hash)) {
   location.replace(`teacher-resources.html${location.search}${location.hash}`);
 }
 

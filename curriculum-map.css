@@ -1,5 +1,5 @@
 /* 課程地圖頁（curriculum-map.html）：沿用原首頁的分年級概念關聯圖與成果卡片樣式 */
-.site-home {
+.curriculum-map-page {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -8,7 +8,7 @@
   line-height: 1.5;
 }
 
-.site-home a {
+.curriculum-map-page a {
   text-decoration: none;
 }
 
@@ -42,7 +42,7 @@
   font-weight: 700;
 }
 
-.home-main {
+.curriculum-map-page .home-main {
   position: relative;
   display: grid;
   flex: 1;
@@ -204,7 +204,7 @@ a.home-start-card:hover {
 }
 
 
-.home-footer {
+.curriculum-map-page .home-footer {
   padding: 1.5rem 1rem;
   border-top: 1px solid var(--site-border);
   background: var(--site-surface);
@@ -213,7 +213,7 @@ a.home-start-card:hover {
   text-align: center;
 }
 
-.home-footer a {
+.curriculum-map-page .home-footer a {
   color: inherit;
 }
 
@@ -310,6 +310,8 @@ a.home-start-card:hover {
   --map-soft: #eef0ff;
   padding: clamp(1.2rem, 3vw, 2rem);
 }
+
+.teacher-map .curriculum-grade { display: block; }
 
 .curriculum-grade-8 {
   --map-color: #087b83;
@@ -448,7 +450,7 @@ a.home-start-card:hover {
   min-width: 0;
 }
 
-.curriculum-steps a {
+.curriculum-steps > li > a {
   display: flex;
   align-items: flex-start;
   gap: .65rem;
@@ -459,7 +461,7 @@ a.home-start-card:hover {
   color: inherit;
 }
 
-.curriculum-steps a:hover {
+.curriculum-steps > li > a:hover {
   border-color: var(--map-color);
   background: var(--map-soft);
 }
@@ -504,6 +506,48 @@ a.home-start-card:hover {
   font-size: .8rem;
 }
 
+.teacher-map:has(#course-map-cards:checked) .curriculum-steps > li {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--site-border);
+  border-top: 3px solid var(--map-color);
+  border-radius: .9rem;
+}
+
+.teacher-map:has(#course-map-cards:checked) .teacher-map__lesson {
+  flex: 1;
+  height: auto;
+  border: 0;
+  border-radius: .7rem .7rem 0 0;
+  text-decoration: none;
+}
+
+.teacher-map__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  padding: .65rem .85rem;
+  border-top: 1px solid var(--site-border);
+}
+
+.teacher-map__links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: .2rem .54rem;
+  border-radius: .4rem;
+  background: var(--map-soft);
+  color: var(--map-color);
+  font-size: .83rem;
+  font-weight: 750;
+  text-underline-offset: .2em;
+}
+
+.teacher-map__links a:hover { text-decoration-thickness: 2px; }
+.teacher-map:has(#course-map-route:checked) .teacher-map__links { display: none; }
+.teacher-map .map-evidence { font-size: .84rem; }
+.teacher-map .map-step-arrow { display: none; }
+
 .curriculum-map a:focus-visible,
 .map-view-options input:focus-visible + label {
   outline: 3px solid #e2a637;
@@ -540,7 +584,7 @@ a.home-start-card:hover {
     gap: .75rem;
   }
 
-  & .curriculum-steps a {
+  & .curriculum-steps > li > a {
     position: relative;
     z-index: 1;
     align-items: center;
@@ -553,7 +597,7 @@ a.home-start-card:hover {
     box-shadow: 0 3px 8px #24214a09;
   }
 
-  & .curriculum-steps a:is(:hover, :focus-visible) {
+  & .curriculum-steps > li > a:is(:hover, :focus-visible) {
     border-color: var(--star-track);
     background: var(--star-board);
   }
@@ -610,12 +654,12 @@ a.home-start-card:hover {
       grid-template-areas: ". one ." "two three four" ". six five";
     }
 
-    & .curriculum-steps li:nth-child(1) { grid-area: one; }
-    & .curriculum-steps li:nth-child(2) { grid-area: two; }
-    & .curriculum-steps li:nth-child(3) { grid-area: three; }
-    & .curriculum-steps li:nth-child(4) { grid-area: four; }
-    & .curriculum-steps li:nth-child(5) { grid-area: five; }
-    & .curriculum-steps li:nth-child(6) { grid-area: six; }
+    & .curriculum-steps > li:nth-child(1) { grid-area: one; }
+    & .curriculum-steps > li:nth-child(2) { grid-area: two; }
+    & .curriculum-steps > li:nth-child(3) { grid-area: three; }
+    & .curriculum-steps > li:nth-child(4) { grid-area: four; }
+    & .curriculum-steps > li:nth-child(5) { grid-area: five; }
+    & .curriculum-steps > li:nth-child(6) { grid-area: six; }
 
     & .course-diagram-lines {
       position: absolute;

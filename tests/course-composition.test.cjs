@@ -50,17 +50,25 @@ test('the homepage opens with a course chooser that links each course', () => {
 test('the curriculum map page keeps both grade maps in curriculum order and is linked from teacher prep', () => {
   const prep = fs.readFileSync(path.join(root, 'teacher-resources.html'), 'utf8');
   assert.match(prep, /href="curriculum-map\.html"/);
+  assert.match(prep, /class="curriculum-map teacher-map"/);
+  assert.match(prep, /id="course-map-cards"[^>]* checked/);
   const map = fs.readFileSync(path.join(root, 'curriculum-map.html'), 'utf8');
   assert.match(map, /href="teacher-resources\.html"/);
   for (const file of ['curriculum-map.css', 'curriculum-map.js']) assert.ok(map.includes(`"${file}"`) && fs.existsSync(path.join(root, file)), `${file} should be loaded`);
   for (const grade of [7, 8]) {
     const article = map.match(new RegExp(`<article class="curriculum-grade curriculum-grade-${grade}"[\\s\\S]*?<\\/article>`))?.[0];
+    const teacherArticle = prep.match(new RegExp(`<article class="curriculum-grade curriculum-grade-${grade}"[\\s\\S]*?<\\/article>`))?.[0];
     assert.ok(article, `grade ${grade} map`);
+    assert.ok(teacherArticle, `grade ${grade} teacher map`);
     assert.equal((article.match(/<li><a /g) || []).length, 6);
     assert.ok((article.match(/<li data-from=/g) || []).length >= 4, `grade ${grade} should keep its concept relations`);
+    assert.equal(teacherArticle.match(/<ul class="course-relations"[\s\S]*?<\/ul>/)[0], article.match(/<ul class="course-relations"[\s\S]*?<\/ul>/)[0]);
     let previous = -1;
     for (const module of modules.filter(item => item.grade === grade)) {
       assert.ok(article.includes(module.title), `${module.title} on the map`);
+      const teacherCard = teacherArticle.split(`class="teacher-map__lesson" href="${module.entry}"`)[1]?.split('class="teacher-map__lesson"')[0];
+      assert.ok(teacherCard?.includes(module.title), `${module.title} on the teacher map`);
+      for (const href of [module.resources.lessonPlan, module.entry, module.resources.records]) assert.ok(teacherCard.includes(`href="${href}"`), `${module.id}: missing ${href}`);
       const position = article.indexOf(`href="${module.entry}"`);
       assert.ok(position > previous, `map order for ${module.id}`);
       previous = position;

@@ -99,6 +99,7 @@ function activityQuestions({ questions }) {
 
 const byPage = {};
 let map = read('curriculum-map.html');
+const teacherCards = new Map();
 for (const item of modules) {
   const { id, entry, title, goal, periods, tags, evidence, successCriteria, resources } = item;
   if (!Array.isArray(evidence) || !evidence.length || evidence.some(entry => typeof entry !== 'string' || !entry.trim()) || !successCriteria?.trim()) {
@@ -117,9 +118,32 @@ for (const item of modules) {
   const card = new RegExp(`(<li><a href="${entry.replace('.', '\\.')}">[^\\n]*?<h4>)[^<]*(</h4><p>)[^<]*(</p><!-- map-evidence -->)[^\\n]*?(<!-- /map-evidence -->)`, 'g');
   if ([...map.matchAll(card)].length !== 1) throw new Error(`${id} 應有一張成果卡片。`);
   map = map.replace(card, (_, start, meta, work, end) => `${start}${escapeHtml(title)}${meta}${escapeHtml(tags.join(' · '))} · 建議 ${periods} 節${work}<div class="map-evidence"><strong>必交項目</strong>${evidenceList(evidence)}</div>${end}`);
+  teacherCards.set(entry, `<div class="teacher-map__links" role="group" aria-label="第 ${item.lesson} 課資源">
+                        <a href="${lessonPlan}">教案</a>
+                        <a href="${entry}">教材</a>
+                        <a href="${records}">紀錄表</a>
+                    </div>`);
 }
 outputs.set('lesson-assessments.js', '// Generated from modules/ by npm run build:lesson-plans.\nwindow.LessonAssessments = ' + JSON.stringify(byPage, null, 2) + ';\n');
 outputs.set('curriculum-map.html', map);
+
+// Reuse the complete concept map, including the grade-specific relations, on the teacher page.
+const mapSection = map.match(/<section id="course-map"[\s\S]*?<\/section>/)?.[0];
+if (!mapSection) throw new Error('找不到課程地圖。');
+const teacherMap = mapSection
+  .replace('class="curriculum-map"', 'class="curriculum-map teacher-map"')
+  .replace('七、八年級單元關聯', '課程地圖')
+  .replace('每年級 6 個單元，每單元建議 2 節。點選單元開啟教材。', '先選年級。用單元圖卡找教案、教材和紀錄表，或切到概念關聯圖看各課如何銜接。')
+  .replace('name="course-map-view" checked', 'name="course-map-view"')
+  .replace('id="course-map-cards" type="radio" name="course-map-view"', 'id="course-map-cards" type="radio" name="course-map-view" checked')
+  .replace('>成果卡片</label>', '>單元圖卡</label>')
+  .replace(/<li><a href="(1150[78]0[1-6]\.html)">([^\n]+)<\/a><\/li>/g,
+    (_, entry, body) => `<li><a class="teacher-map__lesson" href="${entry}">${body}</a>${teacherCards.get(entry)}</li>`);
+const teacherPage = 'teacher-resources.html';
+const teacherTemplate = read(teacherPage);
+const teacherSlot = /(<!-- teacher-course-map -->)[\s\S]*?(<!-- \/teacher-course-map -->)/;
+if (!teacherSlot.test(teacherTemplate)) throw new Error('教師備課頁缺少課程地圖位置。');
+outputs.set(teacherPage, teacherTemplate.replace(teacherSlot, (_, start, end) => `${start}\n        ${teacherMap}\n        ${end}`));
 
 const deckFile = 'presentations/20261110.html';
 const [seven, eight] = [7, 8].map(grade => periodsFor(gradeModules(grade)));

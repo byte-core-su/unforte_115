@@ -186,7 +186,7 @@ CodeGame 與 Python Lab 也改為單一路線：
 | `1150700.html`～`1150706.html` | 11507 課程單元 |
 | `1150800.html`～`1150806.html` | 11508 課程單元 |
 | `lesson-plan-grade-7.html`、`lesson-plan-grade-8.html` | 七、八年級教案；每個單元頁上方可直接開啟該課段落 |
-| `teacher-resources.html` | 教師備課入口，集中各年級教案、Scratch 範例、學習紀錄和備課資源 |
+| `teacher-resources.html` | 教師備課入口，內含完整課程地圖及逐課圖卡，可直達教案、教材和紀錄表 |
 | `curriculum-map.html` | 七、八年級 12 單元的概念關聯圖與成果卡片 |
 | `student-records.html`、`student-record-g*-*.html` | 學習紀錄表目錄與 12 份可獨立分享、複製的單元紀錄表 |
 | `curriculum-alignment.html` | 108 課綱逐課對照 |
