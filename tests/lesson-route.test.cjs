@@ -30,7 +30,7 @@ for (const page of pages) {
   };
   vm.runInNewContext(read('lesson-routes.js'), { window, location: { pathname: `/${page}` } });
   assert.ok(started, `${page} should start a learning route`);
-  const { steps, next } = started;
+  const { steps, next, teacherFinish } = started;
   assert.equal(steps[0].title, '認識任務');
   assert.equal(steps[0].anchors[0], '#learning-guide');
   assert.equal(steps[0].checks, undefined, `${page}: introduction has no completion checklist`);
@@ -59,7 +59,8 @@ for (const page of pages) {
     }
   }
   const lesson = Number(page[6]);
-  assert.equal(next.href, lesson < 6 ? `1150${page[4]}0${lesson + 1}.html` : `1150${page[4]}00.html`);
+  assert.equal(next?.href, lesson < 6 ? `1150${page[4]}0${lesson + 1}.html` : undefined);
+  assert.equal(teacherFinish.href, `1150${page[4]}00.html`);
 }
 
 // CodeGame and Python Lab keep their own single routes.

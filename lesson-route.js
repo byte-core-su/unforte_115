@@ -10,6 +10,8 @@
 
   const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const teacher = window.TeacherDemo;
+  const demo = teacher.isOn();
+  if (demo) document.documentElement.setAttribute('data-teacher-route', '');
   const reduceMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function findAnchor(locator) {
@@ -37,7 +39,6 @@
   }
 
   function start(config) {
-    const demo = teacher.isOn();
     let showAll = demo && teacher.showAll();
     const steps = config.steps.map((step, index) => ({ ...step, index, regions: [] }));
     let current = 0;
@@ -55,10 +56,6 @@
         step.regions = anchors.filter(item => item.node).map(item => regionFor(item.node, item.locator, foreign));
         step.missing = anchors.some(item => !item.node);
       });
-    }
-
-    function nextLinks() {
-      return document.querySelectorAll('main [data-course-direction="next"], main [data-route-finish]');
     }
 
     function apply() {
@@ -79,10 +76,6 @@
           badge.textContent = '選做';
           heading.prepend(badge);
         }
-      });
-      nextLinks().forEach(link => {
-        if (demo || finished) link.removeAttribute('data-route-locked');
-        else link.setAttribute('data-route-locked', '');
       });
     }
 
@@ -157,11 +150,11 @@
       panel.hidden = Boolean(startButton && !demo && current === 0);
       if (finished) {
         if (startButton) startButton.textContent = '回看第一個活動';
-        const next = config.next;
+        const next = config.next || (demo ? config.teacherFinish : null);
         panel.innerHTML = `
           <div class="lesson-route__bar">
             <span class="lesson-route__count">本課結束</span>
-            <strong class="lesson-route__title">${escapeHtml(config.finishTitle || '本課學習路線已完成')}</strong>
+            <strong class="lesson-route__title">${escapeHtml(config.finishTitle || (config.next ? '本課學習路線已完成' : '六課學習路線已完成'))}</strong>
             <div class="lesson-route__actions">
               <button type="button" data-action="toggle" aria-expanded="${expanded}">${expanded ? '收合 ▾' : '路線 ▴'}</button>
               ${next ? `<a class="lesson-route__primary" data-course-direction="next" href="${escapeHtml(next.href)}">${escapeHtml(next.label || '前往下一單元')} →</a>` : ''}
@@ -215,7 +208,10 @@
       if (chip) {
         const step = steps[Number(chip.dataset.chip)];
         if (demo && step.index !== current) { finished = false; enter(step.index); }
-        else scrollToStep(step);
+        else {
+          step.review?.();
+          scrollToStep(step);
+        }
         return;
       }
       const action = event.target.closest('[data-action]')?.dataset.action;
@@ -223,7 +219,7 @@
       if (action === 'toggle') { expanded = !expanded; render(); return; }
       if (action === 'show-all') { showAll = !showAll; apply(); render(); window.dispatchEvent(new Event('resize')); return; }
       if (action === 'end-demo') { teacher.end(); return; }
-      if (action === 'goto') { scrollToStep(steps[current]); return; }
+      if (action === 'goto') { steps[current].review?.(); scrollToStep(steps[current]); return; }
       if (action === 'hint') { hintsShown += 1; render(); return; }
       if (action === 'skip' && steps[current].optional) { skipped.add(current); advance(); return; }
       if (action === 'done') {
@@ -259,6 +255,7 @@
       expanded = true;
       apply();
       render();
+      (panel.querySelector('.lesson-route__primary') || panel.querySelector('[data-action="toggle"]'))?.focus({ preventScroll: true });
     }
 
     resolve();

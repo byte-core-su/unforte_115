@@ -36,7 +36,10 @@
     link: { href: guide.records || 'student-records.html', label: '打開學習紀錄表 ↗' }
   });
   const route = (introExtra, middle) => [intro(introExtra), ...middle, practice, exit()];
-  const tab = name => () => { if (typeof window.switchL2Tab === 'function') window.switchL2Tab(name); };
+  const tab = name => ({
+    enter: () => window.switchL2Tab?.(name),
+    review: () => window.switchL2Tab?.(name, false)
+  });
 
   const routes = {
     '1150701.html': route([], [
@@ -54,16 +57,16 @@
         hints: ['從黃色「當綠旗被點擊」開始，下面接藍色「移動 10 點」。'] })
     ]),
     '1150702.html': route([], [
-      { title: '循序結構', anchors: [{ common: ['#l2-tab-seq', '#l2-content-rep'] }], enter: tab('seq'),
-        todo: '在「1. 循序結構」分頁：先預測平均數再按「計算」，接著依步驟完成 IPO 配對，按「驗證配對」。',
+      { title: '循序結構', anchors: [{ common: ['#l2-tab-seq', '#l2-content-rep'] }], ...tab('seq'),
+        todo: '先預測平均數再按「計算」，接著依步驟完成 IPO 配對，按「驗證配對」。',
         checks: ['先預測，再按「計算」核對過', 'IPO 配對驗證通過'],
         hints: ['Input 是使用者給的資料，Process 是電腦計算，Output 是顯示結果。', '流程從「開始」到「結束」由上往下，一次做一件事。'] },
-      { title: '選擇結構', anchors: [{ common: ['#l2-tab-seq', '#l2-content-rep'] }], enter: tab('sel'),
-        todo: '切到「2. 選擇結構」分頁：輸入成績、先預測會不會及格，再依步驟完成配對驗證。',
+      { title: '選擇結構', anchors: [{ common: ['#l2-tab-seq', '#l2-content-rep'] }], ...tab('sel'),
+        todo: '輸入成績，先預測會不會及格，再依步驟完成配對驗證。',
         checks: ['測過一次及格、一次不及格', '配對驗證通過'],
         hints: ['「如果…那麼…否則」：條件成立走「那麼」，不成立走「否則」。', '故意輸入一組會不及格的成績，看程式走哪一邊。'] },
-      { title: '重複結構', anchors: [{ common: ['#l2-tab-seq', '#l2-content-rep'] }], enter: tab('rep'),
-        todo: '切到「3. 重複結構」分頁：先預測 1 加到 N 的總和，再執行並完成配對驗證。',
+      { title: '重複結構', anchors: [{ common: ['#l2-tab-seq', '#l2-content-rep'] }], ...tab('rep'),
+        todo: '先預測 1 加到 N 的總和，再執行並完成配對驗證。',
         checks: ['先預測，再執行核對過', '配對驗證通過'],
         hints: ['重複執行 N 次：框裡的積木會做 N 遍。', 'N 很小時（例如 3），可以先用心算 1+2+3 驗證。'] },
       scratch({
@@ -284,10 +287,9 @@
     ])
   };
 
-  // Where the finished route leads: the next lesson, or back to the overview after lesson 6.
-  const next = guide.next ? { href: guide.next, label: '前往下一單元' }
-    : guide.overview ? { href: guide.overview, label: '回到課程總覽' } : null;
+  const next = guide.next ? { href: guide.next, label: '前往下一單元' } : null;
+  const teacherFinish = guide.overview ? { href: guide.overview, label: '回到課程總覽' } : null;
 
   window.LessonRoutes = routes;
-  if (routes[page] && window.LessonRoute) window.LessonRoute.start({ steps: routes[page], next });
+  if (routes[page] && window.LessonRoute) window.LessonRoute.start({ steps: routes[page], next, teacherFinish });
 })();

@@ -2,6 +2,10 @@
 [data-route-locked],
 .lesson-route[hidden] { display: none !important; }
 
+html:not([data-teacher-route]) :is(.learning-guide__teacher, .learning-guide__records, [data-route-tab-picker], [data-course-direction]:not(.lesson-route__primary)) {
+  display: none !important;
+}
+
 .lesson-route-flash {
   outline: 3px solid color-mix(in srgb, var(--grade-primary, #4f46e5) 55%, white);
   outline-offset: 6px;

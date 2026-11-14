@@ -28,6 +28,8 @@ h3 { font-size:.875rem; margin:0; }
 .student-actions { display:flex; gap:8px; flex-wrap:wrap; }
 .game-workspace { display:grid; grid-template-columns:150px minmax(0,1fr); gap:12px; align-items:start; }
 .level-panel { padding:14px 12px; min-width:0; }
+body:not(.teacher-route) .game-workspace { grid-template-columns:minmax(0,1fr); }
+body:not(.teacher-route) [data-teacher-link] { display:none; }
 .section-heading { display:flex; align-items:center; justify-content:space-between; gap:8px; }
 .level-group { margin-top:18px; }
 .level-group h3 { color:#6b768b; margin-bottom:7px; font-weight:500; }

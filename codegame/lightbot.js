@@ -21,8 +21,10 @@
         commit: plan => applyPlan(plan),
         cancelled: () => status('未放入圖卡，原指令仍保留。')
     });
-    // 單一路線：第 1 關之後，要過前一關才開啟下一關。教師示範模式（首頁「教師備課」開啟，或網址加 ?teacher=1）會全部開啟。
+    // 第 1 關之後，要過前一關才開啟下一關。只有教師示範模式能用關卡選單。
     const teacherView = window.TeacherDemo.isOn();
+    document.querySelector('.level-panel').hidden = !teacherView;
+    document.body.classList.toggle('teacher-route', teacherView);
     function levelOpen(item) { const index = levels.indexOf(item); return teacherView || index <= 0 || Boolean(record.levels[levels[index - 1].id]?.completed) || Boolean(record.levels[item.id]?.completed); }
     function firstOpenUnfinished() { return levels.find(item => levelOpen(item) && !record.levels[item.id]?.completed) || [...levels].reverse().find(levelOpen); }
     function entry() { return record.levels[level.id] ||= { programs: { main: [], p1: [], p2: [] }, attempts: 0, elapsedMs: 0, completed: false, bestCommands: null, bestProgram: null, completedAt: null, lastRun: null }; }
@@ -35,6 +37,8 @@
     function reset(message = '拖曳或點選圖卡，排好後執行程式。') { stop(); machine = new Machine(level, entry().programs); renderer.set(level, machine.snapshot()); updateBoard(); renderPrograms(); status(message); }
     function renderStudent() { $('student-name').textContent = student.name; $('student-id').textContent = student.studentId; $('student-class').textContent = student.className; $('student-source').textContent = student.source; }
     function renderNav() {
+        $('total-complete').textContent = `${levels.filter(item => record.levels[item.id]?.completed).length} / 20`;
+        if (!teacherView) return;
         const fragment = document.createDocumentFragment();
         groups.forEach((name, index) => {
             const section = document.createElement('section'); section.className = 'level-group'; const heading = document.createElement('h3'); heading.textContent = `${index + 1} · ${name}`; section.append(heading);
@@ -44,7 +48,7 @@
                 button.title = open ? `${item.id} ${item.title}` : `${item.id} ${item.title}：過前一關後開啟`; button.setAttribute('aria-label', `${button.title}${record.levels[item.id]?.completed ? '，已完成' : ''}`); if (item.id === level.id) button.setAttribute('aria-current', 'true'); button.disabled = !open;
                 button.addEventListener('click', () => selectLevel(item.id)); buttons.append(button);
             }); section.append(buttons); fragment.append(section);
-        }); $('level-list').replaceChildren(fragment); $('total-complete').textContent = `${levels.filter(item => record.levels[item.id]?.completed).length} / 20`;
+        }); $('level-list').replaceChildren(fragment);
     }
     function renderPrograms() {
         const fragment = document.createDocumentFragment(), programs = entry().programs;
