@@ -61,11 +61,13 @@ for (const grade of [7, 8]) {
     }
     const title = CourseScenarios.escapeHtml(module.title);
     assert.ok(fs.readFileSync(path.join(root, page), 'utf8').includes(`<title>${title}｜資訊科技課程</title>`));
-    const studentHeading = mission.innerHTML ?? section.innerHTML;
+    const studentHeading = mission.innerHTML;
     for (const html of [studentHeading, planSection, recordPage]) assert.ok(html.includes(title), `${id}: same formal title`);
+    assert.ok(studentHeading.includes(CourseScenarios.escapeHtml(CourseScenarios.active.grades[grade].cards[lesson - 1].title)));
+    assert.match(studentHeading, /<h1 id="learning-guide-title">[^<]+<\/h1>\s*<p>[^<]+<\/p>/);
+    assert.doesNotMatch(section.innerHTML, /<h1/);
     if (id === 'g8-04') {
       assert.match(studentHeading, /招募先遣隊（不重複的隨機抽取）[\s\S]*替先遣隊抽出四名不同的隊員/);
-      assert.ok(!section.innerHTML.includes(title));
     }
     assert.ok(planSection.includes(`href="${module.resources.records}"`), `${id}: plan links to its own record page`);
     assert.ok(planSection.includes(`${module.periods} 節`), `${id}: recommended periods remain in the plan`);
@@ -88,7 +90,7 @@ for (const grade of [7, 8]) {
     assert.deepEqual(Array.from(exit.evidence), module.evidence);
     assert.equal(exit.checks[0], module.successCriteria);
     assert.equal(exit.link.href, module.resources.records);
-    assert.match(section.innerHTML, /今天做什麼[\s\S]*從哪裡開始[\s\S]*最後交什麼/);
+    assert.match(section.innerHTML, /從哪裡開始[\s\S]*最後交什麼/);
     assert.match(section.innerHTML, /data-lesson-start/);
     assert.doesNotMatch(section.innerHTML, /怎樣算達標|離堂檢核/);
     assert.match(section.innerHTML, new RegExp(`href="student-record-${id}\\.html"[^>]*>打開學習紀錄表`));

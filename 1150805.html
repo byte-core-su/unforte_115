@@ -638,11 +638,6 @@
         // 教學內容資料庫
         // ==========================================
         const lesson = {
-            id: 5, 
-            icon: "shuffle", 
-            title: window.CourseScenarios.active.grades[8].cards[4].title,
-            subtitle: "(陣列隨機洗牌演算法)",
-            description: "指揮官！為了防止外星生物預測我們的武器發放順序，我們必須將武器卡牌（牌堆）完全打亂，轉移到「洗牌」新清單中，並完成武裝發放程序！",
             objective: "學習清單（陣列）的動態操作與資料移轉。透過模擬發牌過程，練習使用迴圈進行隨機抽取洗牌，實作動態刪除項次的完整洗牌邏輯。",
             learningPointsSummary: "本單元將帶領指揮官實作完整的「洗牌」演算法：",
             learningPoints: [
@@ -724,7 +719,6 @@
         }
 
         function renderLessonDetail(lesson) {
-            const dt = { iconBg: 'bg-cyan-100 text-cyan-600', tagText: 'text-cyan-500' };
             const learningPointsHtml = lesson.learningPoints.map(pt => `
                 <div class="bg-white border border-teal-100 p-4 rounded-xl shadow-sm flex items-start gap-3 hover:shadow-md transition-shadow">
                     <div class="bg-teal-50 text-teal-600 p-2 rounded-lg shrink-0 mt-0.5 border border-teal-100"><i data-lucide="check-circle-2" class="w-4 h-4"></i></div>
@@ -741,18 +735,6 @@
                         <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回任務儀表板
                     </button>
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="p-8 md:p-10 border-b border-slate-100 bg-slate-50/50 flex flex-col items-start gap-4">
-                            <div class="flex items-center gap-5">
-                                <div class="w-14 h-14 ${dt.iconBg} rounded-2xl flex items-center justify-center shrink-0 shadow-sm">
-                                    <i data-lucide="${lesson.icon}" class="w-7 h-7"></i>
-                                </div>
-                                <div>
-                                    <span class="${dt.tagText} font-bold text-sm tracking-widest uppercase mb-1 block">LESSON ${lesson.id}</span>
-                                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">${window.CourseScenarios.escapeHtml(lesson.title)} <span class="text-slate-400 font-medium text-2xl">${lesson.subtitle}</span></h2>
-                                </div>
-                            </div>
-                            <p class="text-slate-600 font-light text-lg leading-relaxed mt-2 max-w-3xl">${lesson.description}</p>
-                        </div>
                         
                         <div class="p-8 md:p-10 flex flex-col gap-10">
                             <!-- 任務目標 -->

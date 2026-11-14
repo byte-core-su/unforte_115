@@ -39,7 +39,7 @@
     },
     '1150802.html': {
       grade: '八年級｜第 2 課',
-      action: '用清單依序播放一段旋律，改一個音符再聽一次。',
+      action: '用清單依序播放《小星星》，改一個音符再聽一次。',
       exit: '改動一個音符或交換兩項，預測播放順序並驗證，說明清單索引如何控制旋律。'
     },
     '1150803.html': {
@@ -49,14 +49,13 @@
     },
     '1150804.html': {
       grade: '八年級｜第 4 課',
-      missionTitle: active.grades[8].cards[3].title,
       missionGoal: '替先遣隊抽出四名不同的隊員。每輪抽到的座號都要從候選清單移除。',
       action: '先用網頁模擬器試抽，再到 Scratch 寫出抽籤程式。',
       exit: '記錄一次抽取前後兩個清單，指出候選數量與已選數量各變多少，以及避免重複的原因。'
     },
     '1150805.html': {
       grade: '八年級｜第 5 課',
-      action: '比較洗牌與排序，再用 Scratch 把數字由小排到大。',
+      action: '試著把牌隨機移到新清單，再用 Scratch 把數字由小排到大，比較洗牌和排序。',
       exit: '用新數字牌預測第一次比較是否交換，執行後核對；再說明洗牌與排序的目標差別。'
     },
     '1150806.html': {
@@ -86,18 +85,26 @@
   const planGrade = page.startsWith('11508') ? 8 : 7;
   const lessonNumber = Number(page.slice(6, 7));
   const planHref = guide.lessonPlan || `lesson-plan-grade-${planGrade}.html#lesson-${lessonNumber}`;
-  const heading = `
-    <div class="learning-guide__top">
-      <span class="learning-guide__tag">${escapeHtml(guide.grade)}</span>
-      <a class="learning-guide__teacher" href="${escapeHtml(planHref)}" target="_blank" rel="noopener">教師備課：本課教案 ↗</a>
-    </div>
-    <h1${guide.missionTitle ? ' id="learning-guide-title"' : ''}>${guide.missionTitle ? `${escapeHtml(guide.missionTitle)}（${escapeHtml(guide.title)}）` : escapeHtml(guide.title || '本課學習導航')}</h1>`;
+  const { title: missionTitle } = active.grades[planGrade].cards[lessonNumber - 1];
+  const title = guide.title || missionTitle;
+  const heading = missionTitle === title ? title : `${missionTitle}（${title}）`;
+  const mission = document.createElement('section');
+  mission.id = 'learning-guide-heading';
+  mission.className = 'learning-guide learning-guide--mission';
+  mission.setAttribute('aria-labelledby', 'learning-guide-title');
+  mission.innerHTML = `
+    <div class="learning-guide__card">
+      <div class="learning-guide__top">
+        <span class="learning-guide__tag">${escapeHtml(guide.grade)}</span>
+        <a class="learning-guide__teacher" href="${escapeHtml(planHref)}" target="_blank" rel="noopener">教師備課：本課教案 ↗</a>
+      </div>
+      <h1 id="learning-guide-title">${escapeHtml(heading)}</h1>
+      <p>${escapeHtml(guide.missionGoal || guide.action)}</p>
+    </div>`;
   section.innerHTML = `
     <div class="learning-guide__card">
-      ${guide.missionTitle ? '' : heading}
       <div class="learning-guide__grid">
-        <div class="learning-guide__item"><strong>今天做什麼</strong>${escapeHtml(guide.action)}</div>
-        <div class="learning-guide__item"><strong>從哪裡開始</strong><button type="button" class="learning-guide__start" data-lesson-start disabled>載入活動中…</button><p class="learning-guide__status" role="status"></p></div>
+        <div class="learning-guide__item"><strong>從哪裡開始</strong>${guide.missionGoal ? `<div>${escapeHtml(guide.action)}</div>` : ''}<button type="button" class="learning-guide__start" data-lesson-start disabled>載入活動中…</button><p class="learning-guide__status" role="status"></p></div>
         <div class="learning-guide__item"><strong>最後交什麼</strong>
           ${guide.evidence?.length ? `<ul class="evidence-list" role="list">${guide.evidence.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : '<p>請參考本課教案。</p>'}
           <a class="learning-guide__records" href="${escapeHtml(guide.records || 'student-records.html')}" target="_blank" rel="noopener">打開學習紀錄表 ↗</a>
@@ -110,14 +117,7 @@
     </div>
   `;
   main.parentNode.insertBefore(section, main);
-  if (guide.missionTitle) {
-    const mission = document.createElement('section');
-    mission.id = 'learning-guide-heading';
-    mission.className = 'learning-guide learning-guide--mission';
-    mission.setAttribute('aria-labelledby', 'learning-guide-title');
-    mission.innerHTML = `<div class="learning-guide__card">${heading}<p>${escapeHtml(guide.missionGoal)}</p></div>`;
-    section.before(mission);
-  }
+  section.before(mission);
   const story = section.querySelector('.learning-guide__story');
   const header = document.querySelector('body > header');
   if (header) story.append(header);

@@ -134,8 +134,6 @@
 
         // ================= 教學內容資料 =================
         const lesson = {
-            id: 2, icon: "radio", title: window.CourseScenarios.active.grades[8].cards[1].title, subtitle: "(小星星廣播)",
-            description: "總部傳來了一段名為《小星星》的神秘頻率。我們需要建立清單來儲存這串音符，並依序播放出來。",
             objective: "學習清單的序列播放應用。透過將音樂簡譜資料輸入清單，練習連續資料的儲存方法，實作結合計次迴圈依序取出資料執行播放的高效管理邏輯。",
             pseudoCode: `WHEN SPRITE CLICKED\nSAY "現在開始為您演奏「小星星」"\nSET 第幾個音 TO 1\nREPEAT LENGTH("小星星") TIMES:\n    BROADCAST GET_ITEM(第幾個音) FROM "小星星"\n    PLAY NOTE GET_ITEM(第幾個音) FROM "小星星" FOR 0.5 BEATS\n    CHANGE 第幾個音 BY 1`,
             scratchBlocks: [
@@ -182,7 +180,6 @@
 
         // ================= UI 組裝 =================
         function renderLessonDetail(lesson) {
-            const dt = { iconBg: 'bg-cyan-100 text-cyan-600', tagText: 'text-cyan-500' };
             
             const topHtml = `
                 <div class="slide-up-fade">
@@ -190,18 +187,6 @@
                         <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回任務儀表板
                     </button>
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mb-10">
-                        <div class="p-8 md:p-10 border-b border-slate-100 bg-slate-50/50 flex flex-col items-start gap-4">
-                            <div class="flex items-center gap-5">
-                                <div class="w-14 h-14 ${dt.iconBg} rounded-2xl flex items-center justify-center shrink-0 shadow-sm">
-                                    <i data-lucide="${lesson.icon}" class="w-7 h-7"></i>
-                                </div>
-                                <div>
-                                    <span class="${dt.tagText} font-bold text-sm tracking-widest uppercase mb-1 block">LESSON ${lesson.id}</span>
-                                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">${window.CourseScenarios.escapeHtml(lesson.title)} <span class="text-slate-400 font-medium text-2xl">${lesson.subtitle}</span></h2>
-                                </div>
-                            </div>
-                            <p class="text-slate-600 font-light text-lg leading-relaxed mt-2 max-w-3xl">${lesson.description}</p>
-                        </div>
                         <div class="p-8 md:p-10 flex flex-col gap-10">
                             <details id="route-lesson-objectives" class="lesson-reference"><summary>任務說明</summary>
                                 <div class="bg-indigo-50 text-indigo-900 p-5 rounded-2xl border border-indigo-100/50 leading-relaxed font-medium">${lesson.objective}</div>

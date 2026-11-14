@@ -568,11 +568,6 @@
         // 教學內容資料庫 (總複習積木設計)
         // ==========================================
         const lesson = {
-            id: 6, 
-            icon: "swords", 
-            title: window.CourseScenarios.active.grades[8].cards[5].title,
-            subtitle: "（用清單做對決遊戲）",
-            description: "指揮官，最終考驗來了！我們將把前面學過的技巧大結合：建立連續數字的武裝清單、洗牌打散，然後取出前 6 項作為先遣隊的裝備。最後，利用迴圈將我們的裝備與敵方艦隊逐一比對，展開最終的星際決戰！",
             objectives: [
                 { title: "建立武裝清單", desc: `自動生成 1 到 24 的連續數字陣列。在 Scratch 中，這剛好能對應到 24 種不同戰鬥力的${escapeDuelText(duelScenario.costumeLabel)}造型！(模擬器以圖文輔助呈現)` },
                 { title: "亂數洗牌打散", desc: "將「裝備庫存」內的 24 個數字徹底打散，確保我們拿到的武器是完全隨機的。" },
@@ -751,7 +746,6 @@
         }
 
         function renderLessonDetail(lesson) {
-            const dt = { iconBg: 'bg-purple-100 text-purple-600', tagText: 'text-purple-500' };
             
             const learningPointsHtml = lesson.learningPoints.map(pt => `
                 <div class="bg-white border border-purple-100 p-4 rounded-xl shadow-sm flex items-start gap-3 hover:shadow-md transition-shadow h-full">
@@ -781,24 +775,11 @@
                         <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回任務儀表板
                     </button>
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="p-8 md:p-10 border-b border-slate-100 bg-slate-50/50 flex flex-col items-start gap-4">
-                            <div class="flex items-center gap-5">
-                                <div class="w-14 h-14 ${dt.iconBg} rounded-2xl flex items-center justify-center shrink-0 shadow-sm">
-                                    <i data-lucide="${lesson.icon}" class="w-7 h-7"></i>
-                                </div>
-                                <div>
-                                    <span class="${dt.tagText} font-bold text-sm tracking-widest uppercase mb-1 block">LESSON ${lesson.id}</span>
-                                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">${window.CourseScenarios.escapeHtml(lesson.title)} <span class="text-slate-400 font-medium text-2xl">${lesson.subtitle}</span></h2>
-                                </div>
-                            </div>
-                            <p class="text-slate-600 font-light text-lg leading-relaxed mt-2 max-w-3xl">${lesson.description}</p>
+                        <div class="p-8 md:p-10 flex flex-col gap-10">
                             <div id="route-scratch-demo" class="flex flex-wrap items-center gap-3">
                                 <a href="1150806-demo.sb3" download class="inline-flex items-center gap-2 rounded-lg bg-purple-700 px-4 py-2 text-sm font-bold text-white hover:bg-purple-800"><i data-lucide="download" class="w-4 h-4"></i>下載 Scratch 模組化示範</a>
                                 <span class="text-sm text-slate-600">在 Scratch 開啟後，綠旗或 1 測試足夠、2 測試不足、3 修正後重測。</span>
                             </div>
-                        </div>
-                        
-                        <div class="p-8 md:p-10 flex flex-col gap-10">
                             <details id="route-lesson-objectives" class="lesson-reference"><summary>任務說明</summary>
                                 <div class="bg-purple-50 p-6 rounded-2xl border border-purple-100/50">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
