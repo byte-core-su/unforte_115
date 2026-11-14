@@ -40,34 +40,80 @@
     </svg>`;
   }
 
+  const categories = {
+    motion: '動作', looks: '外觀', event: '事件', control: '控制', variable: '變數',
+    list: '清單', custom: '函式積木', pen: '畫筆', music: '音樂'
+  };
+  const escape = value => String(value).replace(/[&<>"']/g, character =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
+  const textLabel = label => label.replace(/[{}\[\]<>]/g, '');
+
+  function labelMarkup(label) {
+    return label.split(/(\{[^}]+\}|\[[^\]]+\]|<[^>]+>|⚑)/).map(part => {
+      if (part === '⚑') return '<span class="block-program__flag" aria-label="綠旗">⚑</span>';
+      const shape = { '{': 'value', '[': 'menu', '<': 'condition' }[part[0]];
+      return shape ? `<span class="block-program__field is-${shape}">${escape(part.slice(1, -1))}</span>` : escape(part);
+    }).join('');
+  }
+
+  function blockMarkup([category, shape, label, inside, otherwise]) {
+    const tile = (kind, form, name) =>
+      `<span class="block-program__tile is-${kind} is-${form}">${labelMarkup(name)}</span>`;
+    if (!inside) return tile(category, shape, label);
+    const body = entries => `<span class="block-program__c-body">${entries.map(([kind, name]) => tile(kind, 'stack', name)).join('')}</span>`;
+    return `<span class="block-program__c is-${category}">${tile(category, 'stack', label)}${body(inside)}
+      ${otherwise ? tile(category, 'stack', '否則') + body(otherwise) : ''}
+      <span class="block-program__tile is-${category} block-program__c-foot" aria-hidden="true">${label.startsWith('重複') ? '↶' : ''}</span></span>`;
+  }
+
+  function compare(task, program) {
+    const results = task.cases.map(({ name, values }) => ({ name, result: execute(task, program, values) }));
+    const sameOrder = task.goal.length === program.length && task.goal.every((id, index) => id === program[index]);
+    const missing = task.goal.filter(id => !program.includes(id));
+    return { results, sameOrder, missing };
+  }
+
+  function summary(result) {
+    if (result.error || result.text) return result.error || result.text;
+    if (result.points) return `移動 ${result.points.length - 1} 次。`;
+    if (result.rows.length) return `執行紀錄共 ${result.rows.length} 筆。`;
+    return '沒有輸出。';
+  }
+
   function mount(root, task) {
     const program = [];
     let audio;
     let result;
     root.innerHTML = `
       <h3>積木程式模擬器</h3>
-      <p>點積木加入程式，用箭頭調整順序，再執行檢查。</p>
+      <p>拖曳或點選積木加入程式。可拖曳調整順序，也可用 ↑ ↓ 按鈕。按「比對檢查」可一次檢查所有預設資料。</p>
       <div class="block-program__cases">
         <label>測試資料 <select data-program-case>${task.cases.map(({ name }, index) => `<option value="${index}">${name}</option>`).join('')}</select></label>
         ${task.fields.map(({ key, label, min, max }) => `<label>${label} <input data-program-value="${key}" type="number" min="${min}" max="${max}" required></label>`).join('')}
       </div>
       <p data-program-input></p>
       <div class="block-program__workspace">
-        <div><h4>積木區</h4><div class="block-program__palette">${Object.entries(task.blocks).map(([id, block]) =>
-          `<button type="button" class="block-program__tile is-${block.kind}" data-program-add="${id}">${block.label}</button>`).join('')}</div></div>
-        <div><h4>程式區</h4>${task.loop ? `<p>初始化後，後續積木重複 ${task.loop.times} 次。</p>` : ''}
+        <div><h4>積木區</h4><div class="block-program__palette">${Object.entries(categories).map(([category, name]) => {
+          const group = Object.entries(task.blocks).filter(([, block]) => block.view[0] === category);
+          return group.length ? `<div class="block-program__category is-${category}"><h5>${name}</h5>
+            ${group.map(([id, block]) => `<button type="button" class="block-program__grab" data-program-add="${id}" draggable="true">${blockMarkup(block.view)}</button>`).join('')}</div>` : '';
+        }).join('')}</div></div>
+        <div><h4>程式區</h4>${task.loop ? `<p>初始化後，後續積木會放在「重複 ${task.loop.times} 次」中。</p>` : ''}
         <ol data-program-script></ol></div>
       </div>
       <div class="block-program__actions">
-        <button type="button" data-program-run>執行並檢查</button>
+        <button type="button" data-program-run>執行本組</button>
+        <button type="button" data-program-compare>比對檢查</button>
         <button type="button" data-program-reset>清空積木</button>
         <button type="button" data-program-copy disabled>複製程式與結果</button>
       </div>
       <p role="status" data-program-feedback></p>
+      <div data-program-comparison></div>
       <div data-program-result></div>`;
     const script = root.querySelector('[data-program-script]');
     const feedback = root.querySelector('[data-program-feedback]');
     const stage = root.querySelector('[data-program-result]');
+    const comparison = root.querySelector('[data-program-comparison]');
     const copy = root.querySelector('[data-program-copy]');
     const inputs = [...root.querySelectorAll('[data-program-value]')];
     const caseSelect = root.querySelector('[data-program-case]');
@@ -77,22 +123,102 @@
       stopAudio();
       result = undefined;
       stage.replaceChildren();
+      comparison.replaceChildren();
       feedback.textContent = message;
       copy.disabled = true;
     }
 
     function render() {
-      script.innerHTML = program.length ? program.map((id, index) =>
-        `<li><span class="block-program__tile is-${task.blocks[id].kind}">${task.blocks[id].label}</span>
+      const rows = program.map((id, index) =>
+        `<li data-program-row="${index}" class="block-program__row">
+          <span class="block-program__grab" data-program-drag="${index}" draggable="true">${blockMarkup(task.blocks[id].view)}</span>
           <div class="block-program__actions">
             <button type="button" data-program-edit="-1" data-index="${index}" aria-label="上移第 ${index + 1} 塊" ${index === 0 ? 'disabled' : ''}>↑</button>
             <button type="button" data-program-edit="1" data-index="${index}" aria-label="下移第 ${index + 1} 塊" ${index === program.length - 1 ? 'disabled' : ''}>↓</button>
             <button type="button" data-program-edit="0" data-index="${index}" aria-label="移除第 ${index + 1} 塊">移除</button>
-          </div></li>`).join('') : '<li>從積木區加入第一塊。</li>';
+          </div></li>`);
+      if (task.loop && rows.length > task.loop.before.length) {
+        const split = task.loop.before.length;
+        script.innerHTML = rows.slice(0, split).join('') +
+          `<li class="block-program__c is-control">
+            <span class="block-program__tile is-control is-stack">${labelMarkup(`重複 {${task.loop.times}} 次`)}</span>
+            <ol class="block-program__c-body">${rows.slice(split).join('')}</ol>
+            <span class="block-program__tile is-control block-program__c-foot" aria-hidden="true">↶</span>
+          </li>`;
+      } else script.innerHTML = rows.join('') || '<li>把第一塊積木拖到這裡，或從積木區點選加入。</li>';
       for (const button of root.querySelectorAll('[data-program-add]')) {
         button.disabled = program.includes(button.dataset.programAdd);
+        button.draggable = !button.disabled;
       }
     }
+
+    function showComparison() {
+      if (!program.length) {
+        feedback.textContent = '先加入積木，再比對檢查。';
+        return;
+      }
+      const { results, sameOrder, missing } = compare(task, program);
+      const allPassed = results.every(({ result }) => result.passed);
+      const order = sameOrder ? '積木順序與參考程式一致。' :
+        allPassed ? '積木順序與參考程式不同，但所有測試都通過。' :
+        missing.length ? `請確認是否缺少：${missing.map(id => textLabel(task.blocks[id].view[2])).join('、')}。` :
+        '請對照參考程式，檢查積木放置順序。';
+      feedback.textContent = allPassed ? '所有測試都通過。' : '有測試未通過，請查看下方結果。';
+      comparison.innerHTML = `<p>${escape(order)}</p><ul>${results.map(({ name, result }) =>
+        `<li><strong>${escape(name)}｜${result.passed ? '通過' : '再檢查'}</strong>
+          ${escape(summary(result))}</li>`).join('')}</ul>
+        <details class="lesson-reference"><summary>查看參考積木順序</summary><ol>${task.goal.map(id =>
+          `<li>${blockMarkup(task.blocks[id].view)}</li>`).join('')}</ol></details>`;
+    }
+
+    let drag;
+    function clearDrop() {
+      script.querySelectorAll('[data-drop]').forEach(row => row.removeAttribute('data-drop'));
+      script.classList.remove('is-drop-end');
+    }
+    function destination(event) {
+      const row = event.target.closest('[data-program-row]');
+      if (!row) return program.length;
+      const rect = row.getBoundingClientRect();
+      return Number(row.dataset.programRow) + (event.clientY > rect.top + rect.height / 2 ? 1 : 0);
+    }
+    root.addEventListener('dragstart', event => {
+      const source = event.target.closest('[data-program-add], [data-program-drag]');
+      if (!source || source.disabled) return;
+      const { programAdd, programDrag } = source.dataset;
+      drag = programAdd ? { id: programAdd } : { index: Number(programDrag) };
+      event.dataTransfer.effectAllowed = programAdd ? 'copy' : 'move';
+      event.dataTransfer.setData('text/plain', programAdd || programDrag);
+    });
+    script.addEventListener('dragover', event => {
+      if (!drag) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = drag.id ? 'copy' : 'move';
+      clearDrop();
+      const position = destination(event);
+      const row = script.querySelector(`[data-program-row="${position}"]`);
+      if (row) row.setAttribute('data-drop', '');
+      else script.classList.add('is-drop-end');
+    });
+    script.addEventListener('dragleave', event => {
+      if (!script.contains(event.relatedTarget)) clearDrop();
+    });
+    script.addEventListener('drop', event => {
+      if (!drag) return;
+      event.preventDefault();
+      let position = destination(event);
+      if (drag.id) program.splice(position, 0, drag.id);
+      else {
+        const [id] = program.splice(drag.index, 1);
+        if (drag.index < position) position--;
+        program.splice(position, 0, id);
+      }
+      invalidate(drag.id ? '已加入積木。' : '已移動積木。');
+      drag = undefined;
+      clearDrop();
+      render();
+    });
+    root.addEventListener('dragend', () => { drag = undefined; clearDrop(); });
 
     function changeCase() {
       const { values } = selected();
@@ -163,10 +289,11 @@
         if (offset) program.splice(from + offset, 0, id);
         invalidate(offset ? '已移動積木。' : '已移除積木。');
         render();
-        const row = script.children[Math.min(from + offset, program.length - 1)];
+        const row = script.querySelector(`[data-program-row="${Math.min(from + offset, program.length - 1)}"]`);
         (row?.querySelector(`[data-program-edit="${offset}"]:not(:disabled)`) ||
           row?.querySelector('[data-program-edit="0"]') || root.querySelector('[data-program-add]:not(:disabled)')).focus();
       } else if (button.hasAttribute('data-program-run')) run();
+      else if (button.hasAttribute('data-program-compare')) showComparison();
       else if (button.hasAttribute('data-program-reset')) {
         program.length = 0;
         invalidate('已清空積木。');
@@ -177,8 +304,8 @@
           ...inputs.map(input => `${input.labels[0].textContent.trim()}：${input.value}`),
           root.querySelector('[data-program-input]').textContent,
           task.loop ? `前 ${task.loop.before.length} 塊執行一次，後續積木重複 ${task.loop.times} 次。` : '',
-          ...program.map((id, index) => `${index + 1}. ${task.blocks[id].label}`),
-          result.error || result.text || (result.points ? `共執行 ${result.points.length - 1} 次移動。` : ''),
+          ...program.map((id, index) => `${index + 1}. ${textLabel(task.blocks[id].view[2])}`),
+          summary(result),
           task.columns.join('｜'),
           ...result.rows.map(row => row.join('｜'))
         ].filter(Boolean).join('\n');
@@ -202,5 +329,5 @@
     render();
   }
 
-  window.BlockProgram = { mount, execute };
+  window.BlockProgram = { mount, execute, compare };
 })();

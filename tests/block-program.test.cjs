@@ -28,3 +28,24 @@ test('all lesson programs run their cases and each required block matters', () =
     }
   }
 });
+
+test('comparison reports every case, missing blocks, and valid alternative orders', () => {
+  const { compare } = window.BlockProgram;
+  for (const [file, program] of Object.entries(keys)) {
+    const task = window.BlockProgramTasks[file];
+    assert.deepEqual(Array.from(task.goal), program, file);
+    assert.ok(Object.values(task.blocks).every(block => block.view?.length >= 3), file);
+    assert.ok(compare(task, program).results.every(({ result }) => result.passed), file);
+  }
+  const spiral = window.BlockProgramTasks['1150704.html'];
+  const alternative = compare(spiral, ['start', 'draw', 'update']);
+  assert.equal(alternative.sameOrder, false);
+  assert.ok(alternative.results.every(({ result }) => result.passed));
+
+  const statistics = window.BlockProgramTasks['1150803.html'];
+  const misplaced = compare(statistics, ['reset', 'sum', 'average', 'guard']);
+  assert.equal(misplaced.sameOrder, false);
+  assert.equal(misplaced.results[0].result.passed, true);
+  assert.match(misplaced.results[2].result.error, /除以 0/);
+  assert.deepEqual(Array.from(compare(statistics, ['reset', 'sum', 'average']).missing), ['guard']);
+});
