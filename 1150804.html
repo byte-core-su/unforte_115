@@ -802,11 +802,6 @@
         // 教學內容資料庫
         // ==========================================
         const lesson = {
-            id: 4, 
-            icon: "users", 
-            title: window.CourseScenarios.active.grades[8].cards[3].title,
-            subtitle: "(隨機不重複抽籤)",
-            description: "替先遣隊抽出四名不同的隊員。",
             learningPoints: [
                 { title: "資料建立", desc: "利用計次迴圈配合變數累加，將 1 至特定號碼依序添加至清單中建立名單。" },
                 { title: "隨機抽籤", desc: "結合隨機取數積木，從 1 到「目前的清單長度」中隨機抽出一個索引值。" },
@@ -865,7 +860,6 @@
         }
 
         function renderLessonDetail(lesson) {
-            const dt = { iconBg: 'bg-cyan-100 text-cyan-600', tagText: 'text-cyan-500' };
             
             const learningPointsHtml = lesson.learningPoints.map(pt => `
                 <div class="bg-white border border-teal-100 p-4 rounded-xl shadow-sm flex items-start gap-3 hover:shadow-md transition-shadow">
@@ -885,19 +879,6 @@
                         <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回任務儀表板
                     </button>
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="p-8 md:p-10 border-b border-slate-100 bg-slate-50/50 flex flex-col items-start gap-4">
-                            <div class="flex items-center gap-5">
-                                <div class="w-14 h-14 ${dt.iconBg} rounded-2xl flex items-center justify-center shrink-0 shadow-sm">
-                                    <i data-lucide="${lesson.icon}" class="w-7 h-7"></i>
-                                </div>
-                                <div>
-                                    <span class="${dt.tagText} font-bold text-sm tracking-widest uppercase mb-1 block">LESSON ${lesson.id}</span>
-                                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2 tracking-tight">${window.CourseScenarios.escapeHtml(lesson.title)} <span class="text-slate-400 font-medium text-2xl">${lesson.subtitle}</span></h2>
-                                </div>
-                            </div>
-                            <p class="text-slate-600 font-light text-lg leading-relaxed mt-2 max-w-3xl">${lesson.description}</p>
-                        </div>
-                        
                         <div class="p-8 md:p-10 flex flex-col gap-10">
                             
                             <details id="route-lesson-key-points" class="bg-slate-50 p-4 rounded-xl border border-slate-100">

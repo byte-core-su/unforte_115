@@ -23,9 +23,11 @@ for (const grade of [7, 8]) {
   const curriculumMap = fs.readFileSync(path.join(root, 'curriculum-map.html'), 'utf8');
   for (let lesson = 1; lesson <= 6; lesson++) {
     const page = `1150${grade}0${lesson}.html`;
-    const section = { setAttribute() {}, querySelector: () => ({ remove() {} }) };
+    const mission = { setAttribute() {} };
+    const section = { setAttribute() {}, querySelector: () => ({ remove() {} }), before(node) { assert.equal(node, mission); } };
     const main = { parentNode: { insertBefore(node) { assert.equal(node, section); } } };
-    const document = { querySelector: selector => selector === 'main' ? main : null, createElement: () => section, body: { classList: { add() {} } } };
+    const elements = [section, mission];
+    const document = { querySelector: selector => selector === 'main' ? main : null, createElement: () => elements.shift(), body: { classList: { add() {} } } };
     const id = `g${grade}-0${lesson}`;
     const module = require(`../modules/${id}.json`);
     const location = { pathname: `/${page}` };
@@ -59,7 +61,12 @@ for (const grade of [7, 8]) {
     }
     const title = CourseScenarios.escapeHtml(module.title);
     assert.ok(fs.readFileSync(path.join(root, page), 'utf8').includes(`<title>${title}｜資訊科技課程</title>`));
-    for (const html of [section.innerHTML, planSection, recordPage]) assert.ok(html.includes(title), `${id}: same formal title`);
+    const studentHeading = mission.innerHTML ?? section.innerHTML;
+    for (const html of [studentHeading, planSection, recordPage]) assert.ok(html.includes(title), `${id}: same formal title`);
+    if (id === 'g8-04') {
+      assert.match(studentHeading, /招募先遣隊（不重複的隨機抽取）[\s\S]*替先遣隊抽出四名不同的隊員/);
+      assert.ok(!section.innerHTML.includes(title));
+    }
     assert.ok(planSection.includes(`href="${module.resources.records}"`), `${id}: plan links to its own record page`);
     assert.ok(planSection.includes(`${module.periods} 節`), `${id}: recommended periods remain in the plan`);
     for (const step of steps.filter(step => step.optional)) assert.ok(planSection.includes(CourseScenarios.escapeHtml(step.title)));
@@ -85,7 +92,7 @@ for (const grade of [7, 8]) {
     assert.match(section.innerHTML, /data-lesson-start/);
     assert.doesNotMatch(section.innerHTML, /怎樣算達標|離堂檢核/);
     assert.match(section.innerHTML, new RegExp(`href="student-record-${id}\\.html"[^>]*>打開學習紀錄表`));
-    assert.match(section.innerHTML, new RegExp(`href="lesson-plan-grade-${grade}\\.html#lesson-${lesson}"[^>]*>教師備課：本課教案`), `${page}: teachers should reach this lesson's plan`);
+    assert.match(studentHeading, new RegExp(`href="lesson-plan-grade-${grade}\\.html#lesson-${lesson}"[^>]*>教師備課：本課教案`), `${page}: teachers should reach this lesson's plan`);
   }
   const filename = `lesson-plan-grade-${grade}.html`;
   const html = fs.readFileSync(path.join(root, filename), 'utf8');

@@ -103,10 +103,11 @@
     main.after(panel, completion);
     const startButton = document.querySelector('[data-lesson-start]');
     const guide = document.querySelector('#learning-guide');
+    const guideHeading = document.getElementById('learning-guide-heading');
     const progress = document.createElement('nav');
     progress.className = 'lesson-route lesson-route--progress';
     progress.setAttribute('aria-label', '本課進度');
-    (guide || main).before(progress);
+    (guideHeading || guide || main).before(progress);
 
     function placeControls() {
       const unique = [...new Set(viewedStep().regions)];
@@ -160,7 +161,7 @@
 
     function focusStep() {
       requestAnimationFrame(() => {
-        const heading = panel.hidden ? guide?.querySelector('h1') : panel.querySelector('.lesson-route__title');
+        const heading = panel.hidden ? (guideHeading || guide)?.querySelector('h1') : panel.querySelector('.lesson-route__title');
         if (panel.hidden) heading?.setAttribute('tabindex', '-1');
         heading?.focus({ preventScroll: true });
         progress.scrollIntoView({ behavior: 'instant', block: 'start' });

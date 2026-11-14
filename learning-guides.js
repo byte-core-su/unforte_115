@@ -49,7 +49,9 @@
     },
     '1150804.html': {
       grade: '八年級｜第 4 課',
-      action: '用 Scratch 抽出 4 個不同的座號。',
+      missionTitle: active.grades[8].cards[3].title,
+      missionGoal: '替先遣隊抽出四名不同的隊員。每輪抽到的座號都要從候選清單移除。',
+      action: '先用網頁模擬器試抽，再到 Scratch 寫出抽籤程式。',
       exit: '記錄一次抽取前後兩個清單，指出候選數量與已選數量各變多少，以及避免重複的原因。'
     },
     '1150805.html': {
@@ -84,13 +86,15 @@
   const planGrade = page.startsWith('11508') ? 8 : 7;
   const lessonNumber = Number(page.slice(6, 7));
   const planHref = guide.lessonPlan || `lesson-plan-grade-${planGrade}.html#lesson-${lessonNumber}`;
+  const heading = `
+    <div class="learning-guide__top">
+      <span class="learning-guide__tag">${escapeHtml(guide.grade)}</span>
+      <a class="learning-guide__teacher" href="${escapeHtml(planHref)}" target="_blank" rel="noopener">教師備課：本課教案 ↗</a>
+    </div>
+    <h1${guide.missionTitle ? ' id="learning-guide-title"' : ''}>${guide.missionTitle ? `${escapeHtml(guide.missionTitle)}（${escapeHtml(guide.title)}）` : escapeHtml(guide.title || '本課學習導航')}</h1>`;
   section.innerHTML = `
     <div class="learning-guide__card">
-      <div class="learning-guide__top">
-        <span class="learning-guide__tag">${escapeHtml(guide.grade)}</span>
-        <a class="learning-guide__teacher" href="${escapeHtml(planHref)}" target="_blank" rel="noopener">教師備課：本課教案 ↗</a>
-      </div>
-      <h1>${escapeHtml(guide.title || '本課學習導航')}</h1>
+      ${guide.missionTitle ? '' : heading}
       <div class="learning-guide__grid">
         <div class="learning-guide__item"><strong>今天做什麼</strong>${escapeHtml(guide.action)}</div>
         <div class="learning-guide__item"><strong>從哪裡開始</strong><button type="button" class="learning-guide__start" data-lesson-start disabled>載入活動中…</button><p class="learning-guide__status" role="status"></p></div>
@@ -106,6 +110,14 @@
     </div>
   `;
   main.parentNode.insertBefore(section, main);
+  if (guide.missionTitle) {
+    const mission = document.createElement('section');
+    mission.id = 'learning-guide-heading';
+    mission.className = 'learning-guide learning-guide--mission';
+    mission.setAttribute('aria-labelledby', 'learning-guide-title');
+    mission.innerHTML = `<div class="learning-guide__card">${heading}<p>${escapeHtml(guide.missionGoal)}</p></div>`;
+    section.before(mission);
+  }
   const story = section.querySelector('.learning-guide__story');
   const header = document.querySelector('body > header');
   if (header) story.append(header);
