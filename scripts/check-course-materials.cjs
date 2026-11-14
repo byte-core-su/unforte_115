@@ -144,12 +144,12 @@ function inspectMaterials({ root = path.resolve(__dirname, '..'), registry = mat
 
         const unit = JSON.parse(readText(`modules/g${grade}-0${lesson}.json`));
         const [planFile, planId] = unit.resources.lessonPlan.split('#');
-        const [recordFile, recordId] = unit.resources.records.split('#');
+        const recordFile = unit.resources.records;
         const source = readText(lessonPlan.source);
         const planHtml = readText(planFile);
         check(source.split(/\r?\n/).some(line => line.startsWith(`### 第 ${lesson} 課`)), '教案 Markdown 缺少指定單元');
         check(hasId(planHtml, planId) && hasId(planHtml, lessonPlan.assessmentId), 'HTML 教案缺少本課或評量區塊');
-        check(readText(record.source).includes(`<!-- assessment:${recordId} -->`) && hasId(readText(recordFile), recordId), '學習紀錄表缺少本課區塊');
+        check(readText(record.source).includes(`<!-- assessment:${unit.id} -->`) && hasId(readText(recordFile), unit.id), '學習紀錄表缺少本課區塊');
 
         const deck = readText(presentation.file);
         for (const { fragment, kind, text } of presentation.references) {

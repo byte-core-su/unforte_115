@@ -90,7 +90,7 @@ for (const folder of ['codegame', 'pythonlab']) {
   assert.ok(read(`${folder}/teacher-demo.js`).endsWith(read('teacher-demo.js')));
   assert.match(read(`${folder}/index.html`), /src="teacher-demo\.js"/);
 }
-assert.match(read('index.html'), /id="teacher-demo-toggle"/);
+assert.match(read('teacher-resources.html'), /id="teacher-demo-toggle"/);
 assert.match(read('lesson-route.js'), /const missing = demo \? \[\]/, 'demo mode should not require ticking completion checks');
 
 console.log('learning routes: 12 Scratch lessons, CodeGame and Python Lab follow one guided path');

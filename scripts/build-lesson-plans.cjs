@@ -51,7 +51,7 @@ const pages = [
   {
     kind: 'records',
     source: 'STUDENT_RECORDS.md',
-    summary: '選一課，按「複製本課紀錄與要求」，貼到班級平台的線上文件或作業。'
+    summary: '七、八年級各 6 份紀錄表。選一課，就能開啟該課的完整紀錄表。'
   },
   {
     kind: 'alignment',
@@ -105,7 +105,7 @@ for (const item of modules) {
     throw new Error(`${id} 缺少必交項目或達標條件。`);
   }
   const { lessonPlan, records } = resources;
-  if (lessonPlan !== `lesson-plan-grade-${item.grade}.html#lesson-${item.lesson}` || records !== `student-records.html#${id}`) {
+  if (lessonPlan !== `lesson-plan-grade-${item.grade}.html#lesson-${item.lesson}` || records !== `student-record-${id}.html`) {
     throw new Error(`${id} 的教案或學習紀錄連結與課次不符。`);
   }
   if (!title?.trim() || !goal?.trim() || !Number.isInteger(periods) || periods < 1) throw new Error(`${id} 的課名、目標或節數無效。`);
@@ -165,7 +165,7 @@ const copyTableScript = `
             if (wrapper.matches('.lesson-table-scroll') && wrapper.closest('.lesson-record')) return;
             const record = wrapper.matches('.lesson-record');
             const content = record ? wrapper : wrapper.querySelector('table');
-            const heading = record ? wrapper.querySelector('h3').textContent.trim() : (() => {
+            const heading = record ? document.querySelector('h1').textContent.trim() : (() => {
                 for (let node = wrapper.previousElementSibling; node; node = node.previousElementSibling) {
                     if (/^H[23]$/.test(node.tagName)) return node.textContent.trim();
                 }
@@ -178,7 +178,12 @@ const copyTableScript = `
             button.setAttribute('aria-label', '複製「' + heading + '」' + (record ? '紀錄與要求' : '表格'));
             button.addEventListener('click', async () => {
                 const copy = content.cloneNode(true);
-                if (record) copy.querySelector('.copy-table-button')?.remove();
+                if (record) {
+                    copy.querySelector('.copy-table-button')?.remove();
+                    const title = document.createElement('h2');
+                    title.textContent = heading;
+                    copy.prepend(title);
+                }
                 const asText = table => [...table.rows].map(row => [...row.cells].map(cell => cell.textContent.trim()).join('\\t')).join('\\n');
                 const plain = record ? [...copy.children].map(node => {
                     const table = node.querySelector('table');
@@ -208,26 +213,56 @@ const copyTableScript = `
                         : '已選取「' + heading + '」，請按 Ctrl+C（Mac 按 ⌘+C）複製。';
                 }
             });
-            if (record) wrapper.querySelector('h3').after(button);
+            if (record) wrapper.prepend(button);
             else wrapper.before(button);
         });
     })();
     </script>`;
 
-for (const page of pages) {
-  page.output = pageFor[page.source];
-  const markdown = read(page.source);
+const recordBodies = new Map();
+const recordsSource = 'STUDENT_RECORDS.md';
+const recordsIndexMarkdown = read(recordsSource).replace(/^### [^\n]+\n<!-- assessment:(g[78]-0[1-6]) -->\s*([\s\S]*?)(?=^#{2,3} |$(?![\s\S]))/gm,
+  (_, id, content) => {
+    if (!byId.has(id) || recordBodies.has(id)) throw new Error(`${id} 的學習紀錄缺漏或重複。`);
+    const html = marked.parse(content.trim(), { gfm: true }).trimEnd();
+    if (!html.includes('<table>')) throw new Error(`${id} 的學習紀錄缺少表格。`);
+    recordBodies.set(id, html);
+    return '';
+  });
+if (recordBodies.size !== modules.length) throw new Error('學習紀錄應包含每一課。');
+
+for (const page of [...pages, ...modules.map(item => ({ kind: 'record', source: recordsSource, item }))]) {
+  const { item } = page;
+  const grade = item?.grade ?? page.grade;
+  const gradeName = grade === 7 ? '七' : '八';
+  const markdown = page.kind === 'records' ? recordsIndexMarkdown : item ? '' : read(page.source);
   const match = /^# (.+)\r?\n/.exec(markdown);
-  if (!match) throw new Error(`${page.source} must begin with an H1 title`);
-  const title = match[1];
+  if (!item && !match) throw new Error(`${page.source} must begin with an H1 title`);
+  const title = item ? `${gradeName}年級第 ${item.lesson} 課｜${item.title}` : match[1];
   const sections = [];
   const lessons = [];
-  let html = marked.parse(markdown.slice(match[0].length), { gfm: true });
+  let html = item
+    ? `<div class="lesson-record" id="${item.id}">\n${assessment(item)}${item.activity ? `\n${activityQuestions(item.activity)}` : ''}\n${recordBodies.get(item.id)}\n</div>`
+    : marked.parse(markdown.slice(match[0].length), { gfm: true });
+  if (page.kind === 'records') {
+    for (const [number, label] of [[7, '七年級'], [8, '八年級']]) {
+      const links = gradeModules(number).map(unit =>
+        `<li id="${unit.id}"><a href="${unit.resources.records}"><span>第 ${unit.lesson} 課</span><strong>${escapeHtml(unit.title)}</strong></a></li>`);
+      html = html.replace(`<h2>${label}</h2>`, `<h2>${label}</h2>\n<ul class="lesson-record-links" id="grade-${number}" role="list">\n${links.join('\n')}\n</ul>`);
+    }
+  }
   html = html.replace(/<h2>(.*?)<\/h2>/g, (_, label) => {
     const id = `section-${sections.length + 1}`;
     sections.push({ id, label: label.replace(/<[^>]*>/g, '') });
     return `<h2 id="${id}">${label}</h2>`;
   });
+  if (page.kind === 'records') {
+    const instructions = html.match(/<h2 id="section-1">([^<]+)<\/h2>\n([\s\S]*?)(?=<h2 id="section-2">)/);
+    if (!instructions) throw new Error('學習紀錄表目錄缺少填寫說明。');
+    const [section, label, content] = instructions;
+    html = html.replace(section, '') + `\n<details id="section-1" class="lesson-record-help"><summary>${label}</summary>\n${content}</details>`;
+    sections.push(sections.shift());
+  }
   if (page.kind === 'lesson-plan') {
     // Stable anchors so each unit page can open its own lesson: lesson-plan-grade-7.html#lesson-3
     html = html.replace(/<h3>第 ([1-6]) 課[^<]*<\/h3>/g, (_, number) => {
@@ -237,17 +272,6 @@ for (const page of pages) {
       const activity = item.activity ? `\n<p><strong>網頁示範</strong> ${escapeHtml(item.activity.preview)}</p>\n<p><strong>Scratch 實作</strong> ${escapeHtml(item.activity.practice)}</p>\n${activityQuestions(item.activity)}` : '';
       return `<h3 id="lesson-${number}">第 ${number} 課｜${escapeHtml(item.title)}</h3>\n<p><strong>建議節數</strong> ${item.periods} 節</p>\n${assessment(item)}\n<p><strong>選做活動</strong> ${optional.join('、')}</p>\n<p><a href="${item.resources.records}">開啟本課學習紀錄 ↗</a></p>${activity}`;
     });
-  }
-  if (page.kind === 'records') {
-    const ids = new Set();
-    html = html.replace(/<h3>[^<]+<\/h3>\s*<!-- assessment:(g[78]-0[1-6]) -->\s*([\s\S]*?)(?=<h[23][ >]|$)/g, (_, id, content) => {
-      if (!byId.has(id) || ids.has(id) || !content.includes('<table>')) throw new Error(`${id} 的學習紀錄缺漏或重複。`);
-      ids.add(id);
-      const item = byId.get(id);
-      const activity = item.activity ? `\n${activityQuestions(item.activity)}` : '';
-      return `<div class="lesson-record" id="${id}">\n<h3>第 ${item.lesson} 課｜${escapeHtml(item.title)}</h3>\n${assessment(item)}${activity}\n${content.trimEnd()}\n</div>\n`;
-    });
-    if (ids.size !== modules.length) throw new Error('學習紀錄應包含每一課。');
   }
   if (page.kind === 'alignment') {
     html = html.replace(/(<a href="(1150[78]0[1-6]\.html)">)[^<]*(<\/a>)/g,
@@ -269,19 +293,28 @@ for (const page of pages) {
   const units = gradeModules(page.grade);
   const totalPeriods = periodsFor(units);
   const planLength = `${units.length} 單元・建議 ${totalPeriods} 節`;
-  const summary = isPlan ? `${page.summary}｜${planLength}` : page.summary;
+  const summary = item ? '學習紀錄表。教師可複製這一課的要求與表格，貼到班級平台的線上作業。'
+    : isPlan ? `${page.summary}｜${planLength}` : page.summary;
   if (isPlan) html = html.replace('<!-- grade-periods -->', `${planLength}，每節約 45 分鐘。`);
-  const gradeName = isPlan ? (page.grade === 7 ? '七' : '八') : '';
-  const topLinks = isPlan
+  const topLinks = item
+    ? `<a class="lesson-hero__link" href="${item.entry}">回到本課教材 →</a>`
+    : isPlan
     ? `<a class="lesson-hero__link" href="${page.course}">前往${gradeName}年級課程 →</a>`
-    : `<a class="lesson-hero__link" href="index.html#teacher-resources">教學資源 →</a>`;
-  const footerLink = isPlan
+    : `<a class="lesson-hero__link" href="teacher-resources.html">教師備課 →</a>`;
+  const footerLink = item
+    ? `<a href="${item.resources.lessonPlan}">查看本課教案 →</a>`
+    : isPlan
     ? `<a href="${page.companion}">查看${page.grade === 7 ? '八' : '七'}年級教案 →</a>`
     : `<a href="${page.kind === 'records' ? 'curriculum-alignment.html">查看 108 課綱對照' : 'student-records.html">查看學生學習紀錄表'} →</a>`;
   const description = isPlan
     ? `${title}｜${planLength}`
-    : `${title}：${page.summary}`;
-  const bodyClass = isPlan && page.grade === 8 ? 'site-course site-course--g8 lesson-page' : 'site-course lesson-page';
+    : `${title}｜${summary}`;
+  const backLink = item
+    ? '<a class="lesson-hero__link" href="student-records.html">← 學習紀錄表目錄</a>'
+    : isPlan
+      ? '<a class="lesson-hero__link" href="teacher-resources.html">← 回到教師備課</a>'
+      : '<a class="lesson-hero__link" href="index.html">← 返回網站首頁</a>';
+  const bodyClass = grade === 8 ? 'site-course site-course--g8 lesson-page' : 'site-course lesson-page';
 
   const document = `<!DOCTYPE html>
 <html lang="zh-TW">
@@ -300,22 +333,22 @@ for (const page of pages) {
     <header class="lesson-hero">
         <div class="lesson-hero__inner">
             <div class="lesson-hero__top">
-                <a class="lesson-hero__link" href="index.html">← 返回網站首頁</a>
+                ${backLink}
                 ${topLinks}
             </div>
             <h1>${escapeHtml(title)}</h1>
             <p class="lesson-hero__summary">${escapeHtml(summary)}</p>
         </div>
     </header>
-    <main class="lesson-shell">
+    <main class="lesson-shell">${navigation ? `
         <nav class="lesson-nav" aria-label="${isPlan ? '教案章節' : '文件章節'}">
             <p class="lesson-nav__title">${isPlan ? '教案目錄' : '目錄'}</p>
             <div class="lesson-nav__links">
                 ${navigation}
             </div>${lessonNavigation}
-        </nav>
+        </nav>` : ''}
         <article class="lesson-content" aria-label="${escapeHtml(title)}">
-${page.kind === 'records' ? '<p id="copy-status" class="copy-status" role="status"></p>\n' : ''}${html.trimEnd()}
+${page.kind === 'records' || item ? '<p id="copy-status" class="copy-status" role="status"></p>\n' : ''}${html.trimEnd()}
         </article>
     </main>
     <footer class="lesson-footer">
@@ -323,11 +356,11 @@ ${page.kind === 'records' ? '<p id="copy-status" class="copy-status" role="statu
             <span>115 學年度資訊科技課程教材・內容同步自 ${page.source}</span>
             ${footerLink}
         </div>
-    </footer>${page.kind === 'records' ? copyTableScript : ''}
+    </footer>${page.kind === 'records' || item ? copyTableScript : ''}
 </body>
 </html>
 `;
-  outputs.set(page.output, document);
+  outputs.set(item?.resources.records ?? pageFor[page.source], document);
 }
 
 for (const [file, content] of outputs) {

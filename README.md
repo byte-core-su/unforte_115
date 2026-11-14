@@ -2,7 +2,7 @@
 
 互動式程式設計教材網站，提供七、八年級 Scratch 課程、Python 引導式學習、Scratch 範例教材與教師資源圖解。
 
-**目前外層工作版本為 V-2，七、八年級 Scratch 教材使用星際主題。** 首頁最前方是「選擇課程」：Scratch 七年級、Scratch 八年級、CodeGame、Python Lab 四門課，點課程進入後再選單元上課；教案、範例與學習紀錄放在下方「教師備課」。各單元的課名、目標、必交項目與達標條件由同一份資料維護。詳見[課程模組維護指南](MODULES_GUIDE.md)。
+**目前外層工作版本為 V-2，七、八年級 Scratch 教材使用星際主題。** 上課首頁提供 Scratch 七年級、Scratch 八年級、CodeGame、Python Lab 四門課的入口。教案、範例、學習紀錄及示範模式集中在[教師備課](teacher-resources.html)。各單元的課名、目標、必交項目與達標條件由同一份資料維護。詳見[課程模組維護指南](MODULES_GUIDE.md)。
 
 | 版本 | 位置 | 用途 |
 | --- | --- | --- |
@@ -160,7 +160,7 @@ npm run check:materials
 - **每一步都有引導**：面板寫出「要做什麼」、完成標準，以及分層提示（卡住時按一次看一則）。學生點進教材操作時，面板會收成一行，按「說明」可再展開。
 - **選做不擋路**：進階或加分活動標為「選做」，可以按「略過選做」繼續。
 - **不保存資料**：路線進度只在目前頁面，重新整理會從第一步開始，不保存、不傳送任何學生資料。
-- **教師示範模式**：在首頁「教師備課」按「開啟教師示範模式」。開啟後，各課的路線面板可以直接跳到任一步、不必勾選完成標準，也能按「全部展開」一次看到整頁；CodeGame 所有關卡、Python Lab 所有單元與練習都會開啟。這個設定只在目前的瀏覽器分頁有效，關閉分頁或按「結束示範」就恢復學生路線，學生之後用同一台電腦也不會沿用。無法從首頁開啟時，可在網址後加 `?teacher=1`（加 `?route=all` 會直接全部展開）。
+- **教師示範模式**：在[教師備課](teacher-resources.html)按「開啟教師示範模式」，再用同一分頁進入課程。各課的路線面板可以直接跳到任一步，也能按「全部展開」一次看到整頁。CodeGame 的關卡與 Python Lab 的單元和練習也會開啟。關閉分頁或按「結束示範」會恢復學生路線。也可在課程網址後加 `?teacher=1`（加 `?route=all` 會直接全部展開）。
 - 路線設定在 `lesson-routes.js`，引導程式在 `lesson-route.js`、`lesson-route.css`。
 
 CodeGame 與 Python Lab 也改為單一路線：
@@ -186,8 +186,10 @@ CodeGame 與 Python Lab 也改為單一路線：
 | `1150700.html`～`1150706.html` | 11507 課程單元 |
 | `1150800.html`～`1150806.html` | 11508 課程單元 |
 | `lesson-plan-grade-7.html`、`lesson-plan-grade-8.html` | 七、八年級教案；每個單元頁上方可直接開啟該課段落 |
-| `curriculum-map.html` | 課程地圖：七、八年級 12 單元的概念關聯圖與成果卡片，從首頁「教師備課」開啟 |
-| `student-records.html`、`curriculum-alignment.html` | 學生學習紀錄表（可逐表複製）與 108 課綱逐課對照 |
+| `teacher-resources.html` | 教師備課入口，集中各年級教案、Scratch 範例、學習紀錄和備課資源 |
+| `curriculum-map.html` | 七、八年級 12 單元的概念關聯圖與成果卡片 |
+| `student-records.html`、`student-record-g*-*.html` | 學習紀錄表目錄與 12 份可獨立分享、複製的單元紀錄表 |
+| `curriculum-alignment.html` | 108 課綱逐課對照 |
 | `scratch_educators.html` | Scratch 教師帳戶、班級與學生管理操作圖解 |
 | `11507.zip`、`11508.zip` | 可下載的 Scratch `.sb3` 教材範例 |
 | `1150806-demo.sb3` | 八年級第 6 課的[四個自訂積木示範](SCRATCH_L6_DEMO_GUIDE.md)，含足夠、不足與修正後重測 |

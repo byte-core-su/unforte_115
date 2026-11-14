@@ -10,7 +10,7 @@
 | `modules/g7-01.json` ～ `g7-06.json` | 七年級六個單元，各一個模組。 |
 | `modules/g8-01.json` ～ `g8-06.json` | 八年級六個單元，各一個模組。 |
 | `1150701.html` ～ `1150806.html` | 各單元的實際互動內容，依年級與課號選取，兩個 `00` 總覽不算單元模組。 |
-| `index.html`、`course-map.css` | 首頁的課程選擇（Scratch 七、八年級、CodeGame、Python Lab）、教師備課。 |
+| `index.html`、`teacher-resources.html`、`course-map.css` | 上課首頁、教師備課頁及兩頁共用的樣式。 |
 | `curriculum-map.html`、`curriculum-map.css`、`curriculum-map.js` | 課程地圖頁：分年級的概念關聯圖與成果卡片，單元名稱與順序須與 `modules/` 一致。 |
 
 共用的 `course-scenarios.js`、`learning-guides.js`、`curriculum-labs.js`、`adaptive-practice.js`、`site-theme.css` 及圖片仍由原單元引用，不複製成十二套。模組的正式名稱以程式概念命名；單元內的故事名稱由情境設定控制。改主題時要檢查模組描述中是否仍有舊情境用語。
@@ -37,7 +37,7 @@
   "tags": ["累加", "平均", "空清單"],
   "resources": {
     "lessonPlan": "lesson-plan-grade-8.html#lesson-3",
-    "records": "student-records.html#g8-03",
+    "records": "student-record-g8-03.html",
     "scratchArchive": "11508.zip"
   }
 }

@@ -85,7 +85,7 @@ test('package resources, classroom use and assessment examples support teacher a
 test('presentation links reach current local teaching pages and visible example sections', () => {
   const presentation = path.join(__dirname, '../presentations');
   assert.doesNotMatch(deck, /href="[^"]*STUDENT_RECORDS\.md/);
-  assert.match(deck, /href="\.\.\/student-records\.html#g8-03"/);
+  assert.match(deck, /href="\.\.\/student-record-g8-03\.html"/);
   for (const [, href] of deck.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)) {
     const url = new URL(href, 'https://example.test/presentations/20261110.html');
     if (url.hostname !== 'example.test') continue;

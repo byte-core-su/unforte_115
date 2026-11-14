@@ -43,13 +43,15 @@ test('the homepage opens with a course chooser that links each course', () => {
     assert.match(card, new RegExp(`href="1150${grade}00.html"`));
   }
   assert.doesNotMatch(home, /自訂課程|customize-course|course-builder\.html|course\.html/);
+  assert.match(home, /href="teacher-resources\.html"/);
+  assert.doesNotMatch(home, /id="teacher-resources"|id="teacher-demo-toggle"|href="lesson-plan-grade-[78]\.html"/);
 });
 
 test('the curriculum map page keeps both grade maps in curriculum order and is linked from teacher prep', () => {
-  const home = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-  const prep = home.match(/<section id="teacher-resources"[\s\S]*?<\/section>/)?.[0];
-  assert.match(prep, /href="curriculum-map.html"/);
+  const prep = fs.readFileSync(path.join(root, 'teacher-resources.html'), 'utf8');
+  assert.match(prep, /href="curriculum-map\.html"/);
   const map = fs.readFileSync(path.join(root, 'curriculum-map.html'), 'utf8');
+  assert.match(map, /href="teacher-resources\.html"/);
   for (const file of ['curriculum-map.css', 'curriculum-map.js']) assert.ok(map.includes(`"${file}"`) && fs.existsSync(path.join(root, file)), `${file} should be loaded`);
   for (const grade of [7, 8]) {
     const article = map.match(new RegExp(`<article class="curriculum-grade curriculum-grade-${grade}"[\\s\\S]*?<\\/article>`))?.[0];

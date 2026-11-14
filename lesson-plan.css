@@ -120,6 +120,37 @@
 .copy-table-button:focus-visible { background: var(--grade-soft); }
 .lesson-record { scroll-margin-top: 1rem; }
 .lesson-record > .copy-table-button { margin: 0 0 .5rem; }
+.lesson-content .lesson-record-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: .65rem;
+  padding: 0;
+  list-style: none;
+  scroll-margin-top: 1rem;
+}
+
+.lesson-record-links li { margin: 0; padding: 0; scroll-margin-top: 1rem; }
+.lesson-record-links a {
+  display: grid;
+  height: 100%;
+  gap: .15rem;
+  padding: .6rem .85rem;
+  border: 1px solid var(--site-border);
+  border-radius: .65rem;
+  text-decoration: none;
+}
+
+.lesson-record-links a span { color: #475569; font-size: .8rem; }
+.lesson-record-links a:hover,
+.lesson-record-links li:target a { border-color: var(--grade-primary); background: var(--grade-soft); }
+.lesson-record-help {
+  margin-top: 1.5rem;
+  border: 1px solid var(--site-border);
+  border-radius: .65rem;
+  padding: .65rem .85rem;
+}
+.lesson-record-help summary { font-weight: 700; cursor: pointer; }
+
 .copy-status:not(:empty) {
   position: sticky;
   top: .5rem;

@@ -10,7 +10,7 @@ window.LessonAssessments = {
     ],
     "successCriteria": "能說明積木何時執行、會改變什麼。三題都選出安全或合宜的做法，並說出理由。",
     "lessonPlan": "lesson-plan-grade-7.html#lesson-1",
-    "records": "student-records.html#g7-01",
+    "records": "student-record-g7-01.html",
     "overview": "1150700.html",
     "next": "1150702.html"
   },
@@ -24,7 +24,7 @@ window.LessonAssessments = {
     ],
     "successCriteria": "三種配對正確。測試紀錄有預測與實際結果，能說明條件不成立時走哪一支，或哪段指令會重複、會做幾次。結果不同時，指出從哪一塊積木開始不同。",
     "lessonPlan": "lesson-plan-grade-7.html#lesson-2",
-    "records": "student-records.html#g7-02",
+    "records": "student-record-g7-02.html",
     "overview": "1150700.html",
     "previous": "1150701.html",
     "next": "1150703.html"
@@ -39,7 +39,7 @@ window.LessonAssessments = {
     ],
     "successCriteria": "兩個圖形都閉合。三角形重複 3 次、每次轉 120 度，五邊形重複 5 次、每次轉 72 度。能用「360 ÷ 邊數」解釋轉角，並指出改錯角度前後的差異。",
     "lessonPlan": "lesson-plan-grade-7.html#lesson-3",
-    "records": "student-records.html#g7-03",
+    "records": "student-record-g7-03.html",
     "overview": "1150700.html",
     "previous": "1150702.html",
     "next": "1150704.html"
@@ -54,7 +54,7 @@ window.LessonAssessments = {
     ],
     "successCriteria": "螺旋的邊長會依設定改變。追蹤表的數值與作品相符，能指出更新積木換位置後，第一輪移動長度怎麼變。",
     "lessonPlan": "lesson-plan-grade-7.html#lesson-4",
-    "records": "student-records.html#g7-04",
+    "records": "student-record-g7-04.html",
     "overview": "1150700.html",
     "previous": "1150703.html",
     "next": "1150705.html"
@@ -69,7 +69,7 @@ window.LessonAssessments = {
     ],
     "successCriteria": "兩組圖形都能畫出來。能指出哪段程式在重複、改了哪個數值，以及圖形哪裡跟著改變。",
     "lessonPlan": "lesson-plan-grade-7.html#lesson-5",
-    "records": "student-records.html#g7-05",
+    "records": "student-record-g7-05.html",
     "overview": "1150700.html",
     "previous": "1150704.html",
     "next": "1150706.html"
@@ -85,7 +85,7 @@ window.LessonAssessments = {
     ],
     "successCriteria": "作品能啟動並依參數改變圖形。紀錄清楚區分 Scratch 實測和網頁資料，能從有效組合中選出實測消耗最少的一組，並用數據說明理由與修正結果。",
     "lessonPlan": "lesson-plan-grade-7.html#lesson-6",
-    "records": "student-records.html#g7-06",
+    "records": "student-record-g7-06.html",
     "overview": "1150700.html",
     "previous": "1150705.html"
   },
@@ -100,7 +100,7 @@ window.LessonAssessments = {
     ],
     "successCriteria": "四種操作的順序和長度變化正確。程式從第 1 項逐項比對，找到就停，全部比完才判定找不到；兩筆紀錄都寫出停止原因。",
     "lessonPlan": "lesson-plan-grade-8.html#lesson-1",
-    "records": "student-records.html#g8-01",
+    "records": "student-record-g8-01.html",
     "overview": "1150800.html",
     "next": "1150802.html"
   },
@@ -115,7 +115,7 @@ window.LessonAssessments = {
     ],
     "successCriteria": "旋律照清單順序播放。改一項後，能指出哪個索引和音符改變、聽到什麼差異。素材使用的理由說明何時應先徵得同意或確認授權。",
     "lessonPlan": "lesson-plan-grade-8.html#lesson-2",
-    "records": "student-records.html#g8-02",
+    "records": "student-record-g8-02.html",
     "overview": "1150800.html",
     "previous": "1150801.html",
     "next": "1150803.html"
@@ -129,7 +129,7 @@ window.LessonAssessments = {
     ],
     "successCriteria": "多筆與單筆的累計值和平均正確。空清單記為 0 筆，說明除數是 0，所以不能直接算平均。",
     "lessonPlan": "lesson-plan-grade-8.html#lesson-3",
-    "records": "student-records.html#g8-03",
+    "records": "student-record-g8-03.html",
     "overview": "1150800.html",
     "previous": "1150802.html",
     "next": "1150804.html"
@@ -144,7 +144,7 @@ window.LessonAssessments = {
     ],
     "successCriteria": "4 個座號都不同，每輪候選少 1 人、已選多 1 人。能指出程式在哪一步把抽到的座號從候選清單移除。",
     "lessonPlan": "lesson-plan-grade-8.html#lesson-4",
-    "records": "student-records.html#g8-04",
+    "records": "student-record-g8-04.html",
     "overview": "1150800.html",
     "previous": "1150803.html",
     "next": "1150805.html",
@@ -169,7 +169,7 @@ window.LessonAssessments = {
     ],
     "successCriteria": "排序輸出由小到大，前項大於後項才交換。能說明排序何時停止，並比對洗牌與排序前後的項目，確認每個數值出現的次數都相同。",
     "lessonPlan": "lesson-plan-grade-8.html#lesson-5",
-    "records": "student-records.html#g8-05",
+    "records": "student-record-g8-05.html",
     "overview": "1150800.html",
     "previous": "1150804.html",
     "next": "1150806.html"
@@ -185,7 +185,7 @@ window.LessonAssessments = {
     ],
     "successCriteria": "主程式依序呼叫建立、洗牌、分配、對決，能說明各積木使用哪些清單。足夠時能分配並對決，不足時能停止或提示，抽取不重複，並能用重測結果說明修正。",
     "lessonPlan": "lesson-plan-grade-8.html#lesson-6",
-    "records": "student-records.html#g8-06",
+    "records": "student-record-g8-06.html",
     "overview": "1150800.html",
     "previous": "1150805.html"
   }

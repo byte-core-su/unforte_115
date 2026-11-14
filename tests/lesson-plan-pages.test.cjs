@@ -7,10 +7,13 @@ const CourseScenarios = require('../course-scenarios.js');
 
 const root = path.resolve(__dirname, '..');
 const home = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const prep = fs.readFileSync(path.join(root, 'teacher-resources.html'), 'utf8');
 const guides = fs.readFileSync(path.join(root, 'learning-guides.js'), 'utf8');
 const records = fs.readFileSync(path.join(root, 'STUDENT_RECORDS.md'), 'utf8');
 assert.match(records, /第 4 課｜不重複抽取\n<!-- assessment:g8-04 -->/);
-const recordPage = fs.readFileSync(path.join(root, 'student-records.html'), 'utf8');
+const recordIndex = fs.readFileSync(path.join(root, 'student-records.html'), 'utf8');
+assert.equal((recordIndex.match(/href="student-record-g[78]-0[1-6]\.html"/g) || []).length, 12);
+assert.doesNotMatch(recordIndex, /class="lesson-record" id=/);
 const routes = fs.readFileSync(path.join(root, 'lesson-routes.js'), 'utf8');
 const assessments = fs.readFileSync(path.join(root, 'lesson-assessments.js'), 'utf8');
 execFileSync(process.execPath, [path.join(root, 'scripts/build-lesson-plans.cjs'), '--check'], { cwd: root });
@@ -36,7 +39,13 @@ for (const grade of [7, 8]) {
     const exit = steps.at(-1);
     const planPage = fs.readFileSync(path.join(root, `lesson-plan-grade-${grade}.html`), 'utf8');
     const planSection = planPage.split(`id="lesson-${lesson}"`)[1].split(/<h[23][ >]/)[0];
-    const recordSection = recordPage.split(`id="${id}"`)[1].split(/<div class="lesson-record"|<\/article>/)[0];
+    assert.equal(module.resources.records, `student-record-${id}.html`);
+    assert.ok(recordIndex.includes(`id="${id}"><a href="${module.resources.records}"`), `${id}: keep the directory entry and old anchor`);
+    const recordPage = fs.readFileSync(path.join(root, module.resources.records), 'utf8');
+    assert.deepEqual([...recordPage.matchAll(/class="lesson-record" id="([^"]+)"/g)].map(([, value]) => value), [id]);
+    assert.ok(recordPage.includes(`href="${page}">回到本課教材`), `${id}: link back to lesson`);
+    assert.match(recordPage, /複製本課紀錄與要求/);
+    const recordSection = recordPage.split(`id="${id}"`)[1].split('</article>')[0];
     const overviewCard = overview.split(`href="${page}"`)[1].split('</a>')[0];
     const mapCard = curriculumMap.split(`href="${page}"`)[1].split('</a>')[0];
     for (const html of [section.innerHTML, planSection, recordSection, overviewCard, mapCard]) {
@@ -50,7 +59,8 @@ for (const grade of [7, 8]) {
     }
     const title = CourseScenarios.escapeHtml(module.title);
     assert.ok(fs.readFileSync(path.join(root, page), 'utf8').includes(`<title>${title}｜資訊科技課程</title>`));
-    for (const html of [section.innerHTML, planSection, recordSection]) assert.ok(html.includes(title), `${id}: same formal title`);
+    for (const html of [section.innerHTML, planSection, recordPage]) assert.ok(html.includes(title), `${id}: same formal title`);
+    assert.ok(planSection.includes(`href="${module.resources.records}"`), `${id}: plan links to its own record page`);
     assert.ok(planSection.includes(`${module.periods} 節`), `${id}: recommended periods remain in the plan`);
     for (const step of steps.filter(step => step.optional)) assert.ok(planSection.includes(CourseScenarios.escapeHtml(step.title)));
     if (module.activity) {
@@ -74,13 +84,13 @@ for (const grade of [7, 8]) {
     assert.match(section.innerHTML, /今天做什麼[\s\S]*從哪裡開始[\s\S]*最後交什麼/);
     assert.match(section.innerHTML, /data-lesson-start/);
     assert.doesNotMatch(section.innerHTML, /怎樣算達標|離堂檢核/);
-    assert.match(section.innerHTML, new RegExp(`href="student-records\\.html#${id}"[^>]*>打開學習紀錄表`));
+    assert.match(section.innerHTML, new RegExp(`href="student-record-${id}\\.html"[^>]*>打開學習紀錄表`));
     assert.match(section.innerHTML, new RegExp(`href="lesson-plan-grade-${grade}\\.html#lesson-${lesson}"[^>]*>教師備課：本課教案`), `${page}: teachers should reach this lesson's plan`);
   }
   const filename = `lesson-plan-grade-${grade}.html`;
   const html = fs.readFileSync(path.join(root, filename), 'utf8');
   const map = home.match(new RegExp(`<article class="curriculum-grade curriculum-grade-${grade}"[^>]*>([\\s\\S]*?)<\\/article>`))?.[1];
-  const resources = home.match(new RegExp(`<div id="grade-${grade}"[^>]*>([\\s\\S]*?)<\\/div>`))?.[1];
+  const resources = prep.match(new RegExp(`<div id="grade-${grade}"[^>]*>([\\s\\S]*?)<\\/div>`))?.[1];
   assert.ok(map, `grade ${grade} home map should exist`);
   assert.ok(resources, `grade ${grade} teaching resources should exist`);
   assert.match(map, new RegExp(`href="1150${grade}00.html"`));
@@ -104,15 +114,14 @@ for (const grade of [7, 8]) {
 }
 
 // Shared teaching documents are rendered pages, not raw Markdown, wherever teachers click them.
-for (const [source, page, heading] of [['STUDENT_RECORDS.md', 'student-records.html', '第 6 課｜參數測試與資料應用'], ['CURRICULUM_ALIGNMENT.md', 'curriculum-alignment.html', '官方來源與引用方式']]) {
+for (const [source, page, heading] of [['STUDENT_RECORDS.md', 'student-records.html', '七、八年級課程學習紀錄表'], ['CURRICULUM_ALIGNMENT.md', 'curriculum-alignment.html', '官方來源與引用方式']]) {
   const html = fs.readFileSync(path.join(root, page), 'utf8');
   assert.ok(html.includes(heading), `${page} should be built from ${source}`);
-  assert.match(home, new RegExp(`href="${page}"`), `home should link ${page}`);
-  assert.doesNotMatch(home, new RegExp(`href="${source}"`), `home should not link raw ${source}`);
+  assert.match(prep, new RegExp(`href="${page}"`), `teacher prep should link ${page}`);
+  assert.doesNotMatch(prep, new RegExp(`href="${source}"`), `teacher prep should link the rendered page for ${source}`);
   for (const [, href] of html.matchAll(/href="([^"#]+)/g)) {
     if (!/^(?:https?:|mailto:)/.test(href)) assert.ok(fs.existsSync(path.join(root, href)), `${page} has a missing local link: ${href}`);
   }
 }
-assert.match(recordPage, /複製本課紀錄與要求/);
 
 console.log('lesson plan pages and links passed');

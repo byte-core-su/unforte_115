@@ -1,4 +1,4 @@
-/* Home page: a quiet teacher index. Both grades side by side; everything else is plain lists. */
+/* Course homepage and teacher resources. */
 .site-home {
   --ink: #1d2433;
   --muted: #5a6474;
@@ -163,63 +163,63 @@
   line-height: 1.7;
 }
 
-/* Teacher resources */
-.tool-cards {
-  margin-top: 2.5rem;
-  border-top: 1px solid var(--line);
-  padding-top: 2.5rem;
+.teacher-prep { display: grid; gap: 1.25rem; align-content: start; }
+.site-home .teacher-prep__heading { margin-bottom: .85rem; }
+.teacher-prep__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
 }
 
-.tool-card {
-  display: grid;
-  gap: .75rem;
+.teacher-prep__card {
   border: 1px solid var(--line);
   border-radius: .75rem;
   background: var(--paper);
-  padding: 1.25rem 1.4rem;
+  padding: 1rem 1.25rem;
   scroll-margin-top: 1rem;
 }
 
-.site-home .tool-card h2 { font-size: 1.15rem; }
-.site-home .tool-card-intro { margin-top: -.5rem; color: var(--muted); font-size: .92rem; }
+.teacher-prep__grid .teacher-prep__card { border-top: 4px solid var(--g7); }
+.teacher-prep__grid .teacher-prep__card--g8 { border-top-color: var(--g8); }
+.site-home .teacher-prep__card h2,
+.site-home .teacher-prep__card h3 { font-size: 1.12rem; line-height: 1.4; }
 
-.prep-row {
-  display: grid;
-  grid-template-columns: 3.5rem minmax(0, 1fr);
-  align-items: baseline;
-  gap: 1rem;
-  border-top: 1px solid var(--line);
-  padding-top: .7rem;
-}
-
-.site-home .prep-row h3 {
-  color: var(--muted);
-  font-size: .88rem;
-  font-weight: 700;
-}
-
-.prep-links {
+.teacher-prep__links {
   display: flex;
   flex-wrap: wrap;
-  gap: .35rem 1.1rem;
+  gap: .45rem .65rem;
+  margin: .75rem 0 0;
+  padding: 0;
+  list-style: none;
 }
 
-.prep-row a {
+.site-home .teacher-prep__links a {
+  display: inline-block;
+  padding: .28rem .6rem;
+  border-radius: .45rem;
+  background: var(--g7-soft);
   color: var(--g7);
+  font-size: .9rem;
   font-weight: 700;
-  text-decoration: none;
+  text-underline-offset: .2em;
 }
 
-.prep-row a:hover { text-decoration: underline; text-underline-offset: 4px; }
-
-.prep-row small {
-  margin-left: .3rem;
-  color: var(--muted);
-  font-size: .78rem;
-  font-weight: 400;
+.site-home .teacher-prep__card--g8 a {
+  background: var(--g8-soft);
+  color: var(--g8);
 }
 
-#teacher-demo-note { flex-basis: 100%; margin: 0; color: var(--muted); font-size: .8rem; line-height: 1.6; }
+.teacher-prep__links a:hover { text-decoration-thickness: 2px; }
+
+.teacher-prep__demo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem 1rem;
+}
+
+.site-home #teacher-demo-note { margin-top: .3rem; color: var(--muted); font-size: .9rem; }
 
 .demo-toggle {
   border: 1px solid #d97706;
@@ -248,7 +248,8 @@
 .home-footer a { text-decoration: underline; text-underline-offset: 3px; }
 
 @media (max-width: 860px) {
-  .course-grid { grid-template-columns: minmax(0, 1fr); }
+  .course-grid,
+  .teacher-prep__grid { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (max-width: 520px) {
@@ -260,6 +261,6 @@
 
 @media print {
   .home-nav,
-  .tool-cards { display: none; }
+  .teacher-prep__demo { display: none; }
   .site-home { background: #fff; }
 }

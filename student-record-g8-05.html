@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="八年級第 5 課｜洗牌與相鄰比較排序｜學習紀錄表。教師可複製這一課的要求與表格，貼到班級平台的線上作業。">
+    <title>八年級第 5 課｜洗牌與相鄰比較排序｜資訊科技課程教材</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="site-theme.css">
+    <link rel="stylesheet" href="lesson-plan.css">
+</head>
+<body class="site-course site-course--g8 lesson-page">
+    <header class="lesson-hero">
+        <div class="lesson-hero__inner">
+            <div class="lesson-hero__top">
+                <a class="lesson-hero__link" href="student-records.html">← 學習紀錄表目錄</a>
+                <a class="lesson-hero__link" href="1150805.html">回到本課教材 →</a>
+            </div>
+            <h1>八年級第 5 課｜洗牌與相鄰比較排序</h1>
+            <p class="lesson-hero__summary">學習紀錄表。教師可複製這一課的要求與表格，貼到班級平台的線上作業。</p>
+        </div>
+    </header>
+    <main class="lesson-shell">
+        <article class="lesson-content" aria-label="八年級第 5 課｜洗牌與相鄰比較排序">
+<p id="copy-status" class="copy-status" role="status"></p>
+<div class="lesson-record" id="g8-05">
+<p><strong>必交項目</strong></p>
+<ul class="evidence-list" role="list"><li>一次洗牌紀錄</li><li>一張相鄰比較的排序追蹤表</li><li>一份 Scratch 排序程式</li></ul>
+<p><strong>怎樣算達標</strong> 排序輸出由小到大，前項大於後項才交換。能說明排序何時停止，並比對洗牌與排序前後的項目，確認每個數值出現的次數都相同。</p>
+<div class="lesson-table-scroll"><table>
+<thead>
+<tr>
+<th>洗牌或排序</th>
+<th>步驟</th>
+<th>操作前清單</th>
+<th>抽取／比較的項目</th>
+<th>移除或交換了什麼</th>
+<th>操作後清單</th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td>1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>2</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>3</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table></div>
+<p>兩項活動分開記錄，步驟不足時加列。排序在＿＿時可以停。為了檢查有沒有多出或少掉資料，我比對了＿＿。</p>
+</div>
+        </article>
+    </main>
+    <footer class="lesson-footer">
+        <div class="lesson-footer__inner">
+            <span>115 學年度資訊科技課程教材・內容同步自 STUDENT_RECORDS.md</span>
+            <a href="lesson-plan-grade-8.html#lesson-5">查看本課教案 →</a>
+        </div>
+    </footer>
+    <script>
+    (() => {
+        const status = document.getElementById('copy-status');
+        document.querySelectorAll('.lesson-record, .lesson-table-scroll').forEach((wrapper, index) => {
+            if (wrapper.matches('.lesson-table-scroll') && wrapper.closest('.lesson-record')) return;
+            const record = wrapper.matches('.lesson-record');
+            const content = record ? wrapper : wrapper.querySelector('table');
+            const heading = record ? document.querySelector('h1').textContent.trim() : (() => {
+                for (let node = wrapper.previousElementSibling; node; node = node.previousElementSibling) {
+                    if (/^H[23]$/.test(node.tagName)) return node.textContent.trim();
+                }
+                return '紀錄 ' + (index + 1);
+            })();
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'copy-table-button';
+            button.textContent = record ? '複製本課紀錄與要求' : '複製表格';
+            button.setAttribute('aria-label', '複製「' + heading + '」' + (record ? '紀錄與要求' : '表格'));
+            button.addEventListener('click', async () => {
+                const copy = content.cloneNode(true);
+                if (record) {
+                    copy.querySelector('.copy-table-button')?.remove();
+                    const title = document.createElement('h2');
+                    title.textContent = heading;
+                    copy.prepend(title);
+                }
+                const asText = table => [...table.rows].map(row => [...row.cells].map(cell => cell.textContent.trim()).join('\t')).join('\n');
+                const plain = record ? [...copy.children].map(node => {
+                    const table = node.querySelector('table');
+                    if (table) return asText(table);
+                    if (node.matches('ul')) return [...node.children].map(item => '• ' + item.textContent.trim()).join('\n');
+                    return node.textContent.trim();
+                }).join('\n\n') : asText(copy);
+                try {
+                    await navigator.clipboard.write([new ClipboardItem({
+                        'text/html': new Blob([copy.outerHTML], { type: 'text/html' }),
+                        'text/plain': new Blob([plain], { type: 'text/plain' })
+                    })]);
+                    status.textContent = '已複製「' + heading + '」，可貼到線上文件或作業。';
+                } catch {
+                    const range = document.createRange();
+                    if (record) {
+                        range.setStartAfter(button);
+                        range.setEndAfter(content.lastElementChild);
+                    } else range.selectNode(content);
+                    const selection = getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                    let copied = false;
+                    try { copied = document.execCommand('copy'); } catch {}
+                    status.textContent = copied
+                        ? '已複製「' + heading + '」，可貼到線上文件或作業。'
+                        : '已選取「' + heading + '」，請按 Ctrl+C（Mac 按 ⌘+C）複製。';
+                }
+            });
+            if (record) wrapper.prepend(button);
+            else wrapper.before(button);
+        });
+    })();
+    </script>
+</body>
+</html>
