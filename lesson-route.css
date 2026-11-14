@@ -22,9 +22,14 @@ html:not([data-teacher-route]) :is(.learning-guide__teacher, .learning-guide__re
   line-height: 1.7;
 }
 
-.site-course > .lesson-route {
+.site-course > :is(.lesson-route, .learning-guide, .lesson-activity, #adaptive-practice, #curriculum-lab) {
   width: min(72rem, 100% - 2rem);
+  max-width: none;
   margin-inline: auto;
+}
+
+.site-course > :is(.learning-guide, .lesson-activity, #adaptive-practice, #curriculum-lab) {
+  padding-inline: 0;
 }
 
 .lesson-route--completion { border-top: 1px solid #d5dbe6; }

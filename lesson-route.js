@@ -100,6 +100,7 @@
     completion.className = 'lesson-route lesson-route--completion';
     completion.setAttribute('aria-label', '完成這一步');
     const main = document.querySelector('main');
+    main.classList.add('lesson-activity');
     main.after(panel, completion);
     const startButton = document.querySelector('[data-lesson-start]');
     const guide = document.querySelector('#learning-guide');
@@ -117,11 +118,11 @@
     (guideHeading || guide || main).before(progress);
 
     function placeControls() {
-      const unique = [...new Set(viewedStep().regions)];
+      const unique = [...new Set(viewedStep().regions.map(region => main.contains(region) ? main : region))];
       const regions = unique.filter(region => !unique.some(other => other !== region && other.contains(region)))
         .sort((a, b) => a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
       if (!atEnd() && regions.length) {
-        // Place beside the current activity without moving any of its existing controls.
+        // Keep the route controls at the same width as the activity's outer container.
         if (regions[0].previousElementSibling !== panel) regions[0].before(panel);
         const last = regions.at(-1);
         if (last.nextElementSibling !== completion) last.after(completion);
