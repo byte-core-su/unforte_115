@@ -898,23 +898,22 @@
                                     </div>
 
                                     <!-- 箭頭 -->
-                                    <div class="flex justify-center -my-3 relative z-0">
-                                        <div class="bg-white p-1 rounded-full border border-slate-200 shadow-sm z-20"><i data-lucide="arrow-down" class="w-5 h-5 text-orange-400"></i></div>
-                                        <div class="absolute w-0.5 h-full bg-slate-200 -z-10"></div>
-                                    </div>
-
-                                    <!-- Step 3: Scratch 積木 -->
-                                    <div class="bg-orange-50 border border-orange-200 rounded-2xl p-6 relative z-10 shadow-sm">
-                                        <div class="flex items-center gap-3 mb-3">
-                                            <span class="flex items-center justify-center w-7 h-7 rounded-full bg-orange-200 text-orange-800 font-black text-sm">3</span>
-                                            <h4 class="text-base font-bold text-orange-900">第三階段：組合為 Scratch 實作積木</h4>
-                                        </div>
-                                        <p class="text-orange-800/80 text-sm mb-4 font-medium leading-relaxed">最後，將這兩階段的公式組合進「重複迴圈」中，電腦就能瞬間幫我們算完所有資料！</p>
-                                        <div class="bg-[#F9F9F9] border border-orange-200/50 p-8 pt-10 rounded-xl flex flex-col gap-0 overflow-x-auto items-start no-scrollbar shadow-inner">
-                                            ${lesson.scratchBlocks.map((b, i) => renderScratchBlock(b, i === 0)).join('')}
-                                        </div>
-                                    </div>
                                 </div>
+                            </section>
+
+                            <section id="route-scratch-statistics" class="min-w-0 bg-orange-50 border border-orange-200 rounded-2xl p-4 md:p-6">
+                                <h3 class="text-lg font-bold text-orange-900 mb-3">Scratch 積木範例</h3>
+                                <a class="inline-flex rounded-lg bg-orange-800 px-4 py-2 font-bold text-white" href="https://scratch.mit.edu/projects/editor/" target="_blank" rel="noopener">開啟 Scratch 編輯器 ↗</a>
+                                <p class="text-slate-700 my-4">在「變數」建立清單「艙房能源」和變數「總能源」「艙房編號」。照下方範例排好積木，再換資料測試。</p>
+                                <div class="bg-white border border-orange-200/50 p-4 md:p-8 rounded-xl flex flex-col overflow-x-auto items-start" role="region" aria-label="統計程式的積木範例" tabindex="0">
+                                    ${lesson.scratchBlocks.map((b, i) => renderScratchBlock(b, i === 0)).join('')}
+                                </div>
+                                <h4 class="font-bold text-orange-900 mt-5 mb-2">用三組資料檢查</h4>
+                                <ul class="list-disc pl-6 space-y-1 text-slate-700">
+                                    <li>輸入 120、80、150，總能源應為 350，平均約 116.67。</li>
+                                    <li>只留 80，總能源和平均都應為 80。</li>
+                                    <li>清空清單，角色應說「沒有資料，無法計算平均」。</li>
+                                </ul>
                             </section>
 
                             <!-- 單元導覽按鈕 -->
