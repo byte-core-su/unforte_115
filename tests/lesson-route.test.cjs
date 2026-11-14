@@ -30,7 +30,7 @@ for (const page of pages) {
   };
   vm.runInNewContext(read('lesson-routes.js'), { window, location: { pathname: `/${page}` } });
   assert.ok(started, `${page} should start a learning route`);
-  const { steps, next, teacherFinish } = started;
+  const { steps, references = [], next, teacherFinish } = started;
   assert.equal(steps[0].title, '認識任務');
   assert.equal(steps[0].anchors[0], '#learning-guide');
   assert.equal(steps[0].checks, undefined, `${page}: introduction has no completion checklist`);
@@ -38,6 +38,9 @@ for (const page of pages) {
   assert.ok(steps.some(step => /Scratch/.test(step.title)), `${page} should include a Scratch hands-on step`);
   assert.equal(steps.at(-2).optional, true, `${page}: practice can be skipped without blocking submission`);
   assert.ok(!steps.at(-1).optional, `${page}: submission is the last required step`);
+  const referenceIds = [...html.matchAll(/<details id="(route-lesson-(?:objectives|key-points))"/g)].map(([, id]) => `#${id}`);
+  assert.deepEqual(Array.from(references), referenceIds, `${page}: lesson references belong in the header`);
+  assert.ok(steps.every(step => (step.anchors || []).every(anchor => !referenceIds.includes(anchor))), `${page}: references should remain available during each step`);
   for (const step of steps.slice(1)) {
     assert.ok(step.todo && step.todo.length > 8, `${page} / ${step.title}: needs a clear instruction`);
     assert.ok(Array.isArray(step.checks) && step.checks.length, `${page} / ${step.title}: needs completion checks`);

@@ -77,6 +77,13 @@
     <!-- React 應用程式掛載點 -->
     <main id="app-container" class="max-w-6xl mx-auto px-4 lg:px-8 py-12 relative min-h-[50vh]"></main>
 
+    <details id="route-lesson-objectives" class="lesson-reference">
+        <summary>清單和索引是什麼？</summary>
+        <div class="bg-indigo-50 text-indigo-900 p-5 rounded-2xl border border-indigo-100/50 leading-relaxed font-medium">
+            一個變數一次存一個值，清單可以依序存放多筆資料。每個項目的位置叫「索引」，例如清單最上面是第 1 項。
+        </div>
+    </details>
+
     <footer class="bg-slate-50 border-t border-slate-200 mt-10 py-8">
         <div class="max-w-6xl mx-auto px-6 lg:px-8 text-center">
             <p data-scenario-text="footer" class="text-sm font-medium text-slate-400">© 演算法與程式設計 - 星際陣列指揮官</p>
@@ -97,18 +104,11 @@
         // 課程介紹標頭 (原網頁的保留資料)
         // ==========================================
         const LessonHeader = () => (
-            <div className="slide-up-fade mb-10">
+            <div data-course-direction="outline" className="slide-up-fade mb-10">
                 <button data-course-direction="outline" onClick={() => window.location.href="1150800.html"} className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors px-4 py-2 rounded-xl hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm mb-6">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 
                     返回任務儀表板
                 </button>
-                <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                    <details id="route-lesson-objectives" className="lesson-reference"><summary>清單和索引是什麼？</summary>
-                        <div className="bg-indigo-50 text-indigo-900 p-5 rounded-2xl border border-indigo-100/50 leading-relaxed font-medium">
-                            一個變數一次存一個值，清單可以依序存放多筆資料。每個項目的位置叫「索引」，例如清單最上面是第 1 項。
-                        </div>
-                    </details>
-                </div>
             </div>
         );
 

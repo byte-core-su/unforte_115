@@ -246,8 +246,9 @@ button { transition: transform .18s ease, box-shadow .18s ease, background-color
 .learning-guide--mission + .learning-guide { width: min(72rem, 100% - 2rem); padding-inline: 0; }
 .learning-guide--mission { margin-top: 0; }
 .learning-guide--mission .learning-guide__card { padding-block: .85rem; }
-.learning-guide--mission p { margin: 0; color: #475569; }
+.learning-guide--mission .learning-guide__card > p { margin: 0; color: #475569; }
 .learning-guide--mission + .learning-guide { margin-top: .8rem; }
+.learning-guide__references { display: grid; gap: .5rem; margin-top: .8rem; }
 
 .learning-guide__tag {
   display: inline-flex;

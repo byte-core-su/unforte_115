@@ -158,7 +158,7 @@
         checks: ['Scratch 作品能一鍵啟動', '三組測試表完成，並修正重測一次', '能用 60 秒說明作品'],
         hints: ['網頁模擬器不能代替自己的作品，請一定要在 Scratch 做一次。'] })
     ]),
-    '1150801.html': route(['#route-lesson-objectives'], [
+    '1150801.html': route([], [
       { title: '清單操作任務', anchors: ['#route-list-missions'],
         todo: '跟著左邊的任務一步步按按鈕，觀察右邊裝備庫的項目和長度怎麼變，走完五個航點；完成後再自己試新增、插入、替換、刪除。',
         checks: ['走完星際航線五個航點', '每次操作後，說得出清單的項目與長度'],
@@ -172,7 +172,7 @@
         checks: ['有四種操作的前後對照', 'Scratch 搜尋程式能執行，兩筆紀錄都寫出在哪裡停和為什麼'],
         hints: ['清單在「變數」分類，按「建立一個清單」。搜尋時用索引從第 1 項開始比，找到或比完就停。'] })
     ]),
-    '1150802.html': route(['#route-lesson-objectives'], [
+    '1150802.html': route([], [
       { title: '讀懂播放程式', anchors: [{ up: '#route-music-pseudocode' }, { up: '#route-music-blocks' }],
         todo: '對照左邊的虛擬碼和右邊的 Scratch 積木，找出「第幾個音」從 1 開始、每圈加 1 的地方。',
         checks: ['說得出「第幾個音」怎麼決定要播哪一個音'],
@@ -194,7 +194,7 @@
         checks: ['短旋律能依序播放', '改動一項後，說得出聽到的差異', '寫好索引對照表（第幾項＝哪個音）'],
         hints: ['音樂積木要先從左下角「擴充功能」加入。'] })
     ]),
-    '1150803.html': route(['#route-lesson-objectives', '#route-lesson-key-points'], [
+    '1150803.html': route([], [
       { title: '暖身：變數累加', anchors: [{ up: '#route-accumulator-warmup' }],
         todo: '用下拉選單完成迴圈內的邏輯，按「驗證邏輯」；答對後執行，看「序號」和「累加值」怎麼變。',
         checks: ['驗證通過並執行過', '說得出前三圈的累加值'],
@@ -212,7 +212,7 @@
         checks: ['總和與平均正確', '單筆資料結果正確', '空清單時程式不會出錯（有先判斷）'],
         hints: ['算平均前先用「如果 清單的長度 > 0 那麼」判斷。'] })
     ]),
-    '1150804.html': route(['#route-lesson-key-points'], [
+    '1150804.html': route([], [
       { title: '抽籤模擬器', anchors: [{ up: '#route-draw-simulator' }],
         todo: draw.preview,
         questions: { before: draw.questions.before, during: draw.questions.during },
@@ -233,7 +233,7 @@
         checks: [drawLesson.successCriteria],
         hints: ['隨機範圍要用「1 到 清單的長度」，不要寫死 30。'] })
     ]),
-    '1150805.html': route(['#route-lesson-objectives', '#route-lesson-key-points'], [
+    '1150805.html': route([], [
       { title: '洗牌模擬器', anchors: [{ up: '#route-shuffle-simulator' }],
         todo: '一直按「執行洗牌步驟」直到牌堆變空，觀察每次從牌堆抽一張移到洗牌清單。',
         checks: ['牌堆抽到空', '說得出兩個清單的長度每次怎麼變'],
@@ -263,7 +263,7 @@
         checks: ['Scratch 排序程式能執行，並有比較與交換紀錄', '洗牌和排序前後，每個數值出現的次數都相同'],
         hints: ['前項比後項大才交換。比對各數值各有幾筆，例如原來有兩個 3，處理後也要有兩個 3。'] })
     ]),
-    '1150806.html': route(['#route-lesson-objectives', '#route-lesson-key-points'], [
+    '1150806.html': route([], [
       { title: '對決模擬器', anchors: [{ up: '#route-duel-simulator' }],
         todo: '按「整備清單」並依按鈕提示一步步執行，觀察三個清單怎麼建立、洗牌、分配與對決。',
         checks: ['模擬器完整跑完一次對決'],
@@ -290,7 +290,17 @@
 
   const next = guide.next ? { href: guide.next, label: '前往下一單元' } : null;
   const teacherFinish = guide.overview ? { href: guide.overview, label: '回到課程總覽' } : null;
+  const objectives = '#route-lesson-objectives';
+  const keyPoints = '#route-lesson-key-points';
+  const references = {
+    '1150801.html': [objectives],
+    '1150802.html': [objectives],
+    '1150803.html': [objectives, keyPoints],
+    '1150804.html': [keyPoints],
+    '1150805.html': [objectives, keyPoints],
+    '1150806.html': [objectives, keyPoints]
+  };
 
   window.LessonRoutes = routes;
-  if (routes[page] && window.LessonRoute) window.LessonRoute.start({ steps: routes[page], next, teacherFinish });
+  if (routes[page] && window.LessonRoute) window.LessonRoute.start({ steps: routes[page], references: references[page], next, teacherFinish });
 })();

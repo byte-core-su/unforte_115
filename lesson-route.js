@@ -104,6 +104,13 @@
     const startButton = document.querySelector('[data-lesson-start]');
     const guide = document.querySelector('#learning-guide');
     const guideHeading = document.getElementById('learning-guide-heading');
+    const referenceNodes = (config.references || []).map(findAnchor).filter(Boolean);
+    if (guideHeading && referenceNodes.length) {
+      const references = document.createElement('div');
+      references.className = 'learning-guide__references';
+      references.append(...referenceNodes);
+      guideHeading.querySelector('.learning-guide__card').append(references);
+    }
     const progress = document.createElement('nav');
     progress.className = 'lesson-route lesson-route--progress';
     progress.setAttribute('aria-label', '本課進度');
@@ -322,7 +329,7 @@
 
   // Wait until the page (including script-built or React parts) shows the anchors we need.
   function startWhenReady(config, timeout = 8000) {
-    const needed = config.steps.flatMap(step => step.anchors || []);
+    const needed = [...config.steps.flatMap(step => step.anchors || []), ...(config.references || [])];
     const began = Date.now();
     (function poll() {
       if (needed.every(locator => findAnchor(locator)) || Date.now() - began > timeout) start(config);
