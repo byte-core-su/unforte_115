@@ -84,7 +84,6 @@
         if (demo || finished) link.removeAttribute('data-route-locked');
         else link.setAttribute('data-route-locked', '');
       });
-      document.querySelectorAll('.learning-guide__exit').forEach(node => node.setAttribute('data-route-moved', ''));
     }
 
     // Some pages re-render parts of themselves; keep the locks on the fresh nodes.
@@ -102,6 +101,25 @@
     panel.className = 'lesson-route';
     panel.setAttribute('aria-label', '學習路線');
     document.body.append(panel);
+    const startButton = document.querySelector('[data-lesson-start]');
+    if (startButton) {
+      const first = steps.find(step => step.index > 0 && !step.optional);
+      const status = document.querySelector('.learning-guide__status');
+      startButton.disabled = false;
+      startButton.textContent = `開始：${first.title}`;
+      startButton.addEventListener('click', () => {
+        if (current === 0 && !finished) {
+          if (first.missing && !first.regions.length) {
+            if (status) status.textContent = '活動未能載入。請確認網路後重新整理。';
+            return;
+          }
+          for (const step of steps.slice(1, first.index)) skipped.add(step.index);
+          enter(first.index);
+          panel.querySelector('[data-action="toggle"]').focus({ preventScroll: true });
+        } else if (finished) scrollToStep(first);
+        else scrollToStep(steps[current]);
+      });
+    }
     new ResizeObserver(() => { document.body.style.paddingBottom = `${panel.offsetHeight + 16}px`; }).observe(panel);
 
     function scrollToStep(step) {
@@ -123,6 +141,7 @@
       render();
       window.dispatchEvent(new Event('resize'));
       if (scroll) requestAnimationFrame(() => scrollToStep(step));
+      if (startButton && index > 0) startButton.textContent = '回到目前步驟';
     }
 
     function chips() {
@@ -135,7 +154,9 @@
     }
 
     function render() {
+      panel.hidden = Boolean(startButton && !demo && current === 0);
       if (finished) {
+        if (startButton) startButton.textContent = '回看第一個活動';
         const next = config.next;
         panel.innerHTML = `
           <div class="lesson-route__bar">
@@ -155,6 +176,7 @@
       const step = steps[current];
       const checks = step.checks || [];
       const hints = step.hints || [];
+      const { before, during, after } = step.questions || {};
       panel.innerHTML = `
         <div class="lesson-route__bar">
           <span class="lesson-route__count">第 ${current + 1}／${steps.length} 步</span>${demo ? '<span class="lesson-route__teacher">教師示範</span>' : ''}
@@ -169,7 +191,11 @@
         ${demo ? `<div class="lesson-route__demo"><span>教師示範模式：直接點上方的步驟即可切換。</span><button type="button" data-action="show-all">${showAll ? '恢復逐步路線' : '全部展開'}</button><button type="button" data-action="end-demo">結束示範</button></div>` : ''}
         <div class="lesson-route__body" ${expanded ? '' : 'hidden'}>
           <ol class="lesson-route__chips">${chips()}</ol>
+          ${before ? `<p class="lesson-route__todo"><b>操作前先猜</b>${escapeHtml(before)}</p>` : ''}
           <p class="lesson-route__todo"><b>要做什麼</b>${escapeHtml(step.todo || '')}</p>
+          ${step.evidence?.length ? `<ul class="evidence-list" role="list">${step.evidence.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''}
+          ${during ? `<p class="lesson-route__todo"><b>操作中觀察</b>${escapeHtml(during)}</p>` : ''}
+          ${after ? `<p class="lesson-route__todo"><b>做完後說明</b>${escapeHtml(after)}</p>` : ''}
           ${step.link ? `<p class="lesson-route__link"><a href="${escapeHtml(step.link.href)}" target="_blank" rel="noopener">${escapeHtml(step.link.label)}</a></p>` : ''}
           ${checks.length ? `<fieldset class="lesson-route__checks"><legend>做完一項就勾一項。全部勾好後，按「${current === steps.length - 1 ? '完成本課' : '完成這一步'}」</legend>${checks.map((check, i) => `<label><input type="checkbox" data-check="${i}" ${ticked[i] ? 'checked' : ''}> ${escapeHtml(check)}</label>`).join('')}</fieldset>` : ''}
           ${hints.length ? `<div class="lesson-route__hints">${hints.slice(0, hintsShown).map((hint, i) => `<p><b>提示 ${i + 1}</b>${escapeHtml(hint)}</p>`).join('')}${hintsShown < hints.length ? `<button type="button" data-action="hint">卡住了？看提示 ${hintsShown + 1}／${hints.length}</button>` : ''}</div>` : ''}
@@ -222,7 +248,7 @@
 
     // Once the student starts working in the lesson, fold the panel to one line so it stays out of the way.
     document.addEventListener('pointerdown', event => {
-      if (!expanded || panel.contains(event.target)) return;
+      if (panel.hidden || !expanded || panel.contains(event.target)) return;
       expanded = false;
       render();
     }, true);

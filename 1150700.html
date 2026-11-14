@@ -1,199 +1,153 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <script src="learning-guides.js" defer></script>
     <meta charset="UTF-8">
-    <script src="course-scenarios.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-scenario-text="tabTitle">課程首頁 - 星際防禦工程師</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入 Lucide Icons -->
-    <script src="https://unpkg.com/lucide@1.72.0"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: #F8F9FA; color: #333333; }
-        .slide-up-fade { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
-        @keyframes slideUpFade { 
-            0% { opacity: 0; transform: translateY(20px); } 
-            100% { opacity: 1; transform: translateY(0); } 
-        }
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
-    </style>
+    <title>七年級課程總覽｜資訊科技課程</title>
     <link rel="stylesheet" href="site-theme.css">
+    <script src="course-scenarios.js"></script>
 </head>
-<body class="antialiased selection:bg-slate-200 selection:text-slate-800">
-
-    <header class="bg-white border-b border-gray-100 pt-12 pb-12 slide-up-fade">
-        <div class="max-w-5xl mx-auto px-6 lg:px-8 relative z-10">
-            <p class="text-sm font-bold text-indigo-500 mb-3 tracking-widest uppercase">演算法與程式設計</p>
-            <h1 class="text-3xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight"><span data-scenario-text="name">星際防禦工程師</span>：<br class="hidden md:block"><span data-scenario-text="tagline">用程式編織能量防護網</span></h1>
-            <p data-scenario-text="intro" class="text-lg text-slate-500 font-light max-w-2xl">先練習讀積木和排程式，再用迴圈與變數畫圖。最後做出防禦網，換幾組設定測試。</p>
+<body class="site-course course-overview">
+    <header class="course-overview__header">
+        <div class="course-overview__shell">
+            <a href="index.html">← 返回網站首頁</a>
+            <p class="course-overview__grade">七年級課程總覽</p>
+            <h1>Scratch 程式結構與幾何創作</h1>
         </div>
-        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-indigo-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
-        <div class="absolute bottom-0 right-40 w-72 h-72 bg-sky-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-6 lg:px-8 py-12 relative">
-        
-        <!-- 🚀 情境模擬任務區塊 開始 -->
-        <div class="bg-white rounded-3xl shadow-sm border border-amber-100 p-8 md:p-12 mb-16 slide-up-fade delay-100 relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
-            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500"></div>
-
-            <div class="flex items-center mb-5">
-                <span class="bg-amber-50 text-amber-600 border border-amber-200 px-3 py-1 rounded-full text-xs font-bold tracking-widest shadow-sm">
-                    MISSION BRIEFING
-                </span>
+    <main class="course-overview__shell">
+        <section aria-labelledby="overview-order">
+            <div class="course-overview__heading">
+                <h2 id="overview-order">上課順序</h2>
+                <nav class="course-overview__links" aria-label="課程資源">
+                    <a href="lesson-plan-grade-7.html">教師教案</a>
+                    <a href="student-records.html#g7-01">學習紀錄表</a>
+                    <a data-scenario-download href="11507.zip" download>下載範例程式</a>
+                </nav>
             </div>
-
-            <h2 class="text-3xl font-bold text-slate-800 mb-4 flex items-center gap-3">
-                <span data-scenario-text="briefing.icon" class="text-4xl group-hover:-translate-y-1 transition-transform duration-300">🚀</span>
-                <span data-scenario-text="briefing.title">星際任務：設計隕石防禦網</span>
-            </h2>
-
-            <p data-scenario-text="briefing.intro" class="text-slate-600 font-medium text-lg mb-8 leading-relaxed">隕石正朝基地飛來。請用 Scratch 排出一圈多邊形做成防禦網，再測試隕石會從哪裡穿過。</p>
-
-            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-10 flex items-center gap-4 shadow-inner">
-                <div class="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-3xl shadow-sm">
-                    <span data-scenario-text="briefing.roleIcon">👤</span>
-                </div>
-                <div>
-                    <div class="text-xs text-slate-400 font-bold mb-1 tracking-wider">你的角色</div>
-                    <div data-scenario-text="briefing.role" class="text-xl font-bold text-slate-700">首席防禦系統工程師</div>
-                </div>
-            </div>
-
-            <h3 class="text-xl font-bold text-slate-800 mb-5 flex items-center gap-2">
-                <span>🎯</span> 任務目標
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:border-amber-300 hover:shadow-md transition-all">
-                    <div class="bg-amber-100 text-amber-700 w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold mb-4">1</div>
-                    <h4 class="font-bold text-slate-800 mb-3 text-lg">核心概念實作</h4>
-                    <p data-scenario-text="briefing.practice" class="text-sm text-slate-500 leading-relaxed font-light">先決定邊數和圖形數量（輸入），再用迴圈重複畫圖（處理），看看畫出的防禦網（輸出）。</p>
-                </div>
-                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:border-amber-300 hover:shadow-md transition-all">
-                    <div class="bg-amber-100 text-amber-700 w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold mb-4">2</div>
-                    <h4 class="font-bold text-slate-800 mb-3 text-lg">運算邏輯梳理</h4>
-                    <p class="text-sm text-slate-500 leading-relaxed font-light">在動手寫程式前，請先進行「畫流程圖」，釐清所設定的圖形邊數與旋轉角度邏輯。確認思考過程沒有破洞或盲點後，再開始上機實作。</p>
-                </div>
-                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:border-amber-300 hover:shadow-md transition-all">
-                    <div class="bg-amber-100 text-amber-700 w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold mb-4">3</div>
-                    <h4 data-scenario-text="briefing.designTitle" class="font-bold text-slate-800 mb-3 text-lg">調整防禦網顏色</h4>
-                    <p data-scenario-text="briefing.design" class="text-sm text-slate-500 leading-relaxed font-light">試著把畫筆改成橙色或琥珀色，看看防禦網在背景上是否清楚。</p>
-                </div>
-            </div>
-
-            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-sm">
-                <div class="bg-emerald-100 text-emerald-600 w-12 h-12 flex-shrink-0 rounded-full flex items-center justify-center text-2xl">
-                    🌍
-                </div>
-                <div>
-                    <h3 class="text-emerald-800 font-bold mb-1 text-lg">現實生活應用</h3>
-                    <p data-scenario-text="briefing.application" class="text-emerald-600 text-sm font-medium">雷達掃描涵蓋範圍、基地台訊號無死角覆蓋網、參數化與幾何演算法設計。</p>
-                </div>
-            </div>
-        </div>
-        <!-- 🚀 情境模擬任務區塊 結束 -->
-
-        <hr class="border-slate-200 mb-16 slide-up-fade delay-200">
-
-        <!-- 課程單元導覽 -->
-        <div class="slide-up-fade delay-200">
-            <!-- 加上 flex justify-between 讓左右兩側自動推開 -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                
-                <!-- 左側群組：標題與下載按鈕 -->
-                <div class="flex flex-wrap items-center gap-4">
-                    <h2 class="text-2xl font-bold text-slate-800">課程單元導覽</h2>
-                    <!-- 📥 範例程式下載按鈕 (套用您指定的樣式與圖示) -->
-                    <a data-scenario-download href="11507.zip" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700 rounded-lg text-sm font-bold transition-colors border border-indigo-200 shadow-sm group active:scale-95">
-                        <i data-lucide="download-cloud" class="w-4 h-4 group-hover:-translate-y-0.5 transition-transform"></i>
-                        <span>範例程式下載</span>
+            <ol class="course-overview__grid" role="list">
+                <!-- overview-cards -->
+                <li class="course-overview__item">
+                    <a class="course-overview__card" href="1150701.html" aria-labelledby="overview-number-1 overview-lesson-1">
+                        <div class="course-overview__meta">
+                            <span id="overview-number-1">第 1 課</span>
+                            <span>建議 2 節</span>
+                        </div>
+                        <h3 id="overview-lesson-1">起步診斷：讀懂積木</h3>
+                        <div class="course-overview__work">
+                            <p>必交項目</p>
+                            <ul class="evidence-list" role="list"><li>一則積木用途說明</li><li>個資、素材授權、可疑連結三題的選擇與理由</li></ul>
+                        </div>
+                        <span class="course-overview__open" aria-hidden="true">進入第 1 課 →</span>
                     </a>
-                </div>
+                </li>
+                <li class="course-overview__item">
+                    <a class="course-overview__card" href="1150702.html" aria-labelledby="overview-number-2 overview-lesson-2">
+                        <div class="course-overview__meta">
+                            <span id="overview-number-2">第 2 課</span>
+                            <span>建議 2 節</span>
+                        </div>
+                        <h3 id="overview-lesson-2">程式三大結構</h3>
+                        <div class="course-overview__work">
+                            <p>必交項目</p>
+                            <ul class="evidence-list" role="list"><li>循序、選擇、重複三種配對結果</li><li>一則 Scratch 分支或迴圈的測試紀錄</li></ul>
+                        </div>
+                        <span class="course-overview__open" aria-hidden="true">進入第 2 課 →</span>
+                    </a>
+                </li>
+                <li class="course-overview__item">
+                    <a class="course-overview__card" href="1150703.html" aria-labelledby="overview-number-3 overview-lesson-3">
+                        <div class="course-overview__meta">
+                            <span id="overview-number-3">第 3 課</span>
+                            <span>建議 2 節</span>
+                        </div>
+                        <h3 id="overview-lesson-3">迴圈多邊形</h3>
+                        <div class="course-overview__work">
+                            <p>必交項目</p>
+                            <ul class="evidence-list" role="list"><li>含三角形和五邊形的 Scratch 作品，標註各自的重複次數與轉角</li><li>一次改錯角度再修正的紀錄</li></ul>
+                        </div>
+                        <span class="course-overview__open" aria-hidden="true">進入第 3 課 →</span>
+                    </a>
+                </li>
+                <li class="course-overview__item">
+                    <a class="course-overview__card" href="1150704.html" aria-labelledby="overview-number-4 overview-lesson-4">
+                        <div class="course-overview__meta">
+                            <span id="overview-number-4">第 4 課</span>
+                            <span>建議 2 節</span>
+                        </div>
+                        <h3 id="overview-lesson-4">變數螺旋圖騰</h3>
+                        <div class="course-overview__work">
+                            <p>必交項目</p>
+                            <ul class="evidence-list" role="list"><li>Scratch 螺旋作品</li><li>追蹤表，記下初始值、每次增加量、前 3 輪移動長度，並比較更新積木放在「移動」前後的結果</li></ul>
+                        </div>
+                        <span class="course-overview__open" aria-hidden="true">進入第 4 課 →</span>
+                    </a>
+                </li>
+                <li class="course-overview__item">
+                    <a class="course-overview__card" href="1150705.html" aria-labelledby="overview-number-5 overview-lesson-5">
+                        <div class="course-overview__meta">
+                            <span id="overview-number-5">第 5 課</span>
+                            <span>建議 2 節</span>
+                        </div>
+                        <h3 id="overview-lesson-5">幾何曼陀羅</h3>
+                        <div class="course-overview__work">
+                            <p>必交項目</p>
+                            <ul class="evidence-list" role="list"><li>一份用迴圈和變數繪圖的 Scratch 作品</li><li>兩組不同設定的曼陀羅和簡短說明</li></ul>
+                        </div>
+                        <span class="course-overview__open" aria-hidden="true">進入第 5 課 →</span>
+                    </a>
+                </li>
+                <li class="course-overview__item">
+                    <a class="course-overview__card" href="1150706.html" aria-labelledby="overview-number-6 overview-lesson-6">
+                        <div class="course-overview__meta">
+                            <span id="overview-number-6">第 6 課</span>
+                            <span>建議 2 節</span>
+                        </div>
+                        <h3 id="overview-lesson-6">參數測試與資料應用</h3>
+                        <div class="course-overview__work">
+                            <p>必交項目</p>
+                            <ul class="evidence-list" role="list"><li>一份可調參數的 Scratch 作品</li><li>至少 3 組實測和一筆修正後的重測</li><li>約 60 秒的作品說明</li></ul>
+                        </div>
+                        <span class="course-overview__open" aria-hidden="true">進入第 6 課 →</span>
+                    </a>
+                </li>
+                <!-- /overview-cards -->
+            </ol>
+        </section>
 
-                <!-- 右側群組：副標題強制靠右 -->
-                <p class="text-sm font-medium text-slate-400 whitespace-nowrap text-left md:text-right">共 6 個核心關卡</p>
-                
-            </div>
+        <section class="course-overview__routine" aria-labelledby="overview-routine">
+            <h2 id="overview-routine">每課怎麼做</h2>
+            <ol role="list">
+                <li><strong>先預測</strong><span>讀積木，寫下程式會怎麼跑。</span></li>
+                <li><strong>再動手</strong><span>執行程式，看看哪裡和預測不同。</span></li>
+                <li><strong>最後驗證</strong><span>修正後再試，記下作品結果。</span></li>
+            </ol>
+        </section>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Lesson 1 -->
-                <a href="1150701.html" class="block bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:border-indigo-300 transition-all group">
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">LESSON 1</span>
-                        <svg class="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </div>
-                    <h3 data-scenario-text="cards.0.title" class="text-xl font-bold text-slate-800 mb-2">起步診斷：Scratch 積木大考驗</h3>
-                    <p data-scenario-text="cards.0.description" class="text-slate-500 text-sm font-light">用 10 題看看自己認得哪些 Scratch 積木。想再練可以重做，達 80 分可選做紀念證書。各分數都可以接著上下一課。</p>
-                </a>
-
-                <!-- Lesson 2 -->
-                <a href="1150702.html" class="block bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:border-indigo-300 transition-all group">
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">LESSON 2</span>
-                        <svg class="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </div>
-                    <h3 data-scenario-text="cards.1.title" class="text-xl font-bold text-slate-800 mb-2">程式三大結構</h3>
-                    <p data-scenario-text="cards.1.description" class="text-slate-500 text-sm font-light">改一組數字試跑，配對輸入、處理和輸出，再排出循序、選擇和重複的流程圖。</p>
-                </a>
-
-                <!-- Lesson 3 -->
-                <a href="1150703.html" class="block bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:border-indigo-300 transition-all group">
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">LESSON 3</span>
-                        <svg class="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </div>
-                    <h3 data-scenario-text="cards.2.title" class="text-xl font-bold text-slate-800 mb-2">基礎防禦單元：迴圈多邊形</h3>
-                    <p data-scenario-text="cards.2.description" class="text-slate-500 text-sm font-light">用迴圈畫正多邊形，試算邊數、重複次數和每次轉角的關係。</p>
-                </a>
-
-                <!-- Lesson 4 -->
-                <a href="1150704.html" class="block bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:border-indigo-300 transition-all group relative overflow-hidden">
-                    <div class="absolute right-0 top-0 w-16 h-16 bg-indigo-50 rounded-bl-full flex items-start justify-end p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span class="text-xl">✨</span>
-                    </div>
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">LESSON 4</span>
-                        <svg class="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </div>
-                    <h3 data-scenario-text="cards.3.title" class="text-xl font-bold text-slate-800 mb-2">魔法變數：擴張型螺旋力場</h3>
-                    <p data-scenario-text="cards.3.description" class="text-slate-500 text-sm font-light">用變數記住每一段的長度，每畫一段就加長，看看螺旋怎麼畫出來。</p>
-                </a>
-
-                <!-- Lesson 5 -->
-                <a href="1150705.html" class="block bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:border-indigo-300 transition-all group">
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">LESSON 5</span>
-                        <svg class="w-5 h-5 text-slate-300 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </div>
-                    <h3 data-scenario-text="cards.4.title" class="text-xl font-bold text-slate-800 mb-2">高階防禦：終極曼陀羅陣</h3>
-                    <p data-scenario-text="cards.4.description" class="text-slate-500 text-sm font-light">重複畫出正多邊形，每畫一次就轉個角度。想多試一題，可以把常用的畫法做成有參數的自訂積木。</p>
-                </a>
-
-                <!-- Lesson 6 -->
-                <a href="1150706.html" class="block bg-indigo-50 border-2 border-indigo-200 rounded-2xl p-6 hover:shadow-lg hover:border-indigo-400 transition-all group">
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full group-hover:bg-indigo-200 transition-colors">LESSON 6 (最終挑戰)</span>
-                        <svg class="w-5 h-5 text-indigo-400 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </div>
-                    <h3 data-scenario-text="cards.5.title" class="text-xl font-bold text-indigo-900 mb-2">終極挑戰：星際防禦網陣列</h3>
-                    <p data-scenario-text="cards.5.description" class="text-indigo-700 text-sm font-light">用前幾課的畫法做防禦網，至少試三組設定，再比較哪組能擋住隕石又比較省資源。</p>
-                </a>
-            </div>
-        </div>
+        <details class="course-overview__story">
+            <summary>課程情境｜<span data-scenario-text="name">星際防禦工程師</span></summary>
+            <h2 data-scenario-text="tagline">用程式編織能量防護網</h2>
+            <p data-scenario-text="intro">先練習讀積木和排程式，再用迴圈與變數畫圖。最後做出防禦網，換幾組設定測試。</p>
+            <h3 data-scenario-text="briefing.title">星際任務：設計隕石防禦網</h3>
+            <p data-scenario-text="briefing.intro">隕石正朝基地飛來。請用 Scratch 排出一圈多邊形做成防禦網，再測試隕石會從哪裡穿過。</p>
+            <p>你的角色是<span data-scenario-text="briefing.role">首席防禦系統工程師</span>。</p>
+            <p data-scenario-text="briefing.practice">先決定邊數和圖形數量（輸入），再用迴圈重複畫圖（處理），看看畫出的防禦網（輸出）。</p>
+            <p><strong data-scenario-text="briefing.designTitle">調整防禦網顏色</strong>　<span data-scenario-text="briefing.design">試著把畫筆改成橙色或琥珀色，看看防禦網在背景上是否清楚。</span></p>
+            <p><strong>生活中的例子</strong>　<span data-scenario-text="briefing.application">雷達掃描涵蓋範圍、基地台訊號無死角覆蓋網、參數化與幾何演算法設計。</span></p>
+            <ol class="course-overview__scenario-list">
+                <!-- overview-scenarios -->
+                <li><strong data-scenario-text="cards.0.title">起步診斷：Scratch 積木大考驗</strong><p data-scenario-text="cards.0.description">用 10 題看看自己認得哪些 Scratch 積木。想再練可以重做，達 80 分可選做紀念證書。各分數都可以接著上下一課。</p></li>
+                <li><strong data-scenario-text="cards.1.title">程式三大結構</strong><p data-scenario-text="cards.1.description">改一組數字試跑，配對輸入、處理和輸出，再排出循序、選擇和重複的流程圖。</p></li>
+                <li><strong data-scenario-text="cards.2.title">基礎防禦單元：迴圈多邊形</strong><p data-scenario-text="cards.2.description">用迴圈畫正多邊形，試算邊數、重複次數和每次轉角的關係。</p></li>
+                <li><strong data-scenario-text="cards.3.title">魔法變數：擴張型螺旋力場</strong><p data-scenario-text="cards.3.description">用變數記住每一段的長度，每畫一段就加長，看看螺旋怎麼畫出來。</p></li>
+                <li><strong data-scenario-text="cards.4.title">高階防禦：終極曼陀羅陣</strong><p data-scenario-text="cards.4.description">重複畫出正多邊形，每畫一次就轉個角度。想多試一題，可以把常用的畫法做成有參數的自訂積木。</p></li>
+                <li><strong data-scenario-text="cards.5.title">終極挑戰：星際防禦網陣列</strong><p data-scenario-text="cards.5.description">用前幾課的畫法做防禦網，至少試三組設定，再比較哪組能擋住隕石又比較省資源。</p></li>
+                <!-- /overview-scenarios -->
+            </ol>
+        </details>
     </main>
 
-    <footer class="bg-slate-50 border-t border-slate-200 mt-20 py-8">
-        <div class="max-w-5xl mx-auto px-6 lg:px-8 text-center">
-            <p data-scenario-text="footer" class="text-sm font-medium text-slate-400">© 演算法與程式設計 - 星際防禦工程師</p>
-        </div>
-    </footer>
-
-    <!-- 啟動 Lucide Icons -->
-    <script>
-        lucide.createIcons();
-    </script>
+    <footer class="course-overview__footer" data-scenario-text="footer">© 演算法與程式設計 - 星際防禦工程師</footer>
 </body>
 </html>

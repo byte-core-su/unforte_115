@@ -756,21 +756,19 @@
                         
                         <div class="p-8 md:p-10 flex flex-col gap-10">
                             <!-- 任務目標 -->
-                            <section>
-                                <h3 id="route-lesson-objectives" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-indigo-100 text-indigo-600 p-1.5 rounded-lg"><i data-lucide="target" class="w-5 h-5"></i></span>任務目標</h3>
+                            <details id="route-lesson-objectives" class="lesson-reference"><summary>任務說明</summary>
                                 <div class="bg-indigo-50 text-indigo-900 p-5 rounded-2xl border border-indigo-100/50 leading-relaxed font-medium">${lesson.objective}</div>
-                            </section>
+                            </details>
 
                             <!-- 單元學習重點 -->
-                            <section>
-                                <h3 id="route-lesson-key-points" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-teal-100 text-teal-600 p-1.5 rounded-lg"><i data-lucide="book-open" class="w-5 h-5"></i></span>單元學習重點</h3>
+                            <details id="route-lesson-key-points" class="lesson-reference"><summary>單元學習重點</summary>
                                 <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
                                     <p class="text-slate-600 font-medium mb-6 leading-relaxed">${lesson.learningPointsSummary}</p>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         ${learningPointsHtml}
                                     </div>
                                 </div>
-                            </section>
+                            </details>
                             
                             <!-- 🚀 洗牌模擬器 -->
                             <section>

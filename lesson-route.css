@@ -1,6 +1,6 @@
 /* 學習路線引導面板（lesson-route.js） */
 [data-route-locked],
-[data-route-moved] { display: none !important; }
+.lesson-route[hidden] { display: none !important; }
 
 .lesson-route-flash {
   outline: 3px solid color-mix(in srgb, var(--grade-primary, #4f46e5) 55%, white);

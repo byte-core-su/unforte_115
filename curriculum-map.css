@@ -137,8 +137,7 @@ a.home-start-card:hover {
   background: #253a9c;
 }
 
-.home-resources,
-.home-customize {
+.home-resources {
   scroll-margin-top: 1rem;
 }
 
@@ -177,18 +176,6 @@ a.home-start-card:hover {
   text-decoration: underline;
 }
 
-.home-compose {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: .5rem .8rem;
-  margin-top: .75rem;
-}
-
-.home-compose p {
-  margin: 0;
-}
-
 .home-start-note {
   color: #435477;
   font-size: .78rem;
@@ -202,65 +189,6 @@ a.home-start-card:hover {
   font-weight: 500;
 }
 
-.home-customize-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: .75rem;
-  margin-top: .85rem;
-}
-
-.home-customize-card {
-  display: grid;
-  align-content: start;
-  justify-items: start;
-  gap: .45rem;
-  padding: 1rem 1.1rem;
-  border: 1px solid #dce3f4;
-  border-radius: .85rem;
-  background: #f7f9ff;
-}
-
-.home-customize-card h3 {
-  margin: 0;
-  font-size: 1.05rem;
-}
-
-.home-customize-card p {
-  margin: 0;
-}
-
-.home-customize-level {
-  border-radius: 999px;
-  background: #e3e9fb;
-  padding: .15rem .6rem;
-  color: #34468f;
-  font-size: .75rem;
-  font-weight: 800;
-}
-
-.home-customize-tools {
-  color: #475569;
-  font-size: .85rem;
-  line-height: 1.7;
-}
-
-.home-customize-more {
-  padding-block: .35rem;
-  color: #34468f;
-  font-weight: 750;
-  text-decoration: underline;
-}
-
-.home-local-help {
-  border-left: 4px solid #d97706;
-  border-radius: .4rem;
-  background: #fffbeb;
-  padding: .55rem .75rem;
-  color: #78350f;
-  font-size: .88rem;
-  line-height: 1.7;
-}
-
 @media (max-width: 620px) {
   .home-quick-start {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -270,8 +198,7 @@ a.home-start-card:hover {
     grid-column: 1 / -1;
   }
 
-  .home-resource-grid,
-  .home-customize-grid {
+  .home-resource-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -517,7 +444,7 @@ a.home-start-card:hover {
   list-style: none;
 }
 
-.curriculum-steps li {
+.curriculum-steps > li {
   min-width: 0;
 }
 
@@ -597,10 +524,6 @@ a.home-start-card:hover {
   .curriculum-grade-heading {
     gap: .65rem;
   }
-}
-
-.site-home .rewrite-guide a:hover {
-  text-decoration: underline;
 }
 
 .course-diagram {
@@ -732,136 +655,6 @@ a.home-start-card:hover {
     paint-order: stroke;
     font-size: .78rem;
     font-weight: 750;
-  }
-}
-
-.rewrite-guide {
-  margin-top: 1rem;
-  padding: .65rem .85rem;
-  border: 1px solid #dce3f4;
-  border-radius: .75rem;
-  scroll-margin-top: 1rem;
-}
-
-#local-compose-help a {
-  margin-inline: .2em;
-  color: #34468f;
-  font-weight: 750;
-  text-decoration: underline;
-  white-space: nowrap;
-}
-
-.rewrite-guide summary {
-  padding-block: .25rem;
-  color: #34468f;
-  font-weight: 750;
-  cursor: pointer;
-}
-
-.rewrite-steps {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: .75rem;
-  margin: 1rem 0 1.25rem;
-  padding: 0;
-  list-style: none;
-  counter-reset: rewrite-step;
-}
-
-.rewrite-steps li {
-  display: grid;
-  align-content: start;
-  gap: .35rem;
-  position: relative;
-  padding: .85rem .8rem .85rem 3rem;
-  border: 1px solid #dce3f4;
-  border-radius: .75rem;
-  background: #f7f9ff;
-  counter-increment: rewrite-step;
-}
-
-.rewrite-steps li::before {
-  position: absolute;
-  top: .82rem;
-  left: .75rem;
-  display: grid;
-  place-items: center;
-  width: 1.65rem;
-  height: 1.65rem;
-  border-radius: 50%;
-  background: #e4eaff;
-  color: #32458b;
-  font-weight: 800;
-  content: counter(rewrite-step);
-}
-
-.rewrite-steps h3,
-.rewrite-steps p {
-  margin: 0;
-  font-size: .9rem;
-}
-
-.rewrite-guide a {
-  color: #34468f;
-  font-size: .9rem;
-  font-weight: 750;
-}
-
-.rewrite-guide code {
-  overflow-wrap: anywhere;
-  color: #354064;
-}
-
-.rewrite-prompt-label {
-  display: block;
-  margin-bottom: .45rem;
-  font-weight: 750;
-}
-
-#rewrite-prompt {
-  width: 100%;
-  padding: .8rem;
-  border: 1px solid #ccd6ed;
-  border-radius: .65rem;
-  background: #f7f9ff;
-  color: #27304d;
-  font: inherit;
-  font-size: .88rem;
-  line-height: 1.7;
-  resize: vertical;
-}
-
-.rewrite-actions {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: .65rem 1rem;
-  margin-top: .65rem;
-}
-
-#copy-rewrite-prompt {
-  padding: .58rem .85rem;
-  border: 0;
-  border-radius: .6rem;
-  background: #334cc4;
-  color: #fff;
-  font: inherit;
-  font-size: .88rem;
-  font-weight: 750;
-  cursor: pointer;
-}
-
-#copy-rewrite-prompt:hover {
-  background: #253a9c;
-}
-
-#rewrite-copy-status:empty {
-  margin: 0;
-}
-
-@media (max-width: 680px) {
-  .rewrite-steps {
-    grid-template-columns: minmax(0, 1fr);
   }
 }
 

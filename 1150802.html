@@ -203,10 +203,9 @@
                             <p class="text-slate-600 font-light text-lg leading-relaxed mt-2 max-w-3xl">${lesson.description}</p>
                         </div>
                         <div class="p-8 md:p-10 flex flex-col gap-10">
-                            <section>
-                                <h3 id="route-lesson-objectives" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-indigo-100 text-indigo-600 p-1.5 rounded-lg"><i data-lucide="target" class="w-5 h-5"></i></span>任務目標</h3>
+                            <details id="route-lesson-objectives" class="lesson-reference"><summary>任務說明</summary>
                                 <div class="bg-indigo-50 text-indigo-900 p-5 rounded-2xl border border-indigo-100/50 leading-relaxed font-medium">${lesson.objective}</div>
-                            </section>
+                            </details>
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                 <section class="h-full flex flex-col">
                                     <h3 id="route-music-pseudocode" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-blue-100 text-blue-600 p-1.5 rounded-lg"><i data-lucide="code-2" class="w-5 h-5"></i></span>虛擬碼 (Pseudo Code)</h3>

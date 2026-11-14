@@ -2,57 +2,25 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'modules/registry.json'), 'utf8'));
 const modules = registry.files.map(file => JSON.parse(fs.readFileSync(path.join(root, 'modules', file), 'utf8')));
-const kit = import('../course-kit.mjs');
-const fixture = moduleIds => ({ schemaVersion: 1, courseVersion: 'V-2', title: '自訂幾何與資料課', description: '跨年級選課', moduleIds });
-
-test('twelve independent module manifests correspond to existing lessons and resources', async () => {
-  const { validateCatalog } = await kit;
-  validateCatalog(modules);
+test('twelve module manifests correspond to existing lessons and resources', () => {
   assert.equal(modules.length, 12);
   assert.equal(modules.filter(module => module.grade === 7).length, 6);
   assert.equal(modules.filter(module => module.grade === 8).length, 6);
   assert.equal(new Set(modules.map(module => module.entry)).size, 12);
+  const ids = new Set(modules.map(module => module.id));
+  assert.equal(ids.size, 12);
   for (const module of modules) {
+    assert.equal(module.entry, `1150${module.grade}0${module.lesson}.html`);
     assert.ok(fs.existsSync(path.join(root, module.entry)));
     for (const resource of Object.values(module.resources)) assert.ok(fs.existsSync(path.join(root, resource.split('#')[0])), resource);
+    for (const prerequisite of module.prerequisites) assert.ok(ids.has(prerequisite) && prerequisite !== module.id);
   }
-  assert.throws(() => validateCatalog([...modules, modules[0]]), /重複/);
-  assert.throws(() => validateCatalog([{ ...modules[0], entry: 'https://example.com/lesson.html' }]), /站內/);
-  assert.throws(() => validateCatalog([{ ...modules[0], prerequisites: ['unknown-module'] }]), /先備/);
 });
 
-test('share link and JSON round-trip preserve custom cross-grade ordering and Chinese titles', async () => {
-  const { validateCourse, encodeCourse, decodeCourse } = await kit;
-  const course = fixture(['g8-03', 'g7-04', 'g8-01']);
-  const clean = validateCourse({ ...course, externalUrl: 'https://example.com', html: '<script>' }, modules);
-  assert.deepEqual(clean, course);
-  assert.deepEqual(decodeCourse(encodeCourse(clean), modules), course);
-  assert.deepEqual(validateCourse(JSON.parse(JSON.stringify(clean)), modules), course);
-});
-
-test('bad imports and links are rejected; empty drafts are accepted only before opening a course', async () => {
-  const { validateCourse, decodeCourse } = await kit;
-  for (const raw of [fixture(['g7-01','g7-01']), fixture(['unknown']), fixture([]), { ...fixture(['g7-01']), title: ' ' }, { ...fixture(['g7-01']), title: '課'.repeat(81) }, { ...fixture(['g7-01']), courseVersion: 'V-1' }, { ...fixture(['g7-01']), description: '字'.repeat(501) }]) assert.throws(() => validateCourse(raw, modules));
-  assert.deepEqual(validateCourse(fixture([]), modules, { allowEmpty: true }).moduleIds, []);
-  for (const hash of ['#course=%E0%A4%A', '#course={bad}', '#other=x', '#course=' + 'a'.repeat(16001)]) assert.throws(() => decodeCourse(hash, modules));
-});
-
-test('prerequisite reminders distinguish omitted, later and already preceding modules', async () => {
-  const { prerequisiteWarnings } = await kit;
-  assert.equal(prerequisiteWarnings(fixture(['g8-01','g8-03']), modules).length, 0);
-  assert.equal(prerequisiteWarnings(fixture(['g8-03']), modules).length, 1);
-  assert.equal(prerequisiteWarnings(fixture(['g8-03','g8-01']), modules).length, 1);
-  assert.equal(prerequisiteWarnings(fixture(['g7-01','g7-02','g7-03','g7-04','g7-05','g7-06']), modules).length, 0);
-});
-
-test('standalone and embedded lesson controls share explicit navigation roles', () => {
-  const viewer = fs.readFileSync(path.join(root, 'course-viewer.mjs'), 'utf8');
-  assert.match(viewer, /closest\('\[data-course-direction\]'\)/);
-  assert.match(viewer, /go\(position \+ \(direction === 'next' \? 1 : -1\)\)/);
+test('lessons retain their previous, next and overview navigation', () => {
   const engine = fs.readFileSync(path.join(root, 'lesson-route.js'), 'utf8');
   assert.match(engine, /data-course-direction="next"/);
   for (const item of modules) {
@@ -74,7 +42,7 @@ test('the homepage opens with a course chooser that links each course', () => {
     assert.ok(card, `grade ${grade} course card`);
     assert.match(card, new RegExp(`href="1150${grade}00.html"`));
   }
-  assert.match(home, /href="course-builder.html"/);
+  assert.doesNotMatch(home, /自訂課程|customize-course|course-builder\.html|course\.html/);
 });
 
 test('the curriculum map page keeps both grade maps in curriculum order and is linked from teacher prep', () => {

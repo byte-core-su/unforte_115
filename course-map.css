@@ -163,12 +163,8 @@
   line-height: 1.7;
 }
 
-/* Teacher tools: one card each, quieter than the course cards */
+/* Teacher resources */
 .tool-cards {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: start;
-  gap: 1.25rem;
   margin-top: 2.5rem;
   border-top: 1px solid var(--line);
   padding-top: 2.5rem;
@@ -240,147 +236,6 @@
 .demo-toggle:hover { background: #fffbeb; }
 .demo-toggle.is-on { background: #d97706; color: #fff; }
 
-.custom-option {
-  border-top: 1px solid var(--line);
-  padding-top: .75rem;
-}
-
-div.custom-option {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: .6rem 1rem;
-}
-
-.site-home .custom-option p,
-.custom-option summary { color: var(--muted); font-size: .92rem; }
-
-.custom-option strong {
-  display: block;
-  color: var(--ink);
-  font-size: 1rem;
-}
-
-.level-tag {
-  margin-left: .45rem;
-  border-radius: .35rem;
-  background: #eef1f5;
-  padding: .05rem .4rem;
-  color: var(--muted);
-  font-size: .75rem;
-  font-weight: 700;
-  vertical-align: .1rem;
-}
-
-.home-button {
-  display: inline-flex;
-  border: 1px solid var(--g7);
-  border-radius: .55rem;
-  background: var(--g7);
-  padding: .5rem 1rem;
-  color: #fff !important;
-  font-weight: 700;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.home-button:hover { background: #2c3a8c; }
-
-.home-local-help {
-  border-left: 3px solid #c77700;
-  background: #fff8eb;
-  padding: .5rem .75rem;
-  color: #6b4100 !important;
-  font-size: .86rem;
-  line-height: 1.7;
-}
-
-.home-local-help a { font-weight: 700; text-decoration: underline; }
-
-/* Rewrite guide (inside the customize card) */
-.rewrite-guide summary {
-  position: relative;
-  padding-left: 1.2rem;
-  cursor: pointer;
-  list-style: none;
-}
-
-.rewrite-guide summary::-webkit-details-marker { display: none; }
-
-.rewrite-guide summary::before {
-  content: "▸";
-  position: absolute;
-  left: 0;
-  top: 0;
-  color: var(--g7);
-  font-size: 1rem;
-  line-height: 1.6;
-}
-
-.rewrite-guide[open] summary::before { content: "▾"; }
-.rewrite-guide summary:hover strong { color: var(--g7); }
-
-.site-home .rewrite-tools { margin-top: .75rem; color: var(--muted); font-size: .9rem; }
-
-.rewrite-steps {
-  display: grid;
-  gap: .5rem;
-  margin: .75rem 0 1rem;
-  padding-left: 1.4rem;
-  font-size: .92rem;
-}
-
-.rewrite-steps strong { display: inline; font-size: inherit; }
-.rewrite-steps li::marker { color: var(--g7); font-weight: 800; }
-.rewrite-steps a { margin-left: .3rem; color: var(--g7); font-weight: 700; }
-
-.rewrite-prompt-label {
-  display: block;
-  margin-bottom: .4rem;
-  font-size: .92rem;
-  font-weight: 700;
-}
-
-#rewrite-prompt {
-  width: 100%;
-  border: 1px solid var(--line);
-  border-radius: .5rem;
-  background: #fafbfc;
-  padding: .7rem;
-  color: var(--ink);
-  font: inherit;
-  font-size: .86rem;
-  line-height: 1.7;
-  resize: vertical;
-}
-
-.rewrite-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: .6rem 1rem;
-  margin-top: .6rem;
-  font-size: .9rem;
-}
-
-.rewrite-actions a { color: var(--g7); font-weight: 700; }
-
-#copy-rewrite-prompt {
-  border: 1px solid var(--g7);
-  border-radius: .55rem;
-  background: var(--g7);
-  padding: .4rem .9rem;
-  color: #fff;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-#copy-rewrite-prompt:hover { background: #2c3a8c; }
-#rewrite-copy-status { margin-top: .5rem; color: var(--g8); font-weight: 700; }
-#rewrite-copy-status:empty { display: none; }
-
 /* Footer */
 .home-footer {
   border-top: 1px solid var(--line);
@@ -393,8 +248,7 @@ div.custom-option {
 .home-footer a { text-decoration: underline; text-underline-offset: 3px; }
 
 @media (max-width: 860px) {
-  .course-grid,
-  .tool-cards { grid-template-columns: minmax(0, 1fr); }
+  .course-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (max-width: 520px) {

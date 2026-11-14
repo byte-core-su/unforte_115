@@ -17,4 +17,4 @@ http.createServer(async (request, response) => {
     response.writeHead(200, { 'Content-Type': types[path.extname(filename)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
     response.end(content);
   } catch { response.writeHead(404); response.end('Not found'); }
-}).listen(port, '127.0.0.1', () => console.log(`教材首頁：http://127.0.0.1:${port}/\n模組組課：http://127.0.0.1:${port}/course-builder.html\nPython Lab：http://127.0.0.1:${port}/pythonlab/index.html`));
+}).listen(port, '127.0.0.1', () => console.log(`教材首頁：http://127.0.0.1:${port}/\nPython Lab：http://127.0.0.1:${port}/pythonlab/index.html`));

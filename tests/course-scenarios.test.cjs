@@ -29,29 +29,30 @@ test('all 14 pages load the catalog and preserve their default fallback copy', (
   }
 });
 
-test('dynamic grade 8 overview reads alternative cards, briefing and local archive', () => {
-  const html = read('1150800.html');
-  const inline = html.match(/<script>([\s\S]+?)<\/script>/)[1];
-  const app = {};
-  const briefing = { dataset: { scenarioText: 'briefing.title' } };
-  const link = { setAttribute(name, value) { this[name] = value; } };
-  const window = { CourseScenarios: { ...CourseScenarios, active: campus }, location: { pathname: '/1150800.html' } };
-  const document = {
-    getElementById: () => app,
-    querySelectorAll: selector => selector === '[data-scenario-text]' ? [briefing] : [link]
-  };
-  vm.runInNewContext(inline, { window, document, lucide: { createIcons() {} } });
-  window.onload();
-  assert.equal(briefing.textContent, campus.grades[8].briefing.title);
-  assert.equal(link.href, campus.grades[8].archive);
-  assert.match(app.innerHTML, /圖書館借閱清單/);
-  assert.match(app.innerHTML, /數字卡逐項比較/);
-  assert.equal((app.innerHTML.match(/onclick="openLesson\([1-6]\)"/g) || []).length, 6);
-  window.openLesson(6);
-  assert.equal(window.location.href, '1150806.html');
-  const external = { ...campus, grades: { ...campus.grades, 8: { ...campus.grades[8], archive: 'https://other.example/files.zip' } } };
-  applyPage(document, '/1150800.html', external);
-  assert.equal(link.href, campus.grades[8].archive, 'invalid destinations must not override the local archive');
+test('grade overviews keep alternative scenarios and local archives with static lesson links', () => {
+  for (const grade of [7, 8]) {
+    const page = `1150${grade}00.html`;
+    const html = read(page);
+    const story = html.match(/<details class="course-overview__story">[\s\S]*?<\/details>/)[0];
+    const nodes = [...story.matchAll(/data-scenario-text="([\w.]+)"/g)]
+      .map(([, key]) => ({ dataset: { scenarioText: key } }));
+    assert.match(html, /<a data-scenario-download href="[^"]+"/);
+    const link = { setAttribute(name, value) { this[name] = value; } };
+    const root = { querySelectorAll: selector => selector === '[data-scenario-text]' ? nodes : [link] };
+    applyPage(root, page, campus);
+    const text = key => nodes.find(node => node.dataset.scenarioText === key)?.textContent;
+    assert.equal(text('briefing.title'), campus.grades[grade].briefing.title);
+    assert.equal(link.href, campus.grades[grade].archive);
+    for (const [index, card] of campus.grades[grade].cards.entries()) {
+      assert.equal(text(`cards.${index}.title`), card.title);
+      assert.equal(text(`cards.${index}.description`), card.description);
+    }
+    assert.deepEqual([...html.matchAll(/class="course-overview__card" href="([^"]+)"/g)].map(([, href]) => href),
+      Array.from({ length: 6 }, (_, index) => `1150${grade}0${index + 1}.html`));
+    const external = { ...campus, grades: { ...campus.grades, [grade]: { ...campus.grades[grade], archive: 'https://other.example/files.zip' } } };
+    applyPage(root, page, external);
+    assert.equal(link.href, campus.grades[grade].archive, 'invalid destinations must not override the local archive');
+  }
 });
 
 test('alternate data drives the actual insert, replace and delete tutorial actions', () => {

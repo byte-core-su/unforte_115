@@ -6,13 +6,13 @@
   const page = location.pathname.split('/').pop();
   const guide = window.LearningGuide || {};
   const labels = window.LessonLabels;
+  const drawLesson = window.LessonAssessments['1150804.html'];
+  const draw = drawLesson.activity;
 
   const intro = (extra = []) => ({
     title: '認識任務',
     anchors: ['#learning-guide', ...extra],
-    todo: '先看上方的「這一課要做什麼」、「必交項目」和「怎樣算達標」。',
-    checks: ['我知道這一課要做什麼、要交什麼'],
-    hints: ['看不懂的詞先圈起來，接下來的活動會一步一步帶你做。']
+    todo: '看完今天的任務和繳交項目，按「從哪裡開始」下方的按鈕。'
   });
   const scratch = step => ({
     title: '到 Scratch 動手做',
@@ -29,7 +29,8 @@
   };
   const exit = () => ({
     title: '離堂任務',
-    todo: `把必交項目交到老師指定的班級平台。${guide.evidence || ''}`,
+    todo: '把下列成果交到老師指定的班級平台。',
+    evidence: guide.evidence,
     checks: [guide.successCriteria || '已依老師說明檢查成果', '已到班級平台繳交'],
     hints: ['可以打開本課學習紀錄表，照欄位填寫。', ...(guide.exit ? [`老師若指定離堂檢核：${guide.exit}`] : [])],
     link: { href: guide.records || 'student-records.html', label: '打開學習紀錄表 ↗' }
@@ -119,7 +120,7 @@
         todo: '把「重複呼叫加旋轉」再包成「畫幾個圖形 (X)」自訂積木。',
         checks: ['「畫幾個圖形」組裝正確'],
         hints: ['每畫一個圖形右轉 360 ÷ X 度，重複 X 次。'] },
-      { title: '第四階段：參數實驗', anchors: [{ up: '#route-mandala-parameters' }],
+      { title: '換參數畫曼陀羅', anchors: [{ up: '#route-mandala-parameters' }],
         todo: '選兩組邊數 N 與圖形數 X（例如 3 和 12、5 和 10）。每組按「傳遞變數並執行」，比較畫出的圖形。',
         checks: ['畫了兩組不同設定的圖形', '能指出是哪個數值改變了圖形'],
         hints: ['N 決定每個小圖形的邊數，X 決定一圈畫幾個。'] },
@@ -154,7 +155,7 @@
         checks: ['Scratch 作品能一鍵啟動', '三組測試表完成，並修正重測一次', '能用 60 秒說明作品'],
         hints: ['網頁模擬器不能代替自己的作品，請一定要在 Scratch 做一次。'] })
     ]),
-    '1150801.html': route([{ up: '#route-lesson-objectives' }], [
+    '1150801.html': route(['#route-lesson-objectives'], [
       { title: '清單操作任務', anchors: [{ up: '#route-list-missions' }],
         todo: '跟著左邊的任務一步步按按鈕，觀察右邊裝備庫的項目和長度怎麼變，走完五個航點；完成後再自己試新增、插入、替換、刪除。',
         checks: ['走完星際航線五個航點', '每次操作後，說得出清單的項目與長度'],
@@ -168,7 +169,7 @@
         checks: ['有四種操作的前後對照', 'Scratch 搜尋程式能執行，兩筆紀錄都寫出在哪裡停和為什麼'],
         hints: ['清單在「變數」分類，按「建立一個清單」。搜尋時用索引從第 1 項開始比，找到或比完就停。'] })
     ]),
-    '1150802.html': route([{ up: '#route-lesson-objectives' }], [
+    '1150802.html': route(['#route-lesson-objectives'], [
       { title: '讀懂播放程式', anchors: [{ up: '#route-music-pseudocode' }, { up: '#route-music-blocks' }],
         todo: '對照左邊的虛擬碼和右邊的 Scratch 積木，找出「第幾個音」從 1 開始、每圈加 1 的地方。',
         checks: ['說得出「第幾個音」怎麼決定要播哪一個音'],
@@ -190,7 +191,7 @@
         checks: ['短旋律能依序播放', '改動一項後，說得出聽到的差異', '寫好索引對照表（第幾項＝哪個音）'],
         hints: ['音樂積木要先從左下角「擴充功能」加入。'] })
     ]),
-    '1150803.html': route([{ up: '#route-lesson-objectives' }, { up: '#route-lesson-key-points' }], [
+    '1150803.html': route(['#route-lesson-objectives', '#route-lesson-key-points'], [
       { title: '暖身：變數累加', anchors: [{ up: '#route-accumulator-warmup' }],
         todo: '用下拉選單完成迴圈內的邏輯，按「驗證邏輯」；答對後執行，看「序號」和「累加值」怎麼變。',
         checks: ['驗證通過並執行過', '說得出前三圈的累加值'],
@@ -208,10 +209,11 @@
         checks: ['總和與平均正確', '單筆資料結果正確', '空清單時程式不會出錯（有先判斷）'],
         hints: ['算平均前先用「如果 清單的長度 > 0 那麼」判斷。'] })
     ]),
-    '1150804.html': route([{ up: '#route-lesson-objectives' }, { up: '#route-lesson-key-points' }], [
+    '1150804.html': route(['#route-lesson-key-points'], [
       { title: '抽籤模擬器', anchors: [{ up: '#route-draw-simulator' }],
-        todo: '按「依序填入座號」，再按「抽出 1 名隊員」四次，每次看候選清單少一人。',
-        checks: ['抽了四次，沒有重複', '說得出抽到後為什麼要從清單刪掉'],
+        todo: draw.preview,
+        questions: { before: draw.questions.before, during: draw.questions.during },
+        checks: ['已抽完 4 輪，每輪都按了「確認刪除」', '看得出座號和項次的差別，也核對了兩份清單的人數'],
         hints: ['抽到的人如果不刪掉，下一次可能又被抽到。'] },
       { title: '建立初始資料', anchors: [{ up: '#route-initialize-list' }],
         todo: '把虛擬碼片段依正確順序點進組合區，按「檢查順序並解鎖積木」。英文看不懂可以按「切換為中文」。',
@@ -222,11 +224,13 @@
         checks: ['第一關順序檢查通過', '第二關積木組裝完成'],
         hints: ['先抽出座號存進變數，再用這個座號找到它在清單的位置並刪掉。'] },
       scratch({
-        todo: '到 Scratch 建立 1～30 的座號清單，寫程式抽 4 人。每輪記下抽到的座號和兩份清單抽取前後的人數。',
-        checks: ['4 個座號都不同', '候選人數每輪少 1，已選人數每輪多 1'],
+        todo: draw.practice,
+        questions: { after: draw.questions.after },
+        link: { href: drawLesson.records, label: '開啟本課學習紀錄表 ↗' },
+        checks: [drawLesson.successCriteria],
         hints: ['隨機範圍要用「1 到 清單的長度」，不要寫死 30。'] })
     ]),
-    '1150805.html': route([{ up: '#route-lesson-objectives' }, { up: '#route-lesson-key-points' }], [
+    '1150805.html': route(['#route-lesson-objectives', '#route-lesson-key-points'], [
       { title: '洗牌模擬器', anchors: [{ up: '#route-shuffle-simulator' }],
         todo: '一直按「執行洗牌步驟」直到牌堆變空，觀察每次從牌堆抽一張移到洗牌清單。',
         checks: ['牌堆抽到空', '說得出兩個清單的長度每次怎麼變'],
@@ -256,7 +260,7 @@
         checks: ['Scratch 排序程式能執行，並有比較與交換紀錄', '洗牌和排序前後，每個數值出現的次數都相同'],
         hints: ['前項比後項大才交換。比對各數值各有幾筆，例如原來有兩個 3，處理後也要有兩個 3。'] })
     ]),
-    '1150806.html': route([{ up: '#route-lesson-objectives' }, { up: '#route-lesson-key-points' }], [
+    '1150806.html': route(['#route-lesson-objectives', '#route-lesson-key-points'], [
       { title: '對決模擬器', anchors: [{ up: '#route-duel-simulator' }],
         todo: '按「整備清單」並依按鈕提示一步步執行，觀察三個清單怎麼建立、洗牌、分配與對決。',
         checks: ['模擬器完整跑完一次對決'],

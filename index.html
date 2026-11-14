@@ -20,7 +20,6 @@
             <nav class="home-nav" aria-label="頁面導覽">
                 <a href="#course-map">選擇課程</a>
                 <a href="#teacher-resources">教師備課</a>
-                <a href="#customize-course">自訂課程</a>
             </nav>
         </div>
     </header>
@@ -88,43 +87,6 @@
                     <h3>示範</h3>
                     <span class="prep-links"><button type="button" id="teacher-demo-toggle" class="demo-toggle" aria-pressed="false">開啟教師示範模式</button><small id="teacher-demo-note">開啟後，各課可直接跳到任一步、不必勾選完成標準；CodeGame 與 Python Lab 全部開啟。只在這個分頁有效，關閉分頁就結束。</small></span>
                 </div>
-            </section>
-
-            <section id="customize-course" class="tool-card" aria-labelledby="customize-course-title">
-                <h2 id="customize-course-title">自訂課程</h2>
-                <p class="tool-card-intro">重新挑選單元組成新課程，或把星際情境改成自己的主題。</p>
-                <div class="custom-option">
-                    <p><strong>重新排課</strong>從 12 個單元挑選、排序，不改教材。</p>
-                    <a href="course-builder.html" class="home-button">挑選單元組課</a>
-                </div>
-                <p id="local-compose-help" class="home-local-help" data-local-help hidden>從資料夾開啟時無法組課，請先在專案資料夾執行 <code>node scripts/preview.cjs</code>，再開啟<a href="http://127.0.0.1:4173/course-builder.html">本機組課工具</a>。</p>
-                <details id="rewrite-course" class="custom-option rewrite-guide">
-                    <summary><strong>改寫主題<span class="level-tag">進階</span></strong>換成自己的情境，程式概念與評量不變。</summary>
-                    <p class="rewrite-tools">需能修改檔案的 AI 工具，例如 OpenAI Codex、Claude Code，或已連結專案資料夾的 Claude 桌面應用程式；預覽與檢查需安裝 Node.js。</p>
-                    <ol class="rewrite-steps">
-                        <li><strong>下載並解壓縮。</strong>確認 README 標示 V-2。<a href="https://github.com/byte-core-su/unforte_115/archive/refs/heads/main.zip">下載原始碼 ZIP ↗</a></li>
-                        <li><strong>開啟專案資料夾。</strong>在 AI 工具中選擇含有 <code>index.html</code> 與 <code>package.json</code> 的整個資料夾。</li>
-                        <li><strong>貼上改寫指令。</strong>把「海洋探索」換成你的主題，<code>ocean</code> 換成簡短英文代碼。</li>
-                        <li><strong>預覽並檢查。</strong>執行 <code>node scripts/preview.cjs</code>，開啟<a href="http://127.0.0.1:4173/">本機預覽</a>核對教材。</li>
-                    </ol>
-                    <label class="rewrite-prompt-label" for="rewrite-prompt">快速更換情境指令（與 README 方法一相同）</label>
-                    <textarea id="rewrite-prompt" rows="12" readonly>請直接修改目前的 V-2 課程，將七、八年級 Scratch 課程改成【海洋探索】主題。
-先閱讀 README.md、COURSE_SCENARIOS_GUIDE.md、MODULES_GUIDE.md 與 course-scenarios.js。
-請自行擬定適合國中生的角色、七八年級課名、每課任務、清單項目及專題名稱，然後完成修改。
-優先在 course-scenarios.js 新增完整的 ocean 情境並設為 activeId，保留 space 可切回。
-逐層定義 grades、briefing、cards、inventory、defense、statistics、duel，保留識別鍵與資料規則。
-同步更新首頁、課程地圖、模組目錄、學習導航中有涉及情境的文字及 HTML 備援內容。
-保留 12 個模組 ID、入口路徑、課號順序、學習目標、演算法與判分結果，僅調整故事與資料名稱。
-不改 V-1；Python Lab、CodeGame 與歷史文件維持原樣。
-此步先不修改圖片、語音、網頁動畫圖像或 .sb3，請在完成說明列出仍保留舊素材的位置。
-執行既有測試與資源檢查；測試若綁定星際文字，確認是文案差異後才更新對應文字斷言，保留功能驗證。
-最後提供預覽方式、修改清單、仍需同步的素材，以及如何切回 space。</textarea>
-                    <div class="rewrite-actions">
-                        <button type="button" id="copy-rewrite-prompt" hidden>複製改寫指令</button>
-                        <a href="https://github.com/byte-core-su/unforte_115#readme" target="_blank" rel="noopener">連同動畫與 Scratch 作品改編：README 方法二 ↗</a>
-                    </div>
-                    <p id="rewrite-copy-status" role="status"></p>
-                </details>
             </section>
         </div>
     </main>

@@ -18,6 +18,7 @@ const outputs = new Map();
 const demoScript = '// Generated from teacher-demo.js by npm run build:lesson-plans.\n' + read('teacher-demo.js');
 for (const folder of ['codegame', 'pythonlab']) outputs.set(`${folder}/teacher-demo.js`, demoScript);
 const routeContext = { window: {}, location: { pathname: '' } };
+routeContext.window.LessonAssessments = Object.fromEntries(modules.map(item => [item.entry, { activity: item.activity, records: item.resources.records, successCriteria: item.successCriteria }]));
 vm.runInNewContext(read('lesson-labels.js'), routeContext);
 vm.runInNewContext(read('lesson-routes.js'), routeContext);
 const routes = routeContext.window.LessonRoutes;
@@ -63,15 +64,46 @@ const escapeHtml = value => value.replace(/[&<>"']/g, character => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
 })[character]);
 
+function evidenceList(items) {
+  return `<ul class="evidence-list" role="list">${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+}
+
 function assessment(item) {
-  return `<p><strong>必交項目</strong> ${escapeHtml(item.evidence)}</p>\n<p><strong>怎樣算達標</strong> ${escapeHtml(item.successCriteria)}</p>`;
+  return `<p><strong>必交項目</strong></p>\n${evidenceList(item.evidence)}\n<p><strong>怎樣算達標</strong> ${escapeHtml(item.successCriteria)}</p>`;
+}
+
+function overviewCards(grade) {
+  return gradeModules(grade).map(({ lesson, title, periods, entry, evidence }) => `                <li class="course-overview__item">
+                    <a class="course-overview__card" href="${entry}" aria-labelledby="overview-number-${lesson} overview-lesson-${lesson}">
+                        <div class="course-overview__meta">
+                            <span id="overview-number-${lesson}">第 ${lesson} 課</span>
+                            <span>建議 ${periods} 節</span>
+                        </div>
+                        <h3 id="overview-lesson-${lesson}">${escapeHtml(title)}</h3>
+                        <div class="course-overview__work">
+                            <p>必交項目</p>
+                            ${evidenceList(evidence)}
+                        </div>
+                        <span class="course-overview__open" aria-hidden="true">進入第 ${lesson} 課 →</span>
+                    </a>
+                </li>`).join('\n');
+}
+
+function overviewScenarios(grade) {
+  return gradeModules(grade).map(({ lesson }) => `                <li><strong data-scenario-text="cards.${lesson - 1}.title"></strong><p data-scenario-text="cards.${lesson - 1}.description"></p></li>`).join('\n');
+}
+
+function activityQuestions({ questions }) {
+  return `<p><strong>操作前先猜</strong> ${escapeHtml(questions.before)}</p>\n<p><strong>操作中觀察</strong> ${escapeHtml(questions.during)}</p>\n<p><strong>做完後說明</strong> ${escapeHtml(questions.after)}</p>`;
 }
 
 const byPage = {};
 let map = read('curriculum-map.html');
 for (const item of modules) {
   const { id, entry, title, goal, periods, tags, evidence, successCriteria, resources } = item;
-  if (!evidence?.trim() || !successCriteria?.trim()) throw new Error(`${id} 缺少必交項目或達標條件。`);
+  if (!Array.isArray(evidence) || !evidence.length || evidence.some(entry => typeof entry !== 'string' || !entry.trim()) || !successCriteria?.trim()) {
+    throw new Error(`${id} 缺少必交項目或達標條件。`);
+  }
   const { lessonPlan, records } = resources;
   if (lessonPlan !== `lesson-plan-grade-${item.grade}.html#lesson-${item.lesson}` || records !== `student-records.html#${id}`) {
     throw new Error(`${id} 的教案或學習紀錄連結與課次不符。`);
@@ -81,10 +113,10 @@ for (const item of modules) {
   const previous = sequence[sequence.indexOf(item) - 1]?.entry;
   const next = sequence[sequence.indexOf(item) + 1]?.entry;
   const overview = `1150${item.grade}00.html`;
-  byPage[entry] = { title, goal, periods, evidence, successCriteria, lessonPlan, records, overview, previous, next };
-  const card = new RegExp(`(<li><a href="${entry.replace('.', '\\.')}">[^\\n]*?<h4>)[^<]*(</h4><p>)[^<]*(</p><span class="map-evidence">)[^<]*(</span>)`, 'g');
+  byPage[entry] = { title, goal, periods, evidence, successCriteria, lessonPlan, records, overview, previous, next, activity: item.activity };
+  const card = new RegExp(`(<li><a href="${entry.replace('.', '\\.')}">[^\\n]*?<h4>)[^<]*(</h4><p>)[^<]*(</p><!-- map-evidence -->)[^\\n]*?(<!-- /map-evidence -->)`, 'g');
   if ([...map.matchAll(card)].length !== 1) throw new Error(`${id} 應有一張成果卡片。`);
-  map = map.replace(card, (_, start, meta, work, end) => `${start}${escapeHtml(title)}${meta}${escapeHtml(tags.join(' · '))} · 建議 ${periods} 節${work}必交｜${escapeHtml(evidence)}${end}`);
+  map = map.replace(card, (_, start, meta, work, end) => `${start}${escapeHtml(title)}${meta}${escapeHtml(tags.join(' · '))} · 建議 ${periods} 節${work}<div class="map-evidence"><strong>必交項目</strong>${evidenceList(evidence)}</div>${end}`);
 }
 outputs.set('lesson-assessments.js', '// Generated from modules/ by npm run build:lesson-plans.\nwindow.LessonAssessments = ' + JSON.stringify(byPage, null, 2) + ';\n');
 outputs.set('curriculum-map.html', map);
@@ -96,7 +128,12 @@ outputs.set(deckFile, read(deckFile).replace(/(<span data-course-periods>)[^<]*(
 
 for (const grade of [7, 8]) for (let lesson = 0; lesson <= 6; lesson++) {
   const entry = `1150${grade}0${lesson}.html`;
-  const html = read(entry).replace(/<([a-z][\w-]*)\b([^>]*\bdata-scenario-text="([\w.]+)"[^>]*)>[\s\S]*?<\/\1>/gi, (whole, tag, attrs, key) => {
+  const source = lesson ? read(entry) : read(entry)
+    .replace(/(<!-- overview-cards -->)[\s\S]*?(<!-- \/overview-cards -->)/,
+      (_, start, end) => `${start}\n${overviewCards(grade)}\n                ${end}`)
+    .replace(/(<!-- overview-scenarios -->)[\s\S]*?(<!-- \/overview-scenarios -->)/,
+      (_, start, end) => `${start}\n${overviewScenarios(grade)}\n                ${end}`);
+  const html = source.replace(/<([a-z][\w-]*)\b([^>]*\bdata-scenario-text="([\w.]+)"[^>]*)>[\s\S]*?<\/\1>/gi, (whole, tag, attrs, key) => {
     const node = { dataset: { scenarioText: key } };
     applyPage({ querySelectorAll: selector => selector === '[data-scenario-text]' ? [node] : [] }, entry, active);
     if (typeof node.textContent !== 'string') throw new Error(`${entry} 的情境欄位 ${key} 找不到。`);
@@ -145,7 +182,9 @@ const copyTableScript = `
                 const asText = table => [...table.rows].map(row => [...row.cells].map(cell => cell.textContent.trim()).join('\\t')).join('\\n');
                 const plain = record ? [...copy.children].map(node => {
                     const table = node.querySelector('table');
-                    return table ? asText(table) : node.textContent.trim();
+                    if (table) return asText(table);
+                    if (node.matches('ul')) return [...node.children].map(item => '• ' + item.textContent.trim()).join('\\n');
+                    return node.textContent.trim();
                 }).join('\\n\\n') : asText(copy);
                 try {
                     await navigator.clipboard.write([new ClipboardItem({
@@ -195,7 +234,8 @@ for (const page of pages) {
       lessons.push(number);
       const item = byId.get(`g${page.grade}-0${number}`);
       const optional = routes[item.entry].filter(step => step.optional).map(step => escapeHtml(step.title));
-      return `<h3 id="lesson-${number}">第 ${number} 課｜${escapeHtml(item.title)}</h3>\n<p><strong>建議節數</strong> ${item.periods} 節</p>\n${assessment(item)}\n<p><strong>選做活動</strong> ${optional.join('、')}</p>\n<p><a href="${item.resources.records}">開啟本課學習紀錄 ↗</a></p>`;
+      const activity = item.activity ? `\n<p><strong>網頁示範</strong> ${escapeHtml(item.activity.preview)}</p>\n<p><strong>Scratch 實作</strong> ${escapeHtml(item.activity.practice)}</p>\n${activityQuestions(item.activity)}` : '';
+      return `<h3 id="lesson-${number}">第 ${number} 課｜${escapeHtml(item.title)}</h3>\n<p><strong>建議節數</strong> ${item.periods} 節</p>\n${assessment(item)}\n<p><strong>選做活動</strong> ${optional.join('、')}</p>\n<p><a href="${item.resources.records}">開啟本課學習紀錄 ↗</a></p>${activity}`;
     });
   }
   if (page.kind === 'records') {
@@ -204,7 +244,8 @@ for (const page of pages) {
       if (!byId.has(id) || ids.has(id) || !content.includes('<table>')) throw new Error(`${id} 的學習紀錄缺漏或重複。`);
       ids.add(id);
       const item = byId.get(id);
-      return `<div class="lesson-record" id="${id}">\n<h3>第 ${item.lesson} 課｜${escapeHtml(item.title)}</h3>\n${assessment(item)}\n${content.trimEnd()}\n</div>\n`;
+      const activity = item.activity ? `\n${activityQuestions(item.activity)}` : '';
+      return `<div class="lesson-record" id="${id}">\n<h3>第 ${item.lesson} 課｜${escapeHtml(item.title)}</h3>\n${assessment(item)}${activity}\n${content.trimEnd()}\n</div>\n`;
     });
     if (ids.size !== modules.length) throw new Error('學習紀錄應包含每一課。');
   }

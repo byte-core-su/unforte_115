@@ -87,7 +87,7 @@ function inspectMaterials({ root = path.resolve(__dirname, '..'), registry = mat
         const overviewHtml = readText(overview);
         check(html.includes('src="course-scenarios.js"'), '課程頁未載入情境設定');
         check(overviewHtml.includes('data-scenario-download'), '總覽未接入情境下載路徑');
-        check(overviewHtml.includes(page) || overviewHtml.includes('openLesson(${lesson.id})'), '總覽沒有單元入口');
+        check(overviewHtml.includes(`href="${page}"`), '總覽沒有單元入口');
         const config = animation.config.split('.').reduce((value, part) => value?.[part], scenario);
         check(Boolean(config), `找不到動畫對應設定 ${animation.config}`);
         for (const id of animation.hostIds) check(hasId(html, id), `找不到動畫區塊 #${id}`);

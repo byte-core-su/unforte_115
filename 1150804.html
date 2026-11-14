@@ -425,12 +425,12 @@
                 renderScratchPuzzle2();
                 
                 fb.innerHTML = '<span class="text-emerald-400 font-bold animate-[popIn_0.2s_ease-out]"><i data-lucide="check-circle-2" class="w-5 h-5 inline mr-1"></i> 選擇正確，組合成功！</span>';
-                lucide.createIcons();
+                updateIcons();
                 setTimeout(() => { if(fb) fb.innerHTML = ''; }, 1500);
             } else {
                 // 答錯了！
                 fb.innerHTML = '<span class="text-rose-400 font-bold animate-pulse"><i data-lucide="alert-circle" class="w-5 h-5 inline mr-1"></i> 不對喔，請再看一次上方的 A (解答提示)。</span>';
-                lucide.createIcons();
+                updateIcons();
                 setTimeout(() => { if(fb) fb.innerHTML = ''; }, 2500);
             }
         }
@@ -465,7 +465,7 @@
                         </div>
                     </div>
                 `;
-                lucide.createIcons();
+                updateIcons();
                 return;
             }
 
@@ -526,13 +526,14 @@
                     </div>
                 </div>
             `;
-            lucide.createIcons();
+            updateIcons();
         }
 
         // ==========================================
         // 模擬器互動邏輯 (Plain JS)
         // ==========================================
         let classList = [];
+        let drawnCount = 0;
         let isAnimating = false;
         let highlightedIndex = -1; 
 
@@ -546,12 +547,13 @@
             const container = document.getElementById('class-list-container');
             const lengthDisplay = document.getElementById('list-length-display');
             if (!container || !lengthDisplay) return;
+            document.getElementById('drawn-count-display').textContent = drawnCount;
 
             if (classList.length === 0) {
                 container.innerHTML = `
                     <div class="col-span-full text-center text-slate-500 py-12 font-bold border-2 border-dashed border-slate-700 rounded-xl">
                         <i data-lucide="users" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
-                        清單目前為空，請點擊左側「建立初始資料」
+                        ${drawnCount ? '候選已抽完。要重來，請按「依序填入座號」。' : '清單目前為空，請按左側「依序填入座號」。'}
                     </div>
                 `;
                 lengthDisplay.innerText = '0';
@@ -583,6 +585,7 @@
             if (isAnimating) return;
             isAnimating = true;
             classList = [];
+            drawnCount = 0;
             highlightedIndex = -1;
             
             const modal = document.getElementById('sim-modal-overlay');
@@ -705,11 +708,12 @@
             modal.innerHTML = '';
 
             classList.splice(indexOfItem, 1);
+            drawnCount += 1;
             highlightedIndex = -1; 
             
             renderClassListUI();
 
-            statusEl.innerHTML = `<span class="text-emerald-400">🎉 成功廣播並刪除：<strong>${selectedItem}</strong>！</span><br><span class="text-xs text-slate-400 mt-1 block">清單長度更新為：${classList.length}。</span>`;
+            statusEl.innerHTML = `<span class="text-emerald-400">抽到座號 <strong>${selectedItem}</strong>，已從候選清單移除。</span><br><span class="text-xs text-slate-400 mt-1 block">候選 ${classList.length} 人，已選 ${drawnCount} 人。</span>`;
             
             btnCreate.disabled = false;
             btnCreate.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -775,10 +779,10 @@
                     <div class="w-full lg:w-2/3 bg-slate-950/50 rounded-xl p-5 border border-slate-800 shadow-inner z-10 flex flex-col h-[500px] sm:h-[550px] relative overflow-hidden">
                         <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800 shrink-0">
                             <h4 class="text-cyan-400 font-bold flex items-center gap-2 text-lg">
-                                <i data-lucide="users" class="w-5 h-5"></i> 全班座號清單
+                                <i data-lucide="users" class="w-5 h-5"></i> 候選清單
                             </h4>
                             <div class="text-sm text-slate-400 font-bold bg-slate-900 px-3 py-1 rounded-lg border border-slate-700">
-                                總長度: <span id="list-length-display" class="text-cyan-300 ml-1">0</span>
+                                候選 <span id="list-length-display" class="text-cyan-300">0</span> 人・已選 <span id="drawn-count-display" class="text-cyan-300">0</span> 人
                             </div>
                         </div>
                         
@@ -802,9 +806,7 @@
             icon: "users", 
             title: window.CourseScenarios.active.grades[8].cards[3].title,
             subtitle: "(隨機不重複抽籤)",
-            description: "指揮官！我們需要從星際新兵庫中隨機招募先遣隊員。請運用清單建立名單，並透過「不重複抽籤」邏輯，隨機挑選出指定的勇士加入我們的隊伍。",
-            objective: "先把全班座號放進清單，再寫一個隨機抽出 4 人的程式。每抽到一人，就從候選清單刪掉他的座號。",
-            learningPointsSummary: "這一課會做一個不重複的抽籤程式。",
+            description: "替先遣隊抽出四名不同的隊員。",
             learningPoints: [
                 { title: "資料建立", desc: "利用計次迴圈配合變數累加，將 1 至特定號碼依序添加至清單中建立名單。" },
                 { title: "隨機抽籤", desc: "結合隨機取數積木，從 1 到「目前的清單長度」中隨機抽出一個索引值。" },
@@ -898,22 +900,10 @@
                         
                         <div class="p-8 md:p-10 flex flex-col gap-10">
                             
-                            <!-- 任務目標 -->
-                            <section>
-                                <h3 id="route-lesson-objectives" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-indigo-100 text-indigo-600 p-1.5 rounded-lg"><i data-lucide="target" class="w-5 h-5"></i></span>任務目標</h3>
-                                <div class="bg-indigo-50 text-indigo-900 p-5 rounded-2xl border border-indigo-100/50 leading-relaxed font-medium">${lesson.objective}</div>
-                            </section>
-
-                            <!-- 單元學習重點 -->
-                            <section>
-                                <h3 id="route-lesson-key-points" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-teal-100 text-teal-600 p-1.5 rounded-lg"><i data-lucide="book-open" class="w-5 h-5"></i></span>單元學習重點</h3>
-                                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                                    <p class="text-slate-600 font-medium mb-6 leading-relaxed">${lesson.learningPointsSummary}</p>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        ${learningPointsHtml}
-                                    </div>
-                                </div>
-                            </section>
+                            <details id="route-lesson-key-points" class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                <summary class="cursor-pointer font-bold text-slate-700">抽籤程式的四個重點</summary>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">${learningPointsHtml}</div>
+                            </details>
                             
                             <!-- 🚀 陣列建立與刪除模擬器 -->
                             <section>

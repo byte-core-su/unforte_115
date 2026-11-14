@@ -16,11 +16,13 @@ const assessments = fs.readFileSync(path.join(root, 'lesson-assessments.js'), 'u
 execFileSync(process.execPath, [path.join(root, 'scripts/build-lesson-plans.cjs'), '--check'], { cwd: root });
 
 for (const grade of [7, 8]) {
+  const overview = fs.readFileSync(path.join(root, `1150${grade}00.html`), 'utf8');
+  const curriculumMap = fs.readFileSync(path.join(root, 'curriculum-map.html'), 'utf8');
   for (let lesson = 1; lesson <= 6; lesson++) {
     const page = `1150${grade}0${lesson}.html`;
-    const section = { setAttribute() {} };
+    const section = { setAttribute() {}, querySelector: () => ({ remove() {} }) };
     const main = { parentNode: { insertBefore(node) { assert.equal(node, section); } } };
-    const document = { querySelector: () => main, createElement: () => section, body: { classList: { add() {} } } };
+    const document = { querySelector: selector => selector === 'main' ? main : null, createElement: () => section, body: { classList: { add() {} } } };
     const id = `g${grade}-0${lesson}`;
     const module = require(`../modules/${id}.json`);
     const location = { pathname: `/${page}` };
@@ -35,23 +37,45 @@ for (const grade of [7, 8]) {
     const planPage = fs.readFileSync(path.join(root, `lesson-plan-grade-${grade}.html`), 'utf8');
     const planSection = planPage.split(`id="lesson-${lesson}"`)[1].split(/<h[23][ >]/)[0];
     const recordSection = recordPage.split(`id="${id}"`)[1].split(/<div class="lesson-record"|<\/article>/)[0];
-    for (const html of [section.innerHTML, planSection, recordSection]) {
-      assert.ok(html.includes(CourseScenarios.escapeHtml(module.evidence)), `${id}: same required work`);
+    const overviewCard = overview.split(`href="${page}"`)[1].split('</a>')[0];
+    const mapCard = curriculumMap.split(`href="${page}"`)[1].split('</a>')[0];
+    for (const html of [section.innerHTML, planSection, recordSection, overviewCard, mapCard]) {
+      const list = html.match(/<ul class="evidence-list" role="list">([\s\S]*?)<\/ul>/)?.[1];
+      assert.ok(list, `${id}: required work should be a list`);
+      assert.deepEqual([...list.matchAll(/<li>([^<]+)<\/li>/g)].map(([, item]) => item),
+        module.evidence.map(CourseScenarios.escapeHtml), `${id}: same required work`);
+    }
+    for (const html of [planSection, recordSection]) {
       assert.ok(html.includes(CourseScenarios.escapeHtml(module.successCriteria)), `${id}: same criteria`);
     }
     const title = CourseScenarios.escapeHtml(module.title);
     assert.ok(fs.readFileSync(path.join(root, page), 'utf8').includes(`<title>${title}｜資訊科技課程</title>`));
     for (const html of [section.innerHTML, planSection, recordSection]) assert.ok(html.includes(title), `${id}: same formal title`);
-    for (const html of [section.innerHTML, planSection]) assert.ok(html.includes(`${module.periods} 節`), `${id}: same periods`);
+    assert.ok(planSection.includes(`${module.periods} 節`), `${id}: recommended periods remain in the plan`);
     for (const step of steps.filter(step => step.optional)) assert.ok(planSection.includes(CourseScenarios.escapeHtml(step.title)));
-    assert.ok(exit.todo.includes(module.evidence));
+    if (module.activity) {
+      const preview = steps.find(step => step.todo === module.activity.preview);
+      const practice = steps.find(step => step.todo === module.activity.practice);
+      assert.equal(preview?.questions.before, module.activity.questions.before);
+      assert.equal(preview?.questions.during, module.activity.questions.during);
+      assert.equal(practice?.questions.after, module.activity.questions.after);
+      assert.equal(practice.link.href, module.resources.records);
+      for (const question of Object.values(module.activity.questions)) {
+        assert.ok(planSection.includes(CourseScenarios.escapeHtml(question)));
+        assert.ok(recordSection.includes(CourseScenarios.escapeHtml(question)));
+      }
+      for (const instruction of [module.activity.preview, module.activity.practice]) {
+        assert.ok(planSection.includes(CourseScenarios.escapeHtml(instruction)));
+      }
+    }
+    assert.deepEqual(Array.from(exit.evidence), module.evidence);
     assert.equal(exit.checks[0], module.successCriteria);
     assert.equal(exit.link.href, module.resources.records);
-    assert.match(section.innerHTML, /class="learning-guide__exit"/, `${page}: each lesson should render an exit task`);
-    assert.match(section.innerHTML, /回班級平台繳交/);
+    assert.match(section.innerHTML, /今天做什麼[\s\S]*從哪裡開始[\s\S]*最後交什麼/);
+    assert.match(section.innerHTML, /data-lesson-start/);
+    assert.doesNotMatch(section.innerHTML, /怎樣算達標|離堂檢核/);
     assert.match(section.innerHTML, new RegExp(`href="student-records\\.html#${id}"[^>]*>打開學習紀錄表`));
     assert.match(section.innerHTML, new RegExp(`href="lesson-plan-grade-${grade}\\.html#lesson-${lesson}"[^>]*>教師備課：本課教案`), `${page}: teachers should reach this lesson's plan`);
-    assert.match(section.innerHTML, /網頁作答用來練習，正式成績依老師說明/);
   }
   const filename = `lesson-plan-grade-${grade}.html`;
   const html = fs.readFileSync(path.join(root, filename), 'utf8');

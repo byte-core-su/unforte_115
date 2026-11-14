@@ -85,12 +85,12 @@
 
 ## 更新單元資料與學習導航
 
-- 在 `modules/` 的單元 JSON 設定正式課名 `title`、目標 `goal`、建議節數 `periods`、標籤 `tags`、必交項目 `evidence` 及達標條件 `successCriteria`。各入口顯示相同資料。故事標題仍由 `course-scenarios.js` 提供。
+- 在 `modules/` 的單元 JSON 設定正式課名 `title`、目標 `goal`、建議節數 `periods`、標籤 `tags`、必交項目 `evidence` 陣列及達標條件 `successCriteria`。每項必交成果各占一個陣列項目。故事標題由 `course-scenarios.js` 提供。
 - 在 `learning-guides.js` 寫學生本課要做的事 `action` 和教師可指定的離堂提問 `exit`。在 `STUDENT_RECORDS.md` 維護表格，保留各課的 `<!-- assessment:單元 ID -->` 標記。
 - 在 `lesson-routes.js` 設定步驟名稱、操作、檢核與提示。區塊本身有 ID 時，可直接用 `'#energy-trace'`。若 ID 在標題上，用 `{ up: '#route-energy-total' }` 找到包含標題和活動的區塊。使用既有連結的 ID 時保留原名。
 - 選做活動只在路線步驟設 `optional: true`。學生面板、頁面區塊標示和教案的選做清單會沿用這個設定。共用練習按鈕文字在 `lesson-labels.js` 維護。
 - 執行 `npm run build:lesson-plans`，同步課程地圖、學習導航資料、教案、紀錄頁、站內導覽和情境預設文字。執行 `npm test`，確認固定 ID 與產出檔已更新。
-- 目前支援七、八年級各六課。增加課號時須先擴充模組目錄、路線、情境與建置，細節見[課程模組與組課指南](MODULES_GUIDE.md)。
+- 目前支援七、八年級各六課。增加課號時須先擴充模組目錄、路線、情境與建置，細節見[課程模組維護指南](MODULES_GUIDE.md)。
 
 ## 連結與資源規則
 
@@ -103,7 +103,7 @@
 <img src="imgs/example.png" alt="範例操作畫面">
 ```
 
-單元導覽以 `data-course-direction` 標記 `previous`、`next` 或 `outline`，組課頁依所選順序處理。簡報若要直達互動活動，可用 `?route=all#區塊ID` 展開示範。請使用站內相對連結。相對路徑可以讓教材同時適用於 GitHub Pages、本機資料夾與日後的其他部署位置。
+單元導覽以 `data-course-direction` 標記 `previous`、`next` 或 `outline`，供單元導覽使用。簡報若要直達互動活動，可用 `?route=all#區塊ID` 展開示範。請使用站內相對連結。相對路徑可以讓教材同時適用於 GitHub Pages、本機資料夾與日後的其他部署位置。
 
 新圖片請放入 `imgs/` 下有意義的子資料夾，檔名採用英文小寫與連字號，例如 `imgs/grade-7/loop-polygon-example.png`。圖片需要提供能說明畫面的 `alt` 文字。
 

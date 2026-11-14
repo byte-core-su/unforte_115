@@ -24,6 +24,7 @@ for (const page of pages) {
   let started;
   const window = {
     LessonLabels: catalog.window.LessonLabels,
+    LessonAssessments: catalog.window.LessonAssessments,
     LearningGuide: catalog.window.LessonAssessments[page],
     LessonRoute: { start: config => { started = config; } }
   };
@@ -32,11 +33,12 @@ for (const page of pages) {
   const { steps, next } = started;
   assert.equal(steps[0].title, '認識任務');
   assert.equal(steps[0].anchors[0], '#learning-guide');
+  assert.equal(steps[0].checks, undefined, `${page}: introduction has no completion checklist`);
   assert.deepEqual(Array.from(steps.slice(-2), step => step.title), ['換題練習', '離堂任務'], `${page} should end with practice and the exit task`);
   assert.ok(steps.some(step => /Scratch/.test(step.title)), `${page} should include a Scratch hands-on step`);
   assert.equal(steps.at(-2).optional, true, `${page}: practice can be skipped without blocking submission`);
   assert.ok(!steps.at(-1).optional, `${page}: submission is the last required step`);
-  for (const step of steps) {
+  for (const step of steps.slice(1)) {
     assert.ok(step.todo && step.todo.length > 8, `${page} / ${step.title}: needs a clear instruction`);
     assert.ok(Array.isArray(step.checks) && step.checks.length, `${page} / ${step.title}: needs completion checks`);
     assert.ok(Array.isArray(step.hints) && step.hints.length, `${page} / ${step.title}: needs at least one hint`);
