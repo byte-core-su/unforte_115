@@ -9,6 +9,7 @@
     <script src="teacher-demo.js" defer></script>
     <script src="lesson-route.js" defer></script>
     <script src="lesson-routes.js" defer></script>
+    <script src="scratch-statistics.js" defer></script>
     <meta charset="UTF-8">
     <script src="course-scenarios.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,6 +24,21 @@
         .slide-up-fade { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
         @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
         #energy-trace { scroll-margin-top: 48px; }
+        .statistics-workspace { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-block: 1rem; }
+        .statistics-workspace h4, .statistics-stage h4 { margin-bottom: .5rem; font-weight: 800; }
+        .statistics-palette, .statistics-script { display: grid; align-content: start; gap: .5rem; }
+        .statistics-script { min-height: 4rem; padding: .75rem; border: 1px dashed #94a3b8; border-radius: .75rem; background: #f8fafc; }
+        .statistics-script li { display: grid; gap: .3rem; }
+        .statistics-block { display: block; padding: .55rem .7rem; border-radius: .5rem; text-align: left; font-weight: 700; overflow-wrap: anywhere; }
+        .statistics-block.is-variable { background: #ffedd5; color: #7c2d12; border-left: 4px solid #f97316; }
+        .statistics-block.is-loop { background: #fef3c7; color: #78350f; border-left: 4px solid #f59e0b; }
+        .statistics-block.is-output { background: #f3e8ff; color: #581c87; border-left: 4px solid #a855f7; }
+        .statistics-block:disabled, .statistics-move button:disabled { opacity: .55; }
+        .statistics-move { display: flex; flex-wrap: wrap; gap: .25rem; }
+        .statistics-move button { min-height: 2rem; min-width: 2rem; padding-inline: .45rem; border: 1px solid #cbd5e1; border-radius: .35rem; background: white; }
+        .statistics-stage table { width: 100%; margin-top: .5rem; font-variant-numeric: tabular-nums; }
+        .statistics-stage th, .statistics-stage td { padding: .3rem; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        @media (max-width: 640px) { .statistics-workspace { grid-template-columns: minmax(0, 1fr); } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
@@ -902,18 +918,28 @@
                             </section>
 
                             <section id="route-scratch-statistics" class="min-w-0 bg-orange-50 border border-orange-200 rounded-2xl p-4 md:p-6">
-                                <h3 class="text-lg font-bold text-orange-900 mb-3">Scratch 積木範例</h3>
-                                <a class="inline-flex rounded-lg bg-orange-800 px-4 py-2 font-bold text-white" href="https://scratch.mit.edu/projects/editor/" target="_blank" rel="noopener">開啟 Scratch 編輯器 ↗</a>
-                                <p class="text-slate-700 my-4">在「變數」建立清單「艙房能源」和變數「總能源」「艙房編號」。照下方範例排好積木，再換資料測試。</p>
-                                <div class="bg-white border border-orange-200/50 p-4 md:p-8 rounded-xl flex flex-col overflow-x-auto items-start" role="region" aria-label="統計程式的積木範例" tabindex="0">
-                                    ${lesson.scratchBlocks.map((b, i) => renderScratchBlock(b, i === 0)).join('')}
+                                <h3 class="text-lg font-bold text-orange-900 mb-3">Scratch 積木模擬</h3>
+                                <p>點積木加入程式，用箭頭調整順序，再按「執行並檢查」。</p>
+                                <div class="statistics-workspace">
+                                    <div><h4>積木區</h4><div class="statistics-palette" data-stat-palette></div></div>
+                                    <div><h4>程式區</h4><ol class="statistics-script" data-stat-script></ol></div>
                                 </div>
-                                <h4 class="font-bold text-orange-900 mt-5 mb-2">用三組資料檢查</h4>
-                                <ul class="list-disc pl-6 space-y-1 text-slate-700">
-                                    <li>輸入 120、80、150，總能源應為 350，平均約 116.67。</li>
-                                    <li>只留 80，總能源和平均都應為 80。</li>
-                                    <li>清空清單，角色應說「沒有資料，無法計算平均」。</li>
-                                </ul>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <button type="button" class="rounded-lg bg-green-800 px-4 py-2 font-bold text-white" data-stat-run>▶ 執行並檢查</button>
+                                    <button type="button" class="rounded-lg border border-slate-300 bg-white px-4 py-2" data-stat-reset>清空積木</button>
+                                </div>
+                                <p class="my-3 font-bold text-slate-800" role="status" data-stat-feedback></p>
+                                <div class="statistics-stage bg-white border border-slate-200 rounded-xl p-4">
+                                    <h4>執行結果</h4>
+                                    <label class="block mb-2">查看測試資料 <select class="max-w-full rounded border border-slate-300 p-1" data-stat-case></select></label>
+                                    <div data-stat-stage></div>
+                                </div>
+                                <details class="lesson-reference mt-4">
+                                    <summary>對照 Scratch 完整積木</summary>
+                                    <div class="bg-white border border-orange-200/50 p-4 md:p-8 rounded-xl flex flex-col overflow-x-auto items-start" role="region" aria-label="統計程式的積木範例" tabindex="0">
+                                        ${lesson.scratchBlocks.map((b, i) => renderScratchBlock(b, i === 0)).join('')}
+                                    </div>
+                                </details>
                             </section>
 
                             <!-- 單元導覽按鈕 -->
@@ -936,6 +962,7 @@
         window.onload = function() {
             // 渲染主要畫面
             document.getElementById('app-container').innerHTML = renderLessonDetail(lesson);
+            window.mountScratchStatistics(document.getElementById('route-scratch-statistics'));
             
             // 初始化模擬器與暖身活動
             initWarmup();
