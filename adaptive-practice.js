@@ -266,6 +266,7 @@
     const selected = choices.querySelector('input:checked');
     if (!selected) { feedback.textContent = '請先選一個答案，再說出理由。'; return; }
     const correct = Number(selected.value) === current.answer;
+    if (correct) section.setAttribute('data-lesson-activity', '');
     const nextState = gradeAttempt(state, correct);
     if (correct) feedback.textContent = `${state.attempts ? '修正後答對。' : '首次答對。'}${current.explanation} ${nextState.level > state.level ? '已提高難度。' : '換一題，用同樣的規則再試一次。'}`;
     else if (nextState.resolved) feedback.textContent = `先看這一題怎麼做。${current.hints[1]} ${current.explanation} 正確答案是「${current.choices[current.answer]}」。下一題改用較基礎的資料；請重新預測。`;

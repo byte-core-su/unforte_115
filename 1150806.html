@@ -370,6 +370,7 @@
             }
             
             simBattleIndex = 99; // 結束標記
+            document.getElementById('arena-status').setAttribute('data-lesson-activity', '');
             renderBattleArena();
             
             const wins = simBattleLog.filter(x => x === '勝').length;
@@ -558,6 +559,7 @@
                     document.getElementById('secret-lock-screen').classList.add('hidden');
                     const secretContent = document.getElementById('secret-content-screen');
                     secretContent.classList.remove('hidden');
+                    secretContent.setAttribute('data-lesson-activity', '');
                     secretContent.classList.add('animate-[slideUpFade_0.5s_ease-out]');
                 }, 1000);
             } else {

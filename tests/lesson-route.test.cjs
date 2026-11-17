@@ -35,12 +35,14 @@ for (const page of pages) {
   assert.equal(steps[0].title, '認識任務');
   assert.equal(steps[0].anchors[0], '#learning-guide');
   assert.equal(steps[0].checks, undefined, `${page}: introduction has no completion checklist`);
+  assert.equal(steps[0].entry.choices[steps[0].entry.correct], window.LearningGuide.evidence[0]);
   assert.deepEqual(Array.from(steps.slice(-2), step => step.title), ['換題練習', '離堂任務'], `${page} should end with practice and the exit task`);
   assert.ok(program?.cases.length && steps.at(-3).anchors.includes('#block-program'), `${page} should include the simulator step`);
   assert.match(html, /src="block-program\.js"/);
   assert.doesNotMatch(html, /scratch\.mit\.edu|href="[^"]*\.sb3/i);
   assert.equal(steps.at(-2).optional, true, `${page}: practice can be skipped without blocking submission`);
   assert.ok(!steps.at(-1).optional, `${page}: submission is the last required step`);
+  assert.ok(steps.at(-1).submission && steps.at(-1).response, `${page}: exit requires an answer and submission confirmation`);
   const referenceIds = [...html.matchAll(/<details id="(route-lesson-(?:objectives|key-points))"/g)].map(([, id]) => `#${id}`);
   assert.deepEqual(Array.from(references), referenceIds, `${page}: lesson references belong in the header`);
   assert.ok(steps.every(step => (step.anchors || []).every(anchor => !referenceIds.includes(anchor))), `${page}: references should remain available during each step`);
@@ -48,6 +50,7 @@ for (const page of pages) {
     assert.ok(step.todo && step.todo.length > 8, `${page} / ${step.title}: needs a clear instruction`);
     assert.ok(Array.isArray(step.checks) && step.checks.length, `${page} / ${step.title}: needs completion checks`);
     assert.ok(Array.isArray(step.hints) && step.hints.length, `${page} / ${step.title}: needs at least one hint`);
+    assert.ok(step.activity?.selector && step.activity?.pending || step.response, `${page} / ${step.title}: needs observable work or a written answer`);
   }
   if (html.includes('curriculum-labs.js')) assert.ok(steps.some(step => (step.anchors || []).includes('#curriculum-lab')));
   const generated = new Map([['#learning-guide', 'learning-guides.js'], ['#adaptive-practice', 'adaptive-practice.js'], ['#curriculum-lab', 'curriculum-labs.js'], ['#block-program', 'lesson-route.js']]);

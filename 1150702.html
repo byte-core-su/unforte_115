@@ -546,6 +546,7 @@
                 msg.textContent = "✅ 循序結構的輸入、處理和輸出都配對正確。";
                 msg.className = "text-xs font-bold text-emerald-600 animate-pulse";
                 
+                msg.setAttribute('data-lesson-activity', '');
                 if (!l2Completed.seq) {
                     l2Completed.seq = true;
                     try { localStorage.setItem('unforte115_l2seq', 'true'); } catch(e){}
@@ -679,6 +680,7 @@
                 msg.textContent = "✅ 選擇結構的輸入、處理和輸出都配對正確。";
                 msg.className = "text-xs font-bold text-emerald-600 animate-pulse";
                 
+                msg.setAttribute('data-lesson-activity', '');
                 if (!l2Completed.sel) {
                     l2Completed.sel = true;
                     try { localStorage.setItem('unforte115_l2sel', 'true'); } catch(e){}
@@ -691,11 +693,27 @@
                 msg.className = "text-xs font-bold text-rose-500";
             }
         }
+        function runSeqCalc() {
+            const a = document.getElementById('seq-a').valueAsNumber;
+            const b = document.getElementById('seq-b').valueAsNumber;
+            const out = document.getElementById('seq-out');
+            if (!Number.isFinite(a) || !Number.isFinite(b)) {
+                out.textContent = '請先輸入兩個數字。';
+                return;
+            }
+            out.textContent = `(${a} + ${b}) ÷ 2 = ${(a + b) / 2}`;
+            out.setAttribute('data-lesson-activity', '');
+        }
+
         function runSelCalc() {
             let hw = parseFloat(document.getElementById('sel-hw').value)||0;
             let test = parseFloat(document.getElementById('sel-test').value)||0;
             let daily = parseFloat(document.getElementById('sel-daily').value)||0;
             let s = (hw*0.4) + (test*0.4) + (daily*0.2);
+            const out = document.getElementById('sel-out');
+            const result = s >= 60 ? 'pass' : 'fail';
+            const previous = out.getAttribute('data-lesson-activity');
+            out.setAttribute('data-lesson-activity', previous && previous !== result ? 'both' : result);
             document.getElementById('sel-out').innerHTML = `計算總分：${s.toFixed(1)}分 ➔ <strong class='${s>=60?'text-emerald-600':'text-rose-600'} text-lg ml-1'>${s>=60?'及格 🎉':'不及格 😢'}</strong>`;
         }
 
@@ -818,6 +836,7 @@
                 msg.textContent = "✅ 重複結構的輸入、處理和輸出都配對正確。";
                 msg.className = "text-xs font-bold text-emerald-600 animate-pulse";
                 
+                msg.setAttribute('data-lesson-activity', '');
                 if (!l2Completed.rep) {
                     l2Completed.rep = true;
                     try { localStorage.setItem('unforte115_l2rep', 'true'); } catch(e){}
@@ -837,6 +856,7 @@
             
             let n = parseInt(nEl.value)||0;
             if(n<=0) { outEl.innerHTML="<strong class='text-rose-600'>錯誤：請輸入大於 0 的整數！</strong>"; return; }
+            outEl.setAttribute('data-lesson-activity', '');
             outEl.innerHTML = `1加到${n}的總和: <strong class='text-rose-600 text-lg ml-1'>${(1+n)*n/2}</strong>`;
         }
     </script>

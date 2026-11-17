@@ -137,6 +137,7 @@
             
             if (isCorrect) {
                 puz1Solved = true;
+                    document.getElementById('route-shuffle-logic').setAttribute('data-lesson-activity', '');
                 fb.innerHTML = '<span class="text-emerald-400">🎉 拼圖正確！已解鎖下方的積木碎片！</span>';
                 fb.classList.remove('hidden');
                 document.getElementById('btn-check-puzzle1').classList.add('hidden');
@@ -282,6 +283,7 @@
             if (!container) return;
 
             if (spStep >= Q_FLOW.length) {
+                container.setAttribute('data-lesson-activity', '');
                 container.innerHTML = `
                     <div class="flex flex-col w-full animate-[slideUpFade_0.5s_ease-out]">
                         <div class="bg-emerald-900/40 border border-emerald-500 p-6 rounded-xl text-center mb-6 shadow-inner relative overflow-hidden">
@@ -441,6 +443,7 @@
             document.getElementById('sim-status').innerHTML = `成功將數值 <span class="text-emerald-400 font-bold">${item}</span> 轉移至洗牌清單！`;
             
             if(simOrigList.length === 0) {
+                document.getElementById('sim-status').setAttribute('data-lesson-activity', '');
                 document.getElementById('sim-status').innerHTML = `<span class="text-emerald-400 font-bold">🎉 洗牌完成！所有陣列元素已打亂順序。</span>`;
             } else {
                 btn.disabled = false;
@@ -605,6 +608,7 @@
                 await new Promise(r => setTimeout(r, 200));
             }
             
+            document.getElementById('adv-status').setAttribute('data-lesson-activity', '');
             document.getElementById('adv-status').innerHTML = `<span class="text-emerald-400 font-bold">🎊 發牌結束！成功取得 13 張隨機手牌。</span>`;
             isAdvAnimating = false;
         }

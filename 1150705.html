@@ -434,6 +434,7 @@
                 msg.className = "text-sm font-bold text-emerald-600";
                 
                 if (tFunc.length === 4) {
+                    msg.setAttribute('data-lesson-activity', '');
                     msg.innerHTML = "✅ 自訂積木排好了。在右側輸入不同的邊數，看看會畫出什麼圖形。";
                     unlockSinglePolygonTester();
                 }
@@ -596,6 +597,7 @@
                 msg.className = "text-sm font-bold text-emerald-600";
                 
                 if (tMain.length === 5) {
+                    msg.setAttribute('data-lesson-activity', '');
                     msg.innerHTML = "✅ 主程式排好了。播放動畫，看看每畫完一個多邊形，角色轉了幾度。 <button onclick='playMainMandalaAnimation()' class='ml-2 bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-sm transition'>觀看曼陀羅繪製 ➔</button>";
                     playMainMandalaAnimation();
                 }
@@ -699,6 +701,7 @@
                 msg.className = "text-sm font-bold text-emerald-600";
                 
                 if (tFunc2.length === 4) {
+                    msg.setAttribute('data-lesson-activity', '');
                     msg.innerHTML = "✅ 第二個自訂積木排好了。先猜傳入 12 會畫出幾個圖形，再播放看看。 <button onclick='playFunc2Animation()' class='ml-2 bg-teal-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-teal-700 shadow-sm transition'>觀看傳入 X=12 的模擬 ➔</button>";
                     playFunc2Animation();
                 }
@@ -901,6 +904,8 @@
         }
 
         // 共用的繪製邏輯
+        const mandalaCases = new Set();
+
         function startDrawingMandala(svgElement, shapeSides, count, feedbackElement, isPuzzle, overrideColor = null) {
             if (isPuzzle && overrideColor) {
                 if(overrideColor === '#4F46E5' && mainPuzzleInterval) clearInterval(mainPuzzleInterval);
@@ -986,6 +991,8 @@
                     }
                     else if (!isPuzzle) {
                         clearInterval(mandalaInterval);
+                        mandalaCases.add(`${shapeSides}:${count}`);
+                        if (mandalaCases.size >= 2) feedbackElement?.setAttribute('data-lesson-activity', '');
                         if(feedbackElement) {
                             if (isRainbow) {
                                 feedbackElement.textContent = `彩虹曼陀羅畫好了。看看每次畫新圖形前，筆跡顏色怎麼變。`;

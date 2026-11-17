@@ -339,6 +339,7 @@
                 msg.className = "text-sm font-bold text-emerald-600";
                 
                 if (tVar.length === 7) {
+                    msg.setAttribute('data-lesson-activity', '');
                     msg.innerHTML = "✅ 四邊螺旋的積木排好了。到右側播放動畫，看看每次移動的距離怎麼變。";
                     document.getElementById('var-sim-container').innerHTML = `
                         <div class="sim-badge">手動四邊螺旋模擬</div>
@@ -430,6 +431,7 @@
                 msg.className = "text-sm font-bold text-emerald-600";
                 
                 if (tLoop.length === 6) {
+                    msg.setAttribute('data-lesson-activity', '');
                     msg.innerHTML = "🎉 變數與重複執行組裝完成！這就是自動化！ <button onclick='playLoopAnimation()' class='ml-3 bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-sm transition'>播放預覽動畫 ➔</button>";
                     playLoopAnimation();
                 }
@@ -537,6 +539,8 @@
             document.getElementById('spiral-feedback').textContent = `角度設為 ${angle}°。先預測圖案，再啟動螺旋繪圖。`;
         }
 
+        const spiralAngles = new Set();
+
         function runSpiralLab() {
             if (spiralInterval) clearInterval(spiralInterval);
 
@@ -594,6 +598,8 @@
             spiralInterval = setInterval(() => {
                 if (step >= points.length - 1) {
                     clearInterval(spiralInterval);
+                    spiralAngles.add(angle);
+                    if (spiralAngles.size >= 2) fb.setAttribute('data-lesson-activity', '');
                     fb.textContent = `🎉 繪圖完成！使用 ${angle}° 畫出來的圖案是不是很特別呢？`;
                     fb.className = "bg-emerald-600 text-white rounded-b-2xl p-4 text-sm font-bold transition-colors duration-300 text-center shadow-lg";
                     return;

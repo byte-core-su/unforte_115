@@ -416,6 +416,7 @@
                 msg.className = "text-sm font-bold text-emerald-600";
                 
                 if (tPen.length === 6) {
+                    msg.setAttribute('data-lesson-activity', '');
                     msg.innerHTML = "🎉 組裝完成！請觀看右側動畫！ <button onclick='playPenAnimation()' class='ml-3 bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-sm transition'>重新播放 ➔</button>";
                     playPenAnimation();
                 }
@@ -545,6 +546,7 @@
                 msg.className = "text-sm font-bold text-emerald-600";
                 
                 if (tSq.length === 9) {
+                    msg.setAttribute('data-lesson-activity', '');
                     msg.innerHTML = "🎉 串接完成！真的太長啦！觀看動畫吧！ <button onclick='playSqAnimation()' class='ml-3 bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-sm transition'>重新播放 ➔</button>";
                     playSqAnimation();
                 }
@@ -684,6 +686,7 @@
             }
 
             if (timesInput === '4' && angleInput === '90') {
+                feedback.setAttribute('data-lesson-activity', '');
                 feedback.textContent = "答對了。正方形有 4 條邊，每次轉 360° ÷ 4 = 90°。";
                 feedback.className = "text-xs font-semibold text-emerald-600 self-center animate-pulse";
             } else {
@@ -695,6 +698,7 @@
         // ====== 實戰程式設計區 (多邊形挑戰) ======
         let polyInterval = null;
         let polyPreviousSides = null;
+        const closedPolygons = new Set();
 
         function newPolygonCase() {
             const choices = [3, 4, 5, 6, 8].filter(sides => sides !== polyPreviousSides);
@@ -792,6 +796,8 @@
                         fb.textContent = `✅ 圖形閉合了。重複 ${nInput} 次，每次轉 ${angleInput}°，一共轉了 ${totalRotation}°。`;
                         fb.className = "bg-emerald-500 text-white rounded-b-2xl p-4 text-sm font-bold transition-colors duration-300 text-center shadow-lg";
                         if(formulaReveal) formulaReveal.classList.remove('hidden');
+                        if (Math.abs(totalRotation - 360) < 0.1) closedPolygons.add(nInput);
+                        if (closedPolygons.has(3) && closedPolygons.has(5)) fb.setAttribute('data-lesson-activity', '');
                     } else {
                         fb.textContent = `🤔 哎呀，圖形沒有接在一起！(提示: 360 ÷ ${nInput} = ?)`;
                         fb.className = "bg-amber-500 text-white rounded-b-2xl p-4 text-sm font-bold transition-colors duration-300 text-center shadow-lg";

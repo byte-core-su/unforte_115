@@ -74,6 +74,9 @@ function loadLab(page, scenario = CourseScenarios.active) {
   const first = state.textContent;
   assert.match(first, /練習題；清單：\[/);
   get('#g8-search-step').click();
+  assert.match(state.textContent, /請先選預測/);
+  get('#g8-search-prediction').value = '1';
+  get('#g8-search-step').click();
   assert.match(state.textContent, /第 1 次比較/);
   get('#g8-search-reset').click();
   assert.equal(state.textContent, first, 'retry should preserve the case');
@@ -88,6 +91,7 @@ function loadLab(page, scenario = CourseScenarios.active) {
   assert.match(state.textContent, /預測正確/);
   get('#g8-search-target').value = '不存在的裝備';
   get('#g8-search-reset').click();
+  get('#g8-search-prediction').value = 'missing';
   for (let i = 0; i < 4; i++) get('#g8-search-step').click();
   assert.match(state.textContent, /沒有找到/);
   get('#g8-search-new').click();
@@ -100,11 +104,15 @@ function loadLab(page, scenario = CourseScenarios.active) {
   const first = state.textContent;
   assert.match(first, /練習題；清單：\[/);
   get('#g8-sort-step').click();
+  assert.match(state.textContent, /比較 0 次.*請先選/);
+  get('#g8-sort-prediction').value = 'swap';
+  get('#g8-sort-step').click();
   assert.match(state.textContent, /比較 1 次/);
   get('#g8-sort-reset').click();
   assert.equal(state.textContent, first, 'retry should restore the original values');
   get('#g8-sort-new').click();
   assert.notEqual(state.textContent, first, 'new sort case should differ');
+  get('#g8-sort-prediction').value = 'swap';
   for (let i = 0; i < 15; i++) get('#g8-sort-step').click();
   assert.match(state.textContent, /排序完成/);
   get('#g8-sort-demo').click();
@@ -127,6 +135,7 @@ function loadLab(page, scenario = CourseScenarios.active) {
   assert.match(state.textContent, /找到，位置是第 2 項.*預測正確/);
   get('#g8-search-target').value = '推車';
   get('#g8-search-reset').click();
+  get('#g8-search-prediction').value = 'missing';
   for (let i = 0; i < 4; i++) get('#g8-search-step').click();
   assert.match(state.textContent, /已檢查 4 項，沒有找到/);
 }

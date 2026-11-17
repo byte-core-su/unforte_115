@@ -631,7 +631,7 @@
                     <LessonHeader />
 
                     {/* 互動學習區域 */}
-                    <div id="route-list-missions" className="flex flex-col md:flex-row gap-8 relative">
+                    <div id="route-list-missions" data-lesson-activity={mode === 'sandbox' ? '' : undefined} className="flex flex-col md:flex-row gap-8 relative">
                         
                         {/* 左側：操作區 (根據階段切換介面) */}
                         <div className="w-full md:w-3/5 pb-20">

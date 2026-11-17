@@ -309,7 +309,9 @@
 
         function finishQuiz() {
             document.getElementById('quiz-active-screen').classList.add('hidden');
-            document.getElementById('quiz-result-screen').classList.remove('hidden');
+            const resultScreen = document.getElementById('quiz-result-screen');
+            resultScreen.classList.remove('hidden');
+            resultScreen.setAttribute('data-lesson-activity', '');
             
             const finalScore = currentScore * 10;
             document.getElementById('quiz-final-score').textContent = finalScore;

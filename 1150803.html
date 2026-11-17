@@ -149,6 +149,7 @@
                 
                 if (warmLoopCount >= WARM_MAX_LOOPS) {
                     warmFinished = true;
+                    document.getElementById('btn-warm-next').setAttribute('data-lesson-activity', '');
                     document.getElementById('warm-math-text').innerHTML = "🎉 迴圈執行完畢！(1 加到 5 的總和是 15)";
                     document.getElementById('warm-math-text').className = "h-6 mt-1 text-sm font-bold text-emerald-400 shrink-0";
                     
@@ -345,14 +346,23 @@
             renderSimList();
         }
 
+        const simCases = new Set();
+
+        function recordSimCase(kind) {
+            simCases.add(kind);
+            if (simCases.size === 3) document.getElementById('sim-btn-next').setAttribute('data-lesson-activity', '');
+        }
+
         function simNextStep() {
             if (simData.length === 0) {
+                recordSimCase('empty');
                 const mathTextEl = document.getElementById('sim-math-text');
                 mathTextEl.textContent = '空清單沒有平均值：清單長度為 0，不能作為除數。';
                 mathTextEl.className = 'mt-1 text-sm font-bold text-amber-300 shrink-0';
                 return;
             }
             if (simFinished) {
+                recordSimCase(simData.length === 1 ? 'single' : 'multiple');
                 const average = simSum / simData.length;
                 
                 const historyEl = document.getElementById('sim-history');
@@ -603,6 +613,7 @@
             const abstractElements = document.querySelectorAll('.math-abstract');
 
             if(isPatternRevealed) {
+                btn.setAttribute('data-lesson-activity', '');
                 btn.innerHTML = '<i data-lucide="eye-off" class="w-4 h-4 inline mr-1"></i>還原具體數字';
                 btn.className = 'bg-orange-100 text-orange-700 hover:bg-orange-200 px-3 py-1.5 rounded-lg text-sm font-bold transition-all shadow-inner active:scale-95';
                 concreteElements.forEach(el => el.classList.add('hidden'));

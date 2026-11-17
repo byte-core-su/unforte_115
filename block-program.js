@@ -86,19 +86,21 @@
     let result;
     root.innerHTML = `
       <h3>積木程式模擬器</h3>
-      <p>拖曳或點選積木加入程式。可拖曳調整順序，也可用 ↑ ↓ 按鈕。按「比對檢查」可一次檢查所有預設資料。</p>
+      <p>拖曳或點選積木加入程式。要調整順序：先點一塊，再點另一塊，兩塊就會交換位置（也可以直接拖曳）。按「比對檢查」可一次檢查所有預設資料。</p>
       <div class="block-program__cases">
         <label>測試資料 <select data-program-case>${task.cases.map(({ name }, index) => `<option value="${index}">${name}</option>`).join('')}</select></label>
         ${task.fields.map(({ key, label, min, max }) => `<label>${label} <input data-program-value="${key}" type="number" min="${min}" max="${max}" required></label>`).join('')}
       </div>
       <p data-program-input></p>
       <div class="block-program__workspace">
-        <div><h4>積木區</h4><div class="block-program__palette">${Object.entries(categories).map(([category, name]) => {
+        <div><h4 data-program-palette-heading tabindex="-1">積木區</h4><button type="button" class="block-program__jump" data-program-jump="work">前往程式區</button><div class="block-program__palette">${Object.entries(categories).map(([category, name]) => {
           const group = Object.entries(task.blocks).filter(([, block]) => block.view[0] === category);
           return group.length ? `<div class="block-program__category is-${category}"><h5>${name}</h5>
             ${group.map(([id, block]) => `<button type="button" class="block-program__grab" data-program-add="${id}" draggable="true">${blockMarkup(block.view)}</button>`).join('')}</div>` : '';
         }).join('')}</div></div>
-        <div><h4>程式區</h4>${task.loop ? `<p>初始化後，後續積木會放在「重複 ${task.loop.times} 次」中。</p>` : ''}
+        <div data-program-work><h4 tabindex="-1">程式區・積木放置區</h4>
+        <button type="button" class="block-program__jump" data-program-jump="palette">回到積木區</button>
+        ${task.loop ? `<p>初始化後，後續積木會放在「重複 ${task.loop.times} 次」中。</p>` : ''}
         <ol data-program-script></ol></div>
       </div>
       <div class="block-program__actions">
@@ -111,6 +113,14 @@
       <div data-program-comparison></div>
       <div data-program-result></div>`;
     const script = root.querySelector('[data-program-script]');
+    const work = root.querySelector('[data-program-work]');
+    root.querySelector('h3').tabIndex = -1;
+    const jumpTo = heading => {
+      heading.focus({ preventScroll: true });
+      heading.scrollIntoView({ behavior: 'instant', block: 'start' });
+    };
+    root.querySelector('[data-program-jump="work"]').addEventListener('click', () => jumpTo(work.querySelector('h4')));
+    root.querySelector('[data-program-jump="palette"]').addEventListener('click', () => jumpTo(root.querySelector('[data-program-palette-heading]')));
     const feedback = root.querySelector('[data-program-feedback]');
     const stage = root.querySelector('[data-program-result]');
     const comparison = root.querySelector('[data-program-comparison]');
@@ -119,7 +129,12 @@
     const caseSelect = root.querySelector('[data-program-case]');
     const selected = () => task.cases[Number(caseSelect.value)];
 
+    // 點選交換：先點一塊（標示為已選），再點另一塊就互換位置；再點同一塊取消。
+    let picked = null;
+
     function invalidate(message = '') {
+      root.removeAttribute('data-program-passed');
+      picked = null;
       stopAudio();
       result = undefined;
       stage.replaceChildren();
@@ -131,10 +146,8 @@
     function render() {
       const rows = program.map((id, index) =>
         `<li data-program-row="${index}" class="block-program__row">
-          <span class="block-program__grab" data-program-drag="${index}" draggable="true">${blockMarkup(task.blocks[id].view)}</span>
+          <button type="button" class="block-program__grab block-program__pick${picked === index ? ' is-picked' : ''}" data-program-drag="${index}" data-program-pick="${index}" draggable="true" aria-pressed="${picked === index}" aria-label="第 ${index + 1} 塊：${escape(textLabel(task.blocks[id].view[2]))}。${picked === null ? '點選後，再點另一塊即可交換位置' : picked === index ? '已選取，再點一次取消' : `點這裡與第 ${picked + 1} 塊交換`}">${blockMarkup(task.blocks[id].view)}</button>
           <div class="block-program__actions">
-            <button type="button" data-program-edit="-1" data-index="${index}" aria-label="上移第 ${index + 1} 塊" ${index === 0 ? 'disabled' : ''}>↑</button>
-            <button type="button" data-program-edit="1" data-index="${index}" aria-label="下移第 ${index + 1} 塊" ${index === program.length - 1 ? 'disabled' : ''}>↓</button>
             <button type="button" data-program-edit="0" data-index="${index}" aria-label="移除第 ${index + 1} 塊">移除</button>
           </div></li>`);
       if (task.loop && rows.length > task.loop.before.length) {
@@ -159,6 +172,7 @@
       }
       const { results, sameOrder, missing } = compare(task, program);
       const allPassed = results.every(({ result }) => result.passed);
+      root.toggleAttribute('data-program-passed', allPassed);
       const order = sameOrder ? '積木順序與參考程式一致。' :
         allPassed ? '積木順序與參考程式不同，但所有測試都通過。' :
         missing.length ? `請確認是否缺少：${missing.map(id => textLabel(task.blocks[id].view[2])).join('、')}。` :
@@ -190,7 +204,7 @@
       event.dataTransfer.effectAllowed = programAdd ? 'copy' : 'move';
       event.dataTransfer.setData('text/plain', programAdd || programDrag);
     });
-    script.addEventListener('dragover', event => {
+    work.addEventListener('dragover', event => {
       if (!drag) return;
       event.preventDefault();
       event.dataTransfer.dropEffect = drag.id ? 'copy' : 'move';
@@ -200,10 +214,10 @@
       if (row) row.setAttribute('data-drop', '');
       else script.classList.add('is-drop-end');
     });
-    script.addEventListener('dragleave', event => {
-      if (!script.contains(event.relatedTarget)) clearDrop();
+    work.addEventListener('dragleave', event => {
+      if (!work.contains(event.relatedTarget)) clearDrop();
     });
-    script.addEventListener('drop', event => {
+    work.addEventListener('drop', event => {
       if (!drag) return;
       event.preventDefault();
       let position = destination(event);
@@ -276,22 +290,38 @@
     root.addEventListener('click', async event => {
       const button = event.target.closest('button');
       if (!button || button.disabled) return;
-      const { programAdd, programEdit, index } = button.dataset;
-      if (programAdd) {
+      const { programAdd, programEdit, programPick, index } = button.dataset;
+      if (programPick !== undefined) {
+        const target = Number(programPick);
+        if (picked === null) {
+          picked = target;
+          render();
+          feedback.textContent = `已選第 ${target + 1} 塊。再點另一塊即可交換位置；再點同一塊取消。`;
+        } else if (picked === target) {
+          picked = null;
+          render();
+          feedback.textContent = '已取消選取。';
+        } else {
+          const first = picked;
+          [program[first], program[target]] = [program[target], program[first]];
+          invalidate(`已交換第 ${first + 1} 塊和第 ${target + 1} 塊。`);
+          render();
+        }
+        script.querySelector(`[data-program-pick="${target}"]`)?.focus({ preventScroll: true });
+      } else if (programAdd) {
         program.push(programAdd);
         invalidate('已加入積木。');
         render();
-        (root.querySelector('[data-program-add]:not(:disabled)') || root.querySelector('[data-program-run]')).focus();
+        if (event.detail === 0) {
+          (root.querySelector('[data-program-add]:not(:disabled)') || root.querySelector('[data-program-run]')).focus();
+        }
       } else if (programEdit !== undefined) {
         const from = Number(index);
-        const offset = Number(programEdit);
-        const [id] = program.splice(from, 1);
-        if (offset) program.splice(from + offset, 0, id);
-        invalidate(offset ? '已移動積木。' : '已移除積木。');
+        program.splice(from, 1);
+        invalidate('已移除積木。');
         render();
-        const row = script.querySelector(`[data-program-row="${Math.min(from + offset, program.length - 1)}"]`);
-        (row?.querySelector(`[data-program-edit="${offset}"]:not(:disabled)`) ||
-          row?.querySelector('[data-program-edit="0"]') || root.querySelector('[data-program-add]:not(:disabled)')).focus();
+        const row = script.querySelector(`[data-program-row="${Math.min(from, program.length - 1)}"]`);
+        (row?.querySelector('[data-program-edit]') || root.querySelector('[data-program-add]:not(:disabled)')).focus();
       } else if (button.hasAttribute('data-program-run')) run();
       else if (button.hasAttribute('data-program-compare')) showComparison();
       else if (button.hasAttribute('data-program-reset')) {
@@ -322,6 +352,14 @@
           feedback.textContent = '請複製下方的積木順序與結果。';
         }
       }
+    });
+    root.addEventListener('keydown', event => {
+      if (event.key !== 'Escape' || picked === null) return;
+      const focused = event.target.dataset.programPick;
+      picked = null;
+      render();
+      if (focused !== undefined) script.querySelector(`[data-program-pick="${focused}"]`)?.focus();
+      feedback.textContent = '已取消選取。';
     });
     caseSelect.addEventListener('change', changeCase);
     for (const input of inputs) input.addEventListener('input', () => invalidate());

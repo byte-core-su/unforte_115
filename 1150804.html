@@ -161,6 +161,7 @@
             
             if (isCorrect) {
                 puz1Solved = true;
+                    document.getElementById('route-initialize-list').setAttribute('data-lesson-activity', '');
                 fb.innerHTML = '<span class="text-emerald-400">🎉 拼圖正確！已解鎖 積木！</span>';
                 fb.classList.remove('hidden');
                 document.getElementById('btn-check-puzzle1').classList.add('hidden');
@@ -442,6 +443,7 @@
             if (!container) return;
 
             if (spStep >= Q_FLOW.length) {
+                container.setAttribute('data-lesson-activity', '');
                 container.innerHTML = `
                     <div class="flex flex-col w-full animate-[slideUpFade_0.5s_ease-out]">
                         <div class="bg-emerald-900/40 border border-emerald-500 p-6 rounded-xl text-center mb-6 shadow-inner relative overflow-hidden">
@@ -711,6 +713,7 @@
 
             classList.splice(indexOfItem, 1);
             drawnCount += 1;
+            if (drawnCount === 4) document.getElementById('route-draw-simulator').setAttribute('data-lesson-activity', '');
             highlightedIndex = -1; 
             
             renderClassListUI();

@@ -79,12 +79,15 @@
     const questions = quizRoot.dataset.quiz === 'g7-safety' ? safety : ethics;
     quizRoot.innerHTML = questions.map(([question, options], index) => `<fieldset><legend>${index + 1}. ${question}</legend>${options.map((option, choice) => `<label><input type="radio" name="lab-q-${index}" value="${choice}"> ${option}</label>`).join('')}<output aria-live="polite"></output></fieldset>`).join('') + '<button type="button">${window.LessonLabels.checkJudgment}</button>';
     quizRoot.querySelector('button').addEventListener('click', () => {
-      questions.forEach(([, , answer, explanation], index) => {
+      const answers = questions.map(([, , answer, explanation], index) => {
         const fieldset = quizRoot.querySelectorAll('fieldset')[index];
         const selected = fieldset.querySelector('input:checked');
         const output = fieldset.querySelector('output');
-        output.textContent = !selected ? '請先選擇。' : `${Number(selected.value) === answer ? '正確。' : '再想想。'}${explanation}`;
+        const correct = selected && Number(selected.value) === answer;
+        output.textContent = !selected ? '請先選擇。' : `${correct ? '正確。' : '再想想。'}${explanation}`;
+        return correct;
       });
+      if (answers.every(Boolean)) section.setAttribute('data-lesson-activity', '');
     });
   }
 
@@ -99,6 +102,7 @@
     let threshold = 15;
     let mode = '練習題';
     let previous = '';
+    let searched = false;
     const result = section.querySelector('#g7-data-result');
     const query = section.querySelector('#g7-data-query');
     const prediction = section.querySelector('#g7-data-prediction');
@@ -126,6 +130,8 @@
     };
     const run = (reveal = true) => {
       const chosen = query.value;
+      if (reveal && chosen !== 'all') searched = true;
+      if (reveal && searched && chosen === 'all' && prediction.value) section.setAttribute('data-lesson-activity', '');
       const rows = records.filter(item => chosen === 'all' || item.id === chosen);
       const average = rows.reduce((total, item) => total + item.count * item.width, 0) / rows.length;
       const valid = rows.filter(item => item.blocked).sort((a, b) => a.count * a.width - b.count * b.width);
@@ -154,11 +160,13 @@
     let done = false;
     let mode = '練習題';
     let previous = '';
+    const searchedCases = new Set();
+    let firstPrediction = '';
     const state = section.querySelector('#g8-search-state');
     const target = section.querySelector('#g8-search-target');
     const prediction = section.querySelector('#g8-search-prediction');
     const show = message => { state.textContent = `${mode}；清單：[${list.join('、')}]。${message}`; };
-    const reset = () => { index = 0; done = false; show('索引從 1 開始，請先預測結果。'); };
+    const reset = () => { index = 0; done = false; firstPrediction = ''; show('索引從 1 開始，請先預測結果。'); };
     const setCase = (items, chosen, label) => {
       list = [...items];
       mode = label;
@@ -172,11 +180,19 @@
     section.querySelector('#g8-search-reset').addEventListener('click', reset);
     section.querySelector('#g8-search-step').addEventListener('click', () => {
       if (done) return;
+      if (index === 0) {
+        firstPrediction = prediction.value;
+        if (!firstPrediction) { show('請先選預測的位置或「找不到」。'); return; }
+      }
       const item = list[index];
       index++;
       done = item === target.value || index === list.length;
       const expected = list.includes(target.value) ? String(list.indexOf(target.value) + 1) : 'missing';
-      const feedback = done ? !prediction.value ? '下次先預測位置，再逐項驗證。' : prediction.value === expected ? '預測正確；請用比較紀錄說明停止條件。' : '預測不同；從第 1 項重新追蹤，找出索引或停止條件的差異。' : '';
+      if (done) {
+        searchedCases.add(expected === 'missing' ? 'missing' : 'found');
+        if (searchedCases.size === 2) section.setAttribute('data-lesson-activity', '');
+      }
+      const feedback = done ? firstPrediction === expected ? '預測正確；請用比較紀錄說明停止條件。' : '預測不同；從第 1 項重新追蹤，找出索引或停止條件的差異。' : '';
       show(`第 ${index} 次比較：${item} ${item === target.value ? '＝' : '≠'} ${target.value}。${item === target.value ? `找到，位置是第 ${index} 項。` : done ? `已檢查 ${index} 項，沒有找到。` : '繼續檢查下一項。'}${feedback}`);
     });
     target.addEventListener('change', () => { prediction.value = ''; reset(); });
@@ -214,14 +230,16 @@
     section.querySelector('#g8-sort-reset').addEventListener('click', reset);
     section.querySelector('#g8-sort-step').addEventListener('click', () => {
       if (pass >= values.length - 1) return;
+      if (comparisons === 0 && !prediction.value) { show('請先選第一次比較是否交換。'); return; }
       const left = values[index];
       const right = values[index + 1];
       const swapped = left > right;
-      const firstFeedback = comparisons === 0 ? !prediction.value ? '下次先預測第一次是否交換。' : prediction.value === (swapped ? 'swap' : 'keep') ? '第一次預測正確；請說明比較規則。' : '第一次預測不同；由小到大排序時，左邊比右邊大才交換。' : '';
+      const firstFeedback = comparisons === 0 ? prediction.value === (swapped ? 'swap' : 'keep') ? '第一次預測正確；請說明比較規則。' : '第一次預測不同；由小到大排序時，左邊比右邊大才交換。' : '';
       if (swapped) [values[index], values[index + 1]] = [right, left];
       comparisons++;
       index++;
       if (index >= values.length - pass - 1) { index = 0; pass++; }
+      if (pass >= values.length - 1) section.setAttribute('data-lesson-activity', '');
       show(`比較 ${left} 與 ${right}：${swapped ? '交換' : '不交換'}。${firstFeedback}${pass >= values.length - 1 ? '排序完成。' : `目前完成 ${pass} 輪。`}`);
     });
     section.querySelector('#g8-sort-new').addEventListener('click', () => {
@@ -245,13 +263,16 @@
     const chosen = [];
     const options = section.querySelector('#g8-module-options');
     const state = section.querySelector('#g8-module-state');
-    options.innerHTML = order.map(name => `<button type="button" data-module="${escapeHtml(name)}">${escapeHtml(name)}</button>`).join('');
+    const choices = shuffle(order);
+    if (choices.every((name, index) => name === order[index])) choices.push(choices.shift());
+    options.innerHTML = choices.map(name => `<button type="button" data-module="${escapeHtml(name)}">${escapeHtml(name)}</button>`).join('');
     const show = () => { state.textContent = `主程式：綠旗 → ${chosen.join(' → ') || '請依序選擇自訂積木'}。${chosen.length === order.length ? (chosen.every((name, index) => name === order[index]) ? '順序正確，接著在積木程式模擬器製作與測試各積木。' : `順序不合理：分配前要先建立並洗牌，${duel.activity}前要先分配。`) : ''}`; };
     options.addEventListener('click', event => {
       const name = event.target.dataset.module;
       if (!name || chosen.includes(name)) return;
       chosen.push(name);
       event.target.disabled = true;
+      if (chosen.length === order.length && chosen.every((item, index) => item === order[index])) section.setAttribute('data-lesson-activity', '');
       show();
     });
     section.querySelector('#g8-module-reset').addEventListener('click', () => { chosen.length = 0; options.querySelectorAll('button').forEach(button => { button.disabled = false; }); show(); });

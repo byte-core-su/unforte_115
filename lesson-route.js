@@ -45,6 +45,7 @@
     let finished = false;
     let hintsShown = 0;
     let ticked = [];
+    let answer = '';
     const skipped = new Set();
     const viewedStep = () => steps[viewing ?? current];
     const atEnd = () => finished && viewing === null;
@@ -90,8 +91,9 @@
           placeControls();
         }
         apply();
+        updateCompletion();
       }, 300);
-    }).observe(document.body, { childList: true, subtree: true });
+    }).observe(document.body, { childList: true, subtree: true, attributeFilter: ['data-lesson-activity', 'data-program-passed'] });
 
     const panel = document.createElement('section');
     panel.className = 'lesson-route';
@@ -151,17 +153,32 @@
     }
 
     if (startButton) {
-      const first = steps.find(step => step.index > 0 && !step.optional);
+      const first = steps[1];
       const status = document.querySelector('.learning-guide__status');
-      startButton.disabled = false;
+      const entry = steps[0].entry;
+      if (entry && !demo) {
+        const question = document.createElement('fieldset');
+        question.className = 'lesson-route__checks lesson-route__entry';
+        question.innerHTML = `<legend>先找一找：本課要交哪一項？</legend>${entry.choices.map((choice, i) =>
+          `<label><input type="radio" name="lesson-entry" value="${i}"> ${escapeHtml(choice)}</label>`).join('')}`;
+        startButton.before(question);
+        startButton.disabled = true;
+        question.addEventListener('change', event => {
+          if (current !== 0) return;
+          const correct = Number(event.target.value) === entry.correct;
+          startButton.disabled = !correct;
+          status.textContent = correct ? '找到了。可以開始第一項活動。' : '對照「最後交什麼」再選一次。';
+        });
+      } else startButton.disabled = false;
       startButton.textContent = `開始：${first.title}`;
       startButton.addEventListener('click', () => {
         if (current === 0 && !finished) {
-          if (first.missing && !first.regions.length) {
+          if (!first.optional && first.missing && !first.regions.length) {
             if (status) status.textContent = '活動未能載入。請確認網路後重新整理。';
             return;
           }
-          for (const step of steps.slice(1, first.index)) skipped.add(step.index);
+          if (status) status.textContent = '';
+          guide.querySelector('.lesson-route__entry')?.setAttribute('disabled', '');
           enter(first.index);
         } else showStep();
       });
@@ -176,7 +193,12 @@
 
     function focusStep() {
       requestAnimationFrame(() => {
-        const heading = panel.hidden ? (guideHeading || guide)?.querySelector('h1') : panel.querySelector('.lesson-route__title');
+        const programHeading = viewedStep().regions.find(region => region.id === 'block-program')?.querySelector('h3');
+        const heading = programHeading || (panel.hidden ? (guideHeading || guide)?.querySelector('h1') : panel.querySelector('.lesson-route__title'));
+        if (programHeading) {
+          reveal(programHeading, 'start');
+          return;
+        }
         if (panel.hidden) heading?.setAttribute('tabindex', '-1');
         heading?.focus({ preventScroll: true });
         progress.scrollIntoView({ behavior: 'instant', block: 'start' });
@@ -196,6 +218,7 @@
       viewing = null;
       hintsShown = 0;
       ticked = [];
+      answer = '';
       const step = steps[current];
       updateView();
       if (typeof step.enter === 'function') { try { step.enter(); } catch (error) { console.warn('lesson-route enter', error); } }
@@ -267,13 +290,36 @@
       const action = current === steps.length - 1 ? '完成本課' : '完成這一步';
       completion.innerHTML = `
         <div class="lesson-route__body">
-          ${checks.length ? `<fieldset class="lesson-route__checks"><legend>做完一項就勾一項</legend>${checks.map((check, i) => `<label><input type="checkbox" data-check="${i}" ${ticked[i] ? 'checked' : ''}> ${escapeHtml(check)}</label>`).join('')}</fieldset>` : ''}
+          ${checks.length ? `<p class="lesson-route__todo"><b>怎樣算達標</b></p><ul class="evidence-list" role="list">${checks.map(check => `<li>${escapeHtml(check)}</li>`).join('')}</ul>` : ''}
+          ${step.response ? `<label class="lesson-route__response">${escapeHtml(step.response)}<textarea data-response rows="2" maxlength="300" placeholder="寫下一句具體的觀察或說明">${escapeHtml(answer)}</textarea></label>` : ''}
+          ${step.submission ? `<label class="lesson-route__submit"><input type="checkbox" data-check="0" ${ticked[0] ? 'checked' : ''}> 已到班級平台繳交</label>` : ''}
           <p class="lesson-route__msg" role="status"></p>
           <div class="lesson-route__actions">
             ${step.optional && (demo || !step.regions.length) ? '<button type="button" data-action="skip">略過選做</button>' : ''}
             <button type="button" class="lesson-route__primary" data-action="done">${action}</button>
           </div>
         </div>`;
+      updateCompletion();
+    }
+
+    function updateCompletion() {
+      if (completion.hidden) return false;
+      const button = completion.querySelector('[data-action="done"]');
+      if (!button) return false;
+      const step = steps[current];
+      const boxes = [...completion.querySelectorAll('[data-check]')];
+      const missing = demo ? [] : boxes.filter(box => !box.checked);
+      const hasResponse = new Set(answer.toLowerCase().match(/[\p{L}\p{N}]/gu)).size >= 4;
+      let message = '';
+      if (!demo) {
+        if (step.activity && !document.querySelector(step.activity.selector)) message = step.activity.pending;
+        else if (step.response && !hasResponse) message = '請先在上方寫下一句具體的說明。';
+        else if (missing.length) message = '繳交後，請勾選「已到班級平台繳交」。';
+      }
+      const status = completion.querySelector('.lesson-route__msg');
+      if (status.textContent !== message) status.textContent = message;
+      button.disabled = Boolean(message);
+      return !message;
     }
 
     function handleClick(event) {
@@ -298,14 +344,7 @@
       }
       if (action === 'skip' && steps[current].optional) { skipped.add(current); advance(); return; }
       if (action === 'done') {
-        const boxes = [...completion.querySelectorAll('[data-check]')];
-        const missing = demo ? [] : boxes.filter(box => !box.checked);
-        if (missing.length) {
-          const message = completion.querySelector('.lesson-route__msg');
-          message.textContent = `還有 ${missing.length} 項沒勾選。做完並勾好後再按一次。`;
-          reveal(missing[0]);
-          return;
-        }
+        if (!updateCompletion()) return;
         skipped.delete(current);
         advance();
       }
@@ -316,7 +355,16 @@
 
     completion.addEventListener('change', event => {
       const box = event.target.closest('[data-check]');
-      if (box) ticked[Number(box.dataset.check)] = box.checked;
+      if (box) {
+        ticked[Number(box.dataset.check)] = box.checked;
+        updateCompletion();
+      }
+    });
+    completion.addEventListener('input', event => {
+      if (event.target.matches('[data-response]')) {
+        answer = event.target.value;
+        updateCompletion();
+      }
     });
 
     function advance() {

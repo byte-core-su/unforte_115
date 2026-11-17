@@ -605,6 +605,7 @@
                 msg.className = "text-sm font-bold text-emerald-600";
                 
                 if (tMain.length === 6) {
+                    msg.setAttribute('data-lesson-activity', '');
                     msg.innerHTML = "✅ 主程式排好了。播放動畫，看看兩組變數怎麼傳進自訂積木。 <button onclick='playFastDeploymentAnimation()' class='ml-2 bg-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-orange-700 shadow-sm transition'>觀看一鍵啟動 ➔</button>";
                     playFastDeploymentAnimation();
                 }
@@ -730,6 +731,8 @@
 
         // ====== Phase 2: 幾何防禦參數盲測與物理視覺實驗室 ======
         let labInterval = null;
+        const shieldCases = new Set();
+        let shieldCase = '';
         let asteroidIntervals = [];
         let defensePreviousCase = '';
         
@@ -795,6 +798,7 @@
             const shieldSize = parseInt(document.getElementById('shield-spacing').value) || 50;
             const shapeSides = parseInt(document.getElementById('shield-sides-select').value) || 5;
             const thickness = parseInt(document.getElementById('shield-thickness').value) || 3;
+            shieldCase = `${shapeSides}:${count}:${shieldSize}:${thickness}`;
             
             let hexColor = '#EA580C'; 
             let pathClass = 'glowing-orange-path';
@@ -912,7 +916,7 @@
             window.totalMeteors = 15;
             for (let i = 0; i < window.totalMeteors; i++) {
                 setTimeout(() => {
-                    createPrecisionMeteor(layer, shields, shieldColor, cx, cy, thickness);
+                    if (layer.isConnected) createPrecisionMeteor(layer, shields, shieldColor, cx, cy, thickness);
                 }, i * 350);
             }
         }
@@ -1005,7 +1009,9 @@
         function checkMeteorStatus(thickness) {
             if (window.meteorsHitHole + window.meteorsPenetrated + window.meteorsBlocked === window.totalMeteors) {
                 const fb = document.getElementById('lab-feedback');
-                let totalHits = window.meteorsHitHole + window.meteorsPenetrated;
+                const totalHits = window.meteorsHitHole + window.meteorsPenetrated;
+                shieldCases.add(shieldCase);
+                if (shieldCases.size >= 3) fb.setAttribute('data-lesson-activity', '');
                 
                 if (totalHits > 0) {
                     if (window.meteorsPenetrated > 0) {
