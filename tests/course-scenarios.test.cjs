@@ -53,9 +53,9 @@ test('grade overviews keep alternative scenarios and local lesson links', () => 
 test('alternate data drives the lesson list operations with one-based positions', () => {
   const html = read('1150801.html');
   const setup = html.match(/const \{ active: scenario \} = window\.CourseScenarios;\s+const \{ items: scenarioItems \} = scenario\.inventory;/)[0];
-  const actions = html.match(/const demoList = [\s\S]+?(?=\s+const ListMissions =)/)[0];
+  const actions = html.match(/const demoList = [\s\S]+?(?=\s+function DemoList)/)[0];
   const window = { CourseScenarios: { ...CourseScenarios, active: campus } };
-  const { demoList, applyListOperation } = vm.runInNewContext(`${setup}\n${actions}\n({ demoList, applyListOperation });`, { window });
+  const { demoList, applyListOperation, demoFrames } = vm.runInNewContext(`${setup}\n${actions}\n({ demoList, applyListOperation, demoFrames });`, { window });
   const { supply, priority, repair, signal } = campus.inventory.items;
   const expected = [supply.label, priority.label, repair.label];
   assert.deepEqual(Array.from(applyListOperation(demoList, 'add', null, signal.label)), [...expected, signal.label]);
@@ -63,6 +63,12 @@ test('alternate data drives the lesson list operations with one-based positions'
   assert.deepEqual(Array.from(applyListOperation(demoList, 'delete', 2)), [supply.label, repair.label]);
   assert.deepEqual(Array.from(applyListOperation(demoList, 'replace', 3, signal.label)), [supply.label, priority.label, signal.label]);
   assert.deepEqual(Array.from(demoList), expected);
+  assert.deepEqual(Array.from(demoFrames[2].insert), [0, 2, 3, null], 'both existing items move before the new card arrives');
+  const last = demoFrames.at(-1);
+  const items = [...demoList, signal.label];
+  const ordered = positions => Array.from(positions.keys()).sort((a, b) => positions[a] - positions[b]).map(index => items[index]);
+  assert.deepEqual(ordered(last.insert), Array.from(applyListOperation(demoList, 'insert', 2, signal.label)));
+  assert.deepEqual(ordered(last.add), Array.from(applyListOperation(demoList, 'add', null, signal.label)));
 });
 
 test('the capstone still creates 24 numbered entries with replacement labels', async () => {

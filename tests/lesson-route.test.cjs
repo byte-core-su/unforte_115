@@ -2,6 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const CourseScenarios = require('../course-scenarios.js');
 
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
@@ -25,6 +26,7 @@ for (const page of pages) {
   const window = {
     LessonLabels: catalog.window.LessonLabels,
     LessonAssessments: catalog.window.LessonAssessments,
+    CourseScenarios,
     LearningGuide: catalog.window.LessonAssessments[page],
     LessonRoute: { start: config => { started = config; } }
   };
@@ -35,7 +37,15 @@ for (const page of pages) {
   assert.equal(steps[0].title, '認識任務');
   assert.equal(steps[0].anchors[0], '#learning-guide');
   assert.equal(steps[0].checks, undefined, `${page}: introduction has no completion checklist`);
-  assert.equal(steps[0].entry.choices[steps[0].entry.correct], window.LearningGuide.evidence[0]);
+  const { entry } = steps[0];
+  if (page === '1150801.html') {
+    const { tool, chip, pack } = CourseScenarios.active.inventory.items;
+    assert.deepEqual(Array.from(entry.items), [tool.label, chip.label, pack.label]);
+    assert.equal(entry.correct, 1);
+    assert.equal(entry.choices, undefined);
+  } else {
+    assert.equal(entry.choices[entry.correct], window.LearningGuide.evidence[0]);
+  }
   assert.deepEqual(Array.from(steps.slice(-2), step => step.title), ['換題練習', '離堂任務'], `${page} should end with practice and the exit task`);
   assert.ok(program?.cases.length && steps.at(-3).anchors.includes('#block-program'), `${page} should include the simulator step`);
   assert.match(html, /src="block-program\.js"/);

@@ -159,16 +159,36 @@
       if (entry && !demo) {
         const question = document.createElement('fieldset');
         question.className = 'lesson-route__checks lesson-route__entry';
-        question.innerHTML = `<legend>先找一找：本課要交哪一項？</legend>${entry.choices.map((choice, i) =>
-          `<label><input type="radio" name="lesson-entry" value="${i}"> ${escapeHtml(choice)}</label>`).join('')}`;
+        if (entry.items) {
+          question.innerHTML = `<legend>從左到右，點出清單的第 2 項</legend>
+            <ol class="lesson-route__entry-list" role="list">${entry.items.map((item, i) =>
+              `<li><button type="button" data-entry-position="${i}">${escapeHtml(item)}</button></li>`).join('')}</ol>`;
+          question.addEventListener('click', event => {
+            const button = event.target.closest('[data-entry-position]');
+            if (!button || current !== 0) return;
+            const position = Number(button.dataset.entryPosition);
+            if (position !== entry.correct) {
+              status.textContent = `這是第 ${position + 1} 項。從最左邊的第 1 項數過去。`;
+              return;
+            }
+            startButton.disabled = false;
+            button.setAttribute('data-correct', '');
+            startButton.focus({ preventScroll: true });
+            question.disabled = true;
+            status.textContent = `${entry.items[position]}在第 2 項。可以開始清單操作。`;
+          });
+        } else {
+          question.innerHTML = `<legend>先找一找：本課要交哪一項？</legend>${entry.choices.map((choice, i) =>
+            `<label><input type="radio" name="lesson-entry" value="${i}"> ${escapeHtml(choice)}</label>`).join('')}`;
+          question.addEventListener('change', event => {
+            if (current !== 0) return;
+            const correct = Number(event.target.value) === entry.correct;
+            startButton.disabled = !correct;
+            status.textContent = correct ? '找到了。可以開始第一項活動。' : '對照「最後交什麼」再選一次。';
+          });
+        }
         startButton.before(question);
         startButton.disabled = true;
-        question.addEventListener('change', event => {
-          if (current !== 0) return;
-          const correct = Number(event.target.value) === entry.correct;
-          startButton.disabled = !correct;
-          status.textContent = correct ? '找到了。可以開始第一項活動。' : '對照「最後交什麼」再選一次。';
-        });
       } else startButton.disabled = false;
       startButton.textContent = `開始：${first.title}`;
       startButton.addEventListener('click', () => {

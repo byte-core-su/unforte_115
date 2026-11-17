@@ -389,6 +389,20 @@ html:not([data-teacher-route]) :is(.learning-guide__teacher, .learning-guide__re
 .lesson-route__checks legend { padding: 0 .3rem; color: #475569; font-size: .85rem; font-weight: 700; }
 .lesson-route__checks label { display: flex; align-items: flex-start; gap: .5rem; cursor: pointer; }
 .lesson-route__checks input { width: 1.1rem; height: 1.1rem; margin-top: .3rem; flex-shrink: 0; accent-color: var(--route-color); }
+.lesson-route__entry-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .35rem; margin: 0; padding: 0; list-style: none; }
+.lesson-route__entry-list button {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: .3rem .2rem;
+  border: 1px solid #94a3b8;
+  border-radius: .55rem;
+  background: #f8fafc;
+  color: #334155;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.lesson-route__entry-list button:hover:not(:disabled) { background: #cffafe; }
+.lesson-route__entry-list button[data-correct] { border-color: #15803d; background: #dcfce7; color: #14532d; }
 
 .lesson-route__hints { display: grid; gap: .4rem; justify-items: start; }
 .lesson-route__hints p { margin: 0; border-left: 3px solid #f59e0b; background: #fffbeb; padding: .35rem .7rem; }

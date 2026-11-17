@@ -32,12 +32,20 @@
     '1150806.html': '裝備不足時，你的哪個自訂積木要先做檢查？要檢查什麼？'
   };
 
-  const intro = (extra = []) => ({
+  const intro = (extra, warmup) => ({
     title: '認識任務',
     anchors: ['#learning-guide', ...extra],
-    entry: { choices: entryChoices, correct: pageIndex % 2 },
-    todo: '看完今天的任務和繳交項目，選出本課要交的成果。'
+    entry: warmup || { choices: entryChoices, correct: pageIndex % 2 },
+    todo: warmup ? '由左到右讀清單，點出第 2 項。' : '看完今天的任務和繳交項目，選出本課要交的成果。'
   });
+
+  function listWarmup() {
+    const { tool, chip, pack } = window.CourseScenarios.active.inventory.items;
+    return {
+      items: [tool.label, chip.label, pack.label],
+      correct: 1
+    };
+  }
   const program = step => ({
     title: '積木程式實作',
     anchors: ['#block-program'],
@@ -64,7 +72,7 @@
     hints: ['可以打開本課學習紀錄表，照欄位填寫。'],
     link: { href: guide.records || 'student-records.html', label: '打開學習紀錄表 ↗' }
   });
-  const route = (introExtra, middle) => [intro(introExtra), ...middle, practice, exit()];
+  const route = (introExtra, middle, warmup) => [intro(introExtra, warmup), ...middle, practice, exit()];
   const tab = (name, runs) => ({
     activity: activity(
       `body:has(#${name}-ipo-msg[data-lesson-activity]):has(${runs})`,
@@ -223,7 +231,7 @@
         todo: '記下前面四種清單操作的結果，再在模擬器排好搜尋積木，分別測找到和找不到。',
         checks: ['有四種操作的前後對照', '搜尋程式能執行，兩筆紀錄都寫出在哪裡停和為什麼'],
         hints: ['從第 1 項開始比，找到或比完才停止。'] })
-    ]),
+    ], page === '1150801.html' ? listWarmup() : undefined),
     '1150802.html': route([], [
       { title: '讀懂播放程式', anchors: [{ up: '#route-music-pseudocode' }, { up: '#route-music-blocks' }],
         response: '「第幾個音」開始是多少？每播完一個音，這個數值怎麼變？',
