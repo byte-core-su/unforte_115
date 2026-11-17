@@ -71,7 +71,9 @@ for (const grade of [7, 8]) {
     }
     assert.ok(planSection.includes(`href="${module.resources.records}"`), `${id}: plan links to its own record page`);
     assert.ok(planSection.includes(`${module.periods} 節`), `${id}: recommended periods remain in the plan`);
-    for (const step of steps.filter(step => step.optional)) assert.ok(planSection.includes(CourseScenarios.escapeHtml(step.title)));
+    const optionalActivities = steps.filter(step => step.optional).map(step => CourseScenarios.escapeHtml(step.title));
+    const optionalRow = planSection.match(/<p><strong>選做活動<\/strong> (.*?)<\/p>/);
+    assert.equal(optionalRow?.[1], optionalActivities.length ? optionalActivities.join('、') : undefined, `${id}: optional activities match the student route`);
     if (module.activity) {
       const preview = steps.find(step => step.todo === module.activity.preview);
       const practice = steps.find(step => step.todo === module.activity.practice);

@@ -50,7 +50,9 @@ for (const page of pages) {
   assert.ok(program?.cases.length && steps.at(-3).anchors.includes('#block-program'), `${page} should include the simulator step`);
   assert.match(html, /src="block-program\.js"/);
   assert.doesNotMatch(html, /scratch\.mit\.edu|href="[^"]*\.sb3/i);
-  assert.equal(steps.at(-2).optional, true, `${page}: practice can be skipped without blocking submission`);
+  const practice = steps.at(-2);
+  assert.equal(practice.optional, page !== '1150801.html', `${page}: only grade 8 lesson 1 requires practice`);
+  assert.equal(practice.activity.selector, '#adaptive-practice[data-lesson-activity]');
   assert.ok(!steps.at(-1).optional, `${page}: submission is the last required step`);
   assert.ok(steps.at(-1).submission && steps.at(-1).response, `${page}: exit requires an answer and submission confirmation`);
   const referenceIds = [...html.matchAll(/<details id="(route-lesson-(?:objectives|key-points))"/g)].map(([, id]) => `#${id}`);

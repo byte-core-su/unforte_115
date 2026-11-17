@@ -1,5 +1,5 @@
 // 12 個 積木程式單元的學習路線設定。每課固定為：
-// 認識任務 → 網頁活動與實作 → 換題練習（選做）→ 離堂任務
+// 認識任務 → 網頁活動與實作 → 換題練習 → 離堂任務
 // 活動以操作結果開啟下一步；閱讀、回顧與離堂任務要先留下作答。
 (() => {
   'use strict';
@@ -53,15 +53,15 @@
     ...step,
     hints: [...(step.hints || []), '做到一半卡住，可以點上方已完成的節點回看參考積木，或舉手請老師幫忙。']
   });
-  const practice = {
+  const practice = (optional = true) => ({
     title: '換題練習',
     anchors: ['#adaptive-practice'],
-    optional: true,
-    activity: achieved('#adaptive-practice', '請先答對一題，或按「略過選做」。'),
+    optional,
+    activity: achieved('#adaptive-practice', optional ? '請先答對一題，或按「略過選做」。' : '答對一題後，就能前往離堂任務。'),
     todo: `先選「標準」（沒把握就選「基礎」）。每題先預測答案，再按「${labels.checkPrediction}」。`,
     checks: ['至少答對一題，並讀完回饋'],
     hints: ['答錯會先給提示，可以同一題再試一次。', '覺得太難就改選「基礎」，選級不影響成績。']
-  };
+  });
   const exit = () => ({
     title: '離堂任務',
     todo: '把下列成果交到老師指定的班級平台。',
@@ -72,7 +72,9 @@
     hints: ['可以打開本課學習紀錄表，照欄位填寫。'],
     link: { href: guide.records || 'student-records.html', label: '打開學習紀錄表 ↗' }
   });
-  const route = (introExtra, middle, warmup) => [intro(introExtra, warmup), ...middle, practice, exit()];
+  const route = (introExtra, middle, { warmup, requirePractice = false } = {}) => [
+    intro(introExtra, warmup), ...middle, practice(!requirePractice), exit()
+  ];
   const tab = (name, runs) => ({
     activity: activity(
       `body:has(#${name}-ipo-msg[data-lesson-activity]):has(${runs})`,
@@ -231,7 +233,7 @@
         todo: '記下前面四種清單操作的結果，再在模擬器排好搜尋積木，分別測找到和找不到。',
         checks: ['有四種操作的前後對照', '搜尋程式能執行，兩筆紀錄都寫出在哪裡停和為什麼'],
         hints: ['從第 1 項開始比，找到或比完才停止。'] })
-    ], page === '1150801.html' ? listWarmup() : undefined),
+    ], { warmup: page === '1150801.html' ? listWarmup() : undefined, requirePractice: true }),
     '1150802.html': route([], [
       { title: '讀懂播放程式', anchors: [{ up: '#route-music-pseudocode' }, { up: '#route-music-blocks' }],
         response: '「第幾個音」開始是多少？每播完一個音，這個數值怎麼變？',

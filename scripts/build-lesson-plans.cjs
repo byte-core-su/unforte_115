@@ -293,8 +293,9 @@ for (const page of [...pages, ...modules.map(item => ({ kind: 'record', source: 
       lessons.push(number);
       const item = byId.get(`g${page.grade}-0${number}`);
       const optional = routes[item.entry].filter(step => step.optional).map(step => escapeHtml(step.title));
+      const optionalActivities = optional.length ? `\n<p><strong>選做活動</strong> ${optional.join('、')}</p>` : '';
       const activity = item.activity ? `\n<p><strong>網頁示範</strong> ${escapeHtml(item.activity.preview)}</p>\n<p><strong>積木程式實作</strong> ${escapeHtml(item.activity.practice)}</p>\n${activityQuestions(item.activity)}` : '';
-      return `<h3 id="lesson-${number}">第 ${number} 課｜${escapeHtml(item.title)}</h3>\n<p><strong>建議節數</strong> ${item.periods} 節</p>\n${assessment(item)}\n<p><strong>選做活動</strong> ${optional.join('、')}</p>\n<p><a href="${item.resources.records}">開啟本課學習紀錄 ↗</a></p>${activity}`;
+      return `<h3 id="lesson-${number}">第 ${number} 課｜${escapeHtml(item.title)}</h3>\n<p><strong>建議節數</strong> ${item.periods} 節</p>\n${assessment(item)}${optionalActivities}\n<p><a href="${item.resources.records}">開啟本課學習紀錄 ↗</a></p>${activity}`;
     });
   }
   if (page.kind === 'alignment') {
