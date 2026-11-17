@@ -1,6 +1,6 @@
 (() => {
   const { active, escapeHtml, inventorySearchPool } = window.CourseScenarios;
-  const { defense, inventory, duel } = active;
+  const { defense, duel } = active;
   const page = window.location.pathname.split('/').pop();
   const main = document.querySelector('main');
   if (!main) return;
@@ -18,8 +18,31 @@
     },
     '1150801.html': {
       title: '循序搜尋：逐項檢查清單',
-      intro: '先預測目標位於第幾項，再逐步執行；找不到時，也要能說出停止條件。',
-      html: `<div class="curriculum-lab__controls"><label>尋找${escapeHtml(inventory.kind)} <select id="g8-search-target"></select></label><label>先預測位置 <select id="g8-search-prediction"></select></label><button type="button" id="g8-search-reset">同題重試</button><button type="button" id="g8-search-step">檢查下一項</button><button type="button" id="g8-search-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g8-search-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g8-search-state" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">積木程式任務：以「索引從 1 開始，逐項比較；找到或超過清單長度就停止」實作搜尋，交出找到與找不到各一筆追蹤紀錄。請記錄比較順序，別只背位置。</p>`
+      intro: '看完示範後，先預測比對範圍，再接手一個還沒查完的搜尋。',
+      html: `
+        <h3 id="g8-search-title" tabindex="-1"></h3>
+        <p id="g8-search-prompt"></p>
+        <div class="curriculum-lab__result">
+          <ol id="g8-search-trace" aria-label="清單與已比對項目"></ol>
+          <p id="g8-search-state" role="status"></p>
+        </div>
+        <div class="curriculum-lab__controls">
+          <label id="g8-search-prediction-label" hidden>從第 1 項比到第幾項？
+            <select id="g8-search-prediction"></select>
+          </label>
+          <label id="g8-search-reason-label" hidden>為什麼可以回報找不到？
+            <select id="g8-search-reason">
+              <option value="">先選理由</option>
+              <option value="some">已經比到不符合的項目</option>
+              <option value="all">每一項都比過，而且都不符合</option>
+              <option value="last">比到最後一項，結果一定是找不到</option>
+            </select>
+          </label>
+          <button type="button" id="g8-search-step">檢查下一項</button>
+          <button type="button" id="g8-search-stop" class="curriculum-lab__secondary" hidden>停止，回報找不到</button>
+          <button type="button" id="g8-search-reset" class="curriculum-lab__secondary" hidden>重新預測</button>
+          <button type="button" id="g8-search-advance" hidden></button>
+        </div>`
     },
     '1150802.html': {
       title: '音訊與作品使用判斷',
@@ -149,63 +172,121 @@
 
   if (page === '1150801.html') {
     const pool = inventorySearchPool(active);
-    let list = [];
-    let index = 0;
-    let done = false;
-    let mode = '練習題';
-    let previous = '';
-    const searchedCases = new Set();
-    let firstPrediction = '';
+    const found = shuffle(pool).slice(0, randomInt(4, 6));
+    const missing = shuffle(pool).slice(0, 5);
+    const cases = [
+      { title: '示範：找到就停止', list: pool.slice(0, 4), target: pool[1], checked: 0 },
+      { title: '第 1 題：預測比對範圍', list: found, target: found[randomInt(2, found.length - 1)], checked: 0 },
+      { title: '第 2 題：接手搜尋到最後', list: missing, target: pool.find(item => !missing.includes(item)), checked: 2 }
+    ];
+    const title = section.querySelector('#g8-search-title');
+    const prompt = section.querySelector('#g8-search-prompt');
+    const trace = section.querySelector('#g8-search-trace');
     const state = section.querySelector('#g8-search-state');
-    const target = section.querySelector('#g8-search-target');
     const prediction = section.querySelector('#g8-search-prediction');
-    const show = message => { state.textContent = `${mode}；清單：[${list.join('、')}]。${message}`; };
-    const reset = () => { index = 0; done = false; firstPrediction = ''; show('索引從 1 開始，請先預測結果。'); };
-    const setCase = (items, chosen, label) => {
-      list = [...items];
-      mode = label;
-      const missing = pool.find(item => !list.includes(item)) || `未知${inventory.kind}`;
-      target.innerHTML = [...list, missing].map(item => `<option value="${escapeHtml(item)}">${escapeHtml(item)}${item === missing ? '（不在清單）' : ''}</option>`).join('');
-      target.value = chosen;
-      prediction.innerHTML = '<option value="">先選答案</option>' + list.map((_, position) => `<option value="${position + 1}">第 ${position + 1} 項</option>`).join('') + '<option value="missing">找不到</option>';
+    const predictionLabel = section.querySelector('#g8-search-prediction-label');
+    const reason = section.querySelector('#g8-search-reason');
+    const reasonLabel = section.querySelector('#g8-search-reason-label');
+    const step = section.querySelector('#g8-search-step');
+    const stop = section.querySelector('#g8-search-stop');
+    const retry = section.querySelector('#g8-search-reset');
+    const advance = section.querySelector('#g8-search-advance');
+    let stage = 0;
+    let checked = 0;
+    let passed = false;
+    const current = () => cases[stage];
+
+    function showTrace() {
+      const { list, target } = current();
+      trace.innerHTML = list.map((item, index) => {
+        const checkedItem = index < checked;
+        const result = checkedItem ? (item === target ? '符合' : '不符') : '未比對';
+        return `<li${checkedItem ? ' data-compared' : ''}><span>第 ${index + 1} 項</span> ${escapeHtml(item)} <small>${result}</small></li>`;
+      }).join('');
+    }
+
+    function begin() {
+      const lessonCase = current();
+      checked = lessonCase.checked;
+      passed = false;
+      title.textContent = lessonCase.title;
+      const task = ['按「檢查下一項」，看搜尋停在哪裡。', '先選比對範圍，再逐項核對。', '隊員只比過前兩項就回報找不到。請接手，決定何時才能停止。'][stage];
+      prompt.textContent = `尋找「${lessonCase.target}」。${task}`;
+      predictionLabel.hidden = stage !== 1;
+      prediction.innerHTML = '<option value="">先選答案</option>' + lessonCase.list.map((_, index) =>
+        `<option value="${index + 1}">第 ${index + 1} 項</option>`).join('');
       prediction.value = '';
-      reset();
-    };
-    section.querySelector('#g8-search-reset').addEventListener('click', reset);
-    section.querySelector('#g8-search-step').addEventListener('click', () => {
-      if (done) return;
-      if (index === 0) {
-        firstPrediction = prediction.value;
-        if (!firstPrediction) { show('請先選預測的位置或「找不到」。'); return; }
+      prediction.disabled = false;
+      reasonLabel.hidden = true;
+      step.hidden = false;
+      step.disabled = false;
+      stop.hidden = stage !== 2;
+      stop.disabled = false;
+      retry.hidden = true;
+      advance.hidden = true;
+      advance.textContent = stage === 0 ? '開始第 1 題' : '進入第 2 題';
+      state.textContent = stage === 2 ? '前兩項已比過，都不符合。' : '從第 1 項開始比對。';
+      showTrace();
+    }
+
+    step.addEventListener('click', () => {
+      const { list, target } = current();
+      if (passed || checked >= list.length) return;
+      if (stage === 1 && !prediction.value) {
+        state.textContent = '請先選預測會比到第幾項。';
+        prediction.focus();
+        return;
       }
-      const item = list[index];
-      index++;
-      done = item === target.value || index === list.length;
-      const expected = list.includes(target.value) ? String(list.indexOf(target.value) + 1) : 'missing';
-      if (done) {
-        searchedCases.add(expected === 'missing' ? 'missing' : 'found');
-        if (searchedCases.size === 2) section.setAttribute('data-lesson-activity', '');
+      prediction.disabled = true;
+      const item = list[checked++];
+      showTrace();
+      if (item === target) {
+        passed = stage === 0 || Number(prediction.value) === checked;
+        state.textContent = `第 ${checked} 項符合，搜尋停止。${stage === 1 ? (passed ? '預測正確。' : '實際停下的位置和預測不同。看完比對紀錄後，再試一次。') : '後面的項目不用再比。'}`;
+        step.disabled = true;
+        advance.hidden = !passed;
+        retry.hidden = passed;
+        (passed ? advance : retry).focus();
+        return;
       }
-      const feedback = done ? firstPrediction === expected ? '預測正確；請用比較紀錄說明停止條件。' : '預測不同；從第 1 項重新追蹤，找出索引或停止條件的差異。' : '';
-      show(`第 ${index} 次比較：${item} ${item === target.value ? '＝' : '≠'} ${target.value}。${item === target.value ? `找到，位置是第 ${index} 項。` : done ? `已檢查 ${index} 項，沒有找到。` : '繼續檢查下一項。'}${feedback}`);
+      const atEnd = checked === list.length;
+      state.textContent = `第 ${checked} 項不符。${atEnd ? '清單已比完，請回報結果。' : `還有 ${list.length - checked} 項未比對。`}`;
+      if (atEnd) {
+        step.disabled = true;
+        reasonLabel.hidden = false;
+        reason.focus();
+      }
     });
-    target.addEventListener('change', () => { prediction.value = ''; reset(); });
-    section.querySelector('#g8-search-new').addEventListener('click', () => {
-      let items;
-      let chosen;
-      let signature;
-      let attempts = 0;
-      do {
-        items = shuffle(pool).slice(0, randomInt(4, 6));
-        chosen = Math.random() < 0.25 ? pool.find(item => !items.includes(item)) : items[randomInt(0, items.length - 1)];
-        signature = `${items.join(',')}:${chosen}`;
-      } while (signature === previous && ++attempts < 12);
-      if (signature === previous) items.reverse();
-      previous = `${items.join(',')}:${chosen}`;
-      setCase(items, chosen, '練習題');
+    stop.addEventListener('click', () => {
+      if (stage !== 2 || passed) return;
+      if (checked < current().list.length) {
+        state.textContent = `還沒比完。第 ${checked + 1} 項還沒檢查，現在不能回報找不到。`;
+        return;
+      }
+      if (reason.value !== 'all') {
+        state.textContent = reason.value
+          ? '再對照紀錄：如果最後一項剛好符合，就要回報找到。請選出這次回報找不到的理由。'
+          : '請先選出回報找不到的理由。';
+        reason.focus();
+        return;
+      }
+      passed = true;
+      stop.disabled = true;
+      reason.disabled = true;
+      state.textContent = `已檢查全部 ${checked} 項，沒有符合的項目。回報正確，兩題都通過了。`;
+      section.setAttribute('data-lesson-activity', '');
     });
-    section.querySelector('#g8-search-demo').addEventListener('click', () => setCase(pool.slice(0, 4), pool[1], '固定示範'));
-    section.querySelector('#g8-search-new').click();
+    retry.addEventListener('click', () => {
+      begin();
+      prediction.focus();
+    });
+    advance.addEventListener('click', () => {
+      if (!passed || stage === 2) return;
+      stage++;
+      begin();
+      title.focus();
+    });
+    begin();
   }
 
   if (page === '1150805.html') {

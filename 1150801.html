@@ -95,12 +95,8 @@
     <!-- React 互動程式邏輯 -->
     <script type="text/babel" data-type="module">
         const { useState, useEffect, useRef } = React;
-        const { active: scenario, format } = window.CourseScenarios;
-        const { items: scenarioItems, tutorial } = scenario.inventory;
-        const tutorialText = template => format(template, {
-            supply: scenarioItems.supply.label, priority: scenarioItems.priority.label,
-            priorityName: scenarioItems.priority.name, upgrade: scenarioItems.upgrade.label
-        });
+        const { active: scenario } = window.CourseScenarios;
+        const { items: scenarioItems } = scenario.inventory;
 
         // ==========================================
         // 課程介紹標頭 (原網頁的保留資料)
@@ -178,160 +174,154 @@
             );
         };
 
-        // ==========================================
-        // 元件 2：第一階段 - 星際特訓 (Tutorial Mode)
-        // ==========================================
-        const TutorialMode = ({ list, setList, setMessage, onComplete }) => {
-            const [step, setStep] = useState(0);
-            const [stepCompleted, setStepCompleted] = useState(false);
+        const demoList = [scenarioItems.supply.label, scenarioItems.priority.label, scenarioItems.repair.label];
 
-            const steps = [
-                {
-                    title: tutorial[0].title,
-                    desc: tutorialText(tutorial[0].desc),
-                    btnText: tutorialText(tutorial[0].button),
-                    action: () => {
-                        setList([...list, scenarioItems.supply.label]);
-                        setMessage("「添加」把新裝備放在清單最後一項。");
-                    }
-                },
-                {
-                    title: tutorial[1].title,
-                    desc: tutorialText(tutorial[1].desc),
-                    btnText: tutorialText(tutorial[1].button),
-                    action: () => {
-                        const newList = [...list];
-                        newList.splice(0, 0, scenarioItems.priority.label);
-                        setList(newList);
-                        setMessage(`插入新裝備後，原本在這個位置和後面的項目（例如${scenarioItems.supply.name}）都往後移一格。`);
-                    }
-                },
-                {
-                    title: tutorial[2].title,
-                    desc: tutorialText(tutorial[2].desc),
-                    btnText: tutorialText(tutorial[2].button),
-                    action: () => {
-                        const newList = [...list];
-                        newList[0] = scenarioItems.upgrade.label;
-                        setList(newList);
-                        setMessage("「替換」只換掉指定的項目，清單長度一樣。");
-                    }
-                },
-                {
-                    title: tutorial[3].title,
-                    desc: tutorialText(tutorial[3].desc),
-                    btnText: tutorialText(tutorial[3].button),
-                    action: () => {
-                        const itemIndex = list.indexOf(scenarioItems.supply.label);
-                        const newList = [...list];
-                        if(itemIndex > -1) newList.splice(itemIndex, 1);
-                        setList(newList);
-                        setMessage("刪除一項後，後面的項目往前移一格，清單少一項。");
-                    }
-                },
-                {
-                    title: "🎉 清單操作練習完成",
-                    desc: "你練習了新增、插入、替換和刪除。接下來到控制台自由練習，先猜清單會怎麼變，再按積木看看。",
-                    btnText: "🚀 進入控制台實驗室",
-                    action: () => {
-                        setMessage("可以點按鈕或 積木，試試清單怎麼變。");
-                        onComplete();
-                    }
-                }
-            ];
+        function applyListOperation(list, operation, position, item) {
+            const next = [...list];
+            const index = Number(position) - 1;
+            switch (operation) {
+                case 'add': next.push(item); break;
+                case 'insert': next.splice(index, 0, item); break;
+                case 'replace': next[index] = item; break;
+                case 'delete': next.splice(index, 1); break;
+            }
+            return next;
+        }
 
-            const current = steps[step];
+        const ListMissions = ({ setList, setMessage, onComplete, onExplore }) => {
+            const [stage, setStage] = useState(0);
+            const [base, setBase] = useState(demoList);
+            const [selectedItem, setSelectedItem] = useState('');
+            const [selectedLength, setSelectedLength] = useState('');
+            const [operation, setOperation] = useState('');
+            const [position, setPosition] = useState('');
+            const [result, setResult] = useState(null);
+            const [feedback, setFeedback] = useState('');
+            const [passed, setPassed] = useState(false);
+            const titleRef = useRef(null);
+            const inserted = scenarioItems.signal.label;
+            const replacement = practiceItemPool.find(item => !base.includes(item));
+            const goal = [...base.slice(0, -1), replacement];
+            const titles = ['示範：添加與插入', '第 1 題：預測刪除後的清單', '第 2 題：選操作達成目標'];
 
-            // 冒險地圖的地點設定
-            const mapNodes = [
-                { icon: '🌍', name: '地球基地' },
-                { icon: '🛰️', name: '太空港' },
-                { icon: '☄️', name: '碎星石帶' },
-                { icon: '🌌', name: '星雲區' },
-                { icon: '🛸', name: '指揮艦' }
-            ];
+            useEffect(() => {
+                if (stage > 0) titleRef.current.focus();
+            }, [stage]);
 
-            const handleAction = () => {
-                current.action();
-                if (step < steps.length - 1) {
-                    setStepCompleted(true);
-                }
-            };
+            function showResult(next, text) {
+                setResult(next);
+                setList(next);
+                setFeedback(text);
+                setMessage(text);
+            }
 
-            const handleNext = () => {
-                setStep(step + 1);
-                setStepCompleted(false);
-                setMessage("下一個任務在左側。先讀說明，再動手試。");
-            };
+            function demonstrate() {
+                showResult(applyListOperation(base, 'insert', 2, inserted),
+                    '新項目放在第 2 項。原本的第 2 項往後移到第 3 項，清單多一項。');
+                setPassed(true);
+            }
 
+            function nextQuestion() {
+                const nextBase = makePracticeList();
+                setBase(nextBase);
+                setList(nextBase);
+                setMessage('這是本題操作前的清單。');
+                setStage(stage + 1);
+                setResult(null);
+                setFeedback('');
+                setPassed(false);
+            }
+
+            function checkPrediction(event) {
+                event.preventDefault();
+                if (!selectedItem || !selectedLength) return;
+                const next = applyListOperation(base, 'delete', 2);
+                const correct = selectedItem === next[1] && Number(selectedLength) === next.length;
+                showResult(next, correct
+                    ? '預測正確。刪掉第 2 項後，原本的第 3 項往前補，清單少一項。'
+                    : '對照操作前和操作後。注意哪一項往前補，以及清單少了幾項，再修改答案。');
+                setPassed(correct);
+            }
+
+            function runOperation(event) {
+                event.preventDefault();
+                if (!operation || (operation !== 'add' && !position)) return;
+                const next = applyListOperation(base, operation, position, replacement);
+                const correct = next.length === goal.length && next.every((item, i) => item === goal[i]);
+                showResult(next, correct
+                    ? '達成目標。替換只改動指定的位置，清單長度不變。'
+                    : (next.length === goal.length ? '項目數相同。再比一比每個位置和目標清單是否一致。'
+                        : '操作後的項目數和目標不同。想一想哪種操作能保留原本的項目數。'));
+                setPassed(correct);
+                if (correct) onComplete();
+            }
+
+            const listText = items => items.join(' → ');
             return (
-                <div className="bg-white rounded-3xl shadow-lg p-8 md:p-10 border-t-8 border-cyan-500 animate-[fadeIn_0.5s_ease-out] min-h-[500px] flex flex-col justify-center">
-                    <h2 className="text-3xl font-black text-slate-800 mb-4">{current.title}</h2>
-                    <p className="text-xl text-slate-700 mb-8 leading-relaxed bg-cyan-50 p-5 rounded-2xl border border-cyan-100">
-                        {current.desc}
-                    </p>
-
-                    <div className="flex flex-col items-center justify-center gap-6 bg-slate-50 p-8 rounded-2xl border-2 border-dashed border-slate-300 min-h-[160px]">
-                        {!stepCompleted ? (
-                            <button
-                                onClick={handleAction}
-                                className="bg-cyan-600 hover:bg-cyan-700 text-white text-2xl font-bold py-4 px-8 rounded-full shadow-lg transition-all active:scale-95 flex items-center gap-2 hover:-translate-y-1"
-                            >
-                                {current.btnText}
-                            </button>
-                        ) : (
-                            <div className="flex flex-col items-center gap-5 animate-[fadeIn_0.3s_ease-out]">
-                                <div className="text-cyan-700 font-extrabold text-xl md:text-2xl flex items-center gap-2 text-center">
-                                    ✅ 這一步完成了。看看右邊的清單和操作結果。
-                                </div>
-                                <button
-                                    onClick={handleNext}
-                                    className="bg-indigo-600 hover:bg-indigo-700 text-white text-xl font-bold py-3 px-8 rounded-full shadow-lg transition-transform active:scale-95 flex items-center gap-2 animate-bounce mt-2"
-                                >
-                                    前往下一座標 ➡️
-                                </button>
-                            </div>
+                <div className="bg-white rounded-3xl shadow-lg p-5 md:p-8 border-t-8 border-cyan-500 list-mission" data-list-stage={stage}>
+                    <h2 ref={titleRef} tabIndex="-1" className="text-2xl font-black text-slate-800 mb-3">{titles[stage]}</h2>
+                    <div className="space-y-3">
+                        <p><strong>操作前（{base.length} 項）</strong> {listText(base)}</p>
+                        {stage === 0 && <p>把「{inserted}」插在第 2 項，看看原本的第 2 項移到哪裡。</p>}
+                        {stage === 1 && <p>刪除第 2 項後，新的第 2 項是什麼？清單剩幾項？</p>}
+                        {stage === 2 && <p><strong>目標（{goal.length} 項）</strong> {listText(goal)}</p>}
+                    </div>
+                    {stage === 0 && <button type="button" disabled={passed} onClick={demonstrate}>示範插入</button>}
+                    {stage === 1 && (
+                        <form onSubmit={checkPrediction}>
+                            <fieldset disabled={passed}>
+                                <label>新的第 2 項
+                                    <select id="list-predict-item" required value={selectedItem} onChange={event => setSelectedItem(event.target.value)}>
+                                        <option value="">請選一項</option>
+                                        {base.map(item => <option key={item}>{item}</option>)}
+                                    </select>
+                                </label>
+                                <label>剩餘項目數
+                                    <select id="list-predict-length" required value={selectedLength} onChange={event => setSelectedLength(event.target.value)}>
+                                        <option value="">請選數量</option>
+                                        {[base.length - 1, base.length, base.length + 1].map(length => <option key={length}>{length}</option>)}
+                                    </select>
+                                </label>
+                                <button type="submit">核對預測</button>
+                            </fieldset>
+                        </form>
+                    )}
+                    {stage === 2 && (
+                        <form onSubmit={runOperation}>
+                            <fieldset disabled={passed}>
+                                <label>要執行的操作
+                                    <select id="list-operation" required value={operation} onChange={event => setOperation(event.target.value)}>
+                                        <option value="">請選操作</option>
+                                        <option value="add">添加到最後</option>
+                                        <option value="insert">插入新項目</option>
+                                        <option value="replace">替換指定項目</option>
+                                        <option value="delete">刪除指定項目</option>
+                                    </select>
+                                </label>
+                                <label>要操作的位置
+                                    <select id="list-position" required disabled={!operation || operation === 'add'} value={position} onChange={event => setPosition(event.target.value)}>
+                                        <option value="">請選位置</option>
+                                        {base.map((_, index) => <option value={index + 1} key={index}>第 {index + 1} 項</option>)}
+                                    </select>
+                                </label>
+                                <button type="submit">執行並核對</button>
+                            </fieldset>
+                        </form>
+                    )}
+                    <div role="status" className="mt-3 space-y-2">
+                        {result && <p><strong>{stage === 0 ? '插入後' : '操作後'}（{result.length} 項）</strong> {listText(result)}</p>}
+                        {feedback && <p>{feedback}</p>}
+                        {stage === 0 && passed && (
+                            <p><strong>若添加在最後（{base.length + 1} 項）</strong> {listText(applyListOperation(base, 'add', null, inserted))}。原本的第 2 項留在原位。</p>
                         )}
                     </div>
-
-                    {/* 任務航線 */}
-                    <div className="mt-10 pt-6 border-t-2 border-dashed border-slate-200 w-full animate-[fadeIn_0.5s_ease-out]">
-                        <h3 className="text-sm font-bold text-slate-400 mb-8 text-center tracking-widest">🗺️ 星際航線進度</h3>
-                        <div className="flex items-center w-full px-2 md:px-8">
-                            {mapNodes.map((node, i) => {
-                                const isPast = i < step;
-                                const isCurrent = i === step;
-                                return (
-                                    <React.Fragment key={i}>
-                                        <div className="flex flex-col items-center relative z-10">
-                                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-xl md:text-2xl border-4 transition-all duration-500 bg-white ${
-                                                isPast ? 'border-cyan-500 scale-95' :
-                                                isCurrent ? 'border-indigo-500 scale-110 shadow-lg shadow-indigo-200 ring-4 ring-indigo-50' :
-                                                'border-slate-300 opacity-50 grayscale'
-                                            }`}>
-                                                {isPast && i !== mapNodes.length - 1 ? '✔️' : node.icon}
-                                            </div>
-                                            <span className={`absolute top-12 md:top-14 text-xs font-bold whitespace-nowrap transition-colors duration-300 ${
-                                                isCurrent ? 'text-indigo-700 font-extrabold' :
-                                                isPast ? 'text-cyan-600' : 'text-slate-400'
-                                            }`}>
-                                                {node.name}
-                                            </span>
-                                        </div>
-                                        {i < mapNodes.length - 1 && (
-                                            <div className="flex-1 h-1.5 mx-1 md:mx-2 relative z-0 rounded-full overflow-hidden">
-                                                <div className="absolute inset-0 bg-slate-200"></div>
-                                                <div className={`absolute inset-0 bg-cyan-500 transition-transform duration-700 ease-in-out origin-left ${
-                                                    i < step ? 'scale-x-100' : 'scale-x-0'
-                                                }`}></div>
-                                            </div>
-                                        )}
-                                    </React.Fragment>
-                                );
-                            })}
-                        </div>
-                        <div className="h-6 md:h-8"></div>
-                    </div>
+                    {passed && stage < 2 && <button type="button" onClick={nextQuestion}>{stage === 0 ? '開始第 1 題' : '進入第 2 題'}</button>}
+                    {passed && stage === 2 && (
+                        <>
+                            <p className="mt-3">兩題都通過了，可以完成這一步，或再試其他清單操作。</p>
+                            <button type="button" onClick={onExplore}>自由練習（選做）</button>
+                        </>
+                    )}
                 </div>
             );
         };
@@ -621,9 +611,10 @@
         }
 
         function App() {
-            const [mode, setMode] = useState('tutorial'); // 階段狀態：'tutorial' 或 'sandbox'
-            const [list, setList] = useState([]);         // 共享的背包資料
-            const [message, setMessage] = useState("先做左側的清單練習。每按一次按鈕，就看看右側的裝備清單怎麼變。");
+            const [exploring, setExploring] = useState(false);
+            const [missionComplete, setMissionComplete] = useState(false);
+            const [list, setList] = useState(demoList);
+            const [message, setMessage] = useState("先看看示範如何把新項目插入清單。");
 
             return (
                 <div>
@@ -631,16 +622,20 @@
                     <LessonHeader />
 
                     {/* 互動學習區域 */}
-                    <div id="route-list-missions" data-lesson-activity={mode === 'sandbox' ? '' : undefined} className="flex flex-col md:flex-row gap-8 relative">
+                    <div id="route-list-missions" data-lesson-activity={missionComplete ? '' : undefined} className="flex flex-col md:flex-row gap-8 relative">
                         
                         {/* 左側：操作區 (根據階段切換介面) */}
                         <div className="w-full md:w-3/5 pb-20">
-                            {mode === 'tutorial' ? (
-                                <TutorialMode 
-                                    list={list} 
-                                    setList={setList} 
-                                    setMessage={setMessage} 
-                                    onComplete={() => { setList(makePracticeList()); setMessage('自由練習已產生一組新裝備清單。先預測操作結果，再按積木驗證。'); setMode('sandbox'); }}
+                            {!exploring ? (
+                                <ListMissions
+                                    setList={setList}
+                                    setMessage={setMessage}
+                                    onComplete={() => setMissionComplete(true)}
+                                    onExplore={() => {
+                                        setList(makePracticeList());
+                                        setMessage('這是一組新的裝備清單。挑一個操作，先猜結果再執行。');
+                                        setExploring(true);
+                                    }}
                                 />
                             ) : (
                                 <SandboxMode 

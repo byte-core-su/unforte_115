@@ -14,14 +14,15 @@ function loadLab(page, scenario = CourseScenarios.active) {
       elements.set(id, {
         innerHTML: '', textContent: '', value: '', listeners: {},
         addEventListener(type, callback) { this.listeners[type] = callback; },
-        click() { this.listeners.click?.(); }
+        click() { if (!this.disabled && !this.hidden) this.listeners.click?.(); },
+        focus() {}
       });
     }
     return elements.get(id);
   };
   const section = {
     className: '', innerHTML: '',
-    setAttribute() {},
+    setAttribute(name, value) { this[name] = value; },
     querySelector(selector) { return selector === '[data-quiz]' ? null : element(selector); }
   };
   const main = { appendChild() {} };
@@ -32,7 +33,7 @@ function loadLab(page, scenario = CourseScenarios.active) {
   const window = { CourseScenarios: { ...CourseScenarios, active: scenario }, location: { pathname: `/${page}` } };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../lesson-labels.js'), 'utf8'), { window });
   vm.runInNewContext(source, { document, window, Math });
-  return element;
+  return Object.assign(element, { section });
 }
 
 {
@@ -68,34 +69,72 @@ function loadLab(page, scenario = CourseScenarios.active) {
   });
 }
 
-{
-  const get = loadLab('1150801.html');
+for (const scenario of [CourseScenarios.active, campus]) {
+  const get = loadLab('1150801.html', scenario);
   const state = get('#g8-search-state');
-  const first = state.textContent;
-  assert.match(first, /練習題；清單：\[/);
-  get('#g8-search-step').click();
+  const trace = get('#g8-search-trace');
+  const prompt = get('#g8-search-prompt');
+  const advance = get('#g8-search-advance');
+  const step = get('#g8-search-step');
+  const stop = get('#g8-search-stop');
+  const prediction = get('#g8-search-prediction');
+  const reason = get('#g8-search-reason');
+  const passed = () => get.section['data-lesson-activity'] === '';
+  const comparisons = () => (trace.innerHTML.match(/data-compared/g) || []).length;
+
+  assert.match(get('#g8-search-title').textContent, /示範/);
+  assert.ok(prompt.textContent.includes(CourseScenarios.inventorySearchPool(scenario)[1]));
+  assert.equal(advance.hidden, true);
+  step.click();
+  assert.equal(comparisons(), 1);
+  assert.equal(advance.hidden, true);
+  step.click();
+  assert.match(state.textContent, /第 2 項符合，搜尋停止/);
+  assert.equal(comparisons(), 2);
+  assert.equal(step.disabled, true);
+  assert.equal(passed(), false);
+  advance.click();
+
+  assert.match(get('#g8-search-title').textContent, /第 1 題：預測/);
+  const target = prompt.textContent.match(/「([^」]+)」/)[1];
+  const items = [...trace.innerHTML.matchAll(/<span>[^<]+<\/span> (.*?) <small>/g)].map(match => match[1]);
+  const index = items.indexOf(target) + 1;
+  assert.ok(index >= 3);
+  step.click();
   assert.match(state.textContent, /請先選預測/);
-  get('#g8-search-prediction').value = '1';
-  get('#g8-search-step').click();
-  assert.match(state.textContent, /第 1 次比較/);
+  assert.equal(comparisons(), 0);
+  prediction.value = '1';
+  for (let i = 0; i < index; i++) step.click();
+  assert.match(state.textContent, /和預測不同/);
+  assert.equal(advance.hidden, true);
+  assert.equal(passed(), false);
   get('#g8-search-reset').click();
-  assert.equal(state.textContent, first, 'retry should preserve the case');
-  get('#g8-search-new').click();
-  assert.notEqual(state.textContent, first, 'new search case should differ');
-  get('#g8-search-demo').click();
-  assert.match(state.textContent, /固定示範；清單：\[能量電池、防護罩、修復劑、雷射槍\]/);
-  get('#g8-search-prediction').value = '2';
-  get('#g8-search-step').click();
-  get('#g8-search-step').click();
-  assert.match(state.textContent, /找到，位置是第 2 項/);
+  assert.equal(prediction.value, '');
+  assert.equal(comparisons(), 0);
+  assert.ok(prompt.textContent.includes(target));
+  prediction.value = String(index);
+  for (let i = 0; i < index; i++) step.click();
   assert.match(state.textContent, /預測正確/);
-  get('#g8-search-target').value = '不存在的裝備';
-  get('#g8-search-reset').click();
-  get('#g8-search-prediction').value = 'missing';
-  for (let i = 0; i < 4; i++) get('#g8-search-step').click();
-  assert.match(state.textContent, /沒有找到/);
-  get('#g8-search-new').click();
-  assert.equal(get('#g8-search-prediction').value, '', 'new search case should clear old prediction');
+  assert.equal(advance.hidden, false);
+  advance.click();
+
+  assert.match(get('#g8-search-title').textContent, /第 2 題：接手/);
+  assert.ok(!trace.innerHTML.includes(prompt.textContent.match(/「([^」]+)」/)[1]));
+  assert.equal(comparisons(), 2);
+  stop.click();
+  assert.match(state.textContent, /第 3 項還沒檢查/);
+  for (let i = 0; i < 3; i++) step.click();
+  assert.equal(comparisons(), 5);
+  assert.equal(passed(), false);
+  stop.click();
+  assert.match(state.textContent, /請先選出.*理由/);
+  reason.value = 'last';
+  stop.click();
+  assert.equal(passed(), false);
+  reason.value = 'all';
+  stop.click();
+  assert.match(state.textContent, /全部 5 項.*兩題都通過/);
+  assert.equal(passed(), true);
 }
 
 {
@@ -122,22 +161,6 @@ function loadLab(page, scenario = CourseScenarios.active) {
   assert.match(state.textContent, /第一次預測正確/);
   get('#g8-sort-new').click();
   assert.equal(get('#g8-sort-prediction').value, '', 'new sort case should clear old prediction');
-}
-
-{
-  const get = loadLab('1150801.html', campus);
-  const state = get('#g8-search-state');
-  get('#g8-search-demo').click();
-  assert.match(state.textContent, /固定示範；清單：\[借書卡、預約單、修補膠帶、掃描器\]/);
-  get('#g8-search-prediction').value = '2';
-  get('#g8-search-step').click();
-  get('#g8-search-step').click();
-  assert.match(state.textContent, /找到，位置是第 2 項.*預測正確/);
-  get('#g8-search-target').value = '推車';
-  get('#g8-search-reset').click();
-  get('#g8-search-prediction').value = 'missing';
-  for (let i = 0; i < 4; i++) get('#g8-search-step').click();
-  assert.match(state.textContent, /已檢查 4 項，沒有找到/);
 }
 
 {

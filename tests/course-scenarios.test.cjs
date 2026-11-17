@@ -50,21 +50,19 @@ test('grade overviews keep alternative scenarios and local lesson links', () => 
   }
 });
 
-test('alternate data drives the actual insert, replace and delete tutorial actions', () => {
+test('alternate data drives the lesson list operations with one-based positions', () => {
   const html = read('1150801.html');
-  const setup = html.match(/const \{ active: scenario, format \}[\s\S]*?\n        \}\);/)[0];
-  const actions = html.match(/const steps = \[[\s\S]+?\n            \];/)[0];
+  const setup = html.match(/const \{ active: scenario \} = window\.CourseScenarios;\s+const \{ items: scenarioItems \} = scenario\.inventory;/)[0];
+  const actions = html.match(/const demoList = [\s\S]+?(?=\s+const ListMissions =)/)[0];
   const window = { CourseScenarios: { ...CourseScenarios, active: campus } };
-  const context = { window, list: [], setMessage() {}, setList(value) { context.list = Array.from(value); } };
-  const steps = vm.runInNewContext(`${setup}\n${actions}\nsteps;`, context);
-  const { supply, priority, upgrade } = campus.inventory.items;
-  assert.match(steps[0].btnText, /借書卡/);
-  assert.match(steps[1].desc, /預約單/);
-  assert.match(steps[2].btnText, /優先借閱單/);
-  for (const [index, expected] of [[0, [supply.label]], [1, [priority.label, supply.label]], [2, [upgrade.label, supply.label]], [3, [upgrade.label]]]) {
-    steps[index].action();
-    assert.deepEqual(context.list, expected);
-  }
+  const { demoList, applyListOperation } = vm.runInNewContext(`${setup}\n${actions}\n({ demoList, applyListOperation });`, { window });
+  const { supply, priority, repair, signal } = campus.inventory.items;
+  const expected = [supply.label, priority.label, repair.label];
+  assert.deepEqual(Array.from(applyListOperation(demoList, 'add', null, signal.label)), [...expected, signal.label]);
+  assert.deepEqual(Array.from(applyListOperation(demoList, 'insert', 2, signal.label)), [supply.label, signal.label, priority.label, repair.label]);
+  assert.deepEqual(Array.from(applyListOperation(demoList, 'delete', 2)), [supply.label, repair.label]);
+  assert.deepEqual(Array.from(applyListOperation(demoList, 'replace', 3, signal.label)), [supply.label, priority.label, signal.label]);
+  assert.deepEqual(Array.from(demoList), expected);
 });
 
 test('the capstone still creates 24 numbered entries with replacement labels', async () => {
