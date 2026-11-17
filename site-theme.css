@@ -364,7 +364,6 @@ button { transition: transform .18s ease, box-shadow .18s ease, background-color
 }
 .curriculum-lab__card h2 { margin: .2rem 0 .5rem; color: var(--site-text); font-size: 1.45rem; font-weight: 800; }
 .curriculum-lab__card p { margin: .5rem 0 1rem; }
-.curriculum-lab__code { color: var(--grade-primary); font-size: .85rem; font-weight: 800; }
 .curriculum-lab__controls { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem; margin: 1rem 0; }
 .curriculum-lab button {
   border: 1px solid var(--grade-primary);

@@ -41,13 +41,9 @@ test('grade 8 ethics codes distinguish review, partial coverage and exclusions',
   const unit = source.split('### 第 2 課')[1].split('### 第 3 課')[0];
   assert.match(unit, /複習資 H-IV-1、資 H-IV-2，部分融入資 H-IV-5/);
   assert.match(unit, /資 H-IV-4 不列為本課涵蓋證據/);
-  const labs = read('curriculum-labs.js');
-  const ethics = labs.match(/'1150802\.html': \{([\s\S]*?)\n    \}/)?.[1];
-  const codes = ethics.match(/codes: '([^']+)'/)?.[1];
-  assert.match(codes, /資 H-IV-1、資 H-IV-2（複習）/);
-  assert.match(codes, /資 H-IV-5（倫理面向部分融入）/);
-  assert.doesNotMatch(codes, /H-IV-4/);
-  assert.match(ethics, /不涵蓋資 H-IV-4/);
+  const plan = read('lesson-plan-grade-8.html');
+  assert.match(plan, /複習資 H-IV-1、資 H-IV-2，部分融入資 H-IV-5/);
+  assert.match(plan, /資 H-IV-4 不列為本課涵蓋證據/);
 });
 
 test('reference code and optional modules are not reported as universal implementation', () => {
@@ -74,9 +70,10 @@ test('presentation uses formal prefixes and consistent partial ethics coverage',
   assert.equal((deck.match(/class="slide-page"/g) || []).length, 16);
 });
 
-test('dynamic lesson rendering does not replace the attached curriculum lab', () => {
-  for (const page of ['1150801.html', '1150802.html', '1150805.html', '1150806.html']) {
-    let sibling;
+test('student labs show activity titles and keep clear of the dynamic render root', () => {
+  for (const page of ['1150701.html', '1150706.html', '1150801.html', '1150802.html', '1150805.html', '1150806.html']) {
+    let mounted;
+    const dynamic = /<main id="app-container"/.test(read(page));
     const controls = new Map();
     const control = selector => {
       if (!controls.has(selector)) controls.set(selector, {
@@ -87,20 +84,21 @@ test('dynamic lesson rendering does not replace the attached curriculum lab', ()
       return controls.get(selector);
     };
     const section = {
-      setAttribute() {},
+      setAttribute(name, value) { this[name] = value; },
       querySelector(selector) { return selector === '[data-quiz]' ? null : control(selector); }
     };
     const main = {
-      id: 'app-container', innerHTML: '',
-      appendChild() { assert.fail('must not mount inside the dynamic render root'); },
-      insertAdjacentElement(position, element) { assert.equal(position, 'afterend'); sibling = element; }
+      id: dynamic ? 'app-container' : '', innerHTML: '',
+      appendChild(element) { assert.ok(!dynamic); mounted = element; },
+      insertAdjacentElement(position, element) { assert.ok(dynamic); assert.equal(position, 'afterend'); mounted = element; }
     };
     vm.runInNewContext(read('curriculum-labs.js'), {
       document: { querySelector: () => main, createElement: () => section },
       window: { CourseScenarios, location: { pathname: `/${page}` } }, Math
     });
-    main.innerHTML = '<article>rendered lesson</article>';
-    assert.equal(sibling, section);
-    assert.match(sibling.innerHTML, /課綱補強實作/);
+    assert.equal(mounted, section);
+    assert.equal(mounted['aria-labelledby'], 'curriculum-lab-title');
+    assert.match(mounted.innerHTML, /<h2 id="curriculum-lab-title">[^<]+<\/h2>/);
+    assert.doesNotMatch(mounted.innerHTML, /課綱|採證|[A-Za-z]-IV-\d|lesson-plan-grade-/);
   }
 });

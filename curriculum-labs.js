@@ -8,37 +8,31 @@
   const labs = {
     '1150701.html': {
       title: '資訊使用情境判斷',
-      codes: '資 H-IV-1／2／3｜運 a-IV-2',
-      intro: '完成積木診斷後，再判斷使用 積木程式與網路資源時，如何保護個資、合理使用素材並維護帳號安全。',
+      intro: '想一想，使用積木程式和網路素材時，怎麼保護個資與帳號，並確認素材能不能使用？',
       html: `<div class="curriculum-lab__questions" data-quiz="g7-safety"></div>`
     },
     '1150706.html': {
       title: escapeHtml(defense.labTitle),
-      codes: '資 T-IV-1｜運 t-IV-4、運 p-IV-1',
       intro: `使用匿名範例資料，先搜尋指定測試、比較${escapeHtml(defense.labResult)}，再計算平均資源消耗；將結論用於改良${escapeHtml(defense.project)}。`,
       html: `<div class="curriculum-lab__controls"><label>搜尋測試編號 <select id="g7-data-query"></select></label><label>先預測有效且最省資源的編號 <select id="g7-data-prediction"><option value="">先選答案</option><option>A</option><option>B</option><option>C</option><option>D</option></select></label><button type="button" id="g7-data-run">核對預測並分析</button><button type="button" id="g7-data-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g7-data-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g7-data-result" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">積木程式測試提示：在自己的作品試不同的邊數、圖形數量和筆跡寬度。把參數及是否${escapeHtml(defense.outcome)}的結果填進本課紀錄表，再比較通過測試的組合。</p>`
     },
     '1150801.html': {
       title: '循序搜尋：逐項檢查清單',
-      codes: '資 A-IV-3（搜尋）｜資 P-IV-3｜運 t-IV-4',
       intro: '先預測目標位於第幾項，再逐步執行；找不到時，也要能說出停止條件。',
       html: `<div class="curriculum-lab__controls"><label>尋找${escapeHtml(inventory.kind)} <select id="g8-search-target"></select></label><label>先預測位置 <select id="g8-search-prediction"></select></label><button type="button" id="g8-search-reset">同題重試</button><button type="button" id="g8-search-step">檢查下一項</button><button type="button" id="g8-search-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g8-search-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g8-search-state" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">積木程式任務：以「索引從 1 開始，逐項比較；找到或超過清單長度就停止」實作搜尋，交出找到與找不到各一筆追蹤紀錄。請記錄比較順序，別只背位置。</p>`
     },
     '1150802.html': {
       title: '音訊與作品使用判斷',
-      codes: '資 H-IV-1、資 H-IV-2（複習）｜資 H-IV-5（倫理面向部分融入）｜運 a-IV-2',
-      intro: '音符清單可用於創作；錄音與現成旋律涉及個資、授權與公開分享，操作前先做判斷。本活動複習個資保護與合理使用，部分融入使用倫理，不涵蓋資 H-IV-4 的網路成癮、網路交友議題。課綱來源與採證範圍見<a href="lesson-plan-grade-8.html#section-1">八年級教案</a>。此頁的錄音比對由瀏覽器端處理，不是教師評分或後端作業系統。',
+      intro: '先判斷錄音和旋律能不能使用或分享。錄音比對會在你的瀏覽器中完成。',
       html: `<div class="curriculum-lab__questions" data-quiz="g8-ethics"></div>`
     },
     '1150805.html': {
       title: '排序與洗牌比較',
-      codes: '資 A-IV-3（排序）｜資 P-IV-3｜運 t-IV-4',
       intro: '洗牌讓順序隨機；排序依明確規則排列。逐步比較相鄰數值，必要時交換，觀察每一輪如何改變清單。',
       html: `<div class="curriculum-lab__controls"><label>先預測第一次比較 <select id="g8-sort-prediction"><option value="">先選答案</option><option value="swap">會交換</option><option value="keep">不交換</option></select></label><button type="button" id="g8-sort-reset">同題重試</button><button type="button" id="g8-sort-step">執行下一次比較</button><button type="button" id="g8-sort-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g8-sort-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g8-sort-state" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">積木程式任務：將四至六張打亂的數字牌由小到大排序；標出每次比較與交換，確認輸出數量與項目和輸入相同。換一組數字後，仍要能解釋交換規則。</p>`
     },
     '1150806.html': {
       title: `用自訂積木分工完成${escapeHtml(duel.activity)}`,
-      codes: '資 P-IV-4／5｜運 t-IV-4、運 p-IV-1',
       intro: '把一大段程式拆成具名的自訂積木。先決定呼叫順序，再到 積木程式建立並測試各段功能。',
       html: `<div class="curriculum-lab__controls" id="g8-module-options"></div><div id="g8-module-state" class="curriculum-lab__result" aria-live="polite"></div><button type="button" id="g8-module-reset" class="curriculum-lab__secondary">重排呼叫順序</button><p class="curriculum-lab__task">積木程式實作提示：建立${duel.modules.map(name => `「${escapeHtml(name)}」`).join('')}四個自訂積木，分別測試。改變${escapeHtml(duel.item)}數量，看看裝備不足時程式怎麼處理。</p>`
     }
@@ -49,8 +43,8 @@
   const section = document.createElement('section');
   section.id = 'curriculum-lab';
   section.className = 'curriculum-lab';
-  section.setAttribute('aria-label', '課綱補強實作');
-  section.innerHTML = `<div class="curriculum-lab__card"><p class="curriculum-lab__code">課綱補強實作｜${lab.codes}</p><h2>${lab.title}</h2><p>${lab.intro}</p>${lab.html}</div>`;
+  section.setAttribute('aria-labelledby', 'curriculum-lab-title');
+  section.innerHTML = `<div class="curriculum-lab__card"><h2 id="curriculum-lab-title">${lab.title}</h2><p>${lab.intro}</p>${lab.html}</div>`;
   // Dynamic lessons replace app-container contents; keep the lab outside that render root.
   if (main.id === 'app-container') main.insertAdjacentElement('afterend', section);
   else main.appendChild(section);
