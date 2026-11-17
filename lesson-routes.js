@@ -218,9 +218,9 @@
     ]),
     '1150801.html': route([], [
       { title: '清單操作任務', anchors: ['#route-list-missions'],
-        activity: achieved('#route-list-missions', '先做完示範，再答對兩道清單操作題。'),
-        todo: '比較添加和插入，預測刪除後的結果，再選操作做出指定的清單。記下這四種操作前後的順序和長度。',
-        checks: ['答對刪除後的第 2 項和清單長度', '選對操作和位置，執行後與目標清單一致'],
+        activity: achieved('#route-list-missions', '先答對刪除預測，再將裝備整理成目標清單。'),
+        todo: '比較添加和插入，預測刪除後的結果，再自行用按鈕或積木做出指定清單。記下操作前後的順序和長度。',
+        checks: ['答對刪除後的第 2 項和清單長度', '目前清單的項目、順序和數量都與目標一致'],
         hints: ['索引值從 1 開始：第 1 項就是最上面那一個。', '插入會讓後面的項目往後移一格；刪除後，後面的項目往前補。'] },
       { title: '循序搜尋', anchors: ['#curriculum-lab'],
         activity: achieved('#curriculum-lab', '看完示範，答對比對範圍，再接手搜尋並正確回報。'),

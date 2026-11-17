@@ -55,7 +55,9 @@ test('alternate data drives the lesson list operations with one-based positions'
   const setup = html.match(/const \{ active: scenario \} = window\.CourseScenarios;\s+const \{ items: scenarioItems \} = scenario\.inventory;/)[0];
   const actions = html.match(/const demoList = [\s\S]+?(?=\s+function DemoList)/)[0];
   const window = { CourseScenarios: { ...CourseScenarios, active: campus } };
-  const { demoList, applyListOperation, demoFrames } = vm.runInNewContext(`${setup}\n${actions}\n({ demoList, applyListOperation, demoFrames });`, { window });
+  const { demoList, applyListOperation, demoFrames, makeListChallenge, compareLists, equipmentValue } = vm.runInNewContext(
+    `${setup}\n${actions}\n({ demoList, applyListOperation, demoFrames, makeListChallenge, compareLists, equipmentValue });`, { window }
+  );
   const { supply, priority, repair, signal } = campus.inventory.items;
   const expected = [supply.label, priority.label, repair.label];
   assert.deepEqual(Array.from(applyListOperation(demoList, 'add', null, signal.label)), [...expected, signal.label]);
@@ -69,6 +71,17 @@ test('alternate data drives the lesson list operations with one-based positions'
   const ordered = positions => Array.from(positions.keys()).sort((a, b) => positions[a] - positions[b]).map(index => items[index]);
   assert.deepEqual(ordered(last.insert), Array.from(applyListOperation(demoList, 'insert', 2, signal.label)));
   assert.deepEqual(ordered(last.add), Array.from(applyListOperation(demoList, 'add', null, signal.label)));
+
+  const mission = makeListChallenge();
+  const [first, second, third] = mission.target;
+  const replace = applyListOperation(applyListOperation(mission.start, 'replace', 1, first), 'replace', 3, third);
+  const rebuild = [first, second, third].reduce((list, item) => applyListOperation(list, 'add', null, item), []);
+  assert.equal(compareLists(replace, mission.target), '');
+  assert.equal(compareLists(rebuild, mission.target), '');
+  assert.match(compareLists([second, first, third], mission.target), /第 1 項/);
+  assert.match(compareLists([...mission.target, third], mission.target), /項目數不同/);
+  assert.equal(equipmentValue(` ${supply.name} `), supply.label);
+  assert.notDeepEqual(Array.from(makeListChallenge(1).target), Array.from(mission.target));
 });
 
 test('the capstone still creates 24 numbered entries with replacement labels', async () => {
