@@ -23,17 +23,17 @@
                 <div class="student-tags"><span>學號 <span id="student-id">1510100</span></span><span>班級 <span id="student-class">11501</span></span><span id="student-source">示範學生</span></div>
             </div>
             <div class="header-progress"><span id="total-complete">0 / 20</span><small>已完成關卡</small></div>
-            <div class="student-actions"><a id="course-menu" class="menu-link" href="../index.html">回主選單</a><button id="edit-student" type="button">設定學生資料</button><button id="show-records" type="button">學習紀錄</button></div>
+            <div class="student-actions"><button id="back-to-levels" class="level-menu-button" type="button">回關卡列表</button><button id="edit-student" type="button">設定學生資料</button><button id="show-records" type="button">學習紀錄</button></div>
         </header>
         <div class="game-workspace">
             <nav class="level-panel card" aria-label="選擇關卡" hidden>
-                <div class="section-heading"><h2>挑戰關卡</h2><span class="muted">20 關</span></div>
+                <div class="section-heading"><h2 id="level-list-title" tabindex="-1">挑戰關卡</h2><span class="muted">20 關</span><button id="resume-level" type="button" hidden>繼續目前關卡</button></div>
                 <div id="level-list"></div>
-                <a class="reference-link" href="lightbot.html" target="_blank" rel="noopener">對照原版遊戲</a>
+                <a class="reference-link" data-teacher-link href="lightbot.html" target="_blank" rel="noopener">對照原版遊戲</a>
             </nav>
             <div class="play-area card">
             <section class="board-panel" aria-labelledby="level-title">
-                <div class="board-heading"><div><span id="level-group" class="eyebrow">基礎 · 1-1</span><h2 id="level-title">第一盞燈</h2></div><button id="rotate-view" type="button" title="只改變觀看角度，不改變機器人方向">旋轉視角</button></div>
+                <div class="board-heading"><div><span id="level-group" class="eyebrow">基礎 · 1-1</span><h2 id="level-title" tabindex="-1">第一盞燈</h2></div><button id="rotate-view" type="button" title="只改變觀看角度，不改變機器人方向">旋轉視角</button></div>
                 <div class="board-stage"><canvas id="game-board" width="900" height="560" role="img" aria-label="關卡地圖，橘色箭頭表示機器人朝向">請使用支援 Canvas 的瀏覽器。</canvas></div>
                 <div class="board-stats"><span id="light-count">已點亮 0 / 1</span><span id="step-count">執行 0 步</span><span id="robot-facing" class="facing-badge"></span></div>
                 <div id="game-status" class="game-status" role="status" aria-live="polite">先選指令格，再點選下方指令。</div>
