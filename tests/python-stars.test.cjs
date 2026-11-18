@@ -13,9 +13,16 @@ const root = path.resolve(__dirname, '..');
   assert.deepEqual(migrated[1].levels[1], old);
   assert.deepEqual(progress.migrateCompletion(migrated), migrated, 'migration must be idempotent');
   assert.equal(progress.canAttemptTier(undefined, 1), true);
-  assert.equal(progress.canAttemptTier(undefined, 2), false);
-  assert.equal(progress.canAttemptTier(migrated[1], 3), false);
-  assert.throws(() => progress.awardTier(undefined, 2, old));
+  assert.equal(progress.canAttemptTier(undefined, 2), true);
+  assert.equal(progress.canAttemptTier(migrated[1], 3), true);
+  for (const tier of [0, 4, 1.5, '2']) assert.throws(() => progress.awardTier(undefined, tier, old));
+  for (const tier of [2, 3]) {
+    const direct = progress.awardTier(undefined, tier, old);
+    assert.equal(progress.earnedStars(direct), tier, 'any verified tier is recorded without prerequisites');
+    assert.deepEqual(Object.keys(direct.levels), [String(tier)], 'unattempted lower tasks receive no fabricated evidence');
+    assert.deepEqual(progress.migrateCompletion({ 1: direct })[1], direct, 'direct higher-tier completion survives reload');
+    assert.equal(progress.earnedStars(progress.awardTier(direct, 1, old)), tier, 'later lower-tier work preserves the highest verified tier');
+  }
   const two = progress.awardTier(migrated[1], 2, { code: 'modified', verifiedAt: 456 });
   assert.equal(progress.earnedStars(two), 2);
   assert.equal(progress.canAttemptTier(two, 3), true);
@@ -50,5 +57,5 @@ const root = path.resolve(__dirname, '..');
   results.forEach((result, i) => {
     assert.equal(result.results.every(item => item.passed), requests[i].shouldPass, `${requests[i].label}: ${JSON.stringify(result.results.filter(item => !item.passed))}`);
   });
-  console.log(`Three-star course: legacy migration, sequential unlock, optional third tier, generated inputs, ${lessons.length * 2} old-answer rejection checks and 4 boundary-defect checks passed.`);
+  console.log(`Three-star course: legacy migration, independent tier verification, optional third tier, generated inputs, ${lessons.length * 2} old-answer rejection checks and 4 boundary-defect checks passed.`);
 })().catch(error => { console.error(error); process.exitCode = 1; });

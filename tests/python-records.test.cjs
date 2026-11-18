@@ -50,6 +50,10 @@ const { pathToFileURL } = require('node:url');
   assert.equal(records.validStudent({ className: ' ', seat: '1', name: '小安' }), false);
   assert.equal(records.validStudent({ className: '701', seat: '1', name: ' ' }), false);
   assert.equal(records.certificateRecord(undefined), null);
+  for (const tier of [2, 3]) {
+    const direct = progress.awardTier(undefined, tier, { code: 'direct challenge', verifiedAt: 90, elapsedMs: 2500 });
+    assert.deepEqual(records.certificateRecord(direct), { stars: tier, achievedAt: 90, elapsedMs: 2500, partial: false }, 'direct higher-tier verification must produce the matching certificate');
+  }
   let completed = progress.awardTier(undefined, 1, { code: 'one', verifiedAt: 100, elapsedMs: 3000 });
   assert.deepEqual(records.certificateRecord(completed), { stars: 1, achievedAt: 100, elapsedMs: 3000, partial: false });
   now += 4000000;

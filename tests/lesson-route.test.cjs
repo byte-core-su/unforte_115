@@ -84,14 +84,11 @@ for (const page of pages) {
   assert.equal(teacherFinish.href, `1150${page[4]}00.html`);
 }
 
-// CodeGame and Python Lab keep their own single routes.
+// CodeGame keeps its own guided route. Python Lab offers independent units.
 const codegame = read('codegame/lightbot.js');
 assert.match(codegame, /function levelOpen\(item\)/);
 assert.match(codegame, /button\.disabled = !open/);
 assert.match(codegame, /function stuckHint\(\)/);
-const pythonlab = read('pythonlab/app.js');
-assert.match(pythonlab, /function unitOpen\(lesson\)/);
-assert.match(pythonlab, /function stageOpen\(lesson, stage\)/);
 for (const file of ['lesson-route.js', 'course-home.js', 'codegame/lightbot.js', 'pythonlab/app.js']) {
   assert.match(read(file), /window\.TeacherDemo/);
 }
@@ -115,4 +112,4 @@ for (const folder of ['codegame', 'pythonlab']) {
 assert.match(read('teacher-resources.html'), /id="teacher-demo-toggle"/);
 assert.match(read('lesson-route.js'), /const missing = demo \? \[\]/, 'demo mode should not require ticking completion checks');
 
-console.log('learning routes: 12 block programming lessons, CodeGame and Python Lab follow one guided path');
+console.log('learning routes: 12 block programming lessons and CodeGame use guided paths; Python Lab keeps teacher-demo support');

@@ -1,6 +1,6 @@
 import { lessons, dictionary } from './course-data.js';
 import { verificationTests } from './challenge-data.js';
-import { migrateCompletion, earnedStars, canAttemptTier, awardTier } from './progress.js';
+import { migrateCompletion, earnedStars, awardTier } from './progress.js';
 import { errors, extensions } from './helper-data.js';
 import { characterInfo, parseCodePoint } from './encoding.js';
 import { createLearningClock, formatDuration, normalizeStudent, validStudent, certificateRecord } from './learning-record.js';
@@ -22,7 +22,6 @@ state.completed = migrateCompletion(state.completed);
 let learningClock = createLearningClock(state.timings);
 let certificateLesson = null;
 let certificateReturnFocus;
-let lockedMessage = '';
 let currentLesson;
 let currentStage = 0;
 let worker;
@@ -36,31 +35,8 @@ let runtimeMessage = '準備 Python 執行環境…';
 let runtimeState = 'loading';
 const main = $('#main');
 const practiceAttempts = new Map();
-// 單一路線：單元依序開啟（上一單元取得一星），單元內「示範 → 引導 → 初階」每一步先成功執行一次才開啟下一步。
-// 「已執行」只記在本頁，重新整理後需再執行一次。教師示範模式從教師備課頁開啟，或在網址加 ?teacher=1。
-const teacherView = window.TeacherDemo.isOn();
+// 各單元與練習皆可自由選擇；星級僅記錄已通過驗證的任務。
 const stages = ['示範', '引導', '初階一星', '進階二星', '終極三星（選做）'];
-const ranStages = new Set();
-function unitOpen(lesson) {
-  return teacherView || lesson.id === 1 || earnedStars(state.completed[lesson.id]) >= 1 || earnedStars(state.completed[lesson.id - 1]) >= 1;
-}
-function stageOpen(lesson, stage) {
-  if (teacherView || stage === 0) return true;
-  if (stage >= 3) return canAttemptTier(state.completed[lesson.id], stage - 1);
-  return earnedStars(state.completed[lesson.id]) >= 1 || (ranStages.has(`${lesson.id}-${stage - 1}`) && stageOpen(lesson, stage - 1));
-}
-function stageLockTitle(stage) {
-  return stage >= 3 ? '先通過前一星級即可解鎖' : `先在「${['示範', '引導'][stage - 1]}」成功執行一次程式`;
-}
-function refreshStageTabs() {
-  if (!currentLesson) return;
-  for (const button of document.querySelectorAll('[data-stage]')) {
-    const stage = Number(button.dataset.stage);
-    const open = stageOpen(currentLesson, stage);
-    button.disabled = !open;
-    if (open) button.removeAttribute('title'); else button.title = stageLockTitle(stage);
-  }
-}
 
 function save() {
   learningClock.checkpoint();
@@ -110,8 +86,7 @@ function updateRuntime() {
   $('#code').readOnly = busy;
   $('#stdin').readOnly = busy;
   for (const element of document.querySelectorAll('[data-stage], #reset-code, #use-input')) {
-    const stage = Number(element.dataset.stage);
-    element.disabled = busy || (element.hasAttribute('data-stage') && stage >= 3 && !canAttemptTier(state.completed[currentLesson.id], stage - 1));
+    element.disabled = busy;
   }
   updateOperationGuide();
 }
@@ -192,7 +167,6 @@ async function runCode(check = false) {
   const code = $('#code').value;
   const input = $('#stdin').value;
   const tier = activity.tier || 0;
-  if (check && tier && !canAttemptTier(state.completed[lesson.id], tier)) { setFeedback('請先通過前一星級。', 'error'); return; }
   $('#feedback').hidden = true;
   $('#output').textContent = check ? '正在驗證…' : '正在執行…';
   try {
@@ -233,7 +207,7 @@ async function runCode(check = false) {
       $('#unit-stars').textContent = starDisplay(lesson);
       updateRuntime();
       $('#open-certificate').disabled = false;
-      if (teacherView && tier < 3) nextLink = ` <a class="next-tier" href="#unit=${lesson.id}&stage=${stage + 1}">${tier === 1 ? '前往進階二星 →' : '選做終極三星 →'}</a>`;
+      if (tier < 3) nextLink = ` <a class="next-tier" href="#unit=${lesson.id}&stage=${stage + 1}">${tier === 1 ? '前往進階二星 →' : '選做終極三星 →'}</a>`;
     }
     setFeedback(`<p><strong>${escape(message)}</strong>${nextLink}</p>${rows}`, allPassed ? 'success' : 'error');
     updateOperationGuide();
@@ -256,23 +230,19 @@ function progressText(lesson) {
   return stars === 3 ? '★★★ 三星已取得・終極挑戰完成' : stars === 2 ? '★★☆ 二星已取得・核心學習完成，三星選做' : stars === 1 ? '★☆☆ 一星已取得・可參考解答，接著挑戰進階二星' : '☆☆☆ 通過初階取得一星，再完成修改任務取得二星。三星選做。';
 }
 function rememberAttempt(update) {
-  if (update.execution?.ok || update.verification?.ok) ranStages.add(draftKey());
   practiceAttempts.set(draftKey(), { ...practiceAttempts.get(draftKey()), ...update, lastAction: update.verification ? 'check' : 'run' });
 }
 function updateOperationGuide() {
-  refreshStageTabs();
   const panel = $('#task-guide');
   if (!panel || !currentLesson || !$('#code')) return;
   const activity = currentLesson.activities[currentStage];
   const progression = $('#lesson-progression');
   const nextLesson = lessons[currentLesson.id];
   if (progression) {
-    const complete = currentStage >= 3 && earnedStars(state.completed[currentLesson.id]) >= 2;
-    progression.hidden = !complete;
-    if (complete && !progression.hasChildNodes()) {
+    if (!progression.hasChildNodes()) {
       progression.innerHTML = nextLesson
         ? `<a class="button blue" href="#unit=${nextLesson.id}&stage=0">前往下一單元 →</a>`
-        : '<strong>Python Lab 核心課程已完成</strong>';
+        : '<a class="button blue" href="#">返回課程總覽 →</a>';
     }
   }
   const step = operationStep({ stage: currentStage, activity, code: $('#code').value, input: $('#stdin').value,
@@ -317,7 +287,6 @@ function guideAction(action) {
   if (action === 'certificate') openCertificate(currentLesson);
   if (action === 'next') {
     if (currentStage === 4) { focusPractice('reflection'); return; }
-    if (!stageOpen(currentLesson, currentStage + 1)) { focusPractice('task-instructions'); return; }
     location.hash = `unit=${currentLesson.id}&stage=${currentStage + 1}`;
   }
 }
@@ -413,7 +382,7 @@ function renderHome() {
   const next = lessons.find(lesson => earnedStars(state.completed[lesson.id]) < 2) || lessons.find(lesson => earnedStars(state.completed[lesson.id]) < 3) || lessons[0];
   const nextStars = earnedStars(state.completed[next.id]);
   const nextStage = nextStars === 1 ? 3 : nextStars === 2 ? 4 : 0;
-  main.innerHTML = `<section class="hero"><div><p class="eyebrow">PYTHON INTERACTIVE LEARNING</p><h1>從積木思考，<br>走向你的<span>第一行程式。</span></h1><p class="description">帶著 Scratch 的基礎，從修改範例開始。${lessons.length} 個循序漸進的任務，陪你讀懂、寫出，也驗證自己的 Python。</p><div class="hero-tags"><span>${lessons.length} 個引導單元</span><span>直接執行 Python</span><span>隨時查語法</span></div><a class="button primary" href="#unit=${next.id}&stage=${nextStage}">${count === lessons.length ? totalStars === lessons.length * 3 ? '回到課程複習' : '選做三星挑戰' : totalStars ? '繼續學習' : '開始第一個單元'} <span aria-hidden="true">→</span></a></div><div class="hero-code"><div class="window-bar"><span class="dots" aria-hidden="true">●●●</span><span>my_first_python.py</span></div><pre><span class="code-comment"># 從改一句話開始</span>\nname = <span class="code-string">"小安"</span>\nprint(<span class="code-string">"哈囉"</span>, name)\n\n<span class="code-comment"># 每一次修改，都是一次探索</span>\nprint(<span class="code-string">"今天，我用 Python 寫程式！"</span>)</pre><div class="hero-console">&gt; 哈囉 小安<br>&gt; 今天，我用 Python 寫程式！</div></div></section><div class="home-content"><div class="path-strip" aria-label="學習路徑"><div class="path-step"><strong><b>01</b> 依序學單元</strong><span>上一單元一星後開啟下一單元</span></div><div class="path-step"><strong><b>02</b> 修改程式</strong><span>範例已放好，從一處開始</span></div><div class="path-step"><strong><b>03</b> 執行後驗證</strong><span>先試跑，再檢查全部測資</span></div><div class="path-step"><strong><b>04</b> 領證再升星</strong><span>一星可領證，三星自由挑戰</span></div></div><div class="home-operation"><p><strong>第一次使用？</strong>「執行程式」是試跑；「驗證任務」全部通過才會通關。每題上方都有下一步提示。</p><button type="button" class="button" data-operation-help>查看學生操作說明</button></div><div class="section-heading"><div><p class="eyebrow">YOUR LEARNING PATH</p><h2>${lessons.length} 個單元，一步一步往前</h2><p>單元依序開啟：取得上一單元的一星，就會開啟下一單元。每課先示範與引導，再取得初階一星、進階二星；終極三星自由選做。</p></div><div class="progress-summary">二星已達成 <strong>${count} / ${lessons.length}</strong><br>已取得 ${totalStars} / ${lessons.length * 3} 星・三星選做</div></div><section class="lesson-grid" aria-label="課程單元">${lessons.map(lesson => unitOpen(lesson) ? `<a class="lesson-card" href="#unit=${lesson.id}"><div class="card-top"><span class="unit-number">${String(lesson.id).padStart(2, '0')}</span><span class="level-tag">${escape(lesson.level)}</span></div><h3>${escape(lesson.title)}</h3><p>${escape(lesson.subtitle)}</p><div class="card-bottom"><span class="star-score ${earnedStars(state.completed[lesson.id]) >= 2 ? 'done' : ''}">${starDisplay(lesson)}</span><span class="card-arrow" aria-hidden="true">↗</span></div></a>` : `<div class="lesson-card is-locked" aria-disabled="true"><div class="card-top"><span class="unit-number">${String(lesson.id).padStart(2, '0')}</span><span class="level-tag">${escape(lesson.level)}</span></div><h3>${escape(lesson.title)}</h3><p>${escape(lesson.subtitle)}</p><div class="card-bottom"><span class="star-score">🔒 第 ${lesson.id - 1} 單元取得一星後開啟</span></div></div>`).join('')}</section><section class="star-explainer"><h3>一星會做，二星會改，三星再探索</h3><p>★ 初階可參考完整解答；★★ 進階要調整規則並通過新測資，完成核心學習；★★★ 終極加深整合與邊界處理，可自由選做。</p></section><section class="course-note"><div><h3>遇到問題，小幫手陪你找線索</h3><p>本課語法、Scratch 對照、錯誤排查與編碼工具都在本站。查完就能接著練習，不用另開網頁。</p></div><button type="button" class="button" data-dictionary>開啟參考小幫手</button></section><div class="home-actions"><span>首次執行需網路載入 Python。進度是練習紀錄，並非正式成績。</span><button type="button" class="button quiet" id="reset-progress">重設本機學習紀錄</button></div></div>`;
+  main.innerHTML = `<section class="hero"><div><p class="eyebrow">PYTHON INTERACTIVE LEARNING</p><h1>從積木思考，<br>走向你的<span>第一行程式。</span></h1><p class="description">帶著 Scratch 的基礎，從修改範例開始。${lessons.length} 個循序漸進的任務，陪你讀懂、寫出，也驗證自己的 Python。</p><div class="hero-tags"><span>${lessons.length} 個引導單元</span><span>直接執行 Python</span><span>隨時查語法</span></div><a class="button primary" href="#unit=${next.id}&stage=${nextStage}">${count === lessons.length ? totalStars === lessons.length * 3 ? '回到課程複習' : '選做三星挑戰' : totalStars ? '繼續學習' : '開始第一個單元'} <span aria-hidden="true">→</span></a></div><div class="hero-code"><div class="window-bar"><span class="dots" aria-hidden="true">●●●</span><span>my_first_python.py</span></div><pre><span class="code-comment"># 從改一句話開始</span>\nname = <span class="code-string">"小安"</span>\nprint(<span class="code-string">"哈囉"</span>, name)\n\n<span class="code-comment"># 每一次修改，都是一次探索</span>\nprint(<span class="code-string">"今天，我用 Python 寫程式！"</span>)</pre><div class="hero-console">&gt; 哈囉 小安<br>&gt; 今天，我用 Python 寫程式！</div></div></section><div class="home-content"><div class="path-strip" aria-label="學習路徑"><div class="path-step"><strong><b>01</b> 選擇單元</strong><span>所有單元與星級都能直接進入</span></div><div class="path-step"><strong><b>02</b> 修改程式</strong><span>範例已放好，從一處開始</span></div><div class="path-step"><strong><b>03</b> 執行後驗證</strong><span>先試跑，再檢查全部測資</span></div><div class="path-step"><strong><b>04</b> 領證再升星</strong><span>一星可領證，三星自由挑戰</span></div></div><div class="home-operation"><p><strong>第一次使用？</strong>「執行程式」是試跑；「驗證任務」全部通過才會通關。每題上方都有下一步提示。</p><button type="button" class="button" data-operation-help>查看學生操作說明</button></div><div class="section-heading"><div><p class="eyebrow">YOUR LEARNING PATH</p><h2>${lessons.length} 個獨立單元，自由選擇</h2><p>選擇想練習的單元，可直接切換示範、引導與各星級任務。通過該題驗證就會記錄星級；終極三星自由選做。</p></div><div class="progress-summary">二星已達成 <strong>${count} / ${lessons.length}</strong><br>已取得 ${totalStars} / ${lessons.length * 3} 星・三星選做</div></div><section class="lesson-grid" aria-label="課程單元">${lessons.map(lesson => `<a class="lesson-card" href="#unit=${lesson.id}"><div class="card-top"><span class="unit-number">${String(lesson.id).padStart(2, '0')}</span><span class="level-tag">${escape(lesson.level)}</span></div><h3>${escape(lesson.title)}</h3><p>${escape(lesson.subtitle)}</p><div class="card-bottom"><span class="star-score ${earnedStars(state.completed[lesson.id]) >= 2 ? 'done' : ''}">${starDisplay(lesson)}</span><span class="card-arrow" aria-hidden="true">↗</span></div></a>`).join('')}</section><section class="star-explainer"><h3>一星會做，二星會改，三星再探索</h3><p>★ 初階可參考完整解答；★★ 進階要調整規則並通過新測資，完成核心學習；★★★ 終極加深整合與邊界處理，可自由選做。</p></section><section class="course-note"><div><h3>遇到問題，小幫手陪你找線索</h3><p>本課語法、Scratch 對照、錯誤排查與編碼工具都在本站。查完就能接著練習，不用另開網頁。</p></div><button type="button" class="button" data-dictionary>開啟參考小幫手</button></section><div class="home-actions"><span>首次執行需網路載入 Python。進度是練習紀錄，並非正式成績。</span><button type="button" class="button quiet" id="reset-progress">重設本機學習紀錄</button></div></div>`;
   document.title = 'Python Lab｜Python 互動學習';
   $('#reset-progress').addEventListener('click', () => confirmAction('重設學習紀錄', '將清除此瀏覽器的程式草稿、預測、離堂說明、星級、計時與證書資料。需要的作品請先下載。', () => {
     state = emptyState(); practiceAttempts.clear(); learningClock = createLearningClock(state.timings); save(); renderHome();
@@ -424,11 +393,9 @@ function renderLesson() {
   const activity = lesson.activities[currentStage];
   const draft = getDraft();
   practiceAttempts.delete(draftKey());
-  const teacherNavigation = teacherView ? `<aside class="lesson-nav"><h2>學習路徑</h2><nav aria-label="單元切換">${lessons.map(item => `<a href="#unit=${item.id}" ${item.id === lesson.id ? 'class="active" aria-current="page"' : ''}><span>${String(item.id).padStart(2, '0')}</span><span>${escape(item.title)}</span></a>`).join('')}</nav></aside>` : '';
-  const stageNavigation = teacherView
-    ? `<div class="stage-tabs" role="group" aria-label="練習與星級挑戰">${stages.map((name, index) => `<button type="button" data-stage="${index}" aria-pressed="${index === currentStage}">${name}</button>`).join('')}</div>`
-    : `<ol class="stage-tabs stage-progress" aria-label="本單元學習步驟">${stages.map((name, index) => `<li${index === currentStage ? ' aria-current="step"' : ''}>${name}</li>`).join('')}</ol>`;
-  main.innerHTML = `<section class="course-bar"><div><p class="eyebrow">UNIT ${String(lesson.id).padStart(2, '0')} / ${lessons.length} · ${escape(lesson.level)}</p><h1>${escape(lesson.title)}</h1><p>${escape(lesson.subtitle)}</p></div>${teacherView ? '<a class="button quiet" href="#">返回課程總覽</a>' : ''}</section><div class="course-shell${teacherView ? '' : ' course-shell--student'}">${teacherNavigation}<div class="lesson-reading"><section class="reading-card overview-card"><div class="unit-star-heading"><strong id="unit-stars">${starDisplay(lesson)}</strong><span>二星完成核心・三星選做</span></div><p class="eyebrow">這一課，你將學會</p><h2>${escape(lesson.goal)}</h2><div class="bridge">${escape(lesson.bridge)}</div><ul class="concept-list">${lesson.concepts.map(([title, text]) => `<li><strong>${escape(title)}</strong><p>${escape(text)}</p></li>`).join('')}</ul><div class="syntax-links">${[...new Set([...lesson.syntax, ...(activity.syntax || [])])].map(id => `<button type="button" data-syntax="${id}">${escape(dictionary.find(item => item.id === id)?.name.split('・')[0] || id)} ↗</button>`).join('')}</div></section>${stageNavigation}<section class="reading-card task-card" id="task-instructions" tabindex="-1"><div class="task-label">${activity.tier ? '★'.repeat(activity.tier) + (activity.optional ? ' 終極選做' : activity.tier === 1 ? ' 初階・可參考解答' : ' 進階・修改新規則') : currentStage === 0 ? '先看懂，再動手' : '引導練習'}</div><h2>${escape(activity.title)}</h2><p class="task">${escape(activity.task)}</p>${lockedMessage ? `<p class="notice">${escape(lockedMessage)}</p>` : ''}${activity.tier ? `<p class="challenge-note">${activity.tier === 1 ? '完成本題取得一星，可先參考解答再觀察。' : activity.tier === 2 ? '二星需要修改程式以符合新規則；資料題另含固定邊界和每次新產生的情境。' : '三星為選做。可從下方的離堂小檢核繼續。'}</p>` : ''}<label class="small-label prediction-label" for="prediction">執行前，先預測結果（可選）</label><textarea class="prediction" id="prediction" placeholder="我預測會出現……">${escape(draft.prediction)}</textarea>${activity.expected ? `<details class="expected-box"><summary>查看原始範例的預期輸出</summary><pre>${escape(activity.expected)}</pre></details>` : ''}</section><section class="reading-card hints-card hints"><h2>需要一點線索？</h2>${activity.hints.map((hint, index) => `<details><summary>提示 ${index + 1}${index === 0 ? ' · 想法' : ' · 語法線索'}</summary><p>${escape(hint)}</p></details>`).join('')}${solutionPanel(activity)}</section><section class="reading-card exit-question"><p class="eyebrow">用自己的話說明</p><h2>離堂小檢核</h2><p>${escape(lesson.exit)}</p><label class="small-label" for="reflection">我的解釋或修改紀錄</label><textarea id="reflection" class="prediction" placeholder="我發現……因為……">${escape(state.reflections[lesson.id] || '')}</textarea><p id="lesson-completion" class="small-label">${progressText(lesson)}</p><p class="small-label">這是學習練習紀錄，並非正式成績。</p><div id="lesson-progression"></div></section><p class="sources">本課重整自原教材第 ${lesson.source.join("、")} 篇。所需解說已收進站內。<button type="button" class="helper-inline" data-dictionary>查看參考小幫手</button></p></div><section class="workspace" aria-label="Python 練習區"><section class="task-guide" id="task-guide" aria-labelledby="task-guide-title"></section>${timerPanel()}<div class="runtime-status" id="runtime-status" role="status"><span id="runtime-text"></span><button id="retry-runtime" type="button" hidden>重新載入</button></div><div class="editor-panel"><div class="editor-toolbar"><label for="code" class="file-name">程式區 · unit_${String(lesson.id).padStart(2, '0')}.py</label><span class="save-state" id="save-state">${canSave ? '草稿保存在此瀏覽器' : '無法自動保存，請下載程式'}</span></div><div class="editor-wrap"><pre id="line-numbers" class="line-numbers" aria-hidden="true"></pre><textarea id="code" class="code-editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" aria-describedby="editor-help">${escape(draft.code)}</textarea></div><div class="editor-actions"><button type="button" id="run" class="button primary">▶ 執行程式</button><button type="button" id="stop" class="button quiet" disabled>■ 停止</button>${activity.tests.length ? '<button type="button" id="check" class="button blue">✓ 驗證任務</button>' : '<button type="button" id="check" hidden>驗證</button>'}</div><div class="editor-bottom"><span id="editor-help">Tab 縮排四格 · Ctrl / ⌘ + Enter 執行 · Esc 讓 Tab 離開編輯器</span><span>執行上限 8 秒</span></div></div><div class="editor-tools"><button type="button" id="reset-code">↺ 還原起始程式</button><button type="button" id="download">↓ 下載 .py</button></div><section class="io-panel"><div class="io-heading"><label for="stdin">輸入資料 · 每行對應一次 input()</label><button type="button" id="use-input">載入範例輸入</button></div><textarea id="stdin" class="input-area" spellcheck="false" aria-describedby="input-help" placeholder="${activity.input ? '每一行放一筆資料' : '這個任務不需要輸入資料'}">${escape(draft.input)}</textarea><p class="io-note" id="input-help">${/\binput\s*\(/.test(activity.solution) ? '範例輸入已填好。每一行對應一次 input()，不用在執行結果裡打字；修改資料後再按「執行程式」。' : '這個任務不需要輸入資料，可以直接執行程式。'}「驗證任務」使用本站測資，不使用這裡的資料。</p></section><section class="io-panel"><div class="io-heading"><span>執行結果</span><span>輸出會顯示在這裡</span></div><pre id="output" class="output-area" tabindex="-1" aria-live="polite">先預測，再按「執行程式」。</pre></section><div id="feedback" class="feedback" role="status" tabindex="-1" hidden></div></section></div>`;
+  const unitNavigation = `<aside class="lesson-nav"><h2>學習路徑</h2><nav aria-label="單元切換">${lessons.map(item => `<a href="#unit=${item.id}" ${item.id === lesson.id ? 'class="active" aria-current="page"' : ''}><span>${String(item.id).padStart(2, '0')}</span><span>${escape(item.title)}</span></a>`).join('')}</nav></aside>`;
+  const stageNavigation = `<div class="stage-tabs" role="group" aria-label="練習與星級挑戰">${stages.map((name, index) => `<button type="button" data-stage="${index}" aria-pressed="${index === currentStage}">${name}</button>`).join('')}</div>`;
+  main.innerHTML = `<section class="course-bar"><div><p class="eyebrow">UNIT ${String(lesson.id).padStart(2, '0')} / ${lessons.length} · ${escape(lesson.level)}</p><h1>${escape(lesson.title)}</h1><p>${escape(lesson.subtitle)}</p></div><a class="button quiet" href="#">返回課程總覽</a></section><div class="course-shell">${unitNavigation}<div class="lesson-reading"><section class="reading-card overview-card"><div class="unit-star-heading"><strong id="unit-stars">${starDisplay(lesson)}</strong><span>二星完成核心・三星選做</span></div><p class="eyebrow">這一課，你將學會</p><h2>${escape(lesson.goal)}</h2><div class="bridge">${escape(lesson.bridge)}</div><ul class="concept-list">${lesson.concepts.map(([title, text]) => `<li><strong>${escape(title)}</strong><p>${escape(text)}</p></li>`).join('')}</ul><div class="syntax-links">${[...new Set([...lesson.syntax, ...(activity.syntax || [])])].map(id => `<button type="button" data-syntax="${id}">${escape(dictionary.find(item => item.id === id)?.name.split('・')[0] || id)} ↗</button>`).join('')}</div></section>${stageNavigation}<section class="reading-card task-card" id="task-instructions" tabindex="-1"><div class="task-label">${activity.tier ? '★'.repeat(activity.tier) + (activity.optional ? ' 終極選做' : activity.tier === 1 ? ' 初階・可參考解答' : ' 進階・修改新規則') : currentStage === 0 ? '先看懂，再動手' : '引導練習'}</div><h2>${escape(activity.title)}</h2><p class="task">${escape(activity.task)}</p>${activity.tier ? `<p class="challenge-note">${activity.tier === 1 ? '完成本題取得一星，可先參考解答再觀察。' : activity.tier === 2 ? '二星需要修改程式以符合新規則；資料題另含固定邊界和每次新產生的情境。' : '三星為選做。可從下方的離堂小檢核繼續。'}</p>` : ''}<label class="small-label prediction-label" for="prediction">執行前，先預測結果（可選）</label><textarea class="prediction" id="prediction" placeholder="我預測會出現……">${escape(draft.prediction)}</textarea>${activity.expected ? `<details class="expected-box"><summary>查看原始範例的預期輸出</summary><pre>${escape(activity.expected)}</pre></details>` : ''}</section><section class="reading-card hints-card hints"><h2>需要一點線索？</h2>${activity.hints.map((hint, index) => `<details><summary>提示 ${index + 1}${index === 0 ? ' · 想法' : ' · 語法線索'}</summary><p>${escape(hint)}</p></details>`).join('')}${solutionPanel(activity)}</section><section class="reading-card exit-question"><p class="eyebrow">用自己的話說明</p><h2>離堂小檢核</h2><p>${escape(lesson.exit)}</p><label class="small-label" for="reflection">我的解釋或修改紀錄</label><textarea id="reflection" class="prediction" placeholder="我發現……因為……">${escape(state.reflections[lesson.id] || '')}</textarea><p id="lesson-completion" class="small-label">${progressText(lesson)}</p><p class="small-label">這是學習練習紀錄，並非正式成績。</p><div id="lesson-progression"></div></section><p class="sources">本課重整自原教材第 ${lesson.source.join("、")} 篇。所需解說已收進站內。<button type="button" class="helper-inline" data-dictionary>查看參考小幫手</button></p></div><section class="workspace" aria-label="Python 練習區"><section class="task-guide" id="task-guide" aria-labelledby="task-guide-title"></section>${timerPanel()}<div class="runtime-status" id="runtime-status" role="status"><span id="runtime-text"></span><button id="retry-runtime" type="button" hidden>重新載入</button></div><div class="editor-panel"><div class="editor-toolbar"><label for="code" class="file-name">程式區 · unit_${String(lesson.id).padStart(2, '0')}.py</label><span class="save-state" id="save-state">${canSave ? '草稿保存在此瀏覽器' : '無法自動保存，請下載程式'}</span></div><div class="editor-wrap"><pre id="line-numbers" class="line-numbers" aria-hidden="true"></pre><textarea id="code" class="code-editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" aria-describedby="editor-help">${escape(draft.code)}</textarea></div><div class="editor-actions"><button type="button" id="run" class="button primary">▶ 執行程式</button><button type="button" id="stop" class="button quiet" disabled>■ 停止</button>${activity.tests.length ? '<button type="button" id="check" class="button blue">✓ 驗證任務</button>' : '<button type="button" id="check" hidden>驗證</button>'}</div><div class="editor-bottom"><span id="editor-help">Tab 縮排四格 · Ctrl / ⌘ + Enter 執行 · Esc 讓 Tab 離開編輯器</span><span>執行上限 8 秒</span></div></div><div class="editor-tools"><button type="button" id="reset-code">↺ 還原起始程式</button><button type="button" id="download">↓ 下載 .py</button></div><section class="io-panel"><div class="io-heading"><label for="stdin">輸入資料 · 每行對應一次 input()</label><button type="button" id="use-input">載入範例輸入</button></div><textarea id="stdin" class="input-area" spellcheck="false" aria-describedby="input-help" placeholder="${activity.input ? '每一行放一筆資料' : '這個任務不需要輸入資料'}">${escape(draft.input)}</textarea><p class="io-note" id="input-help">${/\binput\s*\(/.test(activity.solution) ? '範例輸入已填好。每一行對應一次 input()，不用在執行結果裡打字；修改資料後再按「執行程式」。' : '這個任務不需要輸入資料，可以直接執行程式。'}「驗證任務」使用本站測資，不使用這裡的資料。</p></section><section class="io-panel"><div class="io-heading"><span>執行結果</span><span>輸出會顯示在這裡</span></div><pre id="output" class="output-area" tabindex="-1" aria-live="polite">先預測，再按「執行程式」。</pre></section><div id="feedback" class="feedback" role="status" tabindex="-1" hidden></div></section></div>`;
   document.title = `第 ${lesson.id} 單元 ${lesson.title}｜Python Lab`;
   updateLines(); updateRuntime(); updateLearningClock(); updateOperationGuide();
   $('#timer-toggle').addEventListener('click', () => { learningClock.setPaused(!learningClock.isPaused()); syncLearningClock(); save(); });
@@ -455,7 +422,7 @@ function renderLesson() {
     const link = document.createElement('a'); link.href = url; link.download = `pythonlab-unit-${String(lesson.id).padStart(2, '0')}-${currentStage + 1}.py`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
   for (const button of document.querySelectorAll('[data-stage]')) button.addEventListener('click', () => {
-    capture(); lockedMessage = ''; currentStage = Number(button.dataset.stage); history.replaceState(null, '', `#unit=${lesson.id}&stage=${currentStage}`); renderLesson();
+    capture(); currentStage = Number(button.dataset.stage); history.replaceState(null, '', `#unit=${lesson.id}&stage=${currentStage}`); renderLesson();
   });
   startWorker();
 }
@@ -569,29 +536,7 @@ function route() {
   syncLearningClock(); save();
   const stage = Number(params.get('stage'));
   currentStage = Number.isInteger(stage) ? Math.min(4, Math.max(0, stage)) : 0;
-  lockedMessage = '';
-  if (currentLesson && !unitOpen(currentLesson)) {
-    const open = [...lessons].reverse().find(unitOpen);
-    lockedMessage = `第 ${currentLesson.id} 單元還沒開啟：先在第 ${currentLesson.id - 1} 單元取得一星。`;
-    currentLesson = open; currentStage = 0;
-    learningClock.select(currentLesson.id);
-    history.replaceState(null, '', `#unit=${currentLesson.id}&stage=0`);
-  }
-  if (currentLesson && currentStage >= 1 && currentStage <= 2 && !stageOpen(currentLesson, currentStage)) {
-    currentStage = [0, 1, 2].filter(stage => stageOpen(currentLesson, stage)).pop();
-    lockedMessage = '請依序完成：先在目前的練習成功執行一次程式，就會開啟下一步。';
-    history.replaceState(null, '', `#unit=${currentLesson.id}&stage=${currentStage}`);
-  }
-  if (currentLesson && currentStage >= 3 && !canAttemptTier(state.completed[currentLesson.id], currentStage - 1)) {
-    currentStage = Math.min(4, earnedStars(state.completed[currentLesson.id]) + 2);
-    lockedMessage = '先通過目前星級，再挑戰下一級。終極三星為選做。';
-    history.replaceState(null, '', `#unit=${currentLesson.id}&stage=${currentStage}`);
-  }
   tabMayLeave = false;
-  const inStudentLesson = Boolean(currentLesson) && !teacherView;
-  $('[data-course-home]').hidden = inStudentLesson;
-  if (inStudentLesson) $('.brand').removeAttribute('href');
-  else $('.brand').setAttribute('href', '#');
   if (currentLesson) renderLesson(); else renderHome();
   window.scrollTo({ top: 0, behavior: 'instant' });
   main.focus({ preventScroll: true });
@@ -602,7 +547,7 @@ $('.skip-link').addEventListener('click', event => {
   main.scrollIntoView();
   main.focus({ preventScroll: true });
 });
-if (teacherView) {
+if (window.TeacherDemo.isOn()) {
   const badge = document.createElement('div'); badge.className = 'teacher-demo-badge'; badge.setAttribute('role', 'status');
   badge.innerHTML = '教師示範模式：全部開啟 <button type="button">結束示範</button>';
   badge.querySelector('button').addEventListener('click', window.TeacherDemo.end);
