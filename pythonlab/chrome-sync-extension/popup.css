@@ -1,0 +1,5 @@
+body { width: 300px; margin: 0; padding: 20px; box-sizing: border-box; font: 14px/1.7 system-ui, sans-serif; background: #f4f8fb; color: #203849; }
+h1 { font-size: 18px; margin: 0 0 12px; }
+p { margin: 10px 0; }
+button, .button { display: block; width: 100%; box-sizing: border-box; margin-top: 10px; padding: 9px; border: 1px solid #c5dce9; border-radius: 7px; background: white; color: #245a7c; text-align: center; font: inherit; text-decoration: none; cursor: pointer; }
+.privacy { display: block; margin-top: 16px; color: #476579; }

@@ -199,7 +199,7 @@ CodeGame 點亮任務保存在 `codegame/`，可開啟 `codegame/index.html`，�
 
 學生姓名、學號、班級顯示在遊戲上方；草稿、通關、最佳指令、嘗試次數與學習時間依班級及學號保存於此瀏覽器，重新整理後可繼續練習。可下載包含學生資料、遊戲狀態及指令的 PNG，或匯出學習紀錄 JSON。尚未提供登入驗證與資料庫同步。後續可透過 `window.LightbotLearning.setStudent(...)` 更新學生，透過 `exportData()` 及 `codegame:progress` 事件取得紀錄；詳細規則、來源與資料介面見 [CodeGame 說明](codegame/README.md)。
 
-Python Lab 是獨立課程，可從首頁「其他課程」開啟；Python Lab 頁面本身不連回首頁，`pythonlab/` 仍可單獨部署。可將 `pythonlab/` 單獨部署；本機執行 `npm run preview`（或 `node scripts/preview.cjs`）後，開啟 `http://127.0.0.1:4173/pythonlab/index.html`。Python 執行環境固定使用 Pyodide 0.27.7，首次載入需網路。草稿、預測、離堂說明與挑戰驗證只保存在此瀏覽器，不跨裝置同步。詳細教學流程與維護方式見 [Python Lab 說明](pythonlab/README.md)，課程規劃見 [Python 課程設計](PYTHON_COURSE_PLAN.md)。
+Python Lab 是獨立課程，可從首頁「其他課程」開啟；Python Lab 頁面本身不連回首頁，`pythonlab/` 仍可單獨部署。可將 `pythonlab/` 單獨部署；本機執行 `npm run preview`（或 `node scripts/preview.cjs`）後，開啟 `http://127.0.0.1:4173/pythonlab/index.html`。Python 執行環境固定使用 Pyodide 0.27.7，首次載入需網路。程式草稿、預測與離堂說明保存在原電腦。安裝並啟用 Chrome 進度同步擴充功能後，星級、位置、通關日期與累計時間可隨 Chrome 個人資料同步。下載及上架步驟見 [Chrome 進度同步指南](pythonlab/CHROME_SYNC_GUIDE.md)。詳細教學流程與維護方式見 [Python Lab 說明](pythonlab/README.md)，課程規劃見 [Python 課程設計](PYTHON_COURSE_PLAN.md)。
 
 Python 的十二個單元依序為輸出、變數與輸入、型態與運算、條件、for 累加、巢狀迴圈、while、清單、函式與模組、購物結帳專題、資料排序、字典票選統計。每課包含示範、引導、初階一星、進階二星與選做終極三星，以及語法卡、逐層提示與離堂檢核。一星允許參考完整解答，二星需修改規則並通過新測資，完成核心學習；三星不強制。既有通過紀錄保留為一星。
 

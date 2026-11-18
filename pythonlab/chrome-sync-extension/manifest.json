@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Python Lab 學習進度同步",
+  "version": "1.0.0",
+  "description": "讓 Python Lab 的單元星級、練習位置與學習時間隨 Chrome 個人資料同步。",
+  "minimum_chrome_version": "120",
+  "icons": { "128": "icon128.png" },
+  "permissions": ["storage", "alarms"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": { "default_popup": "popup.html", "default_title": "Python Lab 進度同步", "default_icon": "icon128.png" },
+  "content_scripts": [{
+    "matches": [
+      "https://byte-core-su.github.io/unforte_115/pythonlab/*",
+      "http://127.0.0.1/*",
+      "http://localhost/*"
+    ],
+    "js": ["content-script.js"],
+    "run_at": "document_start"
+  }]
+}

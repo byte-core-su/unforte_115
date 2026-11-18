@@ -241,4 +241,4 @@ if (require.main === module) {
   console.log(`已產生 ${scratch.demo.file}`);
 }
 
-module.exports = { buildDemo };
+module.exports = { buildDemo, packZip };

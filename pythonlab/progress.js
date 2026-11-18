@@ -5,7 +5,7 @@ export function migrateCompletion(completed = {}) {
 export function earnedStars(record) {
   let stars = 0;
   for (let tier = 1; tier <= 3; tier++) {
-    if (typeof record?.levels?.[tier]?.code === 'string') stars = tier;
+    if (typeof record?.levels?.[tier]?.code === 'string' || record?.levels?.[tier]?.verified === true) stars = tier;
   }
   return stars;
 }

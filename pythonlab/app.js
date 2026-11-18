@@ -5,14 +5,20 @@ import { errors, extensions } from './helper-data.js';
 import { characterInfo, parseCodePoint } from './encoding.js';
 import { createLearningClock, formatDuration, normalizeStudent, validStudent, certificateRecord } from './learning-record.js';
 import { operationStep } from './operation-guide.js';
+import { mountChromeSync } from './chrome-sync-client.js';
+import { positionOf } from './chrome-sync-extension/progress-core.js';
 
 const $ = selector => document.querySelector(selector);
 const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
-const storageKey = 'pythonlab-v1';
-const emptyState = () => ({ drafts: {}, completed: {}, reflections: {}, timings: {}, certificates: {}, student: {} });
+const localStorageKey = 'pythonlab-v1';
+const syncStorageKey = 'pythonlab-chrome-v1';
+let storageKey = localStorageKey;
+const emptyState = () => ({ drafts: {}, completed: {}, reflections: {}, timings: {}, certificates: {}, student: {}, recent: null });
 let state = emptyState();
 let canSave = true;
+let chromeSync = null;
 try {
+  if (localStorage.getItem('pythonlab-storage-mode') === 'chrome') storageKey = syncStorageKey;
   const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
   if (saved && typeof saved === 'object') {
     for (const key of Object.keys(state)) if (saved[key] && typeof saved[key] === 'object' && !Array.isArray(saved[key])) state[key] = saved[key];
@@ -42,6 +48,7 @@ function save() {
   learningClock.checkpoint();
   try { localStorage.setItem(storageKey, JSON.stringify(state)); canSave = true; }
   catch { canSave = false; }
+  if (canSave) chromeSync?.schedule(state);
   const label = $('#save-state');
   if (label) label.textContent = canSave ? '草稿已保存在此瀏覽器' : '無法自動保存，請下載程式';
 }
@@ -379,14 +386,19 @@ function solutionPanel(activity) {
 function renderHome() {
   const count = lessons.filter(lesson => earnedStars(state.completed[lesson.id]) >= 2).length;
   const totalStars = lessons.reduce((sum, lesson) => sum + earnedStars(state.completed[lesson.id]), 0);
-  const next = lessons.find(lesson => earnedStars(state.completed[lesson.id]) < 2) || lessons.find(lesson => earnedStars(state.completed[lesson.id]) < 3) || lessons[0];
+  const recent = positionOf(state.recent);
+  const next = lessons.find(lesson => lesson.id === recent?.unit) || lessons.find(lesson => earnedStars(state.completed[lesson.id]) < 2) || lessons.find(lesson => earnedStars(state.completed[lesson.id]) < 3) || lessons[0];
   const nextStars = earnedStars(state.completed[next.id]);
-  const nextStage = nextStars === 1 ? 3 : nextStars === 2 ? 4 : 0;
-  main.innerHTML = `<section class="hero"><div><p class="eyebrow">PYTHON INTERACTIVE LEARNING</p><h1>從積木思考，<br>走向你的<span>第一行程式。</span></h1><p class="description">帶著 Scratch 的基礎，從修改範例開始。${lessons.length} 個循序漸進的任務，陪你讀懂、寫出，也驗證自己的 Python。</p><div class="hero-tags"><span>${lessons.length} 個引導單元</span><span>直接執行 Python</span><span>隨時查語法</span></div><a class="button primary" href="#unit=${next.id}&stage=${nextStage}">${count === lessons.length ? totalStars === lessons.length * 3 ? '回到課程複習' : '選做三星挑戰' : totalStars ? '繼續學習' : '開始第一個單元'} <span aria-hidden="true">→</span></a></div><div class="hero-code"><div class="window-bar"><span class="dots" aria-hidden="true">●●●</span><span>my_first_python.py</span></div><pre><span class="code-comment"># 從改一句話開始</span>\nname = <span class="code-string">"小安"</span>\nprint(<span class="code-string">"哈囉"</span>, name)\n\n<span class="code-comment"># 每一次修改，都是一次探索</span>\nprint(<span class="code-string">"今天，我用 Python 寫程式！"</span>)</pre><div class="hero-console">&gt; 哈囉 小安<br>&gt; 今天，我用 Python 寫程式！</div></div></section><div class="home-content"><div class="path-strip" aria-label="學習路徑"><div class="path-step"><strong><b>01</b> 選擇單元</strong><span>所有單元與星級都能直接進入</span></div><div class="path-step"><strong><b>02</b> 修改程式</strong><span>範例已放好，從一處開始</span></div><div class="path-step"><strong><b>03</b> 執行後驗證</strong><span>先試跑，再檢查全部測資</span></div><div class="path-step"><strong><b>04</b> 領證再升星</strong><span>一星可領證，三星自由挑戰</span></div></div><div class="home-operation"><p><strong>第一次使用？</strong>「執行程式」是試跑；「驗證任務」全部通過才會通關。每題上方都有下一步提示。</p><button type="button" class="button" data-operation-help>查看學生操作說明</button></div><div class="section-heading"><div><p class="eyebrow">YOUR LEARNING PATH</p><h2>${lessons.length} 個獨立單元，自由選擇</h2><p>選擇想練習的單元，可直接切換示範、引導與各星級任務。通過該題驗證就會記錄星級；終極三星自由選做。</p></div><div class="progress-summary">二星已達成 <strong>${count} / ${lessons.length}</strong><br>已取得 ${totalStars} / ${lessons.length * 3} 星・三星選做</div></div><section class="lesson-grid" aria-label="課程單元">${lessons.map(lesson => `<a class="lesson-card" href="#unit=${lesson.id}"><div class="card-top"><span class="unit-number">${String(lesson.id).padStart(2, '0')}</span><span class="level-tag">${escape(lesson.level)}</span></div><h3>${escape(lesson.title)}</h3><p>${escape(lesson.subtitle)}</p><div class="card-bottom"><span class="star-score ${earnedStars(state.completed[lesson.id]) >= 2 ? 'done' : ''}">${starDisplay(lesson)}</span><span class="card-arrow" aria-hidden="true">↗</span></div></a>`).join('')}</section><section class="star-explainer"><h3>一星會做，二星會改，三星再探索</h3><p>★ 初階可參考完整解答；★★ 進階要調整規則並通過新測資，完成核心學習；★★★ 終極加深整合與邊界處理，可自由選做。</p></section><section class="course-note"><div><h3>遇到問題，小幫手陪你找線索</h3><p>本課語法、Scratch 對照、錯誤排查與編碼工具都在本站。查完就能接著練習，不用另開網頁。</p></div><button type="button" class="button" data-dictionary>開啟參考小幫手</button></section><div class="home-actions"><span>首次執行需網路載入 Python。進度是練習紀錄，並非正式成績。</span><button type="button" class="button quiet" id="reset-progress">重設本機學習紀錄</button></div></div>`;
+  const nextStage = recent ? recent.stage : nextStars === 1 ? 3 : nextStars === 2 ? 4 : 0;
+  main.innerHTML = `<section class="hero"><div><p class="eyebrow">PYTHON INTERACTIVE LEARNING</p><h1>從積木思考，<br>走向你的<span>第一行程式。</span></h1><p class="description">帶著 Scratch 的基礎，從修改範例開始。${lessons.length} 個循序漸進的任務，陪你讀懂、寫出，也驗證自己的 Python。</p><div class="hero-tags"><span>${lessons.length} 個引導單元</span><span>直接執行 Python</span><span>隨時查語法</span></div><a class="button primary" href="#unit=${next.id}&stage=${nextStage}">${recent ? '繼續上次練習' : count === lessons.length ? totalStars === lessons.length * 3 ? '回到課程複習' : '選做三星挑戰' : totalStars ? '繼續學習' : '開始第一個單元'} <span aria-hidden="true">→</span></a></div><div class="hero-code"><div class="window-bar"><span class="dots" aria-hidden="true">●●●</span><span>my_first_python.py</span></div><pre><span class="code-comment"># 從改一句話開始</span>\nname = <span class="code-string">"小安"</span>\nprint(<span class="code-string">"哈囉"</span>, name)\n\n<span class="code-comment"># 每一次修改，都是一次探索</span>\nprint(<span class="code-string">"今天，我用 Python 寫程式！"</span>)</pre><div class="hero-console">&gt; 哈囉 小安<br>&gt; 今天，我用 Python 寫程式！</div></div></section><div class="home-content"><div class="path-strip" aria-label="學習路徑"><div class="path-step"><strong><b>01</b> 選擇單元</strong><span>所有單元與星級都能直接進入</span></div><div class="path-step"><strong><b>02</b> 修改程式</strong><span>範例已放好，從一處開始</span></div><div class="path-step"><strong><b>03</b> 執行後驗證</strong><span>先試跑，再檢查全部測資</span></div><div class="path-step"><strong><b>04</b> 領證再升星</strong><span>一星可領證，三星自由挑戰</span></div></div><div class="home-operation"><p><strong>第一次使用？</strong>「執行程式」是試跑；「驗證任務」全部通過才會通關。每題上方都有下一步提示。</p><button type="button" class="button" data-operation-help>查看學生操作說明</button></div><div class="section-heading"><div><p class="eyebrow">YOUR LEARNING PATH</p><h2>${lessons.length} 個獨立單元，自由選擇</h2><p>選擇想練習的單元，可直接切換示範、引導與各星級任務。通過該題驗證就會記錄星級；終極三星自由選做。</p></div><div class="progress-summary">二星已達成 <strong>${count} / ${lessons.length}</strong><br>已取得 ${totalStars} / ${lessons.length * 3} 星・三星選做</div></div><section class="lesson-grid" aria-label="課程單元">${lessons.map(lesson => `<a class="lesson-card" href="#unit=${lesson.id}"><div class="card-top"><span class="unit-number">${String(lesson.id).padStart(2, '0')}</span><span class="level-tag">${escape(lesson.level)}</span></div><h3>${escape(lesson.title)}</h3><p>${escape(lesson.subtitle)}</p><div class="card-bottom"><span class="star-score ${earnedStars(state.completed[lesson.id]) >= 2 ? 'done' : ''}">${starDisplay(lesson)}</span><span class="card-arrow" aria-hidden="true">↗</span></div></a>`).join('')}</section><section class="star-explainer"><h3>一星會做，二星會改，三星再探索</h3><p>★ 初階可參考完整解答；★★ 進階要調整規則並通過新測資，完成核心學習；★★★ 終極加深整合與邊界處理，可自由選做。</p></section><section class="course-note"><div><h3>遇到問題，小幫手陪你找線索</h3><p>本課語法、Scratch 對照、錯誤排查與編碼工具都在本站。查完就能接著練習，不用另開網頁。</p></div><button type="button" class="button" data-dictionary>開啟參考小幫手</button></section><div class="home-actions"><span>首次執行需網路載入 Python。進度是練習紀錄，並非正式成績。</span><button type="button" class="button quiet" id="reset-progress">重設本機學習紀錄</button></div></div>`;
   document.title = 'Python Lab｜Python 互動學習';
-  $('#reset-progress').addEventListener('click', () => confirmAction('重設學習紀錄', '將清除此瀏覽器的程式草稿、預測、離堂說明、星級、計時與證書資料。需要的作品請先下載。', () => {
-    state = emptyState(); practiceAttempts.clear(); learningClock = createLearningClock(state.timings); save(); renderHome();
-  }));
+  $('#reset-progress').addEventListener('click', () => {
+    if (storageKey === syncStorageKey) { void chromeSync?.syncNow(); return; }
+    confirmAction('重設學習紀錄', '將清除此瀏覽器的程式草稿、預測、離堂說明、星級、計時與證書資料。需要的作品請先下載。', () => {
+      state = emptyState(); practiceAttempts.clear(); learningClock = createLearningClock(state.timings); save(); renderHome();
+    });
+  });
+  chromeSync?.refresh();
 }
 function renderLesson() {
   const lesson = currentLesson;
@@ -422,7 +434,7 @@ function renderLesson() {
     const link = document.createElement('a'); link.href = url; link.download = `pythonlab-unit-${String(lesson.id).padStart(2, '0')}-${currentStage + 1}.py`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
   for (const button of document.querySelectorAll('[data-stage]')) button.addEventListener('click', () => {
-    capture(); currentStage = Number(button.dataset.stage); history.replaceState(null, '', `#unit=${lesson.id}&stage=${currentStage}`); renderLesson();
+    capture(); currentStage = Number(button.dataset.stage); rememberPosition(); history.replaceState(null, '', `#unit=${lesson.id}&stage=${currentStage}`); renderLesson();
   });
   startWorker();
 }
@@ -536,6 +548,7 @@ function route() {
   syncLearningClock(); save();
   const stage = Number(params.get('stage'));
   currentStage = Number.isInteger(stage) ? Math.min(4, Math.max(0, stage)) : 0;
+  rememberPosition();
   tabMayLeave = false;
   if (currentLesson) renderLesson(); else renderHome();
   window.scrollTo({ top: 0, behavior: 'instant' });
@@ -559,3 +572,55 @@ window.addEventListener('pageshow', syncLearningClock);
 setInterval(updateLearningClock, 1000);
 setInterval(() => { if (learningClock.isRunning()) save(); }, 5000);
 route();
+
+function rememberPosition() {
+  if (currentLesson) { state.recent = { unit: currentLesson.id, stage: currentStage, updatedAt: Date.now() }; save(); }
+}
+function snapshotState() {
+  if ($('#code')) capture(); else save();
+  return JSON.parse(JSON.stringify(state));
+}
+function showSyncedState(next) {
+  let replaceEditor = false;
+  if (currentLesson && $('#code')) {
+    const draft = next.drafts[`${currentLesson.id}-${currentStage}`] || currentLesson.activities[currentStage];
+    replaceEditor = $('#code').value !== (draft.code ?? draft.starter) || $('#stdin').value !== draft.input
+      || $('#prediction').value !== (draft.prediction || '') || $('#reflection').value !== (next.reflections[currentLesson.id] || '');
+  }
+  learningClock.setRunning(false);
+  state = next;
+  learningClock = createLearningClock(state.timings);
+  learningClock.select(currentLesson?.id ?? null);
+  syncLearningClock();
+  try { localStorage.setItem(storageKey, JSON.stringify(state)); } catch { canSave = false; }
+  if (!currentLesson) renderHome();
+  else if (replaceEditor && !busy) renderLesson();
+  else {
+    $('#unit-stars').textContent = starDisplay(currentLesson);
+    const tier = currentLesson.activities[currentStage].tier;
+    $('#lesson-completion').textContent = tier && state.completed[currentLesson.id]?.levels?.[tier]?.code !== $('#code').value
+      ? '星級紀錄已保留。目前程式尚未驗證，請按「驗證任務」檢查。' : progressText(currentLesson);
+    $('#open-certificate').disabled = !certificateRecord(state.completed[currentLesson.id]);
+    updateOperationGuide();
+  }
+  chromeSync?.refresh();
+}
+chromeSync = mountChromeSync({ readState: snapshotState, replaceState: showSyncedState,
+  isSyncStorage: () => storageKey === syncStorageKey,
+  switchStorage(importLocal) {
+    const original = snapshotState();
+    let cached = emptyState();
+    try { cached = { ...cached, ...JSON.parse(localStorage.getItem(syncStorageKey) || '{}') }; } catch { /* Retain the separate local record. */ }
+    cached.completed = migrateCompletion(cached.completed);
+    if (currentLesson) cached.recent = { unit: currentLesson.id, stage: currentStage, updatedAt: Date.now() };
+    if (importLocal) {
+      for (const key of ['drafts', 'reflections', 'certificates', 'student']) cached[key] = { ...original[key], ...cached[key] };
+      for (const [unit, record] of Object.entries(original.completed)) {
+        cached.completed[unit] = { levels: { ...record.levels, ...cached.completed[unit]?.levels } };
+      }
+    }
+    storageKey = syncStorageKey;
+    localStorage.setItem('pythonlab-storage-mode', 'chrome');
+    showSyncedState(cached);
+  }
+});
