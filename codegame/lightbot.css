@@ -26,6 +26,8 @@ h3 { font-size:.875rem; margin:0; }
 .header-progress span { display:block; color:#5145d6; font-size:1.2rem; font-weight:700; font-variant-numeric:tabular-nums; }
 .header-progress small { font-size:.75rem; color:#758198; }
 .student-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.menu-link { display:inline-flex; align-items:center; border:1px solid #c7c3ef; border-radius:7px; padding:8px 12px; background:#f1f0ff; color:#5145d6; font-size:.875rem; text-decoration:none; }
+.menu-link:hover { background:#e7e5fc; border-color:#ada8ef; }
 .game-workspace { display:grid; grid-template-columns:150px minmax(0,1fr); gap:12px; align-items:start; }
 .level-panel { padding:14px 12px; min-width:0; }
 body:not(.teacher-route) .game-workspace { grid-template-columns:minmax(0,1fr); }

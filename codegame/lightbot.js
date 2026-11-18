@@ -126,6 +126,7 @@
         }
     }
     function tick() { if (!autoplay) return; executeStep(); if (autoplay) timeout = setTimeout(tick, Number($('run-speed').value)); }
+    $('course-menu').addEventListener('click', () => { cardDrag.cancel(); collectTime(); stop(); save(); });
     $('run-program').addEventListener('click', () => { if (autoplay) { stop(); status('已暫停，可繼續執行或單步檢查。'); return; } beginAttempt(); autoplay = true; $('run-program').textContent = '暫停'; tick(); });
     $('step-program').addEventListener('click', () => { stop(); beginAttempt(); executeStep(); });
     $('reset-board').addEventListener('click', () => { if (machine.status === 'running') { entry().lastRun = { status: 'stopped', steps: machine.steps }; save(); } reset('機器人已回到起點，指令草稿仍保留。'); });
