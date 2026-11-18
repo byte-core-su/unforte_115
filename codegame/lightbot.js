@@ -15,6 +15,7 @@
     let record = store.load(student), level = levels.find(item => item.id === record.currentLevel) || levels[0];
     let selected = { section: 'main', index: 0 }, machine, autoplay = false, timeout = null, sessionMs = 0, checkpoint = performance.now();
     let browsingLevels = false;
+    let previewRenderers = [];
     const cards = window.CodeGameCards;
     const cardDrag = new cards.CardDrag({
         context: () => ({ level, programs: entry().programs }),
@@ -39,16 +40,36 @@
     function renderStudent() { $('student-name').textContent = student.name; $('student-id').textContent = student.studentId; $('student-class').textContent = student.className; $('student-source').textContent = student.source; }
     function renderNav() {
         $('total-complete').textContent = `${levels.filter(item => record.levels[item.id]?.completed).length} / 20`;
+        previewRenderers.forEach(preview => preview.observer.disconnect());
+        previewRenderers = [];
         const fragment = document.createDocumentFragment();
+        const previews = [];
         groups.forEach((name, index) => {
-            const section = document.createElement('section'); section.className = 'level-group'; const heading = document.createElement('h3'); heading.textContent = `${index + 1} · ${name}`; section.append(heading);
+            const groupLevels = levels.filter(item => item.group === index + 1);
+            const section = document.createElement('section'); section.className = 'level-group'; section.dataset.group = index + 1;
+            const heading = document.createElement('h3'); heading.textContent = `${index + 1} · ${name}`;
+            const progress = document.createElement('span'); progress.className = 'group-progress'; progress.textContent = `已完成 ${groupLevels.filter(item => record.levels[item.id]?.completed).length}／${groupLevels.length}`;
+            heading.append(progress); section.append(heading);
             const buttons = document.createElement('div'); buttons.className = 'level-buttons';
-            levels.filter(item => item.group === index + 1).forEach(item => {
-                const open = levelOpen(item), button = document.createElement('button'); button.type = 'button'; button.className = `level-button${open ? '' : ' is-locked'}`; button.textContent = `${item.number}${record.levels[item.id]?.completed ? ' ✓' : open ? '' : ' 🔒'}`;
+            groupLevels.forEach(item => {
+                const open = levelOpen(item), completed = Boolean(record.levels[item.id]?.completed), current = item.id === level.id;
+                const button = document.createElement('button'); button.type = 'button'; button.className = `level-button${open ? '' : ' is-locked'}${completed ? ' is-complete' : ''}`;
+                const compact = document.createElement('span'); compact.className = 'level-compact'; compact.textContent = `${item.number}${completed ? ' ✓' : open ? '' : ' 🔒'}`;
+                const preview = document.createElement('canvas'); preview.className = 'level-preview'; preview.setAttribute('aria-hidden', 'true');
+                const caption = document.createElement('span'); caption.className = 'level-caption';
+                const number = document.createElement('span'); number.className = 'level-number'; number.textContent = item.id;
+                const title = document.createElement('span'); title.className = 'level-name'; title.textContent = item.title;
+                const state = document.createElement('span'); state.className = 'level-state'; state.textContent = completed ? '✓ 已完成' : current ? '目前關卡' : open ? '可以挑戰' : '通過前一關後開啟';
+                caption.append(number, title, state); button.append(compact, preview, caption); previews.push({ canvas: preview, item });
                 button.title = open ? `${item.id} ${item.title}` : `${item.id} ${item.title}：過前一關後開啟`; button.setAttribute('aria-label', `${button.title}${record.levels[item.id]?.completed ? '，已完成' : ''}`); if (item.id === level.id) button.setAttribute('aria-current', 'true'); button.disabled = !open;
                 button.addEventListener('click', () => { selectLevel(item.id); $('level-title').focus({ preventScroll: true }); }); buttons.append(button);
             }); section.append(buttons); fragment.append(section);
         }); $('level-list').replaceChildren(fragment);
+        previews.forEach(({ canvas, item }) => {
+            const preview = new window.CodeGameRenderer.Renderer(canvas);
+            preview.set(item, new Machine(item, { main: [], p1: [], p2: [] }).snapshot());
+            previewRenderers.push(preview);
+        });
     }
     function setLevelListVisible(visible) {
         browsingLevels = visible;

@@ -180,13 +180,41 @@ th { background:#f4f6fb; position:sticky; top:0; }
 
 /* 單一路線：尚未開啟的關卡 */
 .level-button.is-locked { opacity:.45; cursor:not-allowed; }
+.level-preview,.level-caption,.group-progress { display:none; }
 body.level-list-view .game-workspace { grid-template-columns:minmax(0,1fr); }
-body.level-list-view .level-panel { padding:20px; }
+body.level-list-view .level-panel { padding:24px; }
 body.level-list-view .level-panel>.section-heading { display:flex; flex-wrap:wrap; }
-body.level-list-view #level-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; margin-top:20px; }
-body.level-list-view .level-group { margin-top:0; }
-body.level-list-view .level-button { min-height:44px; }
-@media(max-width:620px) { body.level-list-view #level-list { grid-template-columns:minmax(0,1fr); gap:20px; } }
+body.level-list-view #level-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; margin-top:24px; }
+body.level-list-view .level-group { --group-ink:#35699e; --group-tint:#eef5fc; margin-top:0; min-width:0; padding:16px; background:var(--group-tint); border:1px solid #dde7f1; border-radius:12px; align-self:start; }
+body.level-list-view .level-group[data-group="2"] { --group-ink:#7255a0; --group-tint:#f5f1fb; border-color:#e7dff1; }
+body.level-list-view .level-group[data-group="3"] { --group-ink:#287b70; --group-tint:#eef8f5; border-color:#d6eae4; }
+body.level-list-view .level-group h3 { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin:0 0 14px; color:var(--group-ink); font-size:1rem; font-weight:700; }
+body.level-list-view .group-progress { display:inline; color:#64748b; font-size:.75rem; font-weight:400; }
+body.level-list-view .level-buttons { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+body.level-list-view .level-button { display:flex; flex-direction:column; min-width:0; padding:0; text-align:left; border:1px solid #dce3ed; border-radius:10px; overflow:hidden; background:#fff; color:#25344c; box-shadow:0 2px 4px #25344c08; }
+body.level-list-view .level-button:not(:disabled):hover { border-color:var(--group-ink); box-shadow:0 4px 12px #25344c15; }
+body.level-list-view .level-button[aria-current="true"] { border:2px solid #6a58df; box-shadow:0 0 0 3px #6a58df14; }
+body.level-list-view .level-button.is-locked { opacity:1; color:#64748b; }
+body.level-list-view .level-compact { display:none; }
+body.level-list-view .level-preview { display:block; width:100%; height:auto; aspect-ratio:9/5.6; background:#eef4fc; }
+body.level-list-view .is-locked .level-preview { filter:saturate(.45); }
+body.level-list-view .level-caption { display:grid; align-content:start; grid-template-rows:auto minmax(2.8em,auto) auto; gap:4px; padding:10px 12px 12px; width:100%; }
+body.level-list-view .level-number { color:var(--group-ink); font-size:.75rem; font-weight:700; }
+body.level-list-view .level-name { font-size:.875rem; font-weight:600; line-height:1.4; overflow-wrap:anywhere; }
+body.level-list-view .level-state { color:#64748b; font-size:.7rem; font-weight:400; line-height:1.5; }
+body.level-list-view .is-complete .level-state { color:#18714c; font-weight:600; }
+body.level-list-view .level-button[aria-current="true"] .level-state { color:#5c48c2; font-weight:600; }
+@media(max-width:1100px) {
+    body.level-list-view #level-list { grid-template-columns:minmax(0,1fr); }
+    body.level-list-view .level-buttons { grid-template-columns:repeat(4,minmax(0,1fr)); }
+}
+@media(max-width:620px) {
+    body.level-list-view .level-panel { padding:14px; }
+    body.level-list-view #level-list { margin-top:18px; gap:16px; }
+    body.level-list-view .level-group { padding:12px; }
+    body.level-list-view .level-buttons { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    body.level-list-view .level-caption { padding:8px; }
+}
 
 /* 教師示範模式提示 */
 .teacher-demo-badge { position:fixed; right:12px; bottom:12px; z-index:50; display:flex; align-items:center; gap:8px; border:1px solid #f59e0b; border-radius:10px; background:#fffbeb; padding:6px 10px; color:#92400e; font-size:13px; font-weight:700; box-shadow:0 6px 18px rgba(0,0,0,.12); }
