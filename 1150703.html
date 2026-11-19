@@ -55,7 +55,7 @@
                 <div class="border-b-2 border-dashed border-slate-100 pb-16">
                     <div class="flex items-center mb-8">
                         <span class="bg-emerald-100 text-emerald-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">1</span>
-                        <h3 id="route-pen-line" class="text-2xl font-bold text-slate-800">第一階段：用畫筆畫直線，畫出第一條直線</h3>
+                        <h3 id="route-pen-line" class="text-2xl font-bold text-slate-800">用畫筆畫直線</h3>
                     </div>
                     
                     <div class="grid grid-cols-1 gap-8 mb-8">
@@ -64,7 +64,7 @@
                                 <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">A</span> 挑戰：組裝畫筆初始化積木
                             </h4>
                             <p class="text-slate-600 font-light text-sm mb-6">
-                                在 中，角色就像拿著一隻隱形的筆。請根據右側空位上的<strong>「功能說明」</strong>，將左側打亂的積木依序點擊放入。組裝正確才能解鎖動畫！
+                                看空位上的功能說明，點選積木排出一條直線。排好後就會播放繪圖動畫。
                             </p>
                             
                             <div class="flex flex-col md:flex-row gap-6 mb-4">
@@ -109,10 +109,10 @@
                 </div>
 
                 <!-- 第二階段：手動繪製正方形遊戲 -->
-                <div class="border-b-2 border-dashed border-slate-100 pb-16">
+                <div id="route-square-manual-panel" class="border-b-2 border-dashed border-slate-100 pb-10">
                     <div class="flex items-center mb-8">
                         <span class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">2</span>
-                        <h3 id="route-manual-square" class="text-2xl font-bold text-slate-800">第二階段：手動畫正方形 (手動繪製正方形)</h3>
+                        <h3 id="route-manual-square" class="text-2xl font-bold text-slate-800">手動畫正方形</h3>
                     </div>
                     
                     <div class="grid grid-cols-1 gap-8 mb-8">
@@ -121,7 +121,7 @@
                                 <span class="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">A</span> 挑戰：手動串接 4 次！
                             </h4>
                             <p class="text-slate-600 font-light text-sm mb-6">
-                                我們已經幫你準備好最上方的<strong>「畫筆」</strong>積木了。請將左側的 8 個積木，依序點擊排入右側的空位中，完成正方形的路線！排完後你就會發現...這程式碼真的太長啦！
+                                點選「移動」與「右轉」積木，排出正方形。看這兩個動作接連出現了幾次。
                             </p>
                             
                             <div class="flex flex-col md:flex-row gap-6 mb-4">
@@ -171,10 +171,10 @@
                 </div>
 
                 <!-- 第三階段：用迴圈畫正方形 -->
-                <div>
+                <div id="route-square-loop-panel">
                     <div class="flex items-center mb-8">
                         <span class="bg-orange-100 text-orange-600 w-8 h-8 rounded-full flex items-center justify-center font-bold mr-3">3</span>
-                        <h3 id="route-repeat-square" class="text-2xl font-bold text-slate-800">第三階段：用迴圈畫正方形 (導入重複結構)</h3>
+                        <h3 id="route-repeat-square" class="text-2xl font-bold text-slate-800">把重複動作放進迴圈</h3>
                     </div>
                     
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -182,7 +182,7 @@
                             <h4 class="text-lg font-bold text-slate-700 mb-4 flex items-center border-b border-slate-100 pb-3"><span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">A</span> 優化目標與流程</h4>
                             <ul class="space-y-3 text-slate-600 font-light mt-2 mb-6">
                                 <li class="flex items-start"><span class="mr-3 text-slate-300">▪</span> 觀察規律：「移動 ➔ 右轉」組合在正方形中出現了幾次？</li>
-                                <li class="flex items-start"><span class="mr-3 text-slate-300">▪</span> 運用<strong>重複結構</strong>將落落長的指令瘦身！</li>
+                                <li class="flex items-start"><span class="mr-3 text-slate-300">▪</span> 迴圈裡只要寫一次「移動、右轉」。</li>
                             </ul>
                             
                             <div class="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-600">
@@ -213,10 +213,12 @@
                         </div>
                     </div>
 
-                    <!-- 第四階段：試畫正多邊形 -->
+                </div>
+                <div>
+                    <!-- 試畫正多邊形 -->
                     <section id="polygon-simulator" class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 mt-12 slide-up-fade">
                         <h4 id="route-polygon" class="text-xl font-bold text-slate-800 mb-3 flex items-center">
-                            <span class="text-2xl mr-2">📐</span> 第四階段：試畫正多邊形 (尋找多邊形密碼)
+                            <span class="text-2xl mr-2" aria-hidden="true">📐</span> 試畫正多邊形
                         </h4>
                         <p class="text-sm text-slate-500 font-light mb-6 leading-relaxed">
                             選一個圖形，設定迴圈的<strong class="text-orange-600">「次數」</strong>與右轉的<strong class="text-indigo-600">「角度」</strong>，用探測車試畫<strong class="text-slate-700">正三角形、正五邊形、正六邊形</strong>。按下啟動後，看看線條能不能回到起點。
@@ -699,6 +701,8 @@
         let polyInterval = null;
         let polyPreviousSides = null;
         const closedPolygons = new Set();
+        let triangleTrial = false;
+        let triangleCorrected = false;
 
         function newPolygonCase() {
             const choices = [3, 4, 5, 6, 8].filter(sides => sides !== polyPreviousSides);
@@ -796,10 +800,14 @@
                         fb.textContent = `✅ 圖形閉合了。重複 ${nInput} 次，每次轉 ${angleInput}°，一共轉了 ${totalRotation}°。`;
                         fb.className = "bg-emerald-500 text-white rounded-b-2xl p-4 text-sm font-bold transition-colors duration-300 text-center shadow-lg";
                         if(formulaReveal) formulaReveal.classList.remove('hidden');
-                        if (Math.abs(totalRotation - 360) < 0.1) closedPolygons.add(nInput);
-                        if (closedPolygons.has(3) && closedPolygons.has(5)) fb.setAttribute('data-lesson-activity', '');
+                        if (Math.abs(totalRotation - 360) < 0.1) {
+                            closedPolygons.add(nInput);
+                            if (nInput === 3 && triangleTrial) triangleCorrected = true;
+                        }
+                        if (closedPolygons.has(3) && closedPolygons.has(5) && triangleCorrected) fb.setAttribute('data-lesson-activity', '');
                     } else {
-                        fb.textContent = `🤔 哎呀，圖形沒有接在一起！(提示: 360 ÷ ${nInput} = ?)`;
+                        if (nInput === 3 && angleInput === 90) triangleTrial = true;
+                        fb.textContent = `終點沒有回到起點。用 360 ÷ ${nInput} 算出轉角，再畫一次。`;
                         fb.className = "bg-amber-500 text-white rounded-b-2xl p-4 text-sm font-bold transition-colors duration-300 text-center shadow-lg";
                     }
                     return;

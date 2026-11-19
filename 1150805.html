@@ -644,13 +644,13 @@
         // 教學內容資料庫
         // ==========================================
         const lesson = {
-            objective: "學習清單（陣列）的動態操作與資料移轉。透過模擬發牌過程，練習使用迴圈進行隨機抽取洗牌，實作動態刪除項次的完整洗牌邏輯。",
-            learningPointsSummary: "本單元將帶領指揮官實作完整的「洗牌」演算法：",
+            objective: "看一輪洗牌怎麼移牌，找出保留每張牌的洗牌結果，再用相鄰比較把牌由小到大排序。",
+            learningPointsSummary: "洗牌與排序都要保留每個數值出現的次數。",
             learningPoints: [
                 { title: "雙清單應用", desc: "準備一個「牌堆」與一個空的「洗牌」，用於存放打亂後的結果。" },
-                { title: "迴圈控制", desc: "使用「重複 (清單長度) 次」積木，動態依據牌的數量執行洗牌動作。" },
-                { title: "隨機抽取", desc: "每次從牌堆目前剩下的長度中，隨機產生一個位置編號。" },
-                { title: "轉移與刪除", desc: "將抽中的項目「添加」到新清單，並從原清單中「刪除」，達成不重複洗牌。" }
+                { title: "抽取與刪除", desc: "從目前的牌堆隨機選一項，加到洗牌清單，再從牌堆刪掉這一項。牌堆空了就停。" },
+                { title: "相鄰比較", desc: "由小到大排列時，左邊比右邊大才交換。數值相同時不交換。" },
+                { title: "排序何時停止", desc: "跑完指定輪數就停止。若程式有記錄每輪是否交換，整輪未交換時可提早結束。" }
             ],
             scratchBlocks1: [
                 { type: "list", text: '刪除 <span class="bg-black/10 text-white px-2 py-0.5 rounded border border-black/20 shadow-inner inline-flex items-center mx-1">洗牌 <span class="text-[10px] ml-1 opacity-70">▼</span></span> 的所有項目' },
@@ -758,6 +758,7 @@
                                 </div>
                             </details>
                             
+                            <details class="lesson-reference" id="teacher-shuffle-activities"><summary>教師延伸活動：洗牌模擬、洗牌積木與發牌</summary>
                             <!-- 🚀 洗牌模擬器 -->
                             <section>
                                 <h3 id="route-shuffle-simulator" class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4"><span class="bg-emerald-100 text-emerald-600 p-1.5 rounded-lg"><i data-lucide="play" class="w-5 h-5"></i></span>⚡ 洗牌演算法模擬器</h3>
@@ -987,6 +988,7 @@
                                 </div>
                             </section>
 
+                            </details>
                             <!-- 單元導覽按鈕 -->
                             <div class="mt-8 pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
                                 <a data-course-direction="previous" href="1150804.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 hover:text-cyan-600 transition-colors shadow-sm">

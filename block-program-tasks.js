@@ -223,10 +223,13 @@
           const opponent = state.enemy[index];
           state.rows.push([index + 1, value, opponent, value > opponent ? '小隊得分' : '對手得分']);
         });
-        state.text = `小隊：${list(state.team)}｜對手：${list(state.enemy)}`;
+        const assigned = [...state.team, ...state.enemy];
+        const remaining = state.deck.length - assigned.length;
+        const unique = new Set(assigned).size === assigned.length;
+        state.text = `小隊：${list(state.team)}｜對手：${list(state.enemy)}｜未分配 ${remaining} 件｜${unique ? '兩隊裝備沒有重複' : '有重複裝備'}`;
       }
-    }, [example('裝備足夠', { stock: 24, count: 6 }), example('裝備不足', { stock: 8, count: 6 }),
-      example('剛好分完且不重複', { stock: 12, count: 6 })],
+    }, [example('足夠有剩', { stock: 24, count: 6 }), example('數量不足', { stock: 8, count: 6 }),
+      example('剛好分完', { stock: 12, count: 6 })],
     state => state.input.stock < state.input.count * 2 ? state.stopped === true && !state.rows.length :
       state.rows.length === state.input.count && new Set([...state.team, ...state.enemy]).size === state.input.count * 2,
     ['輪次', '小隊裝備', '對手裝備', '結果'], [field('stock', '庫存數', 1, 24), field('count', '每隊需求', 1, 12)])

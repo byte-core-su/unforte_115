@@ -139,28 +139,32 @@ for (const scenario of [CourseScenarios.active, campus]) {
 
 {
   const get = loadLab('1150805.html');
+  const passed = () => get.section['data-lesson-activity'] === '';
   const state = get('#g8-sort-state');
-  const first = state.textContent;
-  assert.match(first, /練習題；清單：\[/);
-  get('#g8-sort-step').click();
-  assert.match(state.textContent, /比較 0 次.*請先選/);
-  get('#g8-sort-prediction').value = 'swap';
-  get('#g8-sort-step').click();
-  assert.match(state.textContent, /比較 1 次/);
-  get('#g8-sort-reset').click();
-  assert.equal(state.textContent, first, 'retry should restore the original values');
-  get('#g8-sort-new').click();
-  assert.notEqual(state.textContent, first, 'new sort case should differ');
-  get('#g8-sort-prediction').value = 'swap';
-  for (let i = 0; i < 15; i++) get('#g8-sort-step').click();
-  assert.match(state.textContent, /排序完成/);
-  get('#g8-sort-demo').click();
-  assert.match(state.textContent, /固定示範；清單：\[7、3、5、1\]/);
-  get('#g8-sort-prediction').value = 'swap';
-  get('#g8-sort-step').click();
-  assert.match(state.textContent, /第一次預測正確/);
-  get('#g8-sort-new').click();
-  assert.equal(get('#g8-sort-prediction').value, '', 'new sort case should clear old prediction');
+  const choice = get('#g8-shuffle-choice');
+  choice.value = 'extra';
+  get('#g8-shuffle-check').click();
+  assert.match(get('#g8-shuffle-state').textContent, /總張數相同.*3 少了一張/);
+  assert.equal(passed(), false);
+  choice.value = 'valid';
+  get('#g8-shuffle-check').click();
+  get('#g8-sort-keep').click();
+  assert.match(state.textContent, /再試一次.*比較 3 和 1/);
+  get('#g8-sort-swap').click();
+  assert.match(state.textContent, /比較 3 和 3/);
+  get('#g8-sort-swap').click();
+  assert.match(state.textContent, /再試一次.*比較 3 和 3/);
+  get('#g8-sort-keep').click();
+  assert.match(state.textContent, /結果是 ［1、2、3、3］/);
+  assert.equal(passed(), false);
+  get('#g8-sort-stop').value = 'pair';
+  get('#g8-sort-check').click();
+  assert.equal(passed(), false);
+  get('#g8-sort-stop').value = 'round';
+  get('#g8-sort-check').click();
+  assert.equal(passed(), true);
+  assert.match(get('#g8-sort-report').value, /3 和 3\t不交換/);
+  assert.match(get('#g8-sort-report').value, /完整一輪都沒交換/);
 }
 
 {

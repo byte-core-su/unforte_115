@@ -50,9 +50,56 @@
       html: `<div class="curriculum-lab__questions" data-quiz="g8-ethics"></div>`
     },
     '1150805.html': {
-      title: '排序與洗牌比較',
-      intro: '洗牌讓順序隨機；排序依明確規則排列。逐步比較相鄰數值，必要時交換，觀察每一輪如何改變清單。',
-      html: `<div class="curriculum-lab__controls"><label>先預測第一次比較 <select id="g8-sort-prediction"><option value="">先選答案</option><option value="swap">會交換</option><option value="keep">不交換</option></select></label><button type="button" id="g8-sort-reset">同題重試</button><button type="button" id="g8-sort-step">執行下一次比較</button><button type="button" id="g8-sort-new" class="curriculum-lab__secondary">再產生一題</button><button type="button" id="g8-sort-demo" class="curriculum-lab__secondary">固定示範</button></div><div id="g8-sort-state" class="curriculum-lab__result" aria-live="polite"></div><p class="curriculum-lab__task">積木程式任務：將四至六張打亂的數字牌由小到大排序；標出每次比較與交換，確認輸出數量與項目和輸入相同。換一組數字後，仍要能解釋交換規則。</p>`
+      title: '同一副牌，兩種排法',
+      intro: '洗牌會打亂順序，排序會按規則排好。兩種做法都要保留原本的牌。',
+      html: `
+        <details class="lesson-reference" open>
+          <summary>示範：從牌堆移走一張牌</summary>
+          <div class="curriculum-lab__result">
+            <p>操作前：牌堆 ［1、2、3、3］，洗牌清單是空的。</p>
+            <p>抽到第 3 項。把這張 3 加到洗牌清單，再從牌堆刪掉第 3 項。</p>
+            <p>操作後：牌堆 ［1、2、3］，洗牌清單 ［3］。原牌堆空了就停止。</p>
+          </div>
+        </details>
+        <h3>第 1 題　找出正確的洗牌結果</h3>
+        <p>原牌堆是［1、2、3、3］。哪個結果保留了每張牌？</p>
+        <div class="curriculum-lab__controls">
+          <label>洗牌結果 <select id="g8-shuffle-choice">
+            <option value="">請選一個結果</option>
+            <option value="extra">［3、1、2、2］</option>
+            <option value="valid">［3、1、3、2］</option>
+            <option value="missing">［3、1、2］</option>
+          </select></label>
+          <button type="button" id="g8-shuffle-check">檢查牌數</button>
+        </div>
+        <p id="g8-shuffle-state" class="curriculum-lab__result" role="status"></p>
+        <div id="g8-sort-task" hidden>
+          <h3 id="g8-sort-title" tabindex="-1">第 2 題　比較相鄰兩項</h3>
+          <p id="g8-sort-state" class="curriculum-lab__result" role="status"></p>
+          <div id="g8-sort-actions">
+            <div class="curriculum-lab__controls">
+              <button type="button" id="g8-sort-swap">交換</button>
+              <button type="button" id="g8-sort-keep">不交換</button>
+            </div>
+          </div>
+          <div id="g8-sort-stop-task" hidden>
+            <div id="g8-sort-trace" class="curriculum-lab__result"></div>
+            <div class="curriculum-lab__controls">
+              <label>哪個情況可以提早停止？ <select id="g8-sort-stop">
+                <option value="">請選停止條件</option>
+                <option value="pair">有一對相鄰的牌沒交換</option>
+                <option value="round">完整一輪都沒交換</option>
+                <option value="equal">遇到兩張數值相同的牌</option>
+              </select></label>
+              <button type="button" id="g8-sort-check">檢查停止條件</button>
+            </div>
+          </div>
+          <div id="g8-sort-evidence" class="curriculum-lab__result" hidden>
+            <button type="button" id="g8-sort-copy">複製洗牌與排序紀錄</button>
+            <p id="g8-sort-copy-status" role="status"></p>
+            <textarea id="g8-sort-report" aria-label="洗牌與排序紀錄" rows="3" readonly hidden></textarea>
+          </div>
+        </div>`
     },
     '1150806.html': {
       title: `用自訂積木分工完成${escapeHtml(duel.activity)}`,
@@ -290,47 +337,105 @@
   }
 
   if (page === '1150805.html') {
-    let values;
-    let initialValues;
-    let pass;
-    let index;
-    let comparisons;
-    let mode = '練習題';
-    let previous = '';
-    const state = section.querySelector('#g8-sort-state');
-    const prediction = section.querySelector('#g8-sort-prediction');
-    const show = message => { state.textContent = `${mode}；清單：[${values.join('、')}]；比較 ${comparisons} 次。${message}`; };
-    const reset = () => { values = [...initialValues]; pass = 0; index = 0; comparisons = 0; show('預測第一次要比較哪兩項。'); };
-    const setCase = (items, label) => { initialValues = [...items]; mode = label; prediction.value = ''; reset(); };
-    section.querySelector('#g8-sort-reset').addEventListener('click', reset);
-    section.querySelector('#g8-sort-step').addEventListener('click', () => {
-      if (pass >= values.length - 1) return;
-      if (comparisons === 0 && !prediction.value) { show('請先選第一次比較是否交換。'); return; }
-      const left = values[index];
-      const right = values[index + 1];
-      const swapped = left > right;
-      const firstFeedback = comparisons === 0 ? prediction.value === (swapped ? 'swap' : 'keep') ? '第一次預測正確；請說明比較規則。' : '第一次預測不同；由小到大排序時，左邊比右邊大才交換。' : '';
-      if (swapped) [values[index], values[index + 1]] = [right, left];
-      comparisons++;
-      index++;
-      if (index >= values.length - pass - 1) { index = 0; pass++; }
-      if (pass >= values.length - 1) section.setAttribute('data-lesson-activity', '');
-      show(`比較 ${left} 與 ${right}：${swapped ? '交換' : '不交換'}。${firstFeedback}${pass >= values.length - 1 ? '排序完成。' : `目前完成 ${pass} 輪。`}`);
+    const get = id => section.querySelector(`#g8-${id}`);
+    const shuffled = [3, 1, 3, 2];
+    const values = [...shuffled];
+    const asList = items => `［${items.join('、')}］`;
+    const trace = [];
+    let index = 0;
+    let sortFinished = false;
+
+    function compare(position, round) {
+      const before = asList(values);
+      const [left, right] = [values[position], values[position + 1]];
+      const swap = left > right;
+      if (swap) [values[position], values[position + 1]] = [right, left];
+      trace.push([round, before, `${left} 和 ${right}`, swap ? '交換' : '不交換', asList(values)]);
+      return swap;
+    }
+
+    function askComparison(message = '') {
+      get('sort-state').textContent = `${message}目前順序 ${asList(values)}。比較 ${values[index]} 和 ${values[index + 1]}，要交換嗎？`;
+    }
+
+    const shuffleChoice = get('shuffle-choice');
+    const shuffleCheck = get('shuffle-check');
+    shuffleCheck.addEventListener('click', () => {
+      const feedback = {
+        extra: '總張數相同，但數字 2 多了一張，數字 3 少了一張。',
+        missing: '數字 3 原本有兩張，這裡只剩一張。',
+        valid: '正確。1 和 2 各一張，3 有兩張，與原牌堆相同。'
+      };
+      get('shuffle-state').textContent = feedback[shuffleChoice.value] || '請先選一個結果。';
+      if (shuffleChoice.value !== 'valid') return;
+      shuffleCheck.disabled = shuffleChoice.disabled = true;
+      get('sort-task').hidden = false;
+      askComparison();
+      get('sort-title').focus();
     });
-    section.querySelector('#g8-sort-new').addEventListener('click', () => {
-      let items;
-      let attempts = 0;
-      do {
-        items = Array.from({ length: randomInt(4, 6) }, () => randomInt(1, 19));
-      } while ((items.join(',') === previous || items.every((value, index) => index === 0 || items[index - 1] <= value)) && ++attempts < 12);
-      if (items.join(',') === previous || items.every((value, index) => index === 0 || items[index - 1] <= value)) {
-        items = previous === '7,3,5,1,9' ? [8, 2, 6, 1, 4] : [7, 3, 5, 1, 9];
+
+    function answerComparison(swap) {
+      if (!shuffleCheck.disabled || index >= 2) return;
+      if (swap !== (values[index] > values[index + 1])) {
+        askComparison('再試一次。左邊比右邊大才交換。');
+        return;
       }
-      previous = items.join(',');
-      setCase(items, '練習題');
+      compare(index++, 1);
+      if (index < 2) {
+        askComparison('答對了。');
+        return;
+      }
+      compare(2, 1);
+      for (let round = 2; round < values.length; round++) {
+        let changed = false;
+        for (let position = 0; position < values.length - round; position++) {
+          if (compare(position, round)) changed = true;
+        }
+        if (!changed) break;
+      }
+      sortFinished = true;
+      get('sort-actions').hidden = true;
+      get('sort-state').textContent = `前兩次判斷正確。其餘比較已完成，結果是 ${asList(values)}。`;
+      get('sort-trace').innerHTML = `<details class="lesson-reference"><summary>看每次比較的紀錄</summary>
+        <ol>${trace.map(([round, before, pair, action, after]) => `<li>第 ${round} 輪：${before} 比較 ${pair}，${action} → ${after}</li>`).join('')}</ol></details>`;
+      get('sort-stop-task').hidden = false;
+      get('sort-stop').focus();
+    }
+
+    get('sort-swap').addEventListener('click', () => answerComparison(true));
+    get('sort-keep').addEventListener('click', () => answerComparison(false));
+    const stopChoice = get('sort-stop');
+    const sortCheck = get('sort-check');
+    const report = get('sort-report');
+    sortCheck.addEventListener('click', () => {
+      if (!sortFinished) return;
+      if (stopChoice.value !== 'round') {
+        get('sort-state').textContent = '請再判斷。只比完一對，後面仍可能有需要交換的牌。';
+        return;
+      }
+      sortCheck.disabled = stopChoice.disabled = true;
+      get('sort-state').textContent = '正確。完整一輪都沒交換，就可以提早停止。';
+      report.value = [
+        `洗牌：［1、2、3、3］→ ${asList(shuffled)}。1 和 2 各一張，3 有兩張。`,
+        '輪次\t操作前清單\t比較的項目\t動作\t操作後清單',
+        ...trace.map(row => row.join('\t')),
+        '停止條件：完整一輪都沒交換，可以提早停止。'
+      ].join('\n');
+      get('sort-evidence').hidden = false;
+      section.setAttribute('data-lesson-activity', '');
+      get('sort-copy').focus();
     });
-    section.querySelector('#g8-sort-demo').addEventListener('click', () => setCase([7, 3, 5, 1], '固定示範'));
-    section.querySelector('#g8-sort-new').click();
+    get('sort-copy').addEventListener('click', async () => {
+      if (!report.value) return;
+      try {
+        await navigator.clipboard.writeText(report.value);
+        get('sort-copy-status').textContent = '已複製。請貼到本課作業。';
+      } catch {
+        report.hidden = false;
+        report.select();
+        get('sort-copy-status').textContent = '請複製下方紀錄，貼到本課作業。';
+      }
+    });
   }
 
   if (page === '1150806.html') {
