@@ -36,7 +36,10 @@
                 <div class="board-heading"><div><span id="level-group" class="eyebrow">基礎 · 1-1</span><h2 id="level-title" tabindex="-1">第一盞燈</h2></div><button id="rotate-view" type="button" title="只改變觀看角度，不改變機器人方向">旋轉視角</button></div>
                 <div class="board-stage"><canvas id="game-board" width="900" height="560" role="img" aria-label="關卡地圖，橘色箭頭表示機器人朝向">請使用支援 Canvas 的瀏覽器。</canvas></div>
                 <div class="board-stats"><span id="light-count">已點亮 0 / 1</span><span id="step-count">執行 0 步</span><span id="robot-facing" class="facing-badge"></span></div>
-                <div id="game-status" class="game-status" role="status" aria-live="polite">先選指令格，再點選下方指令。</div>
+                <div class="game-feedback">
+                    <div id="game-status" class="game-status" role="status" aria-live="polite">先選指令格，再點選下方指令。</div>
+                    <button id="next-level" class="next-button" type="button" hidden>前往下一關</button>
+                </div>
                 <details class="board-info"><summary>關卡提示</summary><p id="level-tip"></p><span id="robot-position" class="muted"></span></details>
             </section>
             <section class="program-panel" aria-label="排列程式指令">
@@ -50,7 +53,6 @@
                 <div class="palette-heading"><h3>動作圖卡</h3><span class="muted">拖曳或點選加入</span></div><div id="command-palette" class="command-palette"></div>
                 <details class="program-help"><summary>操作說明</summary><p>把圖卡拖進程式格，或點選格子後加入動作。由左到右執行，程序執行完會返回。</p><p>拖曳可插入、排序或移到 P1／P2。放滿時，拖入新圖卡可替換這格；拖到刪除區可移除圖卡，按 Esc 取消拖曳。</p></details>
                 <div class="level-record"><span id="level-complete">尚未完成</span><span id="attempt-count">嘗試 0 次</span><span id="best-count">最佳 —</span></div>
-                <button id="next-level" class="next-button" type="button" hidden>前往下一關</button>
             </section>
             </div>
         </div>

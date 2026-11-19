@@ -50,9 +50,10 @@ canvas { display:block; width:100%; height:100%; }
 .board-stats { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 18px; font-size:.8rem; }
 #light-count { color:#216b9d; font-weight:600; }
 .facing-badge { color:#ab671a; font-weight:600; }
-.game-status { margin:0 16px 10px; border-radius:7px; padding:9px 11px; font-size:.875rem; min-height:42px; background:#eaf0f8; }
-.game-status.won { background:#e3f4e9; color:#176443; }
-.game-status.warning { background:#fff1d9; color:#925410; }
+.game-feedback { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin:0 16px 10px; border-radius:7px; padding:9px 11px; font-size:.875rem; min-height:42px; background:#eaf0f8; }
+.game-status { flex:1 1 11rem; }
+.game-feedback:has(.game-status.won) { background:#e3f4e9; color:#176443; }
+.game-feedback:has(.game-status.warning) { background:#fff1d9; color:#925410; }
 .board-info { padding:0 18px 14px; font-size:.8rem; color:#758198; }
 .board-info summary { color:#758198; }
 .board-info p { margin:8px 0 4px; }
@@ -98,7 +99,7 @@ select { padding:3px 5px; font-size:.8rem; }
 .program-help p { margin:8px 0; }
 .level-record { display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px; padding-top:10px; border-top:1px solid #edf0f4; color:#8791a3; font-size:.75rem; }
 #level-complete.completed { color:#19845b; font-weight:600; }
-.next-button { width:100%; margin-top:10px; color:#18714a; border-color:#cfe6da; background:#f3faf6; font-weight:600; }
+.next-button { min-height:40px; color:#18714a; border-color:#9fc9b3; background:#f3faf6; font-weight:600; }
 .slot.executing { background:#fff0b8; border-color:#dc9c25; outline:2px solid #e9b443; outline-offset:0; transform:translateY(-3px); box-shadow:0 6px 0 #e4b95b,0 10px 14px #ad792932; }
 .slot.executing .card-icon { animation:card-playing .6s ease-out; }
 .card-landed { animation:card-landing .4s ease-out; }
@@ -170,7 +171,7 @@ th { background:#f4f6fb; position:sticky; top:0; }
     .board-stage { height:240px; }
     .board-stats { padding:8px 12px; }
     .board-info { padding:0 12px 10px; }
-    .game-status { margin:0 12px 8px; }
+    .game-feedback { margin:0 12px 8px; }
     .program-panel { border-left:0; border-top:1px solid #e5e9f0; }
     .session-card { flex-wrap:wrap; padding:10px 12px; gap:10px; }
     .save-summary { width:100%; flex-direction:row; justify-content:space-between; align-items:center; }

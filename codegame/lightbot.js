@@ -36,7 +36,7 @@
     function save() { const ok = store.save(student, record); $('save-status').textContent = ok ? '進度儲存於此瀏覽器' : '無法儲存；請下載紀錄備份'; $('save-status').classList.toggle('error', !ok); window.dispatchEvent(new CustomEvent('codegame:progress', { detail: exportData() })); }
     function status(message, tone = '') { $('game-status').textContent = message; $('game-status').className = `game-status ${tone}`; }
     function stop() { clearTimeout(timeout); timeout = null; autoplay = false; $('run-program').textContent = machine?.status === 'running' ? '繼續執行' : '執行程式'; }
-    function reset(message = '拖曳或點選圖卡，排好後執行程式。') { stop(); machine = new Machine(level, entry().programs); renderer.set(level, machine.snapshot()); updateBoard(); renderPrograms(); status(message); }
+    function reset(message = '拖曳或點選圖卡，排好後執行程式。') { machine = new Machine(level, entry().programs); stop(); renderer.set(level, machine.snapshot()); updateBoard(); renderPrograms(); status(message); }
     function renderStudent() { $('student-name').textContent = student.name; $('student-id').textContent = student.studentId; $('student-class').textContent = student.className; $('student-source').textContent = student.source; }
     function renderNav() {
         $('total-complete').textContent = `${levels.filter(item => record.levels[item.id]?.completed).length} / 20`;
@@ -62,7 +62,15 @@
                 const state = document.createElement('span'); state.className = 'level-state'; state.textContent = completed ? '✓ 已完成' : current ? '目前關卡' : open ? '可以挑戰' : '通過前一關後開啟';
                 caption.append(number, title, state); button.append(compact, preview, caption); previews.push({ canvas: preview, item });
                 button.title = open ? `${item.id} ${item.title}` : `${item.id} ${item.title}：過前一關後開啟`; button.setAttribute('aria-label', `${button.title}${record.levels[item.id]?.completed ? '，已完成' : ''}`); if (item.id === level.id) button.setAttribute('aria-current', 'true'); button.disabled = !open;
-                button.addEventListener('click', () => { selectLevel(item.id); $('level-title').focus({ preventScroll: true }); }); buttons.append(button);
+                button.addEventListener('click', () => {
+                    if (browsingLevels && item.id === level.id) {
+                        resumeLevel();
+                    } else {
+                        selectLevel(item.id);
+                        $('level-title').focus();
+                    }
+                });
+                buttons.append(button);
             }); section.append(buttons); fragment.append(section);
         }); $('level-list').replaceChildren(fragment);
         previews.forEach(({ canvas, item }) => {
@@ -78,6 +86,12 @@
         document.querySelector('.play-area').hidden = visible;
         $('back-to-levels').hidden = visible;
         $('resume-level').hidden = !visible;
+    }
+    function resumeLevel() {
+        collectTime();
+        setLevelListVisible(false);
+        renderer.draw();
+        $('level-title').focus();
     }
     function renderPrograms() {
         const fragment = document.createDocumentFragment(), programs = entry().programs;
@@ -134,7 +148,19 @@
         const before = cardDrag.positions(), plan = cards.editPlan(level, entry().programs, { kind: 'program', ...selected }, { section: selected.section, index: offset < 0 ? to : to + 1 });
         if (plan) { applyPlan(plan); cardDrag.animateMoves(before, plan.moves); }
     }
-    function beginAttempt() { if (!['ready', 'running'].includes(machine.status)) reset(); if (machine.status === 'ready') { entry().attempts++; updateRecord(); save(); } }
+    function beginAttempt() {
+        if (!entry().programs.main.length) {
+            status('請先在主程式加入一張指令卡。', 'warning');
+            return false;
+        }
+        if (!['ready', 'running'].includes(machine.status)) reset();
+        if (machine.status === 'ready') {
+            entry().attempts++;
+            updateRecord();
+            save();
+        }
+        return true;
+    }
     // 分層提示：同一關試了 3 次還沒過，打開關卡提示；6 次後再給拆解方法。
     function stuckHint() {
         const item = entry(); if (item.completed) return '';
@@ -160,16 +186,27 @@
         cardDrag.cancel(); collectTime(); stop(); save(); renderNav(); setLevelListVisible(true);
         $('level-list-title').focus({ preventScroll: true });
     });
-    $('resume-level').addEventListener('click', () => {
-        collectTime(); setLevelListVisible(false); renderer.draw();
-        $('level-title').focus({ preventScroll: true });
+    $('resume-level').addEventListener('click', resumeLevel);
+    $('run-program').addEventListener('click', () => {
+        if (autoplay) { stop(); status('已暫停，可繼續執行或單步檢查。'); return; }
+        if (!beginAttempt()) return;
+        autoplay = true;
+        $('run-program').textContent = '暫停';
+        tick();
     });
-    $('run-program').addEventListener('click', () => { if (autoplay) { stop(); status('已暫停，可繼續執行或單步檢查。'); return; } beginAttempt(); autoplay = true; $('run-program').textContent = '暫停'; tick(); });
-    $('step-program').addEventListener('click', () => { stop(); beginAttempt(); executeStep(); });
+    $('step-program').addEventListener('click', () => {
+        stop();
+        if (beginAttempt()) executeStep();
+    });
     $('reset-board').addEventListener('click', () => { if (machine.status === 'running') { entry().lastRun = { status: 'stopped', steps: machine.steps }; save(); } reset('機器人已回到起點，指令草稿仍保留。'); });
     $('rotate-view').addEventListener('click', () => renderer.rotate()); $('delete-command').addEventListener('click', deleteCommand); $('move-earlier').addEventListener('click', () => moveCommand(-1)); $('move-later').addEventListener('click', () => moveCommand(1));
     $('clear-program').addEventListener('click', () => { entry().programs = { main: [], p1: [], p2: [] }; selected = { section: 'main', index: 0 }; edited(); });
-    $('next-level').addEventListener('click', () => { const next = levels[levels.indexOf(level) + 1]; if (next) selectLevel(next.id); });
+    $('next-level').addEventListener('click', () => {
+        const next = levels[levels.indexOf(level) + 1];
+        if (!next) return;
+        selectLevel(next.id);
+        $('level-title').focus();
+    });
     function setStudent(value) { const next = normalizeStudent(value); collectTime(); stop(); save(); student = next; try { storage?.setItem('codegame.student.v1', JSON.stringify(student)); } catch { /* The save status reports storage errors. */ } record = store.load(student); sessionMs = 0; checkpoint = performance.now(); renderStudent(); selectLevel(record.currentLevel); }
     $('edit-student').addEventListener('click', () => { $('name-input').value = student.name; $('id-input').value = student.studentId; $('class-input').value = student.className; $('student-dialog').showModal(); }); $('cancel-student').addEventListener('click', () => $('student-dialog').close());
     $('student-form').addEventListener('submit', event => { event.preventDefault(); if ([$('name-input'), $('id-input'), $('class-input')].some(input => !input.value.trim())) { status('請填入姓名、學號與班級。'); return; } setStudent({ name: $('name-input').value, studentId: $('id-input').value, className: $('class-input').value }); $('student-dialog').close(); });
