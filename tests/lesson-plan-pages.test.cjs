@@ -71,6 +71,11 @@ for (const grade of [7, 8]) {
     }
     assert.ok(planSection.includes(`href="${module.resources.records}"`), `${id}: plan links to its own record page`);
     assert.ok(planSection.includes(`${module.periods} 節`), `${id}: recommended periods remain in the plan`);
+    for (const period of [1, 2]) {
+      const required = steps.slice(1).filter(step => step.period === period && !step.optional).map(step => CourseScenarios.escapeHtml(step.title));
+      assert.ok(planSection.includes(`<strong>第 ${period} 節</strong> ${required.join(' → ')}`), `${id}: pacing matches the route`);
+    }
+    assert.ok(recordSection.includes(CourseScenarios.escapeHtml(exit.response)), `${id}: record and exit prompt agree`);
     const optionalActivities = steps.filter(step => step.optional).map(step => CourseScenarios.escapeHtml(step.title));
     const optionalRow = planSection.match(/<p><strong>選做活動<\/strong> (.*?)<\/p>/);
     assert.equal(optionalRow?.[1], optionalActivities.length ? optionalActivities.join('、') : undefined, `${id}: optional activities match the student route`);

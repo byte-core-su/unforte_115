@@ -5,7 +5,8 @@ const path = require('node:path');
 const vm = require('node:vm');
 const { active, applyPage } = require('../course-scenarios.js');
 const check = process.argv.includes('--check');
-const { marked } = require(process.argv.slice(2).find(arg => arg !== '--check') || 'marked');
+const courseOnly = process.argv.includes('--course-only');
+const { marked } = require(process.argv.slice(2).find(arg => !arg.startsWith('--')) || 'marked');
 
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
@@ -266,7 +267,7 @@ for (const page of [...pages, ...modules.map(item => ({ kind: 'record', source: 
   const sections = [];
   const lessons = [];
   let html = item
-    ? `<div class="lesson-record" id="${item.id}">\n${assessment(item)}${item.activity ? `\n${activityQuestions(item.activity)}` : ''}\n${recordBodies.get(item.id)}\n</div>`
+    ? `<div class="lesson-record" id="${item.id}">\n${assessment(item)}${item.activity ? `\n${activityQuestions(item.activity)}` : ''}\n${recordBodies.get(item.id)}\n<p><strong>離堂說明</strong> ${escapeHtml(routes[item.entry].at(-1).response)}</p>\n<p>我的說明：＿＿＿＿</p>\n</div>`
     : marked.parse(markdown.slice(match[0].length), { gfm: true });
   if (page.kind === 'records') {
     for (const [number, label] of [[7, '七年級'], [8, '八年級']]) {
@@ -292,10 +293,15 @@ for (const page of [...pages, ...modules.map(item => ({ kind: 'record', source: 
     html = html.replace(/<h3>第 ([1-6]) 課[^<]*<\/h3>/g, (_, number) => {
       lessons.push(number);
       const item = byId.get(`g${page.grade}-0${number}`);
-      const optional = routes[item.entry].filter(step => step.optional).map(step => escapeHtml(step.title));
+      const steps = routes[item.entry];
+      const optional = steps.filter(step => step.optional).map(step => escapeHtml(step.title));
       const optionalActivities = optional.length ? `\n<p><strong>選做活動</strong> ${optional.join('、')}</p>` : '';
+      const pacing = [1, 2].map(period => {
+        const titles = steps.slice(1).filter(step => step.period === period && !step.optional).map(step => escapeHtml(step.title));
+        return `<p><strong>第 ${period} 節</strong> ${titles.join(' → ')}</p>`;
+      }).join('\n');
       const activity = item.activity ? `\n<p><strong>網頁示範</strong> ${escapeHtml(item.activity.preview)}</p>\n<p><strong>積木程式實作</strong> ${escapeHtml(item.activity.practice)}</p>\n${activityQuestions(item.activity)}` : '';
-      return `<h3 id="lesson-${number}">第 ${number} 課｜${escapeHtml(item.title)}</h3>\n<p><strong>建議節數</strong> ${item.periods} 節</p>\n${assessment(item)}${optionalActivities}\n<p><a href="${item.resources.records}">開啟本課學習紀錄 ↗</a></p>${activity}`;
+      return `<h3 id="lesson-${number}">第 ${number} 課｜${escapeHtml(item.title)}</h3>\n<p><strong>建議節數</strong> ${item.periods} 節</p>\n${pacing}\n${assessment(item)}${optionalActivities}\n<p><a href="${item.resources.records}">開啟本課學習紀錄 ↗</a></p>${activity}`;
     });
   }
   if (page.kind === 'alignment') {
@@ -389,6 +395,7 @@ ${page.kind === 'records' || item ? '<p id="copy-status" class="copy-status" rol
 }
 
 for (const [file, content] of outputs) {
+  if (courseOnly && /^(pythonlab|codegame|presentations)\//.test(file)) continue;
   if (fs.existsSync(path.join(root, file)) && read(file) === content) continue;
   if (check) {
     console.error(`${file} 尚未同步。請執行 npm run build:lesson-plans。`);

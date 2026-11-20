@@ -80,10 +80,16 @@
     return '沒有輸出。';
   }
 
-  function mount(root, task) {
-    const program = [];
+  function mount(root, task, { draft, onSave } = {}) {
+    const program = Array.isArray(draft?.blocks)
+      ? [...new Set(draft.blocks.filter(id => typeof id === 'string' && Object.hasOwn(task.blocks, id)))]
+      : [];
+    const runs = Array.isArray(draft?.runs) ? draft.runs.filter(entry =>
+      typeof entry?.key === 'string' && entry.key.length <= 1000 &&
+      typeof entry.text === 'string' && entry.text.length <= 16000).slice(-8) : [];
     let audio;
     let result;
+    let currentReport = '';
     root.innerHTML = `
       <h3>積木程式模擬器</h3>
       <p>拖曳或點選積木加入程式。要調整順序：先點一塊，再點另一塊，兩塊就會交換位置（也可以直接拖曳）。按「比對檢查」可一次檢查所有預設資料。</p>
@@ -108,8 +114,10 @@
         <button type="button" data-program-compare>比對檢查</button>
         <button type="button" data-program-reset>清空積木</button>
         <button type="button" data-program-copy disabled>複製程式與結果</button>
+        <button type="button" data-program-copy-all disabled>複製多組試跑紀錄</button>
       </div>
       <p role="status" data-program-feedback></p>
+      <textarea data-program-output aria-label="可複製的積木程式試跑紀錄" rows="5" readonly hidden></textarea>
       <div data-program-comparison></div>
       <div data-program-result></div>`;
     const script = root.querySelector('[data-program-script]');
@@ -125,9 +133,39 @@
     const stage = root.querySelector('[data-program-result]');
     const comparison = root.querySelector('[data-program-comparison]');
     const copy = root.querySelector('[data-program-copy]');
+    const copyAll = root.querySelector('[data-program-copy-all]');
+    const output = root.querySelector('[data-program-output]');
     const inputs = [...root.querySelectorAll('[data-program-value]')];
     const caseSelect = root.querySelector('[data-program-case]');
     const selected = () => task.cases[Number(caseSelect.value)];
+
+    function saveDraft() {
+      onSave?.({
+        blocks: program, caseIndex: Number(caseSelect.value), runs,
+        fields: Object.fromEntries(inputs.map(input => [input.dataset.programValue, input.value]))
+      });
+    }
+
+    function showRunCount() {
+      copyAll.disabled = runs.length === 0;
+      copyAll.textContent = runs.length ? `複製多組試跑紀錄（${runs.length} 筆）` : '複製多組試跑紀錄';
+      root.toggleAttribute('data-program-three-runs', new Set(runs.filter(entry =>
+        entry.passed === true && typeof entry.inputKey === 'string').map(entry => entry.inputKey)).size >= 3);
+    }
+
+    async function copyReport(report) {
+      if (!report) return;
+      output.hidden = true;
+      try {
+        await navigator.clipboard.writeText(report);
+        feedback.textContent = '已複製。請貼到本課作業。';
+      } catch {
+        output.value = report;
+        output.hidden = false;
+        output.select();
+        feedback.textContent = '請複製下方紀錄，貼到本課作業。';
+      }
+    }
 
     // 點選交換：先點一塊（標示為已選），再點另一塊就互換位置；再點同一塊取消。
     let picked = null;
@@ -137,6 +175,8 @@
       picked = null;
       stopAudio();
       result = undefined;
+      currentReport = '';
+      output.hidden = true;
       stage.replaceChildren();
       comparison.replaceChildren();
       feedback.textContent = message;
@@ -228,6 +268,7 @@
         program.splice(position, 0, id);
       }
       invalidate(drag.id ? '已加入積木。' : '已移動積木。');
+      saveDraft();
       drag = undefined;
       clearDrop();
       render();
@@ -284,6 +325,25 @@
         <tbody>${result.rows.map(row => `<tr>${row.map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : ''}`;
       stage.querySelector('p').textContent = result.text;
       copy.disabled = !program.length;
+      if (program.length) {
+        currentReport = [
+          selected().name,
+          ...inputs.map(field => `${field.labels[0].textContent.trim()}：${field.value}`),
+          root.querySelector('[data-program-input]').textContent,
+          task.loop ? `前 ${task.loop.before.length} 塊執行一次，後續積木重複 ${task.loop.times} 次。` : '',
+          ...program.map((id, index) => `${index + 1}. ${textLabel(task.blocks[id].view[2])}`),
+          summary(result),
+          task.columns.join('｜'),
+          ...result.rows.map(row => row.join('｜'))
+        ].filter(Boolean).join('\n');
+        const key = JSON.stringify([program, input]);
+        const prior = runs.findIndex(entry => entry.key === key);
+        if (prior >= 0) runs.splice(prior, 1);
+        runs.push({ key, inputKey: JSON.stringify(input), passed: result.passed === true, text: currentReport });
+        if (runs.length > 8) runs.shift();
+        showRunCount();
+        saveDraft();
+      }
       if (result.notes?.length) play(result.notes);
     }
 
@@ -305,12 +365,14 @@
           const first = picked;
           [program[first], program[target]] = [program[target], program[first]];
           invalidate(`已交換第 ${first + 1} 塊和第 ${target + 1} 塊。`);
+          saveDraft();
           render();
         }
         script.querySelector(`[data-program-pick="${target}"]`)?.focus({ preventScroll: true });
       } else if (programAdd) {
         program.push(programAdd);
         invalidate('已加入積木。');
+        saveDraft();
         render();
         if (event.detail === 0) {
           (root.querySelector('[data-program-add]:not(:disabled)') || root.querySelector('[data-program-run]')).focus();
@@ -319,6 +381,7 @@
         const from = Number(index);
         program.splice(from, 1);
         invalidate('已移除積木。');
+        saveDraft();
         render();
         const row = script.querySelector(`[data-program-row="${Math.min(from, program.length - 1)}"]`);
         (row?.querySelector('[data-program-edit]') || root.querySelector('[data-program-add]:not(:disabled)')).focus();
@@ -327,31 +390,10 @@
       else if (button.hasAttribute('data-program-reset')) {
         program.length = 0;
         invalidate('已清空積木。');
+        saveDraft();
         render();
-      } else if (button === copy && result) {
-        const evidence = [
-          selected().name,
-          ...inputs.map(input => `${input.labels[0].textContent.trim()}：${input.value}`),
-          root.querySelector('[data-program-input]').textContent,
-          task.loop ? `前 ${task.loop.before.length} 塊執行一次，後續積木重複 ${task.loop.times} 次。` : '',
-          ...program.map((id, index) => `${index + 1}. ${textLabel(task.blocks[id].view[2])}`),
-          summary(result),
-          task.columns.join('｜'),
-          ...result.rows.map(row => row.join('｜'))
-        ].filter(Boolean).join('\n');
-        try {
-          await navigator.clipboard.writeText(evidence);
-          feedback.textContent = '已複製積木順序與本次結果。';
-        } catch {
-          const output = document.createElement('textarea');
-          output.setAttribute('aria-label', '積木順序與結果');
-          output.readOnly = true;
-          output.value = evidence;
-          stage.replaceChildren(output);
-          output.select();
-          feedback.textContent = '請複製下方的積木順序與結果。';
-        }
-      }
+      } else if (button === copy) await copyReport(currentReport);
+      else if (button === copyAll) await copyReport(runs.map(({ text }, index) => `試跑 ${index + 1}\n${text}`).join('\n\n'));
     });
     root.addEventListener('keydown', event => {
       if (event.key !== 'Escape' || picked === null) return;
@@ -361,10 +403,16 @@
       if (focused !== undefined) script.querySelector(`[data-program-pick="${focused}"]`)?.focus();
       feedback.textContent = '已取消選取。';
     });
-    caseSelect.addEventListener('change', changeCase);
-    for (const input of inputs) input.addEventListener('input', () => invalidate());
+    caseSelect.addEventListener('change', () => { changeCase(); saveDraft(); });
+    for (const input of inputs) input.addEventListener('input', () => { invalidate(); saveDraft(); });
+    if (Number.isInteger(draft?.caseIndex) && task.cases[draft.caseIndex]) caseSelect.value = String(draft.caseIndex);
     changeCase();
+    for (const input of inputs) {
+      const value = draft?.fields?.[input.dataset.programValue];
+      if (typeof value === 'string' && value.length <= 20) input.value = value;
+    }
     render();
+    showRunCount();
   }
 
   window.BlockProgram = { mount, execute, compare };

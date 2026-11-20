@@ -1,7 +1,7 @@
 // 學習路線引導：把一頁教材整理成「一步接一步」的單一路線。
 // - 學生一次看一個步驟，完成後才開啟下一步。回看已完成的步驟不影響進度。
 // - 操作說明放在活動前，完成標準和繼續按鈕放在活動後。
-// - 進度只存在本頁，重新整理就從頭開始；不保存、不傳送任何資料。
+// - 步驟、文字草稿與積木程式保存在同一瀏覽器的設定檔。
 // - 教師示範模式：從「教師備課」開啟，或網址加 ?teacher=1／?route=all。只在目前分頁有效，
 //   可直接跳到任一步、不必勾選完成標準，也可一鍵全部展開。
 // 使用：LessonRoute.start({ steps: [...], next: { href, label } })
@@ -40,6 +40,27 @@
   function start(config) {
     let showAll = demo && teacher.showAll();
     const steps = config.steps.map((step, index) => ({ ...step, index, regions: [] }));
+    const key = `unforte:lesson:v1:${location.pathname}`;
+    const version = JSON.stringify(steps.map(({ title, anchors, optional }) => [title, anchors, Boolean(optional)]));
+    function readSaved() {
+      if (demo) return {};
+      try {
+        const value = JSON.parse(localStorage.getItem(key));
+        return value && typeof value === 'object' ? value : {};
+      } catch { return {}; }
+    }
+    function save(patch) {
+      if (demo) return false;
+      try {
+        localStorage.setItem(key, JSON.stringify({ ...readSaved(), ...patch }));
+        return true;
+      } catch { return false; }
+    }
+    const saved = readSaved();
+    const route = saved.route;
+    const resume = route?.version === version && Number.isInteger(route.current) &&
+      route.current > 0 && route.current < steps.length;
+    let storageAvailable = false;
     let current = 0;
     let viewing = null;
     let finished = false;
@@ -47,8 +68,13 @@
     let ticked = [];
     let answer = '';
     const skipped = new Set();
+    const answers = {};
     const viewedStep = () => steps[viewing ?? current];
     const atEnd = () => finished && viewing === null;
+
+    function saveRoute() {
+      storageAvailable = save({ route: { version, current, finished, skipped: [...skipped], answers, submitted: Boolean(ticked[0]) } });
+    }
 
     function resolve() {
       const anchorsByStep = steps.map(step => (step.anchors || []).map(locator => ({ locator, node: findAnchor(locator) })));
@@ -108,7 +134,10 @@
       simulator.id = 'block-program';
       simulator.className = 'block-program';
       main.after(simulator);
-      window.BlockProgram.mount(simulator, config.program);
+      window.BlockProgram.mount(simulator, config.program, demo ? undefined : {
+        draft: saved.program,
+        onSave: program => save({ program })
+      });
     }
     main.after(panel, completion);
     const startButton = document.querySelector('[data-lesson-start]');
@@ -156,37 +185,26 @@
       const first = steps[1];
       const status = document.querySelector('.learning-guide__status');
       const entry = steps[0].entry;
-      if (entry && !demo) {
+      if (entry?.items && !demo) {
         const question = document.createElement('fieldset');
         question.className = 'lesson-route__checks lesson-route__entry';
-        if (entry.items) {
-          question.innerHTML = `<legend>從左到右，點出清單的第 2 項</legend>
-            <ol class="lesson-route__entry-list" role="list">${entry.items.map((item, i) =>
-              `<li><button type="button" data-entry-position="${i}">${escapeHtml(item)}</button></li>`).join('')}</ol>`;
-          question.addEventListener('click', event => {
-            const button = event.target.closest('[data-entry-position]');
-            if (!button || current !== 0) return;
-            const position = Number(button.dataset.entryPosition);
-            if (position !== entry.correct) {
-              status.textContent = `這是第 ${position + 1} 項。從最左邊的第 1 項數過去。`;
-              return;
-            }
-            startButton.disabled = false;
-            button.setAttribute('data-correct', '');
-            startButton.focus({ preventScroll: true });
-            question.disabled = true;
-            status.textContent = `${entry.items[position]}在第 2 項。可以開始清單操作。`;
-          });
-        } else {
-          question.innerHTML = `<legend>先找一找：本課要交哪一項？</legend>${entry.choices.map((choice, i) =>
-            `<label><input type="radio" name="lesson-entry" value="${i}"> ${escapeHtml(choice)}</label>`).join('')}`;
-          question.addEventListener('change', event => {
-            if (current !== 0) return;
-            const correct = Number(event.target.value) === entry.correct;
-            startButton.disabled = !correct;
-            status.textContent = correct ? '找到了。可以開始第一項活動。' : '對照「最後交什麼」再選一次。';
-          });
-        }
+        question.innerHTML = `<legend>從左到右，點出清單的第 2 項</legend>
+          <ol class="lesson-route__entry-list" role="list">${entry.items.map((item, i) =>
+            `<li><button type="button" data-entry-position="${i}">${escapeHtml(item)}</button></li>`).join('')}</ol>`;
+        question.addEventListener('click', event => {
+          const button = event.target.closest('[data-entry-position]');
+          if (!button || current !== 0) return;
+          const position = Number(button.dataset.entryPosition);
+          if (position !== entry.correct) {
+            status.textContent = `這是第 ${position + 1} 項。從最左邊的第 1 項數過去。`;
+            return;
+          }
+          startButton.disabled = false;
+          button.setAttribute('data-correct', '');
+          startButton.focus({ preventScroll: true });
+          question.disabled = true;
+          status.textContent = `${entry.items[position]}在第 2 項。可以開始清單操作。`;
+        });
         startButton.before(question);
         startButton.disabled = true;
       } else startButton.disabled = false;
@@ -233,13 +251,14 @@
       window.dispatchEvent(new Event('resize'));
     }
 
-    function enter(index, { focus = true } = {}) {
+    function enter(index, { focus = true, submitted = false } = {}) {
       current = index;
       viewing = null;
       hintsShown = 0;
-      ticked = [];
-      answer = '';
+      ticked = [submitted];
+      answer = answers[index] || '';
       const step = steps[current];
+      if (index > 0) saveRoute();
       updateView();
       if (typeof step.enter === 'function') { try { step.enter(); } catch (error) { console.warn('lesson-route enter', error); } }
       if (focus) focusStep();
@@ -263,9 +282,15 @@
       progress.innerHTML = `
         <ol class="lesson-route__nodes" role="list">${nodes}</ol>
         <div class="lesson-route__position">
+          ${!atEnd() && viewedStep().period ? `<span class="lesson-route__period">第 ${viewedStep().period} 節</span>` : ''}
           <p role="status">${atEnd() ? '已到終點，本課完成' : viewing !== null ? `回看：${escapeHtml(viewedStep().title)}` : `目前：${escapeHtml(viewedStep().title)}`}</p>
           ${viewing !== null ? `<button type="button" data-action="resume">${finished ? '回到終點' : '回到目前步驟'}</button>` : ''}
-        </div>`;
+        </div>
+        ${!demo && current > 0 && storageAvailable ? `<details class="lesson-route__saved">
+          <summary>本機進度</summary>
+          <p>同一瀏覽器可接續步驟、文字答案和積木草稿。進行中的網頁活動重新開啟後可能要再做一次。</p>
+          <button type="button" data-action="restart">清除本課進度與草稿</button>
+        </details>` : ''}`;
     }
 
     function render() {
@@ -277,7 +302,7 @@
         panel.innerHTML = `
           <div class="lesson-route__bar">
             <span class="lesson-route__count">本課結束</span>
-            <h2 class="lesson-route__title" tabindex="-1">${escapeHtml(config.finishTitle || (config.next ? '本課學習路線已完成' : '六課學習路線已完成'))}</h2>
+            <h2 class="lesson-route__title" tabindex="-1">${escapeHtml(config.finishTitle || '本課學習路線已完成')}</h2>
             <div class="lesson-route__actions">
               ${next ? `<a class="lesson-route__primary" data-course-direction="next" href="${escapeHtml(next.href)}">${escapeHtml(next.label || '前往下一單元')} →</a>` : ''}
             </div>
@@ -302,6 +327,7 @@
           ${before ? `<p class="lesson-route__todo"><b>操作前先猜</b>${escapeHtml(before)}</p>` : ''}
           <p class="lesson-route__todo"><b>要做什麼</b>${escapeHtml(step.todo || '')}</p>
           ${step.evidence?.length ? `<ul class="evidence-list" role="list">${step.evidence.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''}
+          ${viewing !== null && answers[step.index] ? `<p class="lesson-route__todo"><b>我的紀錄</b>${escapeHtml(answers[step.index])}</p>` : ''}
           ${during ? `<p class="lesson-route__todo"><b>操作中觀察</b>${escapeHtml(during)}</p>` : ''}
           ${after ? `<p class="lesson-route__todo"><b>做完後說明</b>${escapeHtml(after)}</p>` : ''}
           ${step.link ? `<p class="lesson-route__link"><a href="${escapeHtml(step.link.href)}" target="_blank" rel="noopener">${escapeHtml(step.link.label)}</a></p>` : ''}
@@ -353,6 +379,12 @@
       }
       const action = event.target.closest('[data-action]')?.dataset.action;
       if (!action) return;
+      if (action === 'restart' && !demo) {
+        if (!window.confirm('重新開始本課？這會刪除這個瀏覽器上的本課進度、答案和積木草稿。')) return;
+        try { localStorage.removeItem(key); } catch { return; }
+        location.reload();
+        return;
+      }
       if (action === 'resume') { showStep(); return; }
       if (action === 'show-all') { showAll = !showAll; apply(); render(); window.dispatchEvent(new Event('resize')); return; }
       if (action === 'end-demo') { teacher.end(); return; }
@@ -377,12 +409,15 @@
       const box = event.target.closest('[data-check]');
       if (box) {
         ticked[Number(box.dataset.check)] = box.checked;
+        saveRoute();
         updateCompletion();
       }
     });
     completion.addEventListener('input', event => {
       if (event.target.matches('[data-response]')) {
         answer = event.target.value;
+        answers[current] = answer;
+        saveRoute();
         updateCompletion();
       }
     });
@@ -390,13 +425,28 @@
     function advance() {
       if (current < steps.length - 1) { enter(current + 1); return; }
       finished = true;
+      saveRoute();
       updateView();
       focusStep();
     }
 
     resolve();
     steps.filter(step => step.missing).forEach(step => console.warn(`lesson-route：找不到「${step.title}」的部分頁面區塊。`));
-    enter(0, { focus: false });
+    if (resume) {
+      for (const step of steps) {
+        const value = route.answers?.[step.index];
+        if (step.response && typeof value === 'string') answers[step.index] = value.slice(0, 300);
+      }
+      if (Array.isArray(route.skipped)) {
+        route.skipped.forEach(index => {
+          if (Number.isInteger(index) && index < route.current && steps[index]?.optional) skipped.add(index);
+        });
+      }
+      finished = route.current === steps.length - 1 && route.finished === true;
+      guide?.querySelector('.lesson-route__entry')?.setAttribute('disabled', '');
+      if (startButton) startButton.disabled = false;
+    }
+    enter(resume ? route.current : 0, { focus: false, submitted: resume && route.submitted === true });
     if (showAll && location.hash) {
       const target = document.getElementById(location.hash.slice(1));
       if (target) requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));

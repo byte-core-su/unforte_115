@@ -2,8 +2,28 @@
 [data-route-locked],
 .lesson-route[hidden] { display: none !important; }
 
-html:not([data-teacher-route]) :is(.learning-guide__teacher, .learning-guide__records, [data-route-tab-picker], [data-course-direction]:not(.lesson-route__primary)) {
+html:not([data-teacher-route]) :is(.learning-guide__teacher, .learning-guide__records, [data-route-tab-picker], [data-route-teacher-reference], [data-course-direction]:not(.lesson-route__primary)) {
   display: none !important;
+}
+
+.lesson-route__saved {
+  margin-top: .5rem;
+  padding: .55rem .85rem;
+  color: #475569;
+  font-size: .85rem;
+}
+.lesson-route__saved summary { cursor: pointer; font-weight: 650; }
+.lesson-route__saved p { margin: .5rem 0; }
+.lesson-route__period {
+  color: var(--route-color);
+  font-size: .8rem;
+  font-weight: 650;
+}
+.block-program textarea[data-program-output]:not([hidden]) {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .lesson-route {

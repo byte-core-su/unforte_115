@@ -44,10 +44,15 @@ for (const page of pages) {
     assert.equal(entry.correct, 1);
     assert.equal(entry.choices, undefined);
   } else {
-    assert.equal(entry.choices[entry.correct], window.LearningGuide.evidence[0]);
+    assert.equal(entry, undefined, `${page}: students can start directly`);
   }
   assert.deepEqual(Array.from(steps.slice(-2), step => step.title), ['換題練習', '離堂任務'], `${page} should end with practice and the exit task`);
-  assert.ok(program?.cases.length && steps.at(-3).anchors.includes('#block-program'), `${page} should include the simulator step`);
+  assert.ok(program?.cases.length && steps.some(step => step.anchors.includes('#block-program')), `${page} should include the simulator step`);
+  assert.ok(steps.slice(1).some(step => step.period === 1 && !step.optional), `${page}: first period has required work`);
+  const secondPeriod = steps.findIndex(step => step.period === 2);
+  assert.ok(secondPeriod > 1 && steps.slice(secondPeriod).every(step => step.period === 2), `${page}: clear second period boundary`);
+  const firstOptional = steps.findIndex(step => step.optional);
+  if (firstOptional >= 0) assert.ok(steps.slice(firstOptional, -1).every(step => step.optional), `${page}: extensions follow required activities`);
   assert.match(html, /src="block-program\.js"/);
   assert.doesNotMatch(html, /scratch\.mit\.edu|href="[^"]*\.sb3/i);
   const practice = steps.at(-2);

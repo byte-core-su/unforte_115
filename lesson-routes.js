@@ -10,20 +10,13 @@
   const draw = drawLesson.activity;
   const activity = (selector, pending) => ({ selector, pending });
   const achieved = (selector, pending) => activity(`${selector}[data-lesson-activity]`, pending);
-  const assessmentPages = Object.keys(window.LessonAssessments);
-  const pageIndex = assessmentPages.indexOf(page);
-  const entryChoices = pageIndex < 0 ? [] : [
-    window.LessonAssessments[page].evidence[0],
-    window.LessonAssessments[assessmentPages[(pageIndex + 1) % assessmentPages.length]].evidence[0]
-  ];
-  if (pageIndex % 2 === 1) entryChoices.reverse();
   const exitQuestions = {
     '1150701.html': '選一塊積木。它何時執行，會改變什麼？',
     '1150702.html': '你改了哪一個條件或次數？執行結果有什麼變化？',
     '1150703.html': '你畫了幾邊形？重複幾次、每次轉幾度才會閉合？',
     '1150704.html': '把「長度增加」移到「移動」前後，第一輪移動距離有什麼差異？',
     '1150705.html': '你改了哪個數值？圖形有什麼變化？',
-    '1150706.html': '三組測試中，哪組有效又最省資源？哪個結果支持你的選擇？',
+    '1150706.html': '三組實測中，哪組有效又最省資源？你改了哪個參數，重測結果如何？',
     '1150801.html': '選一筆搜尋紀錄。程式在第幾次比較後停下來？為什麼？',
     '1150802.html': '你改了清單中的哪一項？播放到哪裡時聽出差異？',
     '1150803.html': '空清單可以直接算平均嗎？請用清單長度說明原因。',
@@ -35,8 +28,8 @@
   const intro = (extra, warmup) => ({
     title: '認識任務',
     anchors: ['#learning-guide', ...extra],
-    entry: warmup || { choices: entryChoices, correct: pageIndex % 2 },
-    todo: warmup ? '由左到右讀清單，點出第 2 項。' : '看完今天的任務和繳交項目，選出本課要交的成果。'
+    entry: warmup,
+    todo: warmup ? '由左到右讀清單，點出第 2 項。' : '看完今天的任務和繳交項目，就可以開始。'
   });
 
   function listWarmup() {
@@ -64,17 +57,22 @@
   });
   const exit = () => ({
     title: '離堂任務',
-    todo: '把下列成果交到老師指定的班級平台。',
-    response: exitQuestions[page],
+    todo: '打開本課紀錄表，把下列成果整理成一份，交到老師指定的班級平台。',
     submission: true,
     evidence: guide.evidence,
     checks: [guide.successCriteria || '已依老師說明檢查成果'],
-    hints: ['可以打開本課學習紀錄表，照欄位填寫。'],
+    hints: ['有積木程式時，可回到實作步驟複製程式與試跑紀錄，再貼到作業。'],
     link: { href: guide.records || 'student-records.html', label: '打開學習紀錄表 ↗' }
   });
-  const route = (introExtra, middle, { warmup, requirePractice = false } = {}) => [
-    intro(introExtra, warmup), ...middle, practice(!requirePractice), exit()
-  ];
+  const route = (introExtra, middle, { warmup, requirePractice = false } = {}) => {
+    const steps = [
+      intro(introExtra, warmup), ...middle.filter(step => !step.optional),
+      ...middle.filter(step => step.optional), practice(!requirePractice), exit()
+    ];
+    const plannedStart = steps.findIndex(step => step.secondPeriod);
+    const secondPeriod = plannedStart >= 0 ? plannedStart : steps.findIndex(step => step.anchors?.includes('#block-program'));
+    return steps.map((step, index) => ({ ...step, period: index < secondPeriod ? 1 : 2 }));
+  };
   const tab = (name, runs) => ({
     activity: activity(
       `body:has(#${name}-ipo-msg[data-lesson-activity]):has(${runs})`,
@@ -91,7 +89,7 @@
         todo: '按「開始測驗」完成 10 題積木診斷，看完結果。',
         checks: ['完成 10 題並看完結果', '選一塊積木，寫下何時執行、會改變什麼'],
         hints: ['先看積木顏色：黃色是事件、藍色是動作、橘色是控制、紫色是外觀、橘紅色是變數。', '答錯沒關係，診斷是用來找起點，不影響進入下一課。'] },
-      { title: '資訊使用判斷', anchors: ['#curriculum-lab'],
+      { title: '資訊使用判斷', anchors: ['#curriculum-lab'], secondPeriod: true,
         activity: achieved('#curriculum-lab', '先選完三題，按下檢查，直到每題都答對。'),
         todo: `三個情境各選一個做法，按「${labels.checkJudgment}」。`,
         checks: ['三題都檢查過，並讀完每題的原因'],
@@ -157,31 +155,17 @@
         hints: ['從執行結果抄下前三輪移動長度。'] })
     ]),
     '1150705.html': route([], [
-      { title: '第一階段：正 N 邊形積木', anchors: [{ up: '#route-define-polygon' }], optional: true,
-        activity: achieved('#func-flow-msg', '請先排對「定義」積木內的順序。'),
-        todo: '把含有參數 N 的積木排進「定義」積木裡，做出能畫任意正 N 邊形的自訂積木。',
-        checks: ['自訂積木組裝正確'],
-        hints: ['重複 N 次，每次移動後右轉 360 ÷ N 度。', '參數 N 就像一個空格，呼叫時填幾就畫幾邊形。'] },
-      { title: '第二階段：組裝曼陀羅', anchors: [{ up: '#route-assemble-mandala' }], optional: true,
-        activity: achieved('#main-flow-msg', '請先排好呼叫與轉向的積木順序。'),
-        todo: '把下筆、重複、呼叫「畫一個正N邊形 5」、旋轉、停筆排好，畫出五邊形曼陀羅。',
-        checks: ['曼陀羅畫出來', '能說出旋轉角度和重複次數的關係'],
-        hints: ['重複 12 次、每次右轉 30 度，剛好轉滿一圈（12 × 30 = 360）。'] },
-      { title: '第三階段：再包一層', anchors: [{ up: '#route-nested-block' }], optional: true,
-        activity: achieved('#func2-flow-msg', '排好「畫幾個圖形」自訂積木。'),
-        todo: '把「重複呼叫加旋轉」再包成「畫幾個圖形 (X)」自訂積木。',
-        checks: ['「畫幾個圖形」組裝正確'],
-        hints: ['每畫一個圖形右轉 360 ÷ X 度，重複 X 次。'] },
       { title: '換參數畫曼陀羅', anchors: [{ up: '#route-mandala-parameters' }],
         activity: achieved('#mandala-feedback', '換兩組不同的邊數或圖形數，分別等圖形畫完。'),
         todo: '選兩組邊數 N 與圖形數 X（例如 3 和 12、5 和 10）。每組按「傳遞變數並執行」，比較畫出的圖形。',
         checks: ['畫了兩組不同設定的圖形', '能指出是哪個數值改變了圖形'],
         hints: ['N 決定每個小圖形的邊數，X 決定一圈畫幾個。'] },
-      { title: '第五階段：彩虹曼陀羅', anchors: [{ up: '#route-rainbow-mandala' }], optional: true,
-        response: '要讓每個小圖形換色，變更筆跡顏色的積木要放在迴圈哪裡？為什麼？',
-        todo: '想一想「筆跡顏色設為隨機」放在哪裡，每個小圖形才會換顏色。',
-        checks: ['說出顏色積木的位置與理由'],
-        hints: ['放在「畫一個正N邊形」之前，每畫一個圖形就換一次顏色。'] },
+      { title: '曼陀羅延伸', anchors: [{ up: '#route-define-polygon' }, { up: '#route-assemble-mandala' },
+          { up: '#route-nested-block' }, { up: '#route-rainbow-mandala' }], optional: true,
+        response: '記下你選的一項：自訂積木的參數控制什麼，或顏色積木該放在哪裡？',
+        todo: '選一項來試：定義多邊形積木、改用自訂積木重複畫圖，或讓每個小圖形換色。',
+        checks: ['寫下一項做法與原因'],
+        hints: ['N 控制邊數；要讓每個圖形換一次顏色，就把換色放在畫圖形的迴圈裡。'] },
       program({
         todo: '在模擬器用重複積木呼叫「畫正 N 邊形」。執行兩組設定，寫下改了什麼數值，以及圖形怎麼變。',
         checks: ['兩組不同設定的圖形完成', '寫出迴圈或變數如何控制圖形'],
@@ -193,23 +177,14 @@
         todo: '先在紙上想好流程，再把積木依序排好，讓防禦網不用詢問就能一鍵啟動。',
         checks: ['積木組裝完成，防禦網能一鍵啟動'],
         hints: ['把「詢問並等待」換成「變數 設為 數字」。', '先設定筆跡寬度、邊數和圖形數量，再下筆、呼叫「畫幾個圖形」，最後停筆。'] },
-      { title: '測試防禦網', anchors: [{ up: '#route-defense-test' }],
-        activity: achieved('#lab-feedback', '請完成三組不同參數的防禦網測試。'),
-        todo: '改變數欄的邊數、圖形數量或筆跡寬度。至少測三組設定，每組按「啟動防禦網」看結果。',
-        checks: ['測了至少三組參數', '記下哪一組擋住、哪一組沒擋住'],
-        hints: ['先試很少的圖形數，再慢慢增加，找出剛好擋住的數量。', '把每組數字和結果寫進測試表，等一下會用到。'] },
-      { title: '選出最省的方案', anchors: [{ up: '#route-defense-cost' }],
-        response: '哪一組參數擋住隕石又最省資源？請寫下設定與理由。',
-        todo: '從能擋住隕石的設定中，找出消耗最少的一組，寫下理由。',
-        checks: ['寫下你選的參數組合與理由'],
-        hints: ['「能過關的最少資源」通常比「越多越粗」更好，想想為什麼。'] },
       { title: '資料分析', anchors: ['#curriculum-lab'],
         activity: achieved('#curriculum-lab', '先選一筆資料搜尋，再回到「全部」，選出預測並核對。'),
         todo: '用匿名測試資料：先搜尋指定測試，再預測哪一組有效又最省資源，按「核對預測並分析」。',
         checks: ['預測並核對過一次', '能說出平均資源消耗怎麼算'],
         hints: ['先刪掉擋不住的組，再從剩下的比消耗量。', '消耗量＝圖形數 × 筆跡寬度。'] },
       program({
-        todo: '排好防禦網程式，執行三組設定。改一個參數再跑一次，準備 60 秒程式說明。',
+        activity: activity('#block-program[data-program-passed][data-program-three-runs]', '請試跑三組不同參數，再按「比對檢查」。'),
+        todo: '排好程式，用同一測試點試三組設定。從擋住的設定中選最省的一組，再改一個參數重測。用「複製多組試跑紀錄」整理結果，準備約 60 秒說明。',
         checks: ['作品能一鍵啟動', '三組測試表完成，並修正重測一次', '能用 60 秒說明作品'],
         hints: ['先設定參數，再繪圖，最後用同一個測試點比較各組結果。'] })
     ]),
@@ -230,16 +205,13 @@
         hints: ['從第 1 項開始比，找到或比完才停止。'] })
     ], { warmup: page === '1150801.html' ? listWarmup() : undefined, requirePractice: true }),
     '1150802.html': route([], [
-      { title: '讀懂播放程式', anchors: [{ up: '#route-music-pseudocode' }, { up: '#route-music-blocks' }],
+      { title: '讀懂清單點播', anchors: [{ up: '#route-music-pseudocode' }, { up: '#route-music-blocks' },
+          { up: '#route-song-library' }, { up: '#song-title' }],
+        activity: achieved('#song-title', '按「依序播放清單」，等一首曲目播完。'),
         response: '「第幾個音」開始是多少？每播完一個音，這個數值怎麼變？',
-        todo: '對照左邊的虛擬碼和右邊的 積木，找出「第幾個音」從 1 開始、每圈加 1 的地方。',
-        checks: ['說得出「第幾個音」怎麼決定要播哪一個音'],
-        hints: ['重複次數＝清單的長度，所以每個音都會播到。', '「第幾個音 改變 1」讓下一圈讀下一項。'] },
-      { title: '聽清單依序播放', anchors: [{ up: '#route-song-library' }, { up: '#song-title' }],
-        activity: achieved('#song-title', '按下「依序播放清單」，讓其中一首曲目播完。'),
-        todo: '按「依序播放清單」播放《小星星》，看清單一項一項被讀取；想練習再按「再抽一首」。',
-        checks: ['完整播放一首，看到每一項依序被讀取', '能說出第 1 到第 4 項分別是哪個音'],
-        hints: ['打開「音符數值」可以看到每個音對應的數字。'] },
+        todo: '播放一首曲目時，對照積木與清單亮起的位置。記下前四個音，再寫出「第幾個音」怎麼變。',
+        checks: ['完整播放一首，按順序記下前四個音', '說得出「第幾個音」怎麼決定讀哪一項'],
+        hints: ['「第幾個音 改變 1」讓下一圈讀下一項。'] },
       { title: '彈奏挑戰', anchors: [{ up: '#route-audio-comparison' }], optional: true,
         activity: achieved('#route-audio-comparison', '試著上傳自己的短錄音，執行一次比對。'),
         todo: '選一段自己的短錄音，和原曲比對。請選沒有他人聲音或個資的檔案。',
@@ -261,7 +233,7 @@
         todo: '用下拉選單完成迴圈內的邏輯，按「驗證邏輯」；答對後執行，看「序號」和「累加值」怎麼變。',
         checks: ['驗證通過並執行過', '說得出前三圈的累加值'],
         hints: ['每一圈先讓序號加 1，再把序號加進累加值。'] },
-      { title: '能源加總模擬器', anchors: [{ up: '#route-energy-total' }],
+      { title: '能源加總模擬器', anchors: [{ up: '#route-energy-total' }], secondPeriod: true,
         activity: achieved('#sim-btn-next', '請完成多筆、單筆和空清單三組資料的測試。'),
         todo: '按「讀取並加總」一次跑一圈，追蹤「目前項目、累計總和、已處理筆數」；再用「套用」測只有一筆和留空（空清單）。',
         checks: ['多筆資料追蹤到最後', '測過只有一筆的資料', '測過空清單，知道為什麼不能直接算平均'],
@@ -284,16 +256,11 @@
         questions: { before: draw.questions.before, during: draw.questions.during },
         checks: ['已抽完 4 輪，每輪都按了「確認刪除」', '看得出座號和項次的差別，也核對了兩份清單的人數'],
         hints: ['抽到的人如果不刪掉，下一次可能又被抽到。'] },
-      { title: '建立初始資料', anchors: [{ up: '#route-initialize-list' }],
-        activity: achieved('#route-initialize-list', '排好建立清單的虛擬碼，通過「檢查順序」。'),
-        todo: '把虛擬碼片段依正確順序點進組合區，按「檢查順序並解鎖積木」。英文看不懂可以按「切換為中文」。',
-        checks: ['順序檢查通過'],
-        hints: ['先按「切換為中文」比較好讀。', '先清空清單、把座號設為 0，再重複 30 次「座號加 1、加入清單」。'] },
-      { title: '隨機抽籤與刪除', anchors: [{ up: '#route-draw-and-remove' }],
-        activity: achieved('#scratch-puzzle-container', '先通過虛擬碼排序，再完成第二關的全部積木組裝。'),
-        todo: '完成第一關虛擬碼排序，再完成第二關 積木組裝。',
-        checks: ['第一關順序檢查通過', '第二關積木組裝完成'],
-        hints: ['先抽出座號存進變數，再用這個座號找到它在清單的位置並刪掉。'] },
+      { title: '從建立名單到抽籤', anchors: [{ up: '#route-initialize-list' }, { up: '#route-draw-and-remove' }],
+        activity: activity('body:has(#route-initialize-list[data-lesson-activity]):has(#scratch-puzzle-container[data-lesson-activity])', '完成建立名單的排序檢查，再排好抽籤積木。'),
+        todo: '先排好建立名單的步驟，再組裝隨機抽取與刪除的積木。',
+        checks: ['名單從 1 建到 30', '抽籤積木能移除已抽中的人'],
+        hints: ['可按「切換為中文」。先清空清單，再重複「座號加 1、加入清單」。'] },
       program({
         todo: draw.practice,
         questions: { after: draw.questions.after },
@@ -313,15 +280,11 @@
         hints: ['前項比後項大才交換。比對各數值各有幾筆，例如原來有兩個 3，處理後也要有兩個 3。'] })
     ]),
     '1150806.html': route([], [
-      { title: '對決模擬器', anchors: [{ up: '#route-duel-simulator' }],
+      { title: '觀察對決的分工', anchors: [{ up: '#route-duel-simulator' }, { up: '#route-duel-program' }],
         activity: achieved('#arena-status', '完成整備、遭遇敵軍與對決，看到戰鬥結算。'),
-        todo: '按「整備清單」並依按鈕提示一步步執行，觀察三個清單怎麼建立、洗牌、分配與對決。',
-        checks: ['模擬器完整跑完一次對決'],
-        hints: ['每按一次，按鈕文字會告訴你下一步要做什麼。'] },
-      { title: '程式教學', anchors: [{ up: '#route-duel-program' }],
         response: '建立、洗牌與提取，這三段各對清單做了什麼？',
-        todo: '閱讀逐段程式教學，弄清楚「建立、洗牌、提取」三段各在做什麼。',
-        checks: ['說得出三段程式各自的工作'],
+        todo: '執行一次對決。看完後對照程式，找出建立、洗牌與分配各自改動了哪份清單。',
+        checks: ['看到一次戰鬥結算', '說得出三段程式各自的工作'],
         hints: ['先找出每一段用到哪一個清單。'] },
       { title: '避免抽到重複裝備', anchors: [{ up: '#route-unique-equipment' }], optional: true,
         activity: achieved('#secret-content-screen', '答對練習題就能開啟防止重複抽取的程式。'),
@@ -339,6 +302,7 @@
         hints: ['分配前確認庫存至少是每隊需求的兩倍。'] })
     ])
   };
+  for (const [entry, steps] of Object.entries(routes)) steps.at(-1).response = exitQuestions[entry];
 
   const next = guide.next ? { href: guide.next, label: '前往下一單元' } : null;
   const teacherFinish = guide.overview ? { href: guide.overview, label: '回到課程總覽' } : null;

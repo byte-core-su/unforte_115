@@ -297,11 +297,6 @@
                                         
                                         <div class="border-l-4 border-[#FFAB19] w-[calc(100%-0.5rem)] max-w-[276px] space-y-1 my-1">
                                             
-                                            <!-- 進階題型：彩虹積木 (預設隱藏) -->
-                                            <div id="preview-color-block" class="hidden block-pink border-b-[3px] px-3 py-1 rounded-md shadow-sm ml-2 items-center gap-2 text-[10px]">
-                                                筆跡顏色設為 <span class="bg-gradient-to-r from-red-400 via-green-400 to-blue-400 text-white px-2 rounded-full shadow-inner border border-white/50">隨機</span>
-                                            </div>
-
                                             <div class="block-pink border-b-[3px] px-3 py-1.5 rounded-md shadow-sm ml-2 flex items-center gap-2 text-[11px]">
                                                 <span class="font-bold tracking-wide">畫一個正N邊形</span> 
                                                 <!-- 修改為變數積木 -->
@@ -381,14 +376,18 @@
                     <div class="flex items-start gap-4">
                         <div class="text-4xl">🌟</div>
                         <div>
-                            <h4 id="route-rainbow-mandala" class="text-xl font-bold text-indigo-900 mb-2">第五階段：進階彩虹曼陀羅</h4>
+                            <h4 id="route-rainbow-mandala" class="text-xl font-bold text-indigo-900 mb-2">彩虹曼陀羅</h4>
                             <p class="text-sm text-indigo-800 font-light mb-4 leading-relaxed max-w-2xl">
                                 要讓每個圖形換顏色，就把「筆跡顏色設為隨機」放在「畫幾個圖形 (X)」的迴圈裡，每次畫圖前先換色。
                             </p>
                             <label class="inline-flex items-center cursor-pointer bg-white px-5 py-2.5 rounded-xl border border-indigo-200 shadow-sm hover:shadow-md hover:border-purple-300 transition-all">
                                 <input type="checkbox" id="rainbow-toggle" onchange="toggleRainbowMode()" class="w-5 h-5 text-purple-600 rounded focus:ring-purple-500 mr-3">
-                                <span class="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 via-green-500 to-blue-500">開啟進階彩虹模式 ➔</span>
+                                <span class="text-sm font-bold text-indigo-800">播放換色示範</span>
                             </label>
+                            <div id="rainbow-preview" hidden>
+                                <svg id="rainbow-svg" viewBox="0 0 200 150" class="w-full max-w-xs mt-3 rounded-xl bg-slate-950" role="img" aria-label="每畫一個三角形就換色的曼陀羅"></svg>
+                                <p id="rainbow-feedback" role="status" class="text-sm mt-2"></p>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -848,18 +847,12 @@
 
         // ====== 第五階段：進階彩虹模式切換 ======
         function toggleRainbowMode() {
-            const block = document.getElementById('preview-color-block');
             const toggle = document.getElementById('rainbow-toggle');
-            if(toggle && block) {
-                if(toggle.checked) {
-                    block.classList.remove('hidden');
-                    block.classList.add('flex');
-                } else {
-                    block.classList.add('hidden');
-                    block.classList.remove('flex');
-                }
-                runLabAnimation(); 
-            }
+            document.getElementById('rainbow-preview').hidden = !toggle.checked;
+            if (!toggle.checked) return;
+            const feedback = document.getElementById('rainbow-feedback');
+            feedback.textContent = '觀察每個三角形開始時的顏色。';
+            startDrawingMandala(document.getElementById('rainbow-svg'), 3, 8, feedback, false);
         }
 
         // 更新實驗室積木畫面數值
@@ -891,14 +884,8 @@
             const count = parseInt(countEl.value) || 12;
             const shapeSides = getMandalaShape();
             
-            const isRainbow = document.getElementById('rainbow-toggle')?.checked;
-            
-            fb.textContent = isRainbow 
-                ? `🌈 主程式傳入 X=${count}，正在畫彩色的曼陀羅...`
-                : `🚀 主程式傳入 X=${count}，正在畫單色的曼陀羅...`;
-            fb.className = isRainbow
-                ? "bg-gradient-to-r from-red-500 via-green-500 to-blue-500 text-white rounded-b-2xl p-4 text-sm font-bold transition-all duration-300 text-center shadow-md"
-                : "bg-indigo-600 text-white rounded-b-2xl p-4 text-sm font-medium transition-colors duration-300 text-center shadow-md";
+            fb.textContent = '正在畫曼陀羅…';
+            fb.className = "bg-indigo-600 text-white rounded-b-2xl p-4 text-sm font-medium transition-colors duration-300 text-center shadow-md";
 
             startDrawingMandala(svg, shapeSides, count, fb, false);
         }
@@ -913,7 +900,7 @@
             }
             if (!isPuzzle && mandalaInterval) clearInterval(mandalaInterval);
             
-            const isRainbow = !isPuzzle && (document.getElementById('rainbow-toggle')?.checked || false);
+            const isRainbow = svgElement.id === 'rainbow-svg';
 
             svgElement.innerHTML = '';
 
@@ -991,14 +978,16 @@
                     }
                     else if (!isPuzzle) {
                         clearInterval(mandalaInterval);
-                        mandalaCases.add(`${shapeSides}:${count}`);
-                        if (mandalaCases.size >= 2) feedbackElement?.setAttribute('data-lesson-activity', '');
+                        if (!isRainbow) {
+                            mandalaCases.add(`${shapeSides}:${count}`);
+                            if (mandalaCases.size >= 2) feedbackElement?.setAttribute('data-lesson-activity', '');
+                        }
                         if(feedbackElement) {
                             if (isRainbow) {
                                 feedbackElement.textContent = `彩虹曼陀羅畫好了。看看每次畫新圖形前，筆跡顏色怎麼變。`;
                                 feedbackElement.className = "bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-b-2xl p-4 text-sm font-bold transition-all duration-300 text-center shadow-lg";
                             } else {
-                                feedbackElement.textContent = `曼陀羅畫好了。可以換一個參數再畫一次，也可以試下方的彩虹模式。`;
+                                feedbackElement.textContent = '曼陀羅畫好了。可以換一個參數再畫一次。';
                                 feedbackElement.className = "bg-emerald-600 text-white rounded-b-2xl p-4 text-sm font-bold transition-colors duration-300 text-center shadow-lg";
                             }
                         }
