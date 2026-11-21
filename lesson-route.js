@@ -145,8 +145,7 @@
     const guide = document.querySelector('#learning-guide');
     const guideHeading = document.getElementById('learning-guide-heading');
     const missionCard = guideHeading?.querySelector('.learning-guide__card');
-    const preview = missionCard && window.LessonPreview?.mount(window.LearningGuide?.page);
-    if (preview) missionCard.append(preview.element);
+    const preview = missionCard && window.LessonPreview?.mount(window.LearningGuide?.page, missionCard);
     const referenceNodes = (config.references || []).map(findAnchor).filter(Boolean);
     if (missionCard && referenceNodes.length) {
       const references = document.createElement('div');

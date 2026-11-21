@@ -27,7 +27,8 @@ html:not([data-teacher-route]) :is(.learning-guide__teacher, .learning-guide__re
   background: #f6f9fe;
   color: #1e293b;
 }
-.lesson-preview[hidden], .lesson-preview button[hidden] { display: none !important; }
+.lesson-preview[hidden] { display: none !important; }
+.lesson-preview [data-preview-finish]:disabled { visibility: hidden; }
 .lesson-preview__header, .lesson-preview__controls {
   display: flex;
   align-items: center;
@@ -45,7 +46,7 @@ html:not([data-teacher-route]) :is(.learning-guide__teacher, .learning-guide__re
   color: #154d83;
   font-weight: 750;
 }
-.lesson-preview [data-preview-play] { background: #15578e; border-color: #15578e; color: #fff; }
+.lesson-preview [data-preview-play] { min-inline-size: 9.4rem; background: #15578e; border-color: #15578e; color: #fff; }
 .lesson-preview button:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
 .lesson-preview figure { margin: .65rem 0 0; }
 .lesson-preview__stage {
@@ -64,9 +65,13 @@ html:not([data-teacher-route]) :is(.learning-guide__teacher, .learning-guide__re
   min-width: 0;
   gap: .45rem;
 }
-.lesson-preview__frame[aria-hidden="true"] { visibility: hidden; }
 .lesson-preview__frame > * { flex: 1 1 11rem; min-width: 0; }
-.lesson-preview figcaption { margin-top: .45rem; color: #334155; font-size: .92rem; line-height: 1.55; }
+.lesson-preview__frame:has(> .lesson-preview__plot:nth-child(2):last-child) > .lesson-preview__plot { flex-basis: 0; }
+.lesson-preview figcaption { display: grid; margin-top: .45rem; color: #334155; font-size: .92rem; line-height: 1.55; }
+.lesson-preview [data-preview-line] { grid-area: 1 / 1; }
+.lesson-preview :is([data-preview-frame], [data-preview-line])[aria-hidden="true"] { visibility: hidden; opacity: 0; }
+.lesson-preview__progress { height: .28rem; margin-top: .45rem; overflow: hidden; border-radius: 1rem; background: #dbe6f3; }
+.lesson-preview__progress > span { display: block; width: 100%; height: 100%; background: #15578e; transform: scaleX(0); transform-origin: left; }
 .lesson-preview :is(.lesson-preview__metric, .lesson-preview__sequence, .lesson-preview__plot, .lesson-preview__output) {
   display: grid;
   align-content: center;
@@ -99,16 +104,14 @@ html:not([data-teacher-route]) :is(.learning-guide__teacher, .learning-guide__re
 .lesson-preview__table :is(th, td) { padding: .25rem .4rem; border-bottom: 1px solid #d8e2ef; text-align: start; }
 .lesson-preview__plot svg { display: block; width: 100%; height: 6.8rem; }
 @media (prefers-reduced-motion: no-preference) {
-  .lesson-preview.is-playing .lesson-preview__frame[aria-hidden="false"] polyline {
-    stroke-dasharray: 1;
-    animation: lesson-preview-draw 1.6s ease-out both;
+  .lesson-preview.is-playing :is([data-preview-frame], [data-preview-line]) {
+    transition: opacity .28s ease-in-out, visibility 0s;
   }
-  .lesson-preview.is-playing .lesson-preview__frame[aria-hidden="false"] :is(.lesson-preview__output, .lesson-preview__sequence .is-active) {
-    animation: lesson-preview-reveal .32s ease-out both;
+  .lesson-preview.is-playing :is([data-preview-frame], [data-preview-line])[aria-hidden="true"] {
+    transition-delay: 0s, .28s;
   }
+  .lesson-preview.is-playing [data-preview-cut] { transition: none; }
 }
-@keyframes lesson-preview-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
-@keyframes lesson-preview-reveal { from { opacity: .25; } to { opacity: 1; } }
 .block-program textarea[data-program-output]:not([hidden]) {
   display: block;
   box-sizing: border-box;
