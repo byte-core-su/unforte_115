@@ -25,10 +25,11 @@
     return state;
   }
 
-  function graph(state) {
+  function graph(state, labels = []) {
     const points = state.points;
     if (!points?.length) return '';
-    const [xs, ys] = [0, 1].map(axis => [...points, ...(state.marker ? [state.marker] : [])].map(point => point[axis]));
+    const extent = [...points, ...(state.marker ? [state.marker] : []), ...labels.map(({ x, y }) => [x, y])];
+    const [xs, ys] = [0, 1].map(axis => extent.map(point => point[axis]));
     const [left, top] = [xs, ys].map(values => Math.min(...values) - 12);
     const [width, height] = [Math.max(...xs) - left + 12, Math.max(...ys) - top + 12];
     const [x, y] = points.at(-1);
@@ -37,6 +38,8 @@
       <polyline fill="none" stroke="#2563eb" pathLength="1" ${stroke} points="${points.map(point => point.join(',')).join(' ')}"/>
       <circle cx="${x}" cy="${y}" r="3" fill="#1d4ed8"/>
       ${state.marker ? `<circle cx="${state.marker[0]}" cy="${state.marker[1]}" r="3" fill="#b91c1c"/>` : ''}
+      ${labels.map(({ x, y, value, at }) =>
+        `<text class="lesson-preview__dimension" data-draw-label="${at}" x="${x}" y="${y}" font-size="${Math.max(width, height) * .1}" text-anchor="middle" dominant-baseline="central">${escape(value)}</text>`).join('')}
     </svg>`;
   }
 
