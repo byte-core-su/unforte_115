@@ -29,7 +29,7 @@
     title: '認識任務',
     anchors: ['#learning-guide', ...extra],
     entry: warmup,
-    todo: warmup ? '由左到右讀清單，點出第 2 項。' : '看完今天的任務和繳交項目，就可以開始。'
+    todo: warmup ? '登記一筆新資料，看變數和清單怎麼變，再找回第 2 筆。' : '看完今天的任務和繳交項目，就可以開始。'
   });
 
   function listWarmup() {
@@ -208,7 +208,7 @@
       { title: '讀懂清單點播', anchors: [{ up: '#route-music-pseudocode' }, { up: '#route-music-blocks' },
           { up: '#route-song-library' }, { up: '#song-title' }],
         activity: achieved('#song-title', '按「依序播放清單」，等一首曲目播完。'),
-        response: '「第幾個音」開始是多少？每播完一個音，這個數值怎麼變？',
+        response: '音符清單記了什麼？變數「第幾個音」開始是多少，每播完一個音又怎麼變？',
         todo: '播放一首曲目時，對照積木與清單亮起的位置。記下前四個音，再寫出「第幾個音」怎麼變。',
         checks: ['完整播放一首，按順序記下前四個音', '說得出「第幾個音」怎麼決定讀哪一項'],
         hints: ['「第幾個音 改變 1」讓下一圈讀下一項。'] },

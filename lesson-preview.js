@@ -161,8 +161,11 @@
       ];
     }],
     '1150801.html': [null, ([found, missing]) => {
+      const before = [4, 6];
+      const latest = 5;
+      const after = [...before, latest];
       const operations = [
-        ['起始清單', [4, 6, 5], [], '先讀清單。項次從第 1 項開始。'],
+        ['起始清單', after, [], '先讀清單。項次從第 1 項開始。'],
         ['添加', [4, 6, 5, 7], [3], '把 7 加到最後，原來的三項都留在原位。'],
         ['插入', [4, 6, 9, 5, 7], [2], '把 9 插在第 3 項，原本在第 3 項的 5 往後移。'],
         ['替換', [4, 7, 9, 5, 7], [1], '把第 2 項的 6 換成 7，項目數不變。'],
@@ -176,6 +179,10 @@
           last ? run.text : `找 ${run.input.target}，第 ${index} 項是 ${value}，繼續往下找。`, 2, '逐項搜尋');
       };
       return [
+        frame(metric('變數「最新點數」', before.at(-1)) + tiles('清單「點數紀錄」', before),
+          '已經有 4、6 兩筆。變數記最新的 6，清單按順序保留兩筆。', 3.5, '變數與清單'),
+        frame(metric('變數「最新點數」', latest) + tiles('清單「點數紀錄」', after, after.length - 1),
+          '又記一筆 5。變數的 6 被換成 5；清單在末端多一筆，第 2 項還是 6。', 4, '變數與清單'),
         ...operations.map(([label, data, active, caption]) => frame(tiles(label, data, active), caption, 2.4, '清單操作')),
         ...[found, missing].flatMap(run => run.rows.map(([index, value]) => compare(run, index, value))),
         frame(tiles('整理後的清單', found.input.data) + metric('找 7', found.text) + metric('找 8', missing.text),

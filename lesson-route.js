@@ -191,23 +191,51 @@
       if (entry?.items && !demo) {
         const question = document.createElement('fieldset');
         question.className = 'lesson-route__checks lesson-route__entry';
-        question.innerHTML = `<legend>從左到右，點出清單的第 2 項</legend>
+        const latest = entry.items.at(-1);
+        question.innerHTML = `<legend>同一筆資料，變數和清單怎麼記？</legend>
+          <div class="lesson-route__entry-variable">
+            <span>變數「最後登記」</span><strong data-entry-value>${escapeHtml(entry.items.at(-2))}</strong>
+          </div>
+          <p><strong>清單「登記紀錄」</strong></p>
           <ol class="lesson-route__entry-list" role="list">${entry.items.map((item, i) =>
-            `<li><button type="button" data-entry-position="${i}">${escapeHtml(item)}</button></li>`).join('')}</ol>`;
+            `<li${i === entry.items.length - 1 ? ' hidden' : ''}>
+              <button type="button" data-entry-position="${i}" disabled>${escapeHtml(item)}</button>
+            </li>`).join('')}</ol>
+          <p data-entry-prompt>登記一筆新的資料，看原來的第 2 筆會留在哪裡。</p>
+          <button class="lesson-route__entry-add" type="button" data-entry-add>登記：${escapeHtml(latest)}</button>`;
+        const append = question.querySelector('[data-entry-add]');
+        const choices = [...question.querySelectorAll('[data-entry-position]')];
+        const applyRegistration = () => {
+          question.querySelector('[data-entry-value]').textContent = latest;
+          choices.at(-1).parentElement.hidden = false;
+          choices.forEach(choice => { choice.disabled = false; });
+          question.querySelector('[data-entry-prompt]').textContent = '從左到右找，點出還保留在清單中的第 2 筆。';
+          append.disabled = true;
+        };
+        append.addEventListener('click', () => {
+          applyRegistration();
+          choices[0].focus({ preventScroll: true });
+          status.textContent = `變數更新成「${latest}」，清單在末端多了一筆。`;
+        });
         question.addEventListener('click', event => {
           const button = event.target.closest('[data-entry-position]');
           if (!button || current !== 0) return;
           const position = Number(button.dataset.entryPosition);
           if (position !== entry.correct) {
-            status.textContent = `這是第 ${position + 1} 項。從最左邊的第 1 項數過去。`;
+            status.textContent = `這是清單的第 ${position + 1} 筆。從最左邊的第 1 筆數過去。`;
             return;
           }
           startButton.disabled = false;
           button.setAttribute('data-correct', '');
           startButton.focus({ preventScroll: true });
           question.disabled = true;
-          status.textContent = `${entry.items[position]}在第 2 項。可以開始清單操作。`;
+          status.textContent = `變數現在記著「${latest}」，清單第 2 筆還是「${entry.items[position]}」。`;
         });
+        if (resume) {
+          applyRegistration();
+          choices[entry.correct].setAttribute('data-correct', '');
+          question.querySelector('[data-entry-prompt]').textContent = '變數更新為最新一筆，清單仍能按位置找回第 2 筆。';
+        }
         startButton.before(question);
         startButton.disabled = true;
       } else startButton.disabled = false;
