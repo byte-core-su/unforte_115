@@ -18,9 +18,12 @@ for (const page of pages) {
   const assessments = html.indexOf('src="lesson-assessments.js"');
   const guide = html.indexOf('src="learning-guides.js"');
   const engine = html.indexOf('src="lesson-route.js"');
+  const programScript = html.indexOf('src="block-program.js"');
+  const preview = html.indexOf('src="lesson-preview.js"');
   const routes = html.indexOf('src="lesson-routes.js"');
   assert.ok(html.includes('href="lesson-route.css"'), `${page} should load the route styles`);
   assert.ok(assessments !== -1 && assessments < guide && guide < engine && engine < routes, `${page} should load assessment data, guide and routes in order`);
+  assert.ok(programScript >= 0 && programScript < preview && preview < routes, `${page} should load the result preview before starting the route`);
 
   let started;
   const window = {

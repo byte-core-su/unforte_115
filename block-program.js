@@ -34,7 +34,7 @@
     const [x, y] = points.at(-1);
     const stroke = state.width ? `stroke-width="${state.width}"` : 'stroke-width="2" vector-effect="non-scaling-stroke"';
     return `<svg viewBox="${left} ${top} ${width} ${height}" role="img" aria-label="程式執行後的移動路徑">
-      <polyline fill="none" stroke="#2563eb" ${stroke} points="${points.map(point => point.join(',')).join(' ')}"/>
+      <polyline fill="none" stroke="#2563eb" pathLength="1" ${stroke} points="${points.map(point => point.join(',')).join(' ')}"/>
       <circle cx="${x}" cy="${y}" r="3" fill="#1d4ed8"/>
       ${state.marker ? `<circle cx="${state.marker[0]}" cy="${state.marker[1]}" r="3" fill="#b91c1c"/>` : ''}
     </svg>`;
@@ -415,5 +415,5 @@
     showRunCount();
   }
 
-  window.BlockProgram = { mount, execute, compare };
+  window.BlockProgram = { mount, execute, compare, graph };
 })();

@@ -88,6 +88,7 @@
 
     function apply() {
       const visible = showAll ? steps.flatMap(step => step.regions) : atEnd() ? [] : viewedStep().regions;
+      preview?.setVisible(showAll || (!atEnd() && viewedStep().index === 0));
       steps.forEach(step => step.regions.forEach(region => {
         region.toggleAttribute('data-route-locked', !visible.some(active => region.contains(active)));
       }));
@@ -143,12 +144,15 @@
     const startButton = document.querySelector('[data-lesson-start]');
     const guide = document.querySelector('#learning-guide');
     const guideHeading = document.getElementById('learning-guide-heading');
+    const missionCard = guideHeading?.querySelector('.learning-guide__card');
+    const preview = missionCard && window.LessonPreview?.mount(window.LearningGuide?.page);
+    if (preview) missionCard.append(preview.element);
     const referenceNodes = (config.references || []).map(findAnchor).filter(Boolean);
-    if (guideHeading && referenceNodes.length) {
+    if (missionCard && referenceNodes.length) {
       const references = document.createElement('div');
       references.className = 'learning-guide__references';
       references.append(...referenceNodes);
-      guideHeading.querySelector('.learning-guide__card').append(references);
+      missionCard.append(references);
     }
     const progress = document.createElement('nav');
     progress.className = 'lesson-route lesson-route--progress';
