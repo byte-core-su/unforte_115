@@ -145,9 +145,12 @@ for (const scenario of [CourseScenarios.active, campus]) {
   choice.value = 'extra';
   get('#g8-shuffle-check').click();
   assert.match(get('#g8-shuffle-state').textContent, /總張數相同.*3 少了一張/);
+  assert.ok(!get('#g8-shuffle-task').hidden);
   assert.equal(passed(), false);
   choice.value = 'valid';
   get('#g8-shuffle-check').click();
+  assert.equal(get('#g8-shuffle-task').hidden, true);
+  assert.equal(get('#g8-sort-task').hidden, false);
   get('#g8-sort-keep').click();
   assert.match(state.textContent, /再試一次.*比較 3 和 1/);
   get('#g8-sort-swap').click();

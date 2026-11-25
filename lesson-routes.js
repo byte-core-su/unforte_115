@@ -124,6 +124,11 @@
         checks: ['畫筆積木組裝正確，看到動畫畫出直線'],
         hints: ['順序：先清除舊圖、設定顏色和粗細、下筆、移動、停筆。', '點錯的積木可以再點一下退回。'] },
       { title: '比較兩種正方形程式', anchors: ['#route-square-manual-panel', '#route-square-loop-panel'],
+        parts: [
+          { title: '手動畫正方形', todo: '把移動和右轉積木排好，畫出正方形。',
+            activity: achieved('#sq-flow-msg', '先用移動和右轉積木畫出正方形。') },
+          { title: '用迴圈畫正方形', todo: '找出反覆執行的兩個動作，填好迴圈次數和每次的轉角。' }
+        ],
         activity: activity('body:has(#sq-flow-msg[data-lesson-activity]):has(#lesson-3-feedback[data-lesson-activity])', '先用移動和右轉排出正方形，再填好迴圈的次數和角度。'),
         todo: '先排積木畫正方形，再把重複的動作用一個迴圈表示。',
         checks: ['手動程式畫出正方形', '迴圈的重複次數和每次轉角都正確'],
@@ -162,6 +167,12 @@
         hints: ['N 決定每個小圖形的邊數，X 決定一圈畫幾個。'] },
       { title: '曼陀羅延伸', anchors: [{ up: '#route-define-polygon' }, { up: '#route-assemble-mandala' },
           { up: '#route-nested-block' }, { up: '#route-rainbow-mandala' }], optional: true,
+        parts: [
+          { title: '定義多邊形積木', todo: '觀察自訂積木怎麼用邊數決定重複次數與轉角。' },
+          { title: '呼叫自訂積木畫曼陀羅', todo: '找出畫完一個多邊形後，哪個積木讓畫筆轉向。' },
+          { title: '用自訂積木重複畫圖', todo: '找出參數 X 怎麼控制一圈畫幾個圖形。' },
+          { title: '彩虹曼陀羅', todo: '播放換色示範，找出每次換色應放在哪一個迴圈裡。' }
+        ],
         response: '記下你選的一項：自訂積木的參數控制什麼，或顏色積木該放在哪裡？',
         todo: '選一項來試：定義多邊形積木、改用自訂積木重複畫圖，或讓每個小圖形換色。',
         checks: ['寫下一項做法與原因'],
@@ -207,6 +218,10 @@
     '1150802.html': route([], [
       { title: '讀懂清單點播', anchors: [{ up: '#route-music-pseudocode' }, { up: '#route-music-blocks' },
           { up: '#route-song-library' }, { up: '#song-title' }],
+        parts: [
+          { title: '讀懂音符程式', todo: '對照虛擬碼和積木，找出「第幾個音」設為多少、在哪裡增加。', anchorCount: 2 },
+          { title: '播放清單並記錄音符', todo: '選一首曲目，按「依序播放清單」，記下依序亮起的前四個音。', anchorCount: 2 }
+        ],
         activity: achieved('#song-title', '按「依序播放清單」，等一首曲目播完。'),
         response: '音符清單記了什麼？變數「第幾個音」開始是多少，每播完一個音又怎麼變？',
         todo: '播放一首曲目時，對照積木與清單亮起的位置。記下前四個音，再寫出「第幾個音」怎麼變。',
@@ -257,6 +272,11 @@
         checks: ['已抽完 4 輪，每輪都按了「確認刪除」', '看得出座號和項次的差別，也核對了兩份清單的人數'],
         hints: ['抽到的人如果不刪掉，下一次可能又被抽到。'] },
       { title: '從建立名單到抽籤', anchors: [{ up: '#route-initialize-list' }, { up: '#route-draw-and-remove' }],
+        parts: [
+          { title: '建立初始名單', todo: '把建立座號清單的步驟排好，再檢查 1 到 30 是否都加入。',
+            activity: achieved('#route-initialize-list', '先通過建立初始名單的排序檢查。') },
+          { title: '抽籤並刪除座號', todo: '排好抽取和刪除積木，確認下一輪會從剩下的人選中抽取。' }
+        ],
         activity: activity('body:has(#route-initialize-list[data-lesson-activity]):has(#scratch-puzzle-container[data-lesson-activity])', '完成建立名單的排序檢查，再排好抽籤積木。'),
         todo: '先排好建立名單的步驟，再組裝隨機抽取與刪除的積木。',
         checks: ['名單從 1 建到 30', '抽籤積木能移除已抽中的人'],
@@ -281,6 +301,11 @@
     ]),
     '1150806.html': route([], [
       { title: '觀察對決的分工', anchors: [{ up: '#route-duel-simulator' }, { up: '#route-duel-program' }],
+        parts: [
+          { title: '執行一次對決', todo: '完成整備和對決，觀察結算時兩隊各有哪些裝備。',
+            activity: achieved('#arena-status', '先完成一次對決，看到戰鬥結算。') },
+          { title: '讀懂對決的清單分工', todo: '閱讀程式，找出建立、洗牌與分配各自改動了哪份清單。' }
+        ],
         activity: achieved('#arena-status', '完成整備、遭遇敵軍與對決，看到戰鬥結算。'),
         response: '建立、洗牌與提取，這三段各對清單做了什麼？',
         todo: '執行一次對決。看完後對照程式，找出建立、洗牌與分配各自改動了哪份清單。',

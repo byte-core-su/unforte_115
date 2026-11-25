@@ -278,8 +278,9 @@
                 if(overlay) overlay.style.opacity = '0';
                 if(container) container.classList.remove('opacity-0', 'blur-sm', 'pointer-events-none');
                 setTimeout(() => { if(overlay) overlay.classList.add('hidden'); }, 500);
-                
-                renderPuzzle2(); 
+
+                renderPuzzle2();
+                document.getElementById('route-draw-code-heading').focus();
             } else {
                 fb.innerHTML = '<span class="text-rose-400">❌ 順序似乎不對喔，再檢查看看邏輯！</span>';
                 fb.classList.remove('hidden');
@@ -967,7 +968,7 @@
                                 <div class="flex flex-col gap-8">
                                     
                                     <!-- ================= 第一關：虛擬碼拼圖 ================= -->
-                                    <div class="flex flex-col">
+                                    <div class="flex flex-col" data-draw-pseudocode>
                                         <div class="flex items-center justify-between mb-3">
                                             <h4 class="flex items-center gap-2 text-base font-bold text-slate-600"><i data-lucide="code-2" class="w-4 h-4"></i>第一關：虛擬碼順序排列</h4>
                                             <button onclick="togglePuzzle2Lang()" id="btn-toggle-puzzle-lang2" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border shadow-sm bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200">
@@ -1000,9 +1001,9 @@
                                     </div>
 
                                     <!-- ================= 第二關：積木組裝 ================= -->
-                                    <div class="flex flex-col relative mt-2 w-full">
+                                    <div class="flex flex-col relative mt-2 w-full" data-draw-blocks>
                                         <div class="flex items-center justify-between mb-3">
-                                            <h4 class="flex items-center gap-2 text-base font-bold text-slate-600"><i data-lucide="blocks" class="w-4 h-4"></i>第二關：進階 積木引導組裝</h4>
+                                            <h4 id="route-draw-code-heading" tabindex="-1" class="flex items-center gap-2 text-base font-bold text-slate-600"><i data-lucide="blocks" class="w-4 h-4"></i>第二關：進階 積木引導組裝</h4>
                                         </div>
 
                                         <div class="relative w-full">

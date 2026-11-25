@@ -53,6 +53,7 @@
       title: '同一副牌，兩種排法',
       intro: '洗牌會打亂順序，排序會按規則排好。兩種做法都要保留原本的牌。',
       html: `
+        <div id="g8-shuffle-task">
         <details class="lesson-reference" open>
           <summary>示範：從牌堆移走一張牌</summary>
           <div class="curriculum-lab__result">
@@ -73,6 +74,7 @@
           <button type="button" id="g8-shuffle-check">檢查牌數</button>
         </div>
         <p id="g8-shuffle-state" class="curriculum-lab__result" role="status"></p>
+        </div>
         <div id="g8-sort-task" hidden>
           <h3 id="g8-sort-title" tabindex="-1">第 2 題　比較相鄰兩項</h3>
           <p id="g8-sort-state" class="curriculum-lab__result" role="status"></p>
@@ -369,8 +371,9 @@
       get('shuffle-state').textContent = feedback[shuffleChoice.value] || '請先選一個結果。';
       if (shuffleChoice.value !== 'valid') return;
       shuffleCheck.disabled = shuffleChoice.disabled = true;
+      get('shuffle-task').hidden = true;
       get('sort-task').hidden = false;
-      askComparison();
+      askComparison(`${feedback.valid} 接下來做排序。`);
       get('sort-title').focus();
     });
 

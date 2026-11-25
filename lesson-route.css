@@ -1,8 +1,13 @@
 /* 學習路線引導面板（lesson-route.js） */
 [data-route-locked],
+[data-route-outside-task],
 .lesson-route[hidden] { display: none !important; }
 
 html:not([data-teacher-route]) :is(.learning-guide__teacher, .learning-guide__records, [data-route-tab-picker], [data-route-teacher-reference], [data-course-direction]:not(.lesson-route__primary)) {
+  display: none !important;
+}
+html:not([data-teacher-route]) [data-draw-pseudocode]:has(#btn-check-puzzle2.hidden),
+html:not([data-teacher-route]) [data-draw-pseudocode]:not(:has(#btn-check-puzzle2.hidden)) + [data-draw-blocks] {
   display: none !important;
 }
 

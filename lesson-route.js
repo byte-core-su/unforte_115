@@ -39,7 +39,9 @@
 
   function start(config) {
     let showAll = demo && teacher.showAll();
-    const steps = config.steps.map((step, index) => ({ ...step, index, regions: [] }));
+    const steps = config.steps.map((step, index) => ({
+      ...step, index, regions: [], parts: step.parts?.map(part => ({ ...part, regions: [] }))
+    }));
     const key = `unforte:lesson:v1:${location.pathname}`;
     const version = JSON.stringify(steps.map(({ title, anchors, optional }) => [title, anchors, Boolean(optional)]));
     function readSaved() {
@@ -63,6 +65,8 @@
     let storageAvailable = false;
     let current = 0;
     let viewing = null;
+    let currentPart = 0;
+    let reviewPart = 0;
     let finished = false;
     let hintsShown = 0;
     let ticked = [];
@@ -70,7 +74,10 @@
     const skipped = new Set();
     const answers = {};
     const viewedStep = () => steps[viewing ?? current];
+    const partIndex = () => viewing === null ? currentPart : reviewPart;
     const atEnd = () => finished && viewing === null;
+    const viewedPart = () => showAll || atEnd() ? undefined : viewedStep().parts?.[partIndex()];
+    const hasNextPart = () => Boolean(viewedPart() && partIndex() + 1 < viewedStep().parts.length);
 
     function saveRoute() {
       storageAvailable = save({ route: { version, current, finished, skipped: [...skipped], answers, submitted: Boolean(ticked[0]) } });
@@ -81,18 +88,50 @@
       steps.forEach((step, index) => {
         const foreign = anchorsByStep.flatMap((list, other) => other === index ? [] : list.map(item => item.node)).filter(Boolean);
         const anchors = anchorsByStep[index];
-        step.regions = anchors.filter(item => item.node).map(item => regionFor(item.node, item.locator, foreign));
+        const resolveRegions = (items, excluded = foreign) => items.filter(item => item.node)
+          .map(item => regionFor(item.node, item.locator, excluded));
+        if (step.parts) {
+          let start = 0;
+          step.parts.forEach(part => {
+            const end = start + (part.anchorCount || 1);
+            const otherParts = [...anchors.slice(0, start), ...anchors.slice(end)].map(item => item.node).filter(Boolean);
+            part.regions = resolveRegions(anchors.slice(start, end), [...foreign, ...otherParts]);
+            start = end;
+          });
+        }
+        step.regions = step.parts ? step.parts.flatMap(part => part.regions) : resolveRegions(anchors);
         step.missing = anchors.some(item => !item.node);
       });
     }
 
+    const viewedRegions = () => viewedPart()?.regions || viewedStep().regions;
+    let hiddenBranches = new Set();
+
     function apply() {
-      const visible = showAll ? steps.flatMap(step => step.regions) : atEnd() ? [] : viewedStep().regions;
-      preview?.setVisible(showAll || (!atEnd() && viewedStep().index === 0));
+      const visible = showAll ? steps.flatMap(step => step.regions) : atEnd() ? [] : viewedRegions();
+      const opening = showAll || (!atEnd() && viewedStep().index === 0);
+      preview?.setVisible(opening);
+      guideHeading?.toggleAttribute('data-route-locked', !opening);
+      const conceptVideo = !opening && missionCard?.querySelector('.learning-guide__video[open]');
+      if (conceptVideo) conceptVideo.open = false;
       steps.forEach(step => step.regions.forEach(region => {
         region.toggleAttribute('data-route-locked', !visible.some(active => region.contains(active)));
       }));
       main.toggleAttribute('data-route-locked', !demo && !visible.some(region => main.contains(region)));
+      const branches = new Set();
+      function collectBranches(container, active) {
+        if (active.includes(container)) return;
+        for (const child of container.children) {
+          const inside = active.filter(region => child.contains(region));
+          if (inside.length) collectBranches(child, inside);
+          else branches.add(child);
+        }
+      }
+      const inMain = visible.filter(region => main.contains(region));
+      if (!demo && inMain.length) collectBranches(main, inMain);
+      for (const branch of hiddenBranches) if (!branches.has(branch)) branch.removeAttribute('data-route-outside-task');
+      for (const branch of branches) branch.setAttribute('data-route-outside-task', '');
+      hiddenBranches = branches;
       steps.filter(step => step.optional).forEach(step => {
         for (const locator of step.anchors || []) {
           const anchor = findAnchor(locator);
@@ -159,7 +198,7 @@
     (guideHeading || guide || main).before(progress);
 
     function placeControls() {
-      const unique = [...new Set(viewedStep().regions.map(region => main.contains(region) ? main : region))];
+      const unique = [...new Set(viewedRegions().map(region => main.contains(region) ? main : region))];
       const regions = unique.filter(region => !unique.some(other => other !== region && other.contains(region)))
         .sort((a, b) => a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
       if (!atEnd() && regions.length) {
@@ -255,6 +294,7 @@
 
     function showStep(index = null) {
       viewing = index;
+      reviewPart = 0;
       updateView();
       if (!atEnd()) viewedStep().review?.();
       focusStep();
@@ -284,6 +324,7 @@
 
     function enter(index, { focus = true, submitted = false } = {}) {
       current = index;
+      currentPart = 0;
       viewing = null;
       hintsShown = 0;
       ticked = [submitted];
@@ -344,34 +385,43 @@
         return;
       }
       const step = viewedStep();
-      const checks = step.checks || [];
+      const part = viewedPart();
+      const choice = part && step.optional;
+      const continuesPart = hasNextPart() && !choice;
+      const checks = continuesPart ? [] : step.checks || [];
       const hints = viewing === null ? step.hints || [] : [];
       const { before, during, after } = step.questions || {};
       panel.innerHTML = `
         <div class="lesson-route__bar">
           <span class="lesson-route__count">${viewing !== null ? '回看步驟' : current === 0 ? '起點' : `第 ${current}／${steps.length - 1} 步`}</span>${demo ? '<span class="lesson-route__teacher">教師示範</span>' : ''}
-          <h2 class="lesson-route__title" tabindex="-1">${escapeHtml(step.title)}${step.optional ? '<span class="lesson-route__tag">選做</span>' : ''}</h2>
+          <h2 class="lesson-route__title" tabindex="-1">${escapeHtml(part?.title || step.title)}${step.optional ? '<span class="lesson-route__tag">選做</span>' : ''}</h2>
           ${!demo && viewing === null && step.optional && step.regions.length ? '<div class="lesson-route__actions"><button type="button" data-action="skip">略過選做</button></div>' : ''}
         </div>
         ${demo ? `<div class="lesson-route__demo"><span>教師示範模式，可直接選取上方步驟。</span><button type="button" data-action="show-all">${showAll ? '恢復逐步路線' : '全部展開'}</button><button type="button" data-action="end-demo">結束示範</button></div>` : ''}
         <div class="lesson-route__body">
           ${before ? `<p class="lesson-route__todo"><b>操作前先猜</b>${escapeHtml(before)}</p>` : ''}
-          <p class="lesson-route__todo"><b>要做什麼</b>${escapeHtml(step.todo || '')}</p>
+          <p class="lesson-route__todo"><b>要做什麼</b>${escapeHtml(part?.todo || step.todo || '')}</p>
           ${step.evidence?.length ? `<ul class="evidence-list" role="list">${step.evidence.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''}
           ${viewing !== null && answers[step.index] ? `<p class="lesson-route__todo"><b>我的紀錄</b>${escapeHtml(answers[step.index])}</p>` : ''}
           ${during ? `<p class="lesson-route__todo"><b>操作中觀察</b>${escapeHtml(during)}</p>` : ''}
           ${after ? `<p class="lesson-route__todo"><b>做完後說明</b>${escapeHtml(after)}</p>` : ''}
           ${step.link ? `<p class="lesson-route__link"><a href="${escapeHtml(step.link.href)}" target="_blank" rel="noopener">${escapeHtml(step.link.label)}</a></p>` : ''}
           ${hints.length ? `<div class="lesson-route__hints">${hints.slice(0, hintsShown).map((hint, i) => `<p tabindex="-1"><b>提示 ${i + 1}</b>${escapeHtml(hint)}</p>`).join('')}${hintsShown < hints.length ? `<button type="button" data-action="hint">卡住了？看提示 ${hintsShown + 1}／${hints.length}</button>` : ''}</div>` : ''}
+          ${part && viewing !== null ? `<div class="lesson-route__actions">
+            ${partIndex() > 0 ? '<button type="button" data-action="previous-part">回看前一小步</button>' : ''}
+            ${hasNextPart() ? '<button type="button" data-action="next-part">回看後一小步</button>' : ''}
+          </div>` : ''}
         </div>`;
-      const action = current === steps.length - 1 ? '完成本課' : '完成這一步';
+      const action = continuesPart ? '繼續下一小步' : current === steps.length - 1 ? '完成本課' : '完成這一步';
       completion.innerHTML = `
         <div class="lesson-route__body">
           ${checks.length ? `<p class="lesson-route__todo"><b>怎樣算達標</b></p><ul class="evidence-list" role="list">${checks.map(check => `<li>${escapeHtml(check)}</li>`).join('')}</ul>` : ''}
-          ${step.response ? `<label class="lesson-route__response">${escapeHtml(step.response)}<textarea data-response rows="2" maxlength="300" placeholder="寫下一句具體的觀察或說明">${escapeHtml(answer)}</textarea></label>` : ''}
+          ${step.response && !continuesPart ? `<label class="lesson-route__response">${escapeHtml(step.response)}<textarea data-response rows="2" maxlength="300" placeholder="寫下一句具體的觀察或說明">${escapeHtml(answer)}</textarea></label>` : ''}
           ${step.submission ? `<label class="lesson-route__submit"><input type="checkbox" data-check="0" ${ticked[0] ? 'checked' : ''}> 已到班級平台繳交</label>` : ''}
           <p class="lesson-route__msg" role="status"></p>
           <div class="lesson-route__actions">
+            ${part && partIndex() > 0 ? '<button type="button" data-action="previous-part">回看前一小步</button>' : ''}
+            ${choice && hasNextPart() ? '<button type="button" data-action="next-part">看下一項選做</button>' : ''}
             ${step.optional && (demo || !step.regions.length) ? '<button type="button" data-action="skip">略過選做</button>' : ''}
             <button type="button" class="lesson-route__primary" data-action="done">${action}</button>
           </div>
@@ -384,13 +434,16 @@
       const button = completion.querySelector('[data-action="done"]');
       if (!button) return false;
       const step = steps[current];
+      const part = viewedPart();
+      const continuesPart = hasNextPart() && !step.optional;
+      const activity = continuesPart ? part.activity : step.activity;
       const boxes = [...completion.querySelectorAll('[data-check]')];
       const missing = demo ? [] : boxes.filter(box => !box.checked);
       const hasResponse = new Set(answer.toLowerCase().match(/[\p{L}\p{N}]/gu)).size >= 4;
       let message = '';
       if (!demo) {
-        if (step.activity && !document.querySelector(step.activity.selector)) message = step.activity.pending;
-        else if (step.response && !hasResponse) message = '請先在上方寫下一句具體的說明。';
+        if (activity && !document.querySelector(activity.selector)) message = activity.pending;
+        else if (!continuesPart && step.response && !hasResponse) message = '請先在上方寫下一句具體的說明。';
         else if (missing.length) message = '繳交後，請勾選「已到班級平台繳交」。';
       }
       const status = completion.querySelector('.lesson-route__msg');
@@ -419,6 +472,10 @@
       if (action === 'resume') { showStep(); return; }
       if (action === 'show-all') { showAll = !showAll; apply(); render(); window.dispatchEvent(new Event('resize')); return; }
       if (action === 'end-demo') { teacher.end(); return; }
+      if (action === 'previous-part' || action === 'next-part') {
+        changePart(partIndex() + (action === 'previous-part' ? -1 : 1));
+        return;
+      }
       if (action === 'hint') {
         hintsShown += 1;
         render();
@@ -428,6 +485,11 @@
       if (action === 'skip' && steps[current].optional) { skipped.add(current); advance(); return; }
       if (action === 'done') {
         if (!updateCompletion()) return;
+        const step = viewedStep();
+        if (hasNextPart() && !step.optional) {
+          changePart(currentPart + 1);
+          return;
+        }
         skipped.delete(current);
         advance();
       }
@@ -452,6 +514,15 @@
         updateCompletion();
       }
     });
+
+    function changePart(index) {
+      if (!viewedPart() || !viewedStep().parts[index]) return;
+      if (viewing === null) currentPart = index;
+      else reviewPart = index;
+      hintsShown = 0;
+      updateView();
+      focusStep();
+    }
 
     function advance() {
       if (current < steps.length - 1) { enter(current + 1); return; }
