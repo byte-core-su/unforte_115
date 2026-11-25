@@ -23,10 +23,12 @@ for (const grade of [7, 8]) {
   const curriculumMap = fs.readFileSync(path.join(root, 'curriculum-map.html'), 'utf8');
   for (let lesson = 1; lesson <= 6; lesson++) {
     const page = `1150${grade}0${lesson}.html`;
-    const mission = { setAttribute() {} };
-    const section = { setAttribute() {}, querySelector: () => ({ remove() {} }), before(node) { assert.equal(node, mission); } };
+    const videoCard = { append(node) { assert.equal(node, player); } };
+    const mission = { setAttribute() {}, querySelector: () => videoCard };
+    const section = { setAttribute() {}, querySelector: () => ({ remove() {}, addEventListener() {} }), before(node) { assert.equal(node, mission); } };
+    const player = { querySelector: () => ({ addEventListener() {} }), addEventListener() {} };
     const main = { parentNode: { insertBefore(node) { assert.equal(node, section); } } };
-    const elements = [section, mission];
+    const elements = [section, mission, player];
     const document = { querySelector: selector => selector === 'main' ? main : null, createElement: () => elements.shift(), body: { classList: { add() {} } } };
     const id = `g${grade}-0${lesson}`;
     const module = require(`../modules/${id}.json`);
@@ -35,6 +37,8 @@ for (const grade of [7, 8]) {
     const context = vm.createContext({ document, window, location });
     vm.runInContext(assessments, context);
     vm.runInContext(guides, context);
+    assert.match(player.innerHTML, /<video controls playsinline preload="none"><\/video>/, `${id}: optional inline concept video`);
+    assert.equal((player.innerHTML.match(/<option /g) || []).length, ['g7-02', 'g8-01'].includes(id) ? 3 : 0);
     vm.runInContext(fs.readFileSync(path.join(root, 'lesson-labels.js'), 'utf8'), context);
     vm.runInContext(routes, context);
     const steps = window.LessonRoutes[page];

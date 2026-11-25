@@ -1,6 +1,88 @@
 (() => {
   const { active, escapeHtml } = window.CourseScenarios;
   const { defense, inventory, duel } = active;
+  const oneMinute = 'https://suyungsheng-kh.github.io/one_minute/docs/';
+  const videos = {
+    'control-sequence': { title: '循序結構' },
+    'control-selection': { title: '選擇結構' },
+    'control-repetition': { title: '重複結構' },
+    'loop-repeat': { title: '重複幾次？把相同動作交給迴圈' },
+    variables: { title: '變數', file: 'series/scratch/videos/scratch-variables-yunjhe-v1.mp4' },
+    lists: { title: '清單', file: 'series/scratch/videos/scratch-lists-yunjhe-v1.mp4' },
+    'search-linear': { title: '循序搜尋' },
+    'bubble-sort': { title: '氣泡排序', file: 'series/sorting/videos/bubble-sort.mp4' },
+    'custom-block-jump': { title: '把跳躍，變成一個積木' },
+    'custom-block-height': { title: '同一個積木，跳得不一樣' },
+    'custom-block-repeat': { title: '高度與次數，各管一件事' }
+  };
+  const lessonVideos = {
+    '1150701.html': [['control-sequence', '點綠旗後，看看積木從哪裡開始執行。回到本課，再預測角色會在什麼時候移動。']],
+    '1150702.html': [
+      ['control-sequence', '先更新再讀出餐號。想想本課計算平均時，哪一步也得先做。'],
+      ['control-selection', '兩種回答會走不同分支。回到本課，看看 60 分與低於 60 分各走哪一條路。'],
+      ['control-repetition', '找出每一輪都做的動作，以及輪數做完才做的動作。回到本課，用同樣方法看累加程式。']
+    ],
+    '1150703.html': [['loop-repeat', '影片中「前進、收星」做完才算一輪。畫多邊形時，一輪做的是「走一段、轉一個角」。']],
+    '1150704.html': [['variables', '比較「設為」和「增加」的效果。再想想本課的邊長要在畫線前還是畫線後增加。']],
+    '1150705.html': [['custom-block-repeat', '影片把一整次跳躍重複多遍。本課要先完成一個小圖形，再把整個圖形旋轉重畫。']],
+    '1150706.html': [['custom-block-height', '同一套積木，改輸入就能跳出不同高度。回到本課，先只改一個參數，比較防禦網有什麼變化。']],
+    '1150801.html': [
+      ['lists', '看看背包怎麼依順序保留多件道具。刪掉一件後，後面的道具編號會怎麼變？'],
+      ['variables', '「設為」會換掉變數原先的值。和清單比較，哪一個能保留每筆登記紀錄？'],
+      ['search-linear', '沿著清單從第 1 項逐一比對。回到本課，分別試一次找到和找不到的資料。']
+    ],
+    '1150802.html': [['lists', '刪除或替換道具會影響清單中的位置與內容。回到本課，先預測改動第 3 項會影響哪一個音。']],
+    '1150803.html': [['loop-repeat', '找出迴圈中每輪會做的動作。回到本課，每讀一筆就更新總和，全部讀完才算平均。']],
+    '1150804.html': [['lists', '注意道具怎麼從清單移除。抽籤時也要移除已抽到的人，下次才能從剩下的人選。']],
+    '1150805.html': [['bubble-sort', '觀察哪一對相鄰數字會交換，哪一對會保留。回到本課，先洗牌，再用這個規則排序。']],
+    '1150806.html': [['custom-block-jump', '注意「定義」積木和「呼叫」積木的時機。再看看本課怎麼分開處理庫存、洗牌、分配和對決。']]
+  };
+
+  function mountLessonVideos(card, clips, startButton) {
+    const details = document.createElement('details');
+    details.className = 'learning-guide__video';
+    const summary = clips.length === 1 ? videos[clips[0][0]].title : `一分鐘認識（${clips.length} 集）`;
+    details.innerHTML = `
+      <summary>概念動畫｜${escapeHtml(summary)}</summary>
+      ${clips.length > 1 ? `<label>選擇影片 <select>${clips.map(([id], index) =>
+        `<option value="${index}">${escapeHtml(videos[id].title)}</option>`).join('')}</select></label>` : ''}
+      <p class="learning-guide__video-prompt"></p>
+      <video controls playsinline preload="none"></video>
+      <p class="learning-guide__video-status" role="status" hidden>影片暫時無法播放。可開啟影片原頁，或繼續本課活動。</p>
+      <a target="_blank" rel="noopener">影片原頁、字幕與練習 ↗</a>`;
+    const select = details.querySelector('select');
+    const video = details.querySelector('video');
+    const prompt = details.querySelector('.learning-guide__video-prompt');
+    const status = details.querySelector('.learning-guide__video-status');
+    const original = details.querySelector('a');
+
+    function loadClip() {
+      const [id, takeaway] = clips[select ? Number(select.value) : 0];
+      const { title, file = `media/${id}.mp4` } = videos[id];
+      const source = `${oneMinute}${file}`;
+      if (video.getAttribute('src') === source && !video.error) return;
+      video.pause();
+      status.hidden = true;
+      prompt.textContent = takeaway;
+      video.setAttribute('aria-label', `${title}｜一分鐘認識`);
+      video.poster = `${oneMinute}posters/${id}.jpg`;
+      video.src = source;
+      original.href = `${oneMinute}lesson.html?id=${id}`;
+    }
+
+    video.addEventListener('error', () => { status.hidden = false; });
+    select?.addEventListener('change', loadClip);
+    details.addEventListener('toggle', () => {
+      if (details.open) loadClip();
+      else video.pause();
+    });
+    startButton.addEventListener('click', () => {
+      video.pause();
+      details.open = false;
+    });
+    card.append(details);
+  }
+
   const guides = {
     '1150701.html': {
       grade: '七年級｜第 1 課',
@@ -118,6 +200,7 @@
   `;
   main.parentNode.insertBefore(section, main);
   section.before(mission);
+  mountLessonVideos(mission.querySelector('.learning-guide__card'), lessonVideos[page], section.querySelector('[data-lesson-start]'));
   const story = section.querySelector('.learning-guide__story');
   const header = document.querySelector('body > header');
   if (header) story.append(header);
