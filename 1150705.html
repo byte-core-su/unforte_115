@@ -347,6 +347,10 @@
                                     </div>
                                 </div>
 
+                                <div id="mandala-prediction-task" class="mt-4 text-sm font-bold text-slate-700" hidden>
+                                    <label for="mandala-prediction">挑戰：畫完整個曼陀羅，畫筆一共會畫幾條邊？</label>
+                                    <input id="mandala-prediction" type="number" min="1" step="1" class="mt-2 block w-28 rounded-lg border border-slate-300 px-3 py-2">
+                                </div>
                                 <button onclick="runLabAnimation()" class="w-full mt-6 bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-indigo-700 shadow-md transition-all flex items-center justify-center gap-2 transform active:scale-95">
                                     <span>🚀 傳遞變數並執行</span>
                                 </button>
@@ -774,20 +778,22 @@
 
         // ====== 第四階段：曼陀羅實戰 ======
         let mandalaInterval = null;
-        let mandalaPreviousCase = '';
+        let mandalaChallenge = false;
+        let mandalaChallengePassed = false;
 
         function newMandalaCase() {
-            let sides;
-            let count;
-            let signature;
-            let attempts = 0;
-            do {
-                sides = 3 + Math.floor(Math.random() * 6);
-                count = 6 + Math.floor(Math.random() * 13);
-                signature = `${sides},${count}`;
-            } while (signature === mandalaPreviousCase && ++attempts < 12);
-            if (signature === mandalaPreviousCase) count = count === 18 ? 6 : count + 1;
-            setMandalaPreset(sides, count);
+            const currentSides = getMandalaShape();
+            const currentCount = parseInt(document.getElementById('mandala-count').value) || 12;
+            const sides = [3, 4, 5, 6, 7, 8].filter(value => value !== currentSides);
+            const counts = [6, 8, 10, 12, 15, 18].filter(value => value !== currentCount);
+            if (Math.random() < 0.5) {
+                setMandalaPreset(sides[Math.floor(Math.random() * sides.length)], currentCount);
+            } else {
+                setMandalaPreset(currentSides, counts[Math.floor(Math.random() * counts.length)]);
+            }
+            mandalaChallenge = true;
+            document.getElementById('mandala-prediction-task').hidden = false;
+            document.getElementById('mandala-feedback').textContent = '這次換了一個參數。先預測總邊數，再執行。';
         }
         const shapeNameMap = { 3: '三角形', 4: '方形', 5: '五邊形', 6: '六邊形' };
 
@@ -839,7 +845,9 @@
             if(countEl) {
                 if (mandalaInterval) clearInterval(mandalaInterval);
                 document.getElementById('mandala-svg').innerHTML = '';
-                mandalaPreviousCase = `${shapeSides},${count}`;
+                mandalaChallenge = false;
+                document.getElementById('mandala-prediction-task').hidden = true;
+                document.getElementById('mandala-prediction').value = '';
                 setMandalaShapeUI(shapeSides);
                 countEl.value = count;
                 updateMandala();
@@ -885,16 +893,20 @@
             const count = parseInt(countEl.value) || 12;
             const shapeSides = getMandalaShape();
             
+            if (mandalaChallenge && Number(document.getElementById('mandala-prediction').value) !== shapeSides * count) {
+                fb.textContent = '再試一次。想想每個小圖形畫幾條邊，以及一圈要畫幾個小圖形。';
+                return;
+            }
             fb.textContent = '正在畫曼陀羅…';
             fb.className = "bg-indigo-600 text-white rounded-b-2xl p-4 text-sm font-medium transition-colors duration-300 text-center shadow-md";
 
-            startDrawingMandala(svg, shapeSides, count, fb, false);
+            startDrawingMandala(svg, shapeSides, count, fb, false, null, mandalaChallenge);
         }
 
         // 共用的繪製邏輯
         const mandalaCases = new Set();
 
-        function startDrawingMandala(svgElement, shapeSides, count, feedbackElement, isPuzzle, overrideColor = null) {
+        function startDrawingMandala(svgElement, shapeSides, count, feedbackElement, isPuzzle, overrideColor = null, isChallenge = false) {
             if (isPuzzle && overrideColor) {
                 if(overrideColor === '#4F46E5' && mainPuzzleInterval) clearInterval(mainPuzzleInterval);
                 if(overrideColor === '#0D9488' && func2PuzzleInterval) clearInterval(func2PuzzleInterval);
@@ -981,14 +993,17 @@
                         clearInterval(mandalaInterval);
                         if (!isRainbow) {
                             mandalaCases.add(`${shapeSides}:${count}`);
-                            if (mandalaCases.size >= 2) feedbackElement?.setAttribute('data-lesson-activity', '');
+                            if (isChallenge) mandalaChallengePassed = true;
+                            if (mandalaCases.size >= 2 && mandalaChallengePassed) feedbackElement?.setAttribute('data-lesson-activity', '');
                         }
                         if(feedbackElement) {
                             if (isRainbow) {
                                 feedbackElement.textContent = `彩虹曼陀羅畫好了。看看每次畫新圖形前，筆跡顏色怎麼變。`;
                                 feedbackElement.className = "bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-b-2xl p-4 text-sm font-bold transition-all duration-300 text-center shadow-lg";
                             } else {
-                                feedbackElement.textContent = '曼陀羅畫好了。可以換一個參數再畫一次。';
+                                feedbackElement.textContent = isChallenge
+                                    ? `預測正確。一共畫了 ${shapeSides * count} 條邊。`
+                                    : '曼陀羅畫好了。接著按「再產生一題」換一個參數。';
                                 feedbackElement.className = "bg-emerald-600 text-white rounded-b-2xl p-4 text-sm font-bold transition-colors duration-300 text-center shadow-lg";
                             }
                         }
@@ -1014,7 +1029,7 @@
             initFuncGame();
             initMainGame();
             initFunc2Game();
-            newMandalaCase();
+            setMandalaPreset(4, 12);
         });
     </script>
 </body>

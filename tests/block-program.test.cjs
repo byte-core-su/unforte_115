@@ -49,3 +49,48 @@ test('comparison reports every case, missing blocks, and valid alternative order
   assert.match(misplaced.results[2].result.error, /除以 0/);
   assert.deepEqual(Array.from(compare(statistics, ['reset', 'sum', 'average']).missing), ['guard']);
 });
+
+test('duel palette reading order cannot pass and its reference appears after a valid program', async () => {
+  const math = Object.create(Math);
+  math.random = () => 0.999999;
+  const target = {};
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'block-program.js'), 'utf8'), { window: target, Math: math });
+  const task = window.BlockProgramTasks['1150806.html'];
+  function mount() {
+    const nodes = new Map();
+    const events = {};
+    const flags = new Set();
+    const root = {
+      querySelector(selector) {
+        if (!nodes.has(selector)) nodes.set(selector, { value: '0', addEventListener() {}, replaceChildren() {} });
+        return nodes.get(selector);
+      },
+      querySelectorAll: () => [],
+      addEventListener: (name, callback) => { events[name] = callback; },
+      removeAttribute: name => flags.delete(name),
+      toggleAttribute(name, on) { if (on) flags.add(name); else flags.delete(name); }
+    };
+    target.BlockProgram.mount(root, task);
+    const displayed = Array.from(root.innerHTML.matchAll(/data-program-add="([^"]+)"/g), match => match[1]);
+    const click = (programAdd, action) => events.click({ detail: 1, target: {
+      closest: () => ({ dataset: { programAdd }, hasAttribute: name => name === action })
+    } });
+    return { root, displayed, flags, click };
+  }
+
+  const ui = mount();
+  assert.deepEqual([...ui.displayed].sort(), [...task.goal].sort());
+  assert.notDeepEqual(ui.displayed, Array.from(task.goal), 'even an identity shuffle must be changed');
+  for (const id of ui.displayed) await ui.click(id);
+  await ui.click(undefined, 'data-program-compare');
+  assert.equal(ui.flags.has('data-program-passed'), false);
+  assert.doesNotMatch(ui.root.querySelector('[data-program-comparison]').innerHTML, /查看參考積木順序/);
+
+  math.random = () => 0.5;
+  const second = mount();
+  assert.notDeepEqual(second.displayed, ui.displayed);
+  for (const id of task.goal) await second.click(id);
+  await second.click(undefined, 'data-program-compare');
+  assert.equal(second.flags.has('data-program-passed'), true);
+  assert.match(second.root.querySelector('[data-program-comparison]').innerHTML, /查看參考積木順序/);
+});

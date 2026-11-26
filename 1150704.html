@@ -205,7 +205,7 @@
                                         重複執行 40 次
                                     </div>
                                     <div class="bg-[#FF8C1A] border-b-[3px] border-[#DB6E00] text-white px-4 py-2 rounded-md shadow-sm ml-4 my-1 w-[calc(100%-1rem)] max-w-[220px] flex items-center gap-2">
-                                        變數 <span class="bg-white text-orange-600 px-2 py-0.5 rounded-full text-xs shadow-inner">長度</span> 改變 10
+                                        變數 <span class="bg-white text-orange-600 px-2 py-0.5 rounded-full text-xs shadow-inner">長度</span> 改變 <span id="spiral-increment">10</span>
                                     </div>
                                     <div class="bg-[#4C97FF] border-b-[3px] border-[#3373CC] text-white px-4 py-2 rounded-md shadow-sm ml-4 mb-1 w-[calc(100%-1rem)] max-w-[220px] flex items-center gap-2">
                                         移動 <span class="bg-[#FF8C1A] border border-[#DB6E00] px-3 py-0.5 rounded-full shadow-sm text-white text-[11px]">長度</span> 點
@@ -221,6 +221,10 @@
                                     </div>
                                 </div>
 
+                                <div id="spiral-prediction-task" class="mt-4 text-sm font-bold text-slate-700" hidden>
+                                    <label for="spiral-prediction" id="spiral-prediction-prompt"></label>
+                                    <input id="spiral-prediction" type="number" min="1" step="1" class="mt-2 block w-28 rounded-lg border border-slate-300 px-3 py-2">
+                                </div>
                                 <button onclick="runSpiralLab()" class="w-full mt-6 bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-indigo-700 shadow-md transition-all flex items-center justify-center gap-2 transform active:scale-95">
                                     <span>🚀 啟動螺旋繪圖</span>
                                 </button>
@@ -522,15 +526,32 @@
         // ====== 第三階段：螺旋實戰區 ======
         let spiralInterval = null;
         let spiralPreviousAngle = null;
+        let spiralChallengeRound = 0;
+        let spiralIncrement = 10;
+        let spiralChallengePassed = false;
 
         function newSpiralCase() {
             const choices = [60, 72, 90, 95, 108, 120].filter(angle => angle !== spiralPreviousAngle);
-            setSpiral(choices[Math.floor(Math.random() * choices.length)]);
+            const currentAngle = Number(document.getElementById('spiral-angle').value);
+            const available = choices.filter(angle => angle !== currentAngle);
+            setSpiral(available[Math.floor(Math.random() * available.length)]);
+            const increments = [6, 8, 12, 14];
+            spiralIncrement = increments[Math.floor(Math.random() * increments.length)];
+            spiralChallengeRound = 2 + Math.floor(Math.random() * 4);
+            document.getElementById('spiral-increment').textContent = spiralIncrement;
+            document.getElementById('spiral-prediction-task').hidden = false;
+            document.getElementById('spiral-prediction-prompt').textContent = `挑戰：第 ${spiralChallengeRound} 次移動時，會走幾點？`;
+            document.getElementById('spiral-feedback').textContent = '先從積木讀出長度起始值和每次增加的點數，再填預測。';
         }
 
         function setSpiral(angle) {
             if (spiralInterval) clearInterval(spiralInterval);
             spiralPreviousAngle = angle;
+            spiralChallengeRound = 0;
+            spiralIncrement = 10;
+            document.getElementById('spiral-increment').textContent = spiralIncrement;
+            document.getElementById('spiral-prediction-task').hidden = true;
+            document.getElementById('spiral-prediction').value = '';
             const angleEl = document.getElementById('spiral-angle');
             if(angleEl) {
                 angleEl.value = angle;
@@ -552,6 +573,11 @@
             
             if(!angleEl || !svg) return;
 
+            const isChallenge = spiralChallengeRound > 0;
+            if (isChallenge && Number(document.getElementById('spiral-prediction').value) !== spiralChallengeRound * spiralIncrement) {
+                fb.textContent = '再試一次。長度從 0 開始，每次先增加，再移動。';
+                return;
+            }
             const angle = parseFloat(angleEl.value) || 90;
             svg.innerHTML = '';
             
@@ -568,7 +594,7 @@
             let points = [{ x, y, angle: 0 }];
 
             for (let i = 0; i < 40; i++) {
-                length += 2; // 在畫線前先遞增長度 (為符合顯示比例的簡化數值)
+                length += spiralIncrement / 5; // 以五分之一的比例呈現積木中的移動距離
                 let rad = currentAngle * Math.PI / 180;
                 x += Math.cos(rad) * length;
                 y += Math.sin(rad) * length;
@@ -600,8 +626,11 @@
                 if (step >= points.length - 1) {
                     clearInterval(spiralInterval);
                     spiralAngles.add(angle);
-                    if (spiralAngles.size >= 2) fb.setAttribute('data-lesson-activity', '');
-                    fb.textContent = `🎉 繪圖完成！使用 ${angle}° 畫出來的圖案是不是很特別呢？`;
+                    if (isChallenge) spiralChallengePassed = true;
+                    if (spiralAngles.size >= 2 && spiralChallengePassed) fb.setAttribute('data-lesson-activity', '');
+                    fb.textContent = isChallenge
+                        ? `預測正確。第 ${spiralChallengeRound} 次移動了 ${spiralChallengeRound * spiralIncrement} 點，螺旋畫好了。`
+                        : `使用 ${angle}° 的螺旋畫好了。接著按「再產生一題」練習預測。`;
                     fb.className = "bg-emerald-600 text-white rounded-b-2xl p-4 text-sm font-bold transition-colors duration-300 text-center shadow-lg";
                     return;
                 }
@@ -622,7 +651,7 @@
         document.addEventListener("DOMContentLoaded", () => {
             initVarGame();
             initLoopGame();
-            newSpiralCase();
+            setSpiral(90);
         });
     </script>
 </body>

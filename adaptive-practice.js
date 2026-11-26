@@ -19,9 +19,16 @@
     const choices = shuffle(unique, random);
     return { prompt, choices, answer: choices.indexOf(String(answer)), hints, explanation, key: `${prompt}|${unique.join('|')}` };
   };
-  const numeric = (prompt, answer, hints, explanation, random) => {
-    const choices = [answer, answer + 1, answer + 2, answer - 1];
-    return question(prompt, choices, answer, hints, explanation, random);
+  const numeric = (prompt, answer, mistakes, hints, explanation, random) => {
+    const plausible = [...new Set(mistakes)].filter(value => value >= 0 && value !== answer);
+    const nearby = [1, 2, 3].flatMap(step => [answer - step, answer + step])
+      .filter(value => value >= 0 && !plausible.includes(value));
+    const take = (matches, count) => [
+      ...shuffle(plausible.filter(matches), random), ...shuffle(nearby.filter(matches), random)
+    ].slice(0, count);
+    const smaller = rand(0, Math.min(3, Math.floor(answer)), random);
+    const choices = [answer, ...take(value => value < answer, smaller), ...take(value => value > answer, 3 - smaller)];
+    return { ...question(prompt, choices, answer, hints, explanation, random), key: prompt };
   };
 
   function createQuestion(page, level, random = Math.random, scenario = active) {
@@ -40,31 +47,31 @@
           return question(`想要「${scene}」，應先找哪種積木？`, [answer, '移動 10 點', '將分數設為 0', '重複 10 次'], answer, ['先找出什麼事件會觸發程式。', '啟動時機與移動或記錄資料不同。'], `「${answer}」對應這個啟動或判斷時機。`, random);
         }
         if (level === 2) return question(`上一局結束時分數是 ${start}，新一局要從 0 開始。應先執行哪個積木？`, ['將分數設為 0', '將分數改變 0', '顯示分數', '等待 1 秒'], '將分數設為 0', ['比較「設為」與「改變」的差別。', '新的一局需要指定確定的初始值。'], '初始化要使用「將分數設為 0」；改變 0 不會清掉舊值。', random);
-        return numeric(`分數從 ${start} 分開始，每次答對增加 ${step} 分，連續答對 ${n} 題後是多少分？`, start + step * n, ['先算每次增加的總量。', `增加量是 ${step} × ${n}，再加上初始分數。`], `初始值 ${start} 加上 ${n} 次各 ${step} 分。`, random);
+        return numeric(`分數從 ${start} 分開始，每次答對增加 ${step} 分，連續答對 ${n} 題後是多少分？`, start + step * n, [step * n, start + step, start + step * (n + 1)], ['先算每次增加的總量。', `增加量是 ${step} × ${n}，再加上初始分數。`], `初始值 ${start} 加上 ${n} 次各 ${step} 分。`, random);
       }
       case '1150702.html':
-        if (level === 1) return numeric(`依序執行「加 ${step}」再「乘 ${n}」，初始值 ${start} 的結果是多少？`, (start + step) * n, ['請依程式順序，不能先乘。', `先算 ${start} + ${step}，再乘 ${n}。`], '循序結構必須按照積木的先後順序計算。', random);
-        if (level === 2) return numeric(`初始值 ${start}，把「增加 ${step}」重複 ${n} 次，最後是多少？`, start + step * n, ['重複的是「增加」，不是設定初始值。', `總共增加 ${step} × ${n}。`], '迴圈每次更新一次，共更新指定次數。', random);
+        if (level === 1) return numeric(`依序執行「加 ${step}」再「乘 ${n}」，初始值 ${start} 的結果是多少？`, (start + step) * n, [start * n + step, start + step + n, (start + step) * (n + 1)], ['請依程式順序，不能先乘。', `先算 ${start} + ${step}，再乘 ${n}。`], '循序結構必須按照積木的先後順序計算。', random);
+        if (level === 2) return numeric(`初始值 ${start}，把「增加 ${step}」重複 ${n} 次，最後是多少？`, start + step * n, [step * n, start + step, (start + step) * n], ['重複的是「增加」，不是設定初始值。', `總共增加 ${step} × ${n}。`], '迴圈每次更新一次，共更新指定次數。', random);
         const score = start + step;
         const limit = score + rand(-2, 2, random);
         const branch = score > limit ? '如果成立' : '否則';
         return question(`分數是 ${score}；條件為「分數大於 ${limit}」。會走哪一支？`, ['否則', '如果成立', '兩支都走', '兩支都不走'], branch, ['注意是「大於」，不是「大於或等於」。', '比較分數與門檻後，只會走其中一支。'], `${score} ${score > limit ? '大於' : '沒有大於'} ${limit}，因此走「${branch}」。`, random);
       case '1150703.html': {
         const sides = [3, 4, 5, 6, 8, 9, 10, 12][rand(0, 7, random)];
-        if (level === 1) return numeric(`畫正 ${sides} 邊形，重複「前進、轉彎」需要幾次？`, sides, ['每次重複完成一條邊。', '邊數與重複次數相同。'], '正多邊形有幾條邊，就執行幾次。', random);
-        if (level === 2) return numeric(`畫正 ${sides} 邊形，每次應轉幾度才閉合？`, 360 / sides, ['一圈共 360 度。', `用 360 ÷ ${sides}。`], `外角為 360 ÷ ${sides} 度。`, random);
+        if (level === 1) return numeric(`畫正 ${sides} 邊形，重複「前進、轉彎」需要幾次？`, sides, [sides - 1, sides + 1, sides * 2], ['每次重複完成一條邊。', '邊數與重複次數相同。'], '正多邊形有幾條邊，就執行幾次。', random);
+        if (level === 2) return numeric(`畫正 ${sides} 邊形，每次應轉幾度才閉合？`, 360 / sides, [180 / sides, 180 - 360 / sides, 360 / sides * 2], ['一圈共 360 度。', `用 360 ÷ ${sides}。`], `外角為 360 ÷ ${sides} 度。`, random);
         const other = sides === 3 ? 6 : 3;
-        return numeric(`正 ${sides} 邊形的外角，比正 ${other} 邊形的外角相差幾度？`, Math.abs(360 / sides - 360 / other), ['先分別算兩個外角。', `分別用 360 ÷ ${sides} 與 360 ÷ ${other}，再取差。`], '先求各圖形外角，再比較差值。', random);
+        return numeric(`正 ${sides} 邊形的外角，比正 ${other} 邊形的外角相差幾度？`, Math.abs(360 / sides - 360 / other), [360 / sides, 360 / other, (360 / sides + 360 / other) / 2], ['先分別算兩個外角。', `分別用 360 ÷ ${sides} 與 360 ÷ ${other}，再取差。`], '先求各圖形外角，再比較差值。', random);
       }
       case '1150704.html':
-        if (level === 1) return numeric(`變數從 ${start} 開始，執行一次「改變 ${step}」後是多少？`, start + step, ['「改變」要加在目前數值上。', `算 ${start} + ${step}。`], '更新後的值是原值加增加量。', random);
-        if (level === 2) return numeric(`變數從 ${start} 開始，每輪畫完才增加 ${step}；第 ${n} 輪畫線時使用多少？`, start + (n - 1) * step, ['第一輪尚未增加。', `畫第 ${n} 輪前只更新 ${n - 1} 次。`], '更新在畫線之後，所以第 n 輪使用初始值加 n−1 次增加量。', random);
-        return numeric(`變數從 ${start} 開始，每輪先增加 ${step} 再畫線；第 ${n} 輪畫線時使用多少？`, start + n * step, ['第一輪畫之前就已增加一次。', `畫第 ${n} 輪前已更新 ${n} 次。`], '更新在畫線之前，所以第 n 輪使用初始值加 n 次增加量。', random);
+        if (level === 1) return numeric(`變數從 ${start} 開始，執行一次「改變 ${step}」後是多少？`, start + step, [start, step, start + 2 * step], ['「改變」要加在目前數值上。', `算 ${start} + ${step}。`], '更新後的值是原值加增加量。', random);
+        if (level === 2) return numeric(`變數從 ${start} 開始，每輪畫完才增加 ${step}；第 ${n} 輪畫線時使用多少？`, start + (n - 1) * step, [(n - 1) * step, start + (n - 2) * step, start + n * step], ['第一輪尚未增加。', `畫第 ${n} 輪前只更新 ${n - 1} 次。`], '更新在畫線之後，所以第 n 輪使用初始值加 n−1 次增加量。', random);
+        return numeric(`變數從 ${start} 開始，每輪先增加 ${step} 再畫線；第 ${n} 輪畫線時使用多少？`, start + n * step, [n * step, start + (n - 1) * step, start + (n + 1) * step], ['第一輪畫之前就已增加一次。', `畫第 ${n} 輪前已更新 ${n} 次。`], '更新在畫線之前，所以第 n 輪使用初始值加 n 次增加量。', random);
       case '1150705.html': {
         const copies = [4, 6, 8, 9, 12][rand(0, 4, random)];
-        if (level === 1) return numeric(`將同一個圖形旋轉繪製 ${copies} 次，每次應旋轉幾度才繞完一圈？`, 360 / copies, ['完整一圈是 360 度。', `用 360 ÷ ${copies}。`], '每次旋轉角度乘上次數應等於 360 度。', random);
-        if (level === 2) return numeric(`每次繪製 ${n} 條邊，共繪製 ${copies} 個圖形，總共執行幾次畫邊動作？`, n * copies, ['每個圖形都要完成所有邊。', `算 ${n} × ${copies}。`], '重複的圖形數乘上每個圖形的邊數。', random);
-        return numeric(`自訂積木的「旋轉角度」設為 ${360 / copies} 度。重複呼叫幾次才會繞完一圈？`, copies, ['角度總和要達到 360 度。', `算 360 ÷ ${360 / copies}。`], '參數不同時，呼叫次數也要跟著調整。', random);
+        if (level === 1) return numeric(`將同一個圖形旋轉繪製 ${copies} 次，每次應旋轉幾度才繞完一圈？`, 360 / copies, [180 / copies, 90, 720 / copies], ['完整一圈是 360 度。', `用 360 ÷ ${copies}。`], '每次旋轉角度乘上次數應等於 360 度。', random);
+        if (level === 2) return numeric(`每次繪製 ${n} 條邊，共繪製 ${copies} 個圖形，總共執行幾次畫邊動作？`, n * copies, [n + copies, n * (copies - 1), (n + 1) * copies], ['每個圖形都要完成所有邊。', `算 ${n} × ${copies}。`], '重複的圖形數乘上每個圖形的邊數。', random);
+        return numeric(`自訂積木的「旋轉角度」設為 ${360 / copies} 度。重複呼叫幾次才會繞完一圈？`, copies, [Math.floor(copies / 2), copies - 1, copies + 1], ['角度總和要達到 360 度。', `算 360 ÷ ${360 / copies}。`], '參數不同時，呼叫次數也要跟著調整。', random);
       }
       case '1150706.html': {
         const { practiceThreshold, shortOutcome, advancedCondition } = scenario.defense;
@@ -100,10 +107,14 @@
       }
       case '1150803.html': {
         const values = [rand(2, 8, random), rand(3, 9, random), rand(2, 8, random)];
-        if (level === 1) return numeric(`清單 [${values.join('、')}] 的總和是多少？`, values.reduce((sum, value) => sum + value, 0), ['逐項加到累加器。', '不要把清單長度當作資料值。'], '總和是所有項目的累計結果。', random);
+        if (level === 1) {
+          const sum = values.reduce((total, value) => total + value, 0);
+          return numeric(`清單 [${values.join('、')}] 的總和是多少？`, sum, [values.length, sum - values[0], sum + values[0]], ['逐項加到累加器。', '不要把清單長度當作資料值。'], '總和是所有項目的累計結果。', random);
+        }
         if (level === 2) {
           const even = [rand(2, 6, random) * 2, rand(2, 6, random) * 2];
-          return numeric(`清單 [${even.join('、')}] 的平均是多少？`, (even[0] + even[1]) / 2, ['先求總和，再除以筆數。', '此清單有 2 筆資料。'], '平均＝總和 ÷ 筆數。', random);
+          const sum = even[0] + even[1];
+          return numeric(`清單 [${even.join('、')}] 的平均是多少？`, sum / 2, [...even, sum], ['先求總和，再除以筆數。', '此清單有 2 筆資料。'], '平均＝總和 ÷ 筆數。', random);
         }
         const { exampleListNames } = scenario.statistics;
         const listName = exampleListNames[rand(0, exampleListNames.length - 1, random)];
@@ -112,8 +123,8 @@
       case '1150804.html': {
         const length = rand(5, 9, random);
         const draws = rand(1, Math.min(length - 2, level === 1 ? 3 : 5), random);
-        if (level === 1) return numeric(`候選清單有 ${length} 人，不重複抽出 ${draws} 人後，候選清單剩幾人？`, length - draws, ['每抽出一人，就從候選清單移除一人。', `計算 ${length} − ${draws}。`], '移除後候選數量逐次減一。', random);
-        if (level === 2) return numeric(`原本 ${length} 張不同的牌，已選清單有 ${draws} 張且不重複。兩個清單合計仍有幾張？`, length, ['抽取是在兩個清單間移動資料。', '候選變少多少，已選就增加多少。'], '不重複抽取不會憑空增加或遺失項目。', random);
+        if (level === 1) return numeric(`候選清單有 ${length} 人，不重複抽出 ${draws} 人後，候選清單剩幾人？`, length - draws, [draws, length, length - draws - 1], ['每抽出一人，就從候選清單移除一人。', `計算 ${length} − ${draws}。`], '移除後候選數量逐次減一。', random);
+        if (level === 2) return numeric(`原本 ${length} 張不同的牌，已選清單有 ${draws} 張且不重複。兩個清單合計仍有幾張？`, length, [draws, length - draws, length + draws], ['抽取是在兩個清單間移動資料。', '候選變少多少，已選就增加多少。'], '不重複抽取不會憑空增加或遺失項目。', random);
         return question(`原本 ${length} 人，已不重複抽出 ${draws} 人。下一次抽取要如何保證不重複？`, ['只從剩餘候選清單選，選後移除', '每次都從原始名單重新抽', '抽到同一人時仍加入已選', '只檢查已選數量'], '只從剩餘候選清單選，選後移除', ['想想候選清單應包含誰。', '已選過的人不能留在下一輪候選中。'], '每次從剩餘候選抽取並移除，才能維持不重複。', random);
       }
       case '1150805.html': {
@@ -143,7 +154,7 @@
           const before = modules[index], prior = modules[index - 1];
           return question(`主程式要執行「${before}」，緊接在它之前應完成哪個自訂積木？`, modules, prior, ['想想每一步需要前一步產生什麼資料。', `建立、洗牌、分配、${activity}有先後依賴。`], `「${prior}」應在「${before}」之前完成。`, random);
         }
-        if (level === 2) return numeric(`${scenario.duel.inventory}有 ${n * 2 + step} 件，兩隊各分 ${n} 件後還剩幾件？`, step, ['兩隊各取相同數量。', `總共分出 ${n} × 2 件。`], '剩餘量＝原庫存 − 兩隊分配總量。', random);
+        if (level === 2) return numeric(`${scenario.duel.inventory}有 ${n * 2 + step} 件，兩隊各分 ${n} 件後還剩幾件？`, step, [n, 2 * n, n + step], ['兩隊各取相同數量。', `總共分出 ${n} × 2 件。`], '剩餘量＝原庫存 − 兩隊分配總量。', random);
         return question(`兩隊各需要 ${n} 件${scenario.duel.item}，但庫存只有 ${n * 2 - 1} 件。分配積木應先做什麼？`, ['檢查庫存是否足夠並處理不足情況', '照常抽取直到清單為空', `重複使用最後一件${scenario.duel.item}`, `直接開始${scenario.duel.activity}`], '檢查庫存是否足夠並處理不足情況', ['先比較需求量與庫存量。', '不能讓抽取次數超過候選清單長度。'], '模組應先處理資料不足的邊界案例，再執行分配。', random);
       default:
         return null;

@@ -704,16 +704,21 @@
         const closedPolygons = new Set();
         let triangleTrial = false;
         let triangleCorrected = false;
+        let polygonChallenge = null;
+        let polygonChallengePassed = false;
 
         function newPolygonCase() {
-            const choices = [3, 4, 5, 6, 8].filter(sides => sides !== polyPreviousSides);
-            setPolygonPreset(choices[Math.floor(Math.random() * choices.length)]);
+            const choices = [6, 8, 10, 12].filter(sides => sides !== polyPreviousSides);
+            polygonChallenge = choices[Math.floor(Math.random() * choices.length)];
+            setPolygonPreset(polygonChallenge);
+            document.getElementById('poly-feedback').textContent = `挑戰：畫出正 ${polygonChallenge} 邊形。先填每次的轉角，再啟動繪圖。`;
         }
 
         function setPolygonPreset(sides) {
             if (polyInterval) clearInterval(polyInterval);
             const nInput = document.getElementById('poly-n');
             const angleInput = document.getElementById('poly-angle');
+            if (sides !== polygonChallenge) polygonChallenge = null;
             if (sides) polyPreviousSides = sides;
             
             if (!sides) {
@@ -804,8 +809,12 @@
                         if (Math.abs(totalRotation - 360) < 0.1) {
                             closedPolygons.add(nInput);
                             if (nInput === 3 && triangleTrial) triangleCorrected = true;
+                            if (nInput === polygonChallenge) {
+                                polygonChallengePassed = true;
+                                fb.textContent += ' 已完成新圖形挑戰。';
+                            }
                         }
-                        if (closedPolygons.has(3) && closedPolygons.has(5) && triangleCorrected) fb.setAttribute('data-lesson-activity', '');
+                        if (closedPolygons.has(3) && closedPolygons.has(5) && triangleCorrected && polygonChallengePassed) fb.setAttribute('data-lesson-activity', '');
                     } else {
                         if (nInput === 3 && angleInput === 90) triangleTrial = true;
                         fb.textContent = `終點沒有回到起點。用 360 ÷ ${nInput} 算出轉角，再畫一次。`;
@@ -824,7 +833,7 @@
         document.addEventListener("DOMContentLoaded", () => {
             initPenGame();
             initSqGame();
-            newPolygonCase();
+            setPolygonPreset(3);
         });
         window.addEventListener('load', () => {
             if (window.location.hash === '#polygon-simulator') {

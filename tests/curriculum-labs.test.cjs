@@ -7,7 +7,7 @@ const campus = require('./fixtures/campus-scenario.cjs');
 
 const source = fs.readFileSync(path.join(__dirname, '..', 'curriculum-labs.js'), 'utf8');
 
-function loadLab(page, scenario = CourseScenarios.active) {
+function loadLab(page, scenario = CourseScenarios.active, random = Math.random) {
   const elements = new Map();
   const element = id => {
     if (!elements.has(id)) {
@@ -23,6 +23,7 @@ function loadLab(page, scenario = CourseScenarios.active) {
   const section = {
     className: '', innerHTML: '',
     setAttribute(name, value) { this[name] = value; },
+    removeAttribute(name) { delete this[name]; },
     querySelector(selector) { return selector === '[data-quiz]' ? null : element(selector); }
   };
   const main = { appendChild() {} };
@@ -32,13 +33,20 @@ function loadLab(page, scenario = CourseScenarios.active) {
   };
   const window = { CourseScenarios: { ...CourseScenarios, active: scenario }, location: { pathname: `/${page}` } };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../lesson-labels.js'), 'utf8'), { window });
-  vm.runInNewContext(source, { document, window, Math });
+  vm.runInNewContext(source, { document, window, Math: Object.assign(Object.create(Math), { random }) });
   return Object.assign(element, { section });
 }
 
 {
   const get = loadLab('1150706.html');
   const result = get('#g7-data-result');
+  const query = get('#g7-data-query');
+  const prediction = get('#g7-data-prediction');
+  const run = get('#g7-data-run');
+  const passed = () => get.section['data-lesson-activity'] === '';
+  const rows = () => [...result.innerHTML.matchAll(/<tr><td>([A-D])<\/td><td>(\d+)<\/td><td>(\d+)<\/td><td>(是|否)<\/td><td>(\d+|？)<\/td><\/tr>/g)]
+    .map(([, id, count, width, blocked, shownCost]) => ({ id, cost: Number(count) * Number(width), blocked: blocked === '是', shownCost }));
+  const search = id => { query.value = id; run.click(); query.value = 'all'; };
   assert.match(result.innerHTML, /練習題/);
   assert.match(result.innerHTML, /防護強度門檻/);
   const first = result.innerHTML;
@@ -47,26 +55,43 @@ function loadLab(page, scenario = CourseScenarios.active) {
   get('#g7-data-demo').click();
   assert.match(result.innerHTML, /固定示範/);
   assert.match(result.innerHTML, /<td>A<\/td><td>4<\/td><td>1<\/td>/);
-  get('#g7-data-prediction').value = 'B';
-  get('#g7-data-run').click();
-  assert.match(result.innerHTML, /預測符合條件/);
-  get('#g7-data-prediction').value = 'C';
-  get('#g7-data-run').click();
-  assert.match(result.innerHTML, /預測不同/);
-  get('#g7-data-query').value = 'B';
-  get('#g7-data-run').click();
-  assert.match(result.innerHTML, /共 1 筆/);
+  search('A');
+  prediction.value = 'B';
+  run.click();
+  assert.match(result.innerHTML, /最省資源的是 B/);
+  assert.equal(passed(), false, 'worked example cannot complete the practice');
   get('#g7-data-new').click();
-  assert.match(result.innerHTML, /先算出各筆消耗量/);
-  assert.equal(get('#g7-data-prediction').value, '', 'new data case should clear old prediction');
-  get('#g7-data-run').click();
+  assert.equal(prediction.value, '', 'new data case should clear old prediction');
+  const wrong = rows().find(row => !row.blocked).id;
+  prediction.value = wrong;
+  run.click();
+  assert.match(result.innerHTML, /先選一個測試編號並查詢/);
+  assert.ok(rows().every(row => row.shownCost === '？'));
+  search('B');
+  assert.match(result.innerHTML, /共 1 筆/);
+  run.click();
+  assert.match(result.innerHTML, /預測不同.*再產生一題/);
+  assert.equal(prediction.disabled, true);
+  assert.equal(passed(), false, 'wrong prediction must leave the step locked');
+
+  get('#g7-data-new').click();
+  const cheapest = rows().filter(row => row.blocked).sort((a, b) => a.cost - b.cost)[0].id;
+  assert.equal(prediction.disabled, false);
+  prediction.value = cheapest;
+  run.click();
+  assert.equal(passed(), false, 'a previous search does not carry across practice cases');
+  search('A');
+  run.click();
+  assert.match(result.innerHTML, /預測符合條件/);
+  assert.equal(passed(), true);
   const threshold = Number(result.innerHTML.match(/門檻為 (\d+)/)[1]);
-  const rows = [...result.innerHTML.matchAll(/<tr><td>[A-D]<\/td><td>(\d+)<\/td><td>(\d+)<\/td><td>(是|否)<\/td><td>(\d+)<\/td><\/tr>/g)];
-  assert.equal(rows.length, 4);
-  rows.forEach(([, count, width, blocked, cost]) => {
-    assert.equal(Number(cost), Number(count) * Number(width));
-    assert.equal(blocked === '是', Number(cost) >= threshold);
+  assert.equal(rows().length, 4);
+  rows().forEach(row => {
+    assert.equal(Number(row.shownCost), row.cost);
+    assert.equal(row.blocked, row.cost >= threshold);
   });
+  get('#g7-data-new').click();
+  assert.equal(passed(), false, 'new challenge invalidates the previous result while practising');
 }
 
 for (const scenario of [CourseScenarios.active, campus]) {
@@ -138,36 +163,52 @@ for (const scenario of [CourseScenarios.active, campus]) {
 }
 
 {
-  const get = loadLab('1150805.html');
-  const passed = () => get.section['data-lesson-activity'] === '';
-  const state = get('#g8-sort-state');
-  const choice = get('#g8-shuffle-choice');
-  choice.value = 'extra';
-  get('#g8-shuffle-check').click();
-  assert.match(get('#g8-shuffle-state').textContent, /總張數相同.*3 少了一張/);
-  assert.ok(!get('#g8-shuffle-task').hidden);
-  assert.equal(passed(), false);
-  choice.value = 'valid';
-  get('#g8-shuffle-check').click();
-  assert.equal(get('#g8-shuffle-task').hidden, true);
-  assert.equal(get('#g8-sort-task').hidden, false);
-  get('#g8-sort-keep').click();
-  assert.match(state.textContent, /再試一次.*比較 3 和 1/);
-  get('#g8-sort-swap').click();
-  assert.match(state.textContent, /比較 3 和 3/);
-  get('#g8-sort-swap').click();
-  assert.match(state.textContent, /再試一次.*比較 3 和 3/);
-  get('#g8-sort-keep').click();
-  assert.match(state.textContent, /結果是 ［1、2、3、3］/);
-  assert.equal(passed(), false);
-  get('#g8-sort-stop').value = 'pair';
-  get('#g8-sort-check').click();
-  assert.equal(passed(), false);
-  get('#g8-sort-stop').value = 'round';
-  get('#g8-sort-check').click();
-  assert.equal(passed(), true);
-  assert.match(get('#g8-sort-report').value, /3 和 3\t不交換/);
-  assert.match(get('#g8-sort-report').value, /完整一輪都沒交換/);
+  const optionOrder = new Set();
+  const decks = new Set();
+  const parseCards = text => text.match(/［([\d、]+)］/)[1].split('、').map(Number);
+  for (const random of [() => 0, () => 0.4, () => 0.8]) {
+    const get = loadLab('1150805.html', CourseScenarios.active, random);
+    const passed = () => get.section['data-lesson-activity'] === '';
+    const state = get('#g8-sort-state');
+    const choice = get('#g8-shuffle-choice');
+    const original = parseCards(get('#g8-shuffle-prompt').textContent);
+    decks.add(original.join(','));
+    const options = Array.from(choice.innerHTML.matchAll(/<option value="(\w+)">(.*?)<\/option>/g));
+    optionOrder.add(options.map(([, value]) => value).join(','));
+    for (const [, value, label] of options) {
+      const sorted = parseCards(label).sort((a, b) => a - b);
+      assert.equal(sorted.join(',') === original.join(','), value === 'valid');
+    }
+
+    choice.value = 'extra';
+    get('#g8-shuffle-check').click();
+    assert.match(get('#g8-shuffle-state').textContent, /總張數相同.*少了一張/);
+    assert.ok(!get('#g8-shuffle-task').hidden);
+    assert.equal(passed(), false);
+    choice.value = 'valid';
+    get('#g8-shuffle-check').click();
+    assert.equal(get('#g8-shuffle-task').hidden, true);
+    assert.equal(get('#g8-sort-task').hidden, false);
+    for (let comparison = 0; comparison < 2; comparison++) {
+      const [, left, right] = state.textContent.match(/比較 (\d+) 和 (\d+)/);
+      const swap = Number(left) > Number(right);
+      get(swap ? '#g8-sort-keep' : '#g8-sort-swap').click();
+      assert.match(state.textContent, /再試一次/);
+      get(swap ? '#g8-sort-swap' : '#g8-sort-keep').click();
+    }
+    assert.deepEqual(parseCards(state.textContent), original);
+    assert.equal(passed(), false);
+    get('#g8-sort-stop').value = 'pair';
+    get('#g8-sort-check').click();
+    assert.equal(passed(), false);
+    get('#g8-sort-stop').value = 'round';
+    get('#g8-sort-check').click();
+    assert.equal(passed(), true);
+    assert.deepEqual(parseCards(get('#g8-sort-report').value), original);
+    assert.match(get('#g8-sort-report').value, /完整一輪都沒交換/);
+  }
+  assert.ok(decks.size > 1);
+  assert.ok(optionOrder.size > 1);
 }
 
 {
@@ -178,7 +219,7 @@ for (const scenario of [CourseScenarios.active, campus]) {
   const result = get('#g7-data-result').innerHTML;
   assert.match(result, /緩衝強度門檻為 15/);
   assert.match(result, /<th>攔住測試球<\/th>/);
-  assert.match(result, /最省資源的是 B（消耗量 18）.*預測符合條件/);
+  assert.match(result, /最省資源的是 B（消耗量 18）.*再產生一題/);
 }
 
 {

@@ -324,5 +324,6 @@
     task.goal = goal;
     for (const [id, view] of Object.entries(blocks)) task.blocks[id] = { run: task.blocks[id], view };
   }
+  tasks['1150806.html'].shufflePalette = true;
   window.BlockProgramTasks = tasks;
 })();

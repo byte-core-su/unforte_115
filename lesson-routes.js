@@ -29,14 +29,14 @@
     title: '認識任務',
     anchors: ['#learning-guide', ...extra],
     entry: warmup,
-    todo: warmup ? '登記一筆新資料，看變數和清單怎麼變，再找回第 2 筆。' : '看完今天的任務和繳交項目，就可以開始。'
+    todo: warmup ? '登記一筆新資料，看變數和清單怎麼變，再依項次找回一筆舊資料。' : '看完今天的任務和繳交項目，就可以開始。'
   });
 
   function listWarmup() {
     const { tool, chip, pack } = window.CourseScenarios.active.inventory.items;
     return {
       items: [tool.label, chip.label, pack.label],
-      correct: 1
+      correct: Math.floor(Math.random() * 2)
     };
   }
   const program = step => ({
@@ -90,8 +90,8 @@
         checks: ['完成 10 題並看完結果', '選一塊積木，寫下何時執行、會改變什麼'],
         hints: ['先看積木顏色：黃色是事件、藍色是動作、橘色是控制、紫色是外觀、橘紅色是變數。', '答錯沒關係，診斷是用來找起點，不影響進入下一課。'] },
       { title: '資訊使用判斷', anchors: ['#curriculum-lab'], secondPeriod: true,
-        activity: achieved('#curriculum-lab', '先選完三題，按下檢查，直到每題都答對。'),
-        todo: `三個情境各選一個做法，按「${labels.checkJudgment}」。`,
+        activity: achieved('#curriculum-lab', '依序完成三個情境，每題答對後才能繼續。'),
+        todo: `每次看一個情境，選一個做法後按「${labels.checkJudgment}」。`,
         checks: ['三題都檢查過，並讀完每題的原因'],
         hints: ['想一想：這樣做會不會讓別人知道你的真實姓名、帳號或密碼？', '網路上的圖片、音樂要先確認授權；看不出來就改用可使用的素材。'] },
       program({ title: '綠旗小程式', optional: true,
@@ -134,9 +134,9 @@
         checks: ['手動程式畫出正方形', '迴圈的重複次數和每次轉角都正確'],
         hints: ['找出一直重複的兩個動作。重複次數等於邊數，每次轉角是 360 ÷ 邊數。'] },
       { title: '畫三角形、五邊形與修正', anchors: [{ up: '#route-polygon' }],
-        activity: achieved('#poly-feedback', '先試畫右轉 90 度的三角形，再修到閉合，最後畫出閉合的五邊形。'),
-        todo: '三角形先試每次右轉 90 度，看終點在哪裡；修正角度後重畫。接著換成五邊形，算出轉角再畫。',
-        checks: ['觀察三角形未閉合，再修正到閉合', '換成五邊形也能畫到閉合'],
+        activity: achieved('#poly-feedback', '修好三角形並畫出五邊形後，按「再產生一題」，算出新圖形的轉角並畫到閉合。'),
+        todo: '三角形先試每次右轉 90 度，看終點在哪裡；修正角度後重畫。接著畫五邊形，最後按「再產生一題」，預測新圖形的轉角。',
+        checks: ['觀察三角形未閉合，再修正到閉合', '五邊形和新抽到的圖形都能畫到閉合'],
         hints: ['每次轉角用 360 ÷ 邊數。'] },
       program({
         todo: '用重複積木畫三角形和五邊形，記下邊數與轉角。附上前一步的修正紀錄。',
@@ -150,9 +150,9 @@
         checks: ['手動螺旋畫出來'],
         hints: ['每條邊都比上一條長 10 點。', '每畫完一條邊都要右轉 90 度。'] },
       { title: '第二階段：用變數畫螺旋', anchors: [{ up: '#route-variable-spiral' }],
-        activity: activity('body:has(#loop-flow-msg[data-lesson-activity]):has(#spiral-feedback[data-lesson-activity])', '先排好迴圈積木，再畫兩種不同角度的螺旋。'),
-        todo: '把 4 塊積木排進「重複執行」，讓「長度」變數每次增加；再選一種螺旋（例如三角螺旋）按「啟動螺旋繪圖」。',
-        checks: ['變數版螺旋畫出來', '試過另一種角度的螺旋', '能說出前三圈「長度」的值'],
+        activity: activity('body:has(#loop-flow-msg[data-lesson-activity]):has(#spiral-feedback[data-lesson-activity])', '先排好迴圈積木，畫過示範和新題，再答對新題的移動點數。'),
+        todo: '把 4 塊積木排進「重複執行」，讓「長度」變數每次增加；先畫一次螺旋，再按「再產生一題」。讀出新的長度增量，預測指定那一次移動幾點。',
+        checks: ['變數版螺旋畫出來', '試過另一種角度的螺旋', '答對新題指定的移動長度'],
         hints: ['「長度」要先設為 0，再在迴圈裡每次改變 10。', '「改變 10」放在移動之前或之後，第一圈的長度會不一樣。'] },
       program({
         todo: '在模擬器畫螺旋。把增加長度的積木分別放在「移動」前後，各執行一次，比較第一輪移動的長度。',
@@ -161,9 +161,9 @@
     ]),
     '1150705.html': route([], [
       { title: '換參數畫曼陀羅', anchors: [{ up: '#route-mandala-parameters' }],
-        activity: achieved('#mandala-feedback', '換兩組不同的邊數或圖形數，分別等圖形畫完。'),
-        todo: '選兩組邊數 N 與圖形數 X（例如 3 和 12、5 和 10）。每組按「傳遞變數並執行」，比較畫出的圖形。',
-        checks: ['畫了兩組不同設定的圖形', '能指出是哪個數值改變了圖形'],
+        activity: achieved('#mandala-feedback', '畫完兩組不同參數的圖形，並答對新題的總邊數。'),
+        todo: '先用一組邊數 N 和圖形數 X 畫一次。再按「再產生一題」，比較哪個參數變了，預測新圖形的總邊數。',
+        checks: ['畫了兩組不同設定的圖形', '答對新題的總邊數'],
         hints: ['N 決定每個小圖形的邊數，X 決定一圈畫幾個。'] },
       { title: '曼陀羅延伸', anchors: [{ up: '#route-define-polygon' }, { up: '#route-assemble-mandala' },
           { up: '#route-nested-block' }, { up: '#route-rainbow-mandala' }], optional: true,
@@ -189,9 +189,9 @@
         checks: ['積木組裝完成，防禦網能一鍵啟動'],
         hints: ['把「詢問並等待」換成「變數 設為 數字」。', '先設定筆跡寬度、邊數和圖形數量，再下筆、呼叫「畫幾個圖形」，最後停筆。'] },
       { title: '資料分析', anchors: ['#curriculum-lab'],
-        activity: achieved('#curriculum-lab', '先選一筆資料搜尋，再回到「全部」，選出預測並核對。'),
-        todo: '用匿名測試資料：先搜尋指定測試，再預測哪一組有效又最省資源，按「核對預測並分析」。',
-        checks: ['預測並核對過一次', '能說出平均資源消耗怎麼算'],
+        activity: achieved('#curriculum-lab', '請在練習題先查詢一筆資料，再回到「全部」正確預測一次。'),
+        todo: '先查詢一筆測試資料，再預測哪一組有效又最省資源。答錯時先看分析，再產生一題重試。',
+        checks: ['正確預測有效又最省資源的一組', '能說出平均資源消耗怎麼算'],
         hints: ['先刪掉擋不住的組，再從剩下的比消耗量。', '消耗量＝圖形數 × 筆跡寬度。'] },
       program({
         activity: activity('#block-program[data-program-passed][data-program-three-runs]', '請試跑三組不同參數，再按「比對檢查」。'),
@@ -233,7 +233,7 @@
         checks: ['完成一次比對，並看懂結果'],
         hints: ['結果會受雜音影響，只是練習回饋，不是評分。'] },
       { title: '錄音與素材判斷', anchors: ['#curriculum-lab'],
-        activity: achieved('#curriculum-lab', '選完每個情境的答案並按檢查，直到兩題都答對。'),
+        activity: achieved('#curriculum-lab', '依序完成兩個情境，每題答對後才能繼續。'),
         todo: `每個情境選一個做法，按「${labels.checkJudgment}」。`,
         checks: ['每題都檢查過，並讀完原因'],
         hints: ['分享錄音前想一想：裡面有沒有別人的聲音或個資？', '現成的旋律或音檔要先確認授權。'] },
@@ -266,10 +266,10 @@
     ]),
     '1150804.html': route([], [
       { title: '抽籤模擬器', anchors: [{ up: '#route-draw-simulator' }],
-        activity: achieved('#route-draw-simulator', '抽滿四輪，每輪都要按「確認刪除」。'),
+        activity: achieved('#route-draw-simulator', '抽滿四輪，每輪都要找對候選清單中的項次才能刪除。'),
         todo: draw.preview,
         questions: { before: draw.questions.before, during: draw.questions.during },
-        checks: ['已抽完 4 輪，每輪都按了「確認刪除」', '看得出座號和項次的差別，也核對了兩份清單的人數'],
+        checks: ['抽完 4 輪，且每輪都驗證過清單項次', '看得出座號和項次的差別，也核對了兩份清單的人數'],
         hints: ['抽到的人如果不刪掉，下一次可能又被抽到。'] },
       { title: '從建立名單到抽籤', anchors: [{ up: '#route-initialize-list' }, { up: '#route-draw-and-remove' }],
         parts: [
@@ -291,7 +291,7 @@
     '1150805.html': route([], [
       { title: '洗牌與排序挑戰', anchors: ['#curriculum-lab'],
         activity: achieved('#curriculum-lab', '請通過洗牌的牌數檢查，以及排序的交換和停止判斷。'),
-        todo: '先看一輪洗牌怎麼移牌。接著找出正確的洗牌結果，並判斷排序何時交換、何時停止。',
+        todo: '先看一輪洗牌怎麼移牌。接著依本次牌堆找出正確的洗牌結果，並判斷排序何時交換、何時停止。',
         checks: ['洗牌後，每種數值出現的次數不變', '根據比較結果決定是否交換，並判斷一整輪未交換時可以停止'],
         hints: ['先數每種牌有幾張。排序時，左邊比右邊大才交換。'] },
       program({

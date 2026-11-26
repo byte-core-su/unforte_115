@@ -85,6 +85,7 @@ test('student labs show activity titles and keep clear of the dynamic render roo
     };
     const section = {
       setAttribute(name, value) { this[name] = value; },
+      removeAttribute(name) { delete this[name]; },
       querySelector(selector) { return selector === '[data-quiz]' ? null : control(selector); }
     };
     const main = {

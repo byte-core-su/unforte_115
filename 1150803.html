@@ -184,8 +184,9 @@
 
             for(let i=1; i<=5; i++) {
                 const sel = document.getElementById(`q-blank-${i}`);
-                if(sel) { sel.value = ""; sel.disabled = false; }
+                if(sel) sel.disabled = false;
             }
+            shuffleWarmupOptions();
             document.getElementById('warmup-quiz-feedback').innerHTML = "";
 
             const btnVerify = document.getElementById('btn-warm-verify');
@@ -202,7 +203,21 @@
             lucide.createIcons();
         }
 
+        function shuffleWarmupOptions() {
+            for (let i = 1; i <= 5; i++) {
+                const select = document.getElementById(`q-blank-${i}`);
+                if (!select) continue;
+                const choices = Array.from(select.options).slice(1);
+                while (choices.length) {
+                    const index = Math.floor(Math.random() * choices.length);
+                    select.append(choices.splice(index, 1)[0]);
+                }
+                select.value = '';
+            }
+        }
+
         function initWarmup() {
+            shuffleWarmupOptions();
             document.getElementById('btn-warm-verify')?.addEventListener('click', checkWarmupAnswers);
             document.getElementById('btn-warm-next')?.addEventListener('click', warmNextStep);
             document.getElementById('btn-warm-reset')?.addEventListener('click', warmReset);

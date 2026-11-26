@@ -23,7 +23,16 @@ for (const grade of [7, 8]) {
       }
       let seed = 17;
       const random = () => { seed = (seed * 48271) % 2147483647; return seed / 2147483647; };
-      for (let index = 0; index < 100; index++) createQuestion(page, level, random);
+      const numericRanks = new Set();
+      for (let index = 0; index < 100; index++) {
+        const item = createQuestion(page, level, random);
+        const values = item.choices.map(Number);
+        if (values.every(Number.isFinite)) {
+          assert.ok(values.every(value => value >= 0));
+          numericRanks.add(values.filter(value => value < values[item.answer]).length);
+        }
+      }
+      if (numericRanks.size) assert.ok(numericRanks.size >= 3, `${page} level ${level}: numeric answer must vary by value rank`);
     }
   }
 }

@@ -33,9 +33,6 @@
           <label id="g8-search-reason-label" hidden>為什麼可以回報找不到？
             <select id="g8-search-reason">
               <option value="">先選理由</option>
-              <option value="some">已經比到不符合的項目</option>
-              <option value="all">每一項都比過，而且都不符合</option>
-              <option value="last">比到最後一項，結果一定是找不到</option>
             </select>
           </label>
           <button type="button" id="g8-search-step">檢查下一項</button>
@@ -63,13 +60,10 @@
           </div>
         </details>
         <h3>第 1 題　找出正確的洗牌結果</h3>
-        <p>原牌堆是［1、2、3、3］。哪個結果保留了每張牌？</p>
+        <p id="g8-shuffle-prompt"></p>
         <div class="curriculum-lab__controls">
           <label>洗牌結果 <select id="g8-shuffle-choice">
             <option value="">請選一個結果</option>
-            <option value="extra">［3、1、2、2］</option>
-            <option value="valid">［3、1、3、2］</option>
-            <option value="missing">［3、1、2］</option>
           </select></label>
           <button type="button" id="g8-shuffle-check">檢查牌數</button>
         </div>
@@ -89,9 +83,6 @@
             <div class="curriculum-lab__controls">
               <label>哪個情況可以提早停止？ <select id="g8-sort-stop">
                 <option value="">請選停止條件</option>
-                <option value="pair">有一對相鄰的牌沒交換</option>
-                <option value="round">完整一輪都沒交換</option>
-                <option value="equal">遇到兩張數值相同的牌</option>
               </select></label>
               <button type="button" id="g8-sort-check">檢查停止條件</button>
             </div>
@@ -131,6 +122,9 @@
     return result;
   };
 
+  const optionsHtml = choices => shuffle(choices).map(([value, label]) =>
+    `<option value="${value}">${label}</option>`).join('');
+
   const safety = [
     ['準備分享 積木程式時，哪種做法較合適？', ['在作品說明寫出全班真實姓名', '用角色代號，分享前檢查個資', '公開同學的帳號密碼'], 1, '公開作品不應包含可辨識同學的個人資料。'],
     ['想使用網路上的圖片或音樂，應先做什麼？', ['確認授權並標示來源或改用可使用素材', '只要能下載就直接使用', '刪掉作者名稱再上傳'], 0, '素材的合理使用與授權需要先確認。'],
@@ -143,18 +137,42 @@
   const quizRoot = section.querySelector('[data-quiz]');
   if (quizRoot) {
     const questions = quizRoot.dataset.quiz === 'g7-safety' ? safety : ethics;
-    quizRoot.innerHTML = questions.map(([question, options], index) => `<fieldset><legend>${index + 1}. ${question}</legend>${options.map((option, choice) => `<label><input type="radio" name="lab-q-${index}" value="${choice}"> ${option}</label>`).join('')}<output aria-live="polite"></output></fieldset>`).join('') + '<button type="button">${window.LessonLabels.checkJudgment}</button>';
-    quizRoot.querySelector('button').addEventListener('click', () => {
-      const answers = questions.map(([, , answer, explanation], index) => {
-        const fieldset = quizRoot.querySelectorAll('fieldset')[index];
+    let questionIndex = 0;
+    function showQuestion() {
+      const [question, options, answer, explanation] = questions[questionIndex];
+      const choices = shuffle(options.map((label, value) => ({ label, value })));
+      quizRoot.innerHTML = `<fieldset>
+        <legend>${questionIndex + 1} / ${questions.length}　${question}</legend>
+        ${choices.map(({ label, value }) => `<label><input type="radio" name="lab-q-${questionIndex}" value="${value}"> ${label}</label>`).join('')}
+      </fieldset>
+      <div class="curriculum-lab__controls">
+        <button type="button" data-quiz-check>${window.LessonLabels.checkJudgment}</button>
+        <button type="button" data-quiz-next hidden>下一題</button>
+      </div>
+      <p class="curriculum-lab__result" role="status"></p>`;
+      const fieldset = quizRoot.querySelector('fieldset');
+      const check = quizRoot.querySelector('[data-quiz-check]');
+      const next = quizRoot.querySelector('[data-quiz-next]');
+      const result = quizRoot.querySelector('[role="status"]');
+      check.addEventListener('click', () => {
         const selected = fieldset.querySelector('input:checked');
-        const output = fieldset.querySelector('output');
         const correct = selected && Number(selected.value) === answer;
-        output.textContent = !selected ? '請先選擇。' : `${correct ? '正確。' : '再想想。'}${explanation}`;
-        return correct;
+        result.textContent = !selected ? '請先選擇。' : `${correct ? '正確。' : '再想想。'}${explanation}`;
+        if (!correct) return;
+        fieldset.disabled = check.disabled = true;
+        if (questionIndex + 1 === questions.length) {
+          section.setAttribute('data-lesson-activity', '');
+          return;
+        }
+        next.hidden = false;
       });
-      if (answers.every(Boolean)) section.setAttribute('data-lesson-activity', '');
-    });
+      next.addEventListener('click', () => {
+        questionIndex++;
+        showQuestion();
+        quizRoot.querySelector('input').focus();
+      });
+    }
+    showQuestion();
   }
 
   if (page === '1150706.html') {
@@ -169,6 +187,7 @@
     let mode = '練習題';
     let previous = '';
     let searched = false;
+    let checked = false;
     const result = section.querySelector('#g7-data-result');
     const query = section.querySelector('#g7-data-query');
     const prediction = section.querySelector('#g7-data-prediction');
@@ -190,21 +209,42 @@
       records.forEach(item => { item.blocked = item.count * item.width >= threshold; });
       previous = signature();
       mode = '練習題';
+      resetCase();
+    };
+    const resetCase = (reveal = false) => {
+      searched = false;
+      checked = false;
       query.value = 'all';
       prediction.value = '';
-      run(false);
+      prediction.disabled = false;
+      section.removeAttribute('data-lesson-activity');
+      run(reveal);
     };
     const run = (reveal = true) => {
       const chosen = query.value;
-      if (reveal && chosen !== 'all') searched = true;
-      if (reveal && searched && chosen === 'all' && prediction.value) section.setAttribute('data-lesson-activity', '');
+      const all = chosen === 'all';
+      const demo = mode === '固定示範';
       const rows = records.filter(item => chosen === 'all' || item.id === chosen);
-      const average = rows.reduce((total, item) => total + item.count * item.width, 0) / rows.length;
-      const valid = rows.filter(item => item.blocked).sort((a, b) => a.count * a.width - b.count * b.width);
-      const bestCost = Math.min(...records.filter(item => item.blocked).map(item => item.count * item.width));
+      if (reveal && !all && rows.length) searched = true;
+      const cost = item => item.count * item.width;
+      const average = rows.reduce((total, item) => total + cost(item), 0) / rows.length;
+      const bestCost = Math.min(...rows.filter(item => item.blocked).map(cost));
+      const best = rows.filter(item => item.blocked && cost(item) === bestCost);
       const predicted = records.find(item => item.id === prediction.value);
-      const feedback = chosen !== 'all' ? '先選「全部」，才能比較哪筆最省資源。' : !prediction.value ? '下次先選預測，再核對結果。' : predicted?.blocked && predicted.count * predicted.width === bestCost ? '預測符合條件；請說明為何其他通過測試的組合消耗更多。' : '預測不同；先排除未通過門檻的組合，再比較其餘的消耗量，重抽新題驗證。';
-      result.innerHTML = `<p>${mode}；本題${escapeHtml(defense.labThreshold)}為 ${threshold}，圖形數 × 筆跡寬度達到門檻才算${escapeHtml(defense.outcome)}。</p><table><caption>測試資料（消耗量＝圖形數 × 筆跡寬度）</caption><thead><tr><th>編號</th><th>圖形數</th><th>寬度</th><th>${escapeHtml(defense.outcome)}</th><th>消耗量</th></tr></thead><tbody>${rows.map(item => `<tr><td>${item.id}</td><td>${item.count}</td><td>${item.width}</td><td>${item.blocked ? '是' : '否'}</td><td>${reveal ? item.count * item.width : '？'}</td></tr>`).join('')}</tbody></table><p>${reveal ? `共 ${rows.length} 筆；平均消耗量 ${average.toFixed(1)}。${valid.length ? `目前結果中有效且最省資源的是 ${valid[0].id}（消耗量 ${valid[0].count * valid[0].width}）。` : '目前結果中沒有通過測試的組合。'} ${feedback}` : '先算出各筆消耗量，預測通過測試且最省資源的組合，再按「核對預測並分析」。'}</p>`;
+      const correct = best.includes(predicted);
+      if (reveal && all && !demo && searched && predicted && !checked) {
+        checked = true;
+        prediction.disabled = true;
+        if (correct) section.setAttribute('data-lesson-activity', '');
+      }
+      const showResults = (reveal && (demo || !all)) || (all && checked);
+      const feedback = !all ? '回到「全部」，再比較各組。'
+        : demo ? '看完固定示範後，按「再產生一題」完成練習。'
+        : checked ? (correct ? '預測符合條件，可以完成這一步。' : '預測不同。對照表格的門檻與消耗量，再按「再產生一題」試一次。')
+        : searched ? '先選出達到門檻且消耗量最小的一組，再核對。' : '先選一個測試編號並查詢，再回到「全部」預測。';
+      const comparison = best.length ? `有效且最省資源的是 ${best.map(item => item.id).join('、')}（消耗量 ${bestCost}）。` : '目前結果中沒有通過測試的組合。';
+      const summary = showResults && rows.length ? `共 ${rows.length} 筆；平均消耗量 ${average.toFixed(1)}。${all ? comparison : ''}` : '';
+      result.innerHTML = `<p>${mode}；本題${escapeHtml(defense.labThreshold)}為 ${threshold}，圖形數 × 筆跡寬度達到門檻才算${escapeHtml(defense.outcome)}。</p><table><caption>測試資料（消耗量＝圖形數 × 筆跡寬度）</caption><thead><tr><th>編號</th><th>圖形數</th><th>寬度</th><th>${escapeHtml(defense.outcome)}</th><th>消耗量</th></tr></thead><tbody>${rows.map(item => `<tr><td>${item.id}</td><td>${item.count}</td><td>${item.width}</td><td>${item.blocked ? '是' : '否'}</td><td>${showResults ? cost(item) : '？'}</td></tr>`).join('')}</tbody></table><p>${summary}${feedback}</p>`;
     };
     section.querySelector('#g7-data-run').addEventListener('click', () => run());
     section.querySelector('#g7-data-new').addEventListener('click', newCase);
@@ -212,9 +252,7 @@
       records = demoRecords.map(item => ({ ...item }));
       threshold = 15;
       mode = '固定示範';
-      query.value = 'all';
-      prediction.value = '';
-      run(false);
+      resetCase(true);
     });
     newCase();
   }
@@ -235,6 +273,11 @@
     const prediction = section.querySelector('#g8-search-prediction');
     const predictionLabel = section.querySelector('#g8-search-prediction-label');
     const reason = section.querySelector('#g8-search-reason');
+    reason.innerHTML += optionsHtml([
+      ['some', '已經比到不符合的項目'],
+      ['all', '每一項都比過，而且都不符合'],
+      ['last', '只要比過最後一個項目就好']
+    ]);
     const reasonLabel = section.querySelector('#g8-search-reason-label');
     const step = section.querySelector('#g8-search-step');
     const stop = section.querySelector('#g8-search-stop');
@@ -340,9 +383,14 @@
 
   if (page === '1150805.html') {
     const get = id => section.querySelector(`#g8-${id}`);
-    const shuffled = [3, 1, 3, 2];
-    const values = [...shuffled];
     const asList = items => `［${items.join('、')}］`;
+    const [first, second, repeated] = shuffle([2, 3, 4, 5, 6, 7]).slice(0, 3);
+    const deck = [first, second, repeated, repeated].sort((a, b) => a - b);
+    const shuffled = shuffle(deck);
+    if (shuffled.every((card, index) => card === deck[index])) shuffled.push(shuffled.shift());
+    const values = [...shuffled];
+    const counts = `${first} 和 ${second} 各一張，${repeated} 有兩張`;
+    get('shuffle-prompt').textContent = `原牌堆是 ${asList(deck)}。哪個結果保留了每張牌？`;
     const trace = [];
     let index = 0;
     let sortFinished = false;
@@ -361,12 +409,17 @@
     }
 
     const shuffleChoice = get('shuffle-choice');
+    shuffleChoice.innerHTML += optionsHtml([
+      ['extra', asList(shuffle([first, second, second, repeated]))],
+      ['valid', asList(shuffled)],
+      ['missing', asList(shuffle([first, second, repeated]))]
+    ]);
     const shuffleCheck = get('shuffle-check');
     shuffleCheck.addEventListener('click', () => {
       const feedback = {
-        extra: '總張數相同，但數字 2 多了一張，數字 3 少了一張。',
-        missing: '數字 3 原本有兩張，這裡只剩一張。',
-        valid: '正確。1 和 2 各一張，3 有兩張，與原牌堆相同。'
+        extra: `總張數相同，但數字 ${second} 多了一張，數字 ${repeated} 少了一張。`,
+        missing: `數字 ${repeated} 原本有兩張，這裡只剩一張。`,
+        valid: `正確。${counts}，與原牌堆相同。`
       };
       get('shuffle-state').textContent = feedback[shuffleChoice.value] || '請先選一個結果。';
       if (shuffleChoice.value !== 'valid') return;
@@ -408,6 +461,11 @@
     get('sort-swap').addEventListener('click', () => answerComparison(true));
     get('sort-keep').addEventListener('click', () => answerComparison(false));
     const stopChoice = get('sort-stop');
+    stopChoice.innerHTML += optionsHtml([
+      ['pair', '有一對相鄰的牌沒交換'],
+      ['round', '完整一輪都沒交換'],
+      ['equal', '遇到兩張數值相同的牌']
+    ]);
     const sortCheck = get('sort-check');
     const report = get('sort-report');
     sortCheck.addEventListener('click', () => {
@@ -419,7 +477,7 @@
       sortCheck.disabled = stopChoice.disabled = true;
       get('sort-state').textContent = '正確。完整一輪都沒交換，就可以提早停止。';
       report.value = [
-        `洗牌：［1、2、3、3］→ ${asList(shuffled)}。1 和 2 各一張，3 有兩張。`,
+        `洗牌：${asList(deck)} → ${asList(shuffled)}。${counts}。`,
         '輪次\t操作前清單\t比較的項目\t動作\t操作後清單',
         ...trace.map(row => row.join('\t')),
         '停止條件：完整一輪都沒交換，可以提早停止。'

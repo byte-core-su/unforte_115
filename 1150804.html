@@ -347,23 +347,23 @@
         // 定義 Q&A 流程與邏輯
         const Q_FLOW = [
             {
-                title: "Q1：決定要抽出「籤筒」裡的第幾支籤？",
-                desc: "A：從 1 到籤筒（全班同學清單）的總長度中，閉著眼睛隨機挑一個數字！",
-                note: "💡 提示：這就像是決定我們要摸出第幾個籤，但還沒看到籤上面寫的號碼喔！",
+                title: "抽籤前，怎麼讓清單中的每一個位置都有機會被選到？",
+                explanation: "從 1 到籤筒（全班同學清單）的總長度中，閉著眼睛隨機挑一個數字！",
+                hint: "清單每抽完一次就會變短。想想抽籤範圍的上限要跟著什麼改變。",
                 expectedPieceId: 0,
                 action: (html) => { spStaging = html; }
             },
             {
-                title: "Q2：看看這支幸運籤上面寫了什麼座號？",
-                desc: "A：把籤筒（全班同學）裡「剛剛決定好的那個位置」的籤拿出來看！",
-                note: "💡 提示：使用深橘色的清單讀取積木，把剛剛 Q1 的隨機數字裝進去。",
+                title: "手上只有位置。哪個積木能取得這個位置的座號？",
+                explanation: "把籤筒（全班同學）裡「剛剛決定好的那個位置」的籤拿出來看！",
+                hint: "位置是第幾項，座號是那一項的內容。",
                 expectedPieceId: 1,
                 action: (html) => { spStaging = html.replace('__INNER__', spStaging); }
             },
             {
-                title: "Q3：把抽到的座號抄在黑板上（記進變數）！",
-                desc: "A：把變數 [抽出座號] 的值，設定為剛剛拿出來的那支籤的號碼。",
-                note: "💡 提示：使用橘色的變數設定積木，把找到的幸運座號存起來，不然等一下就忘記啦！",
+                title: "接下來還會用到這個座號。怎麼把它保留到後面的步驟？",
+                explanation: "把變數 [抽出座號] 的值，設定為剛剛拿出來的那支籤的號碼。",
+                hint: "待會要找人、公布結果，兩次都要用同一個座號。",
                 expectedPieceId: 2,
                 action: (html) => { 
                     spLines[0] = html.replace('__INNER__', spStaging); 
@@ -371,16 +371,16 @@
                 }
             },
             {
-                title: "Q4：找出剛剛黑板上的號碼，原本是在籤筒的哪個位置？",
-                desc: "A：找出 [抽出座號] 在全班同學清單裡的「項目編號」（也就是第幾個位置）。",
-                note: "💡 提問釐清：你可能會想，位置不是在 Q1 就抽出來了嗎？\n沒錯！但因為 Q1 只是「隨機閃過一個數字」，電腦並沒有把它記下來。\n所以我們得拿著黑板上的號碼回去對照：「欸，這支籤本來排在第幾個啊？」\n<span class='text-emerald-400'>(當然，如果你一開始就多做一個變數把 Q1 的位置存起來也是可以的，這是不一樣的寫法喔！)</span>",
+                title: "變數只存了座號。怎麼知道要移除清單哪一項？",
+                explanation: "找出 [抽出座號] 在全班同學清單裡的「項目編號」（也就是第幾個位置）。",
+                hint: "刪掉前面的候選後，後面的座號可能和項次不同。",
                 expectedPieceId: 3,
                 action: (html) => { spStaging = html; }
             },
             {
-                title: "Q5：把這支籤丟掉！這樣下次就不會重複抽到了！",
-                desc: "A：刪除籤筒（全班同學）裡的第 [剛才找出的那個位置] 項。",
-                note: "💡 提示：把 Q4 的抽籤步驟放進 Q5 的迴圈。每抽到一人，就從候選清單刪掉他。",
+                title: "位置查到了。要怎麼讓這個人下一輪不會再被抽中？",
+                explanation: "刪除籤筒（全班同學）裡的第 [剛才找出的那個位置] 項。",
+                hint: "下一輪仍從候選清單抽。想一想候選清單應該少掉什麼。",
                 expectedPieceId: 4,
                 action: (html) => {
                     spLines[1] = html.replace('__INNER__', spStaging);
@@ -388,16 +388,16 @@
                 }
             },
             {
-                title: "Q6：大聲宣布，準備開獎動畫！",
-                desc: "A：發送廣播訊息 [抽獎]，讓其他舞台角色開始放煙火。",
-                note: "💡 提示：使用黃色的事件積木。在大型專案中，我們常透過「廣播」來通知其他角色做事。",
+                title: "其他角色也要在開獎時放煙火。怎麼通知它們？",
+                explanation: "發送廣播訊息 [抽獎]，讓其他舞台角色開始放煙火。",
+                hint: "主角知道結果時，其他角色還在等收到通知。",
                 expectedPieceId: 5,
                 action: (html) => { spLines[2] = html; }
             },
             {
-                title: "Q7：大聲唸出幸運兒的座號！",
-                desc: "A：讓電腦說出黑板上 [抽出座號] 的號碼。",
-                note: "💡 提示：最後一步囉！用紫色的外觀積木，讓主角把變數裡的值說出來。",
+                title: "最後，怎麼讓主角在畫面上公布抽到的座號？",
+                explanation: "讓電腦說出黑板上 [抽出座號] 的號碼。",
+                hint: "要顯示的是每輪變數裡的值。",
                 expectedPieceId: 6,
                 action: (html) => { spLines[3] = html; }
             }
@@ -413,7 +413,12 @@
             spStaging = null;
             spLines = [null, null, null, null];
             // 隨機打亂所有積木碎片
-            spPool = [0, 1, 2, 3, 4, 5, 6].sort(() => Math.random() - 0.5);
+            const pieces = Q_FLOW.map(question => question.expectedPieceId);
+            spPool = [];
+            while (pieces.length) {
+                const index = Math.floor(Math.random() * pieces.length);
+                spPool.push(pieces.splice(index, 1)[0]);
+            }
             renderScratchPuzzle2();
         }
 
@@ -422,22 +427,14 @@
             const currentQ = Q_FLOW[spStep];
             const fb = document.getElementById('sp-feedback');
             
-            if(pieceId === currentQ.expectedPieceId) {
-                // 答對了！
-                spPool = spPool.filter(id => id !== pieceId);
-                currentQ.action(P_HTML[pieceId]);
-                spStep++;
-                renderScratchPuzzle2();
-                
-                fb.innerHTML = '<span class="text-emerald-400 font-bold animate-[popIn_0.2s_ease-out]"><i data-lucide="check-circle-2" class="w-5 h-5 inline mr-1"></i> 選擇正確，組合成功！</span>';
-                updateIcons();
-                setTimeout(() => { if(fb) fb.innerHTML = ''; }, 1500);
-            } else {
-                // 答錯了！
-                fb.innerHTML = '<span class="text-rose-400 font-bold animate-pulse"><i data-lucide="alert-circle" class="w-5 h-5 inline mr-1"></i> 不對喔，請再看一次上方的 A (解答提示)。</span>';
-                updateIcons();
-                setTimeout(() => { if(fb) fb.innerHTML = ''; }, 2500);
+            if (pieceId !== currentQ.expectedPieceId) {
+                fb.textContent = `再試一次。${currentQ.hint}`;
+                return;
             }
+            currentQ.action(P_HTML[pieceId]);
+            spStep++;
+            renderScratchPuzzle2();
+            document.getElementById('sp-question').focus({ preventScroll: true });
         }
 
         function renderScratchPuzzle2() {
@@ -451,8 +448,8 @@
                         <div class="bg-emerald-900/40 border border-emerald-500 p-6 rounded-xl text-center mb-6 shadow-inner relative overflow-hidden">
                             <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500 rounded-full mix-blend-screen filter blur-[50px] opacity-20 pointer-events-none"></div>
                             <i data-lucide="party-popper" class="w-12 h-12 text-emerald-400 mx-auto mb-3 animate-bounce"></i>
-                            <h4 class="text-emerald-400 font-bold text-2xl mb-2">抽籤步驟排好了</h4>
-                            <p class="text-emerald-200 text-sm">你排對了抽籤步驟。看看每抽到一人後，候選清單和已選清單各怎麼變。</p>
+                            <h4 id="sp-question" tabindex="-1" class="text-emerald-400 font-bold text-2xl mb-2">抽籤步驟排好了</h4>
+                            <p class="text-emerald-200 text-sm">${Q_FLOW.at(-1).explanation}</p>
                         </div>
                         <div class="text-slate-400 text-xs font-bold mb-2 flex items-center gap-1.5"><i data-lucide="code-2" class="w-4 h-4"></i> 完整程式積木：</div>
                         <div class="bg-[#F9F9F9] p-6 rounded-xl border border-slate-200 shadow-inner overflow-x-auto custom-scrollbar w-full">
@@ -485,9 +482,8 @@
                         <div class="bg-indigo-950/60 border border-indigo-800 p-5 rounded-xl shadow-inner relative overflow-hidden h-full">
                             <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500 rounded-full mix-blend-screen filter blur-[40px] opacity-20 pointer-events-none"></div>
                             <div class="text-indigo-300 font-bold mb-2 tracking-widest text-[10px] uppercase bg-indigo-900/80 inline-block px-2 py-0.5 rounded border border-indigo-700">Step ${spStep + 1} / 7</div>
-                            <h5 class="text-white font-bold text-lg mb-2 relative z-10 leading-snug">${currentQ.title}</h5>
-                            <div class="text-emerald-400 text-sm font-bold mb-3 relative z-10 bg-emerald-950/40 p-2.5 rounded-lg border border-emerald-900/50">${currentQ.desc}</div>
-                            ${currentQ.note ? `<div class="bg-indigo-900/40 p-3 rounded-lg text-indigo-200 text-xs leading-relaxed border border-indigo-700/50 relative z-10">${currentQ.note.replace(/\n/g, '<br>')}</div>` : ''}
+                            <h5 id="sp-question" tabindex="-1" class="text-white font-bold text-lg relative z-10 leading-snug">${currentQ.title}</h5>
+                            ${spStep ? `<p class="text-emerald-300 text-sm mt-3">上一題：${Q_FLOW[spStep - 1].explanation}</p>` : ''}
                         </div>
                     </div>
 
@@ -496,12 +492,12 @@
                         <div class="text-slate-400 text-xs font-bold mb-2 flex items-center gap-1.5"><i data-lucide="mouse-pointer-click" class="w-4 h-4"></i> 請從下方點擊選出對應的積木碎片：</div>
                         <div class="flex flex-wrap gap-3 p-5 bg-slate-900 rounded-xl border border-slate-700 min-h-[160px] content-start shadow-inner flex-1">
                             ${spPool.map(id => `
-                                <div onclick="clickScratchPoolItem(${id})" class="cursor-pointer hover:scale-[1.03] hover:-translate-y-0.5 transition-all shadow-md active:scale-95 w-max">
+                                <button type="button" onclick="clickScratchPoolItem(${id})" class="cursor-pointer hover:scale-[1.03] hover:-translate-y-0.5 transition-all shadow-md active:scale-95 w-max">
                                     ${P_POOL_HTML[id]}
-                                </div>
+                                </button>
                             `).join('')}
                         </div>
-                        <div id="sp-feedback" class="h-6 mt-2 text-sm text-center"></div>
+                        <p id="sp-feedback" role="status" class="min-h-6 mt-2 text-sm text-amber-300"></p>
                     </div>
                 </div>
 
@@ -668,46 +664,34 @@
 
             const indexOfItem = classList.indexOf(selectedItem);
             const modal = document.getElementById('sim-modal-overlay');
-            
-            statusEl.innerHTML = `<span class="text-indigo-400 flex flex-col items-center justify-center gap-1 text-sm"><span>請核對右側面板的比對結果，確認後執行刪除。</span></span>`;
-            
-            modal.className = "absolute bottom-5 left-5 right-5 z-50 animate-[slideUpFade_0.3s_ease-out]";
+            highlightedIndex = -1;
+            renderClassListUI();
+            statusEl.textContent = `抽到座號 ${selectedItem}。請在候選清單找出它的項次。`;
+            modal.className = 'shrink-0 pt-3';
             modal.innerHTML = `
-                <div class="bg-slate-800/95 backdrop-blur-md border border-indigo-500/70 rounded-2xl p-4 sm:p-5 shadow-[0_10px_40px_rgba(0,0,0,0.5)] flex flex-col gap-4 w-full max-w-3xl mx-auto">
-                    <!-- 上方資訊區 -->
-                    <div class="text-center w-full pb-3 border-b border-slate-700/50">
-                        <h3 class="text-base sm:text-lg font-bold text-white flex items-center justify-center gap-1.5 mb-2">
-                            <i data-lucide="search" class="w-5 h-5 text-indigo-400"></i> 抽籤結果比對
-                        </h3>
-                        <p class="text-xs sm:text-sm text-indigo-200">
-                            已抽出數值 <strong class="text-amber-400 text-sm mx-1">${selectedItem}</strong>，對照上方亮起的位置，確認它在清單的第 <strong class="text-[#FF661A] text-base mx-0.5">${indexOfItem + 1}</strong> 項。
-                        </p>
+                <form id="draw-delete-form" class="rounded-xl border border-indigo-500/70 bg-slate-800 p-3">
+                    <label for="draw-delete-position" class="block text-sm font-bold text-indigo-100">
+                        座號 <strong class="text-amber-300">${selectedItem}</strong> 在目前清單的第幾項？
+                    </label>
+                    <div class="mt-2 flex flex-wrap items-center gap-2">
+                        <input id="draw-delete-position" type="number" min="1" max="${classList.length}" step="1" required class="w-24 rounded-lg px-3 py-2 text-slate-900">
+                        <button type="submit" class="rounded-lg bg-emerald-600 hover:bg-emerald-500 px-4 py-2 text-sm font-bold text-white">核對並刪除</button>
                     </div>
-                    
-                    <!-- 下方數值對照與按鈕區 -->
-                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 w-full pt-1">
-                        <div class="flex items-center justify-center gap-4 bg-slate-900/80 px-6 py-2.5 rounded-xl border border-slate-700 shadow-inner w-full sm:w-auto">
-                            <div class="flex flex-col items-center">
-                                <span class="text-[10px] sm:text-xs text-slate-400 font-bold mb-1 tracking-wider">變數 [抽出座號]</span>
-                                <span class="text-3xl font-black text-amber-400 leading-none">${selectedItem}</span>
-                            </div>
-                            <i data-lucide="arrow-right" class="w-5 h-5 text-slate-500"></i>
-                            <div class="flex flex-col items-center">
-                                <span class="text-[10px] sm:text-xs text-slate-400 font-bold mb-1 tracking-wider">清單項目編號</span>
-                                <span class="text-3xl font-black text-[#FF661A] leading-none">${indexOfItem + 1}</span>
-                            </div>
-                        </div>
-
-                        <button id="modal-confirm-btn" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 sm:py-3 px-6 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm shrink-0">
-                            <i data-lucide="trash-2" class="w-5 h-5"></i> 確認刪除
-                        </button>
-                    </div>
-                </div>
-            `;
-            updateIcons();
-
+                    <p id="draw-delete-feedback" role="status" class="min-h-5 mt-2 text-sm text-amber-300"></p>
+                </form>`;
+            const positionInput = document.getElementById('draw-delete-position');
+            positionInput.focus();
             await new Promise(resolve => {
-                document.getElementById('modal-confirm-btn').onclick = resolve;
+                document.getElementById('draw-delete-form').addEventListener('submit', event => {
+                    event.preventDefault();
+                    if (Number(positionInput.value) === indexOfItem + 1) {
+                        resolve();
+                        return;
+                    }
+                    document.getElementById('draw-delete-feedback').textContent = '這個項次的座號不同。找到抽中的座號，再讀取卡片左上角的項次。';
+                    positionInput.focus();
+                    positionInput.select();
+                });
             });
 
             modal.className = 'hidden';
@@ -720,7 +704,7 @@
             
             renderClassListUI();
 
-            statusEl.innerHTML = `<span class="text-emerald-400">抽到座號 <strong>${selectedItem}</strong>，已從候選清單移除。</span><br><span class="text-xs text-slate-400 mt-1 block">候選 ${classList.length} 人，已選 ${drawnCount} 人。</span>`;
+            statusEl.innerHTML = `<span class="text-emerald-400">抽到座號 <strong>${selectedItem}</strong>，已從候選清單的第 ${indexOfItem + 1} 項移除。</span><br><span class="text-xs text-slate-400 mt-1 block">候選 ${classList.length} 人，已選 ${drawnCount} 人。</span>`;
             
             btnCreate.disabled = false;
             btnCreate.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -793,7 +777,7 @@
                             </div>
                         </div>
                         
-                        <div id="class-list-container" class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-6 xl:grid-cols-10 gap-2 flex-1 items-start content-start overflow-y-auto custom-scrollbar pr-1 pb-24 relative z-10">
+                        <div id="class-list-container" class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-6 xl:grid-cols-10 gap-2 flex-1 items-start content-start overflow-y-auto custom-scrollbar pr-1 relative z-10">
                             <!-- JS 動態產生方塊 -->
                         </div>
 

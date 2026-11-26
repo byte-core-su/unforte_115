@@ -84,6 +84,14 @@
   }
 
   function mount(root, task, { draft, onSave } = {}) {
+    const palette = Object.entries(task.blocks);
+    if (task.shufflePalette) {
+      for (let i = palette.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [palette[i], palette[j]] = [palette[j], palette[i]];
+      }
+      if (palette.every(([id], index) => id === task.goal[index])) palette.push(palette.shift());
+    }
     const program = Array.isArray(draft?.blocks)
       ? [...new Set(draft.blocks.filter(id => typeof id === 'string' && Object.hasOwn(task.blocks, id)))]
       : [];
@@ -103,7 +111,7 @@
       <p data-program-input></p>
       <div class="block-program__workspace">
         <div><h4 data-program-palette-heading tabindex="-1">積木區</h4><button type="button" class="block-program__jump" data-program-jump="work">前往程式區</button><div class="block-program__palette">${Object.entries(categories).map(([category, name]) => {
-          const group = Object.entries(task.blocks).filter(([, block]) => block.view[0] === category);
+          const group = palette.filter(([, block]) => block.view[0] === category);
           return group.length ? `<div class="block-program__category is-${category}"><h5>${name}</h5>
             ${group.map(([id, block]) => `<button type="button" class="block-program__grab" data-program-add="${id}" draggable="true">${blockMarkup(block.view)}</button>`).join('')}</div>` : '';
         }).join('')}</div></div>
@@ -219,13 +227,13 @@
       const order = sameOrder ? '積木順序與參考程式一致。' :
         allPassed ? '積木順序與參考程式不同，但所有測試都通過。' :
         missing.length ? `請確認是否缺少：${missing.map(id => textLabel(task.blocks[id].view[2])).join('、')}。` :
-        '請對照參考程式，檢查積木放置順序。';
+        task.shufflePalette ? '看下方哪組資料先出錯，再檢查積木順序。' : '請對照參考程式，檢查積木放置順序。';
       feedback.textContent = allPassed ? '所有測試都通過。' : '有測試未通過，請查看下方結果。';
+      const reference = !task.shufflePalette || allPassed ? `<details class="lesson-reference"><summary>查看參考積木順序</summary><ol>${task.goal.map(id =>
+        `<li>${blockMarkup(task.blocks[id].view)}</li>`).join('')}</ol></details>` : '';
       comparison.innerHTML = `<p>${escape(order)}</p><ul>${results.map(({ name, result }) =>
         `<li><strong>${escape(name)}｜${result.passed ? '通過' : '再檢查'}</strong>
-          ${escape(summary(result))}</li>`).join('')}</ul>
-        <details class="lesson-reference"><summary>查看參考積木順序</summary><ol>${task.goal.map(id =>
-          `<li>${blockMarkup(task.blocks[id].view)}</li>`).join('')}</ol></details>`;
+          ${escape(summary(result))}</li>`).join('')}</ul>${reference}`;
     }
 
     let drag;

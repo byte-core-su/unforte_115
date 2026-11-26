@@ -44,7 +44,7 @@ for (const page of pages) {
   if (page === '1150801.html') {
     const { tool, chip, pack } = CourseScenarios.active.inventory.items;
     assert.deepEqual(Array.from(entry.items), [tool.label, chip.label, pack.label]);
-    assert.equal(entry.correct, 1);
+    assert.ok([0, 1].includes(entry.correct), "only an earlier list entry may be requested");
     assert.equal(entry.choices, undefined);
   } else {
     assert.equal(entry, undefined, `${page}: students can start directly`);
