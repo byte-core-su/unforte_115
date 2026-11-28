@@ -7,8 +7,8 @@ const window = {};
 for (const file of ['block-program-tasks.js', 'block-program.js']) {
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', file), 'utf8'), { window, AbortController });
 }
-const execute = (task, program, input) => window.BlockProgram.execute(task, program, input, task.variables);
-const compare = (task, program) => window.BlockProgram.compare(task, program, task.variables);
+const execute = (task, program, input) => window.BlockProgram.execute(task, program, input, task.variables, task.branch?.solution);
+const compare = (task, program) => window.BlockProgram.compare(task, program, task.variables, task.branch?.solution);
 const keys = {
   '1150701.html': ['flag','move'], '1150702.html': ['calculate','branch','loop','report'],
   '1150703.html': ['pen','draw'], '1150704.html': ['start','update','draw'],
@@ -83,6 +83,74 @@ test('comparison reports every case, missing blocks, and valid alternative order
   assert.equal(misplaced.results[0].result.passed, true);
   assert.match(misplaced.results[2].result.error, /除以 0/);
   assert.deepEqual(Array.from(compare(statistics, ['reset', 'sum', 'average']).missing), ['guard']);
+});
+
+test('both grade seven conditional programs evaluate the result blocks placed by the learner', () => {
+  for (const task of [window.BlockProgramPractice['sel-block-program'], window.BlockProgramTasks['1150702.html']]) {
+    const check = choices => window.BlockProgram.compare(task, task.goal, task.variables, choices);
+    for (const choices of [undefined, [null, null], ['qualified', null], ['qualified', 'qualified']]) {
+      const incomplete = check(choices);
+      assert.equal(incomplete.sameOrder, false);
+      assert.ok(incomplete.results.every(({ result }) => /各放入一塊/.test(result.error)));
+    }
+    const swapped = check(['unqualified', 'qualified']);
+    assert.equal(swapped.sameOrder, false);
+    assert.deepEqual(Array.from(swapped.results, ({ result }) => result.passed), [false, false]);
+    assert.match(swapped.results[0].result.text, /未及格/);
+    assert.match(swapped.results[1].result.text, /｜及格/);
+    assert.ok(check(task.branch.solution).results.every(({ result }) => result.passed));
+  }
+});
+
+test('branch placement starts empty on old drafts, can be fixed, and survives reload', async () => {
+  const task = window.BlockProgramPractice['sel-block-program'];
+  let draft = { blocks: task.goal, variables: task.variables };
+  function mount() {
+    const nodes = new Map();
+    const events = new Map();
+    const flags = new Set();
+    const get = selector => {
+      if (!nodes.has(selector)) nodes.set(selector, { value: '0', focus() {}, addEventListener() {}, replaceChildren() {} });
+      return nodes.get(selector);
+    };
+    get('[data-program-script]').querySelector = get;
+    get('[data-program-variable-form]').querySelector = get;
+    const root = {
+      querySelector: get, querySelectorAll: () => [],
+      addEventListener: (name, listener) => events.set(name, listener),
+      toggleAttribute: (name, state) => state ? flags.add(name) : flags.delete(name),
+      removeAttribute: name => flags.delete(name)
+    };
+    window.BlockProgram.mount(root, task, { draft, onSave: saved => { draft = saved; } });
+    const click = (dataset, attribute) => events.get('click')({ target: {
+      closest: () => ({ dataset, hasAttribute: name => name === attribute })
+    } });
+    const script = () => get('[data-program-script]').innerHTML;
+    const comparison = () => get('[data-program-comparison]').innerHTML;
+    const check = () => click({}, 'data-program-compare');
+    const place = async (id, slot) => {
+      await click({ programOutcome: id });
+      await click({ programBranchSlot: String(slot) });
+    };
+    return { flags, script, comparison, check, place };
+  }
+  const ui = mount();
+  assert.equal((ui.script().match(/放入結果積木/g) || []).length, 2);
+  await ui.check();
+  assert.equal(ui.flags.has('data-program-passed'), false);
+  await ui.place('unqualified', 0);
+  await ui.place('qualified', 1);
+  await ui.check();
+  assert.equal(ui.flags.has('data-program-passed'), false);
+  assert.doesNotMatch(ui.comparison(), /查看參考積木順序/);
+  const reopened = mount();
+  assert.match(reopened.script(), /那麼：變數 結果 設為 未及格/);
+  await reopened.place('qualified', 0);
+  assert.deepEqual(Array.from(draft.branchChoices), ['qualified', null]);
+  await reopened.place('unqualified', 1);
+  await reopened.check();
+  assert.equal(reopened.flags.has('data-program-passed'), true);
+  assert.match(reopened.comparison(), /查看參考積木順序/);
 });
 
 test('variable dependencies are enforced by execution and comparison', () => {

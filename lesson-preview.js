@@ -257,7 +257,7 @@
     const config = previews[page];
     if (!task || !config || !window.BlockProgram) return null;
     const [standardSeconds, storyboard] = config;
-    const runs = task.cases.map(({ values }) => window.BlockProgram.execute(task, task.goal, values, task.variables));
+    const runs = task.cases.map(({ values }) => window.BlockProgram.execute(task, task.goal, values, task.variables, task.branch?.solution));
     if (runs.some(run => run.error || !run.passed)) return null;
     const frames = storyboard(runs, task);
     const chapters = [...new Set(frames.map(({ chapter }) => chapter).filter(Boolean))];

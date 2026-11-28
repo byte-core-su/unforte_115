@@ -8,12 +8,12 @@
 
   const declarationMessage = names => '請先新增變數：' + names.join('、') + '。';
 
-  function execute(task, program, input, variables = []) {
+  function execute(task, program, input, variables = [], branchChoices) {
     const state = { input, rows: [], text: '' };
     const run = ids => {
       for (const id of ids) {
         if (state.stopped) break;
-        task.blocks[id].run(state);
+        task.blocks[id].run(state, branchChoices);
       }
     };
     try {
@@ -78,9 +78,14 @@
       <span class="block-program__tile is-${category} block-program__c-foot" aria-hidden="true">${label.startsWith('重複') ? '↶' : ''}</span></span>`;
   }
 
-  function compare(task, program, variables) {
-    const results = task.cases.map(({ name, values }) => ({ name, result: execute(task, program, values, variables) }));
-    const sameOrder = task.goal.length === program.length && task.goal.every((id, index) => id === program[index]);
+  const branchNames = ['那麼', '否則'];
+  const outcomeLabel = value => `變數 [結果] 設為 {${value}}`;
+  const outcomeMarkup = value => blockMarkup(['variable', 'stack', outcomeLabel(value)]);
+
+  function compare(task, program, variables, branchChoices) {
+    const results = task.cases.map(({ name, values }) => ({ name, result: execute(task, program, values, variables, branchChoices) }));
+    const sameBranch = !task.branch || task.branch.solution.every((id, index) => branchChoices?.[index] === id);
+    const sameOrder = sameBranch && task.goal.length === program.length && task.goal.every((id, index) => id === program[index]);
     const missing = task.goal.filter(id => !program.includes(id));
     return { results, sameOrder, missing };
   }
@@ -93,6 +98,7 @@
   }
 
   function mount(root, task, { draft, onSave } = {}) {
+    const branch = task.branch;
     const palette = Object.entries(task.blocks);
     const variableNames = task.variables || [];
     const savedVariables = Array.isArray(draft?.variables) ? draft.variables : [];
@@ -107,6 +113,11 @@
     const program = Array.isArray(draft?.blocks)
       ? [...new Set(draft.blocks.filter(id => typeof id === 'string' && Object.hasOwn(task.blocks, id)))]
       : [];
+    const branchChoices = branchNames.map((_, index) => {
+      const id = draft?.branchChoices?.[index];
+      return branch && program.includes(branch.id) && typeof id === 'string' && Object.hasOwn(branch.outcomes, id) ? id : null;
+    });
+    if (branchChoices[0] === branchChoices[1]) branchChoices[1] = null;
     const runs = Array.isArray(draft?.runs) ? draft.runs.filter(entry =>
       typeof entry?.key === 'string' && entry.key.length <= 1000 &&
       typeof entry.text === 'string' && entry.text.length <= 16000).slice(-8) : [];
@@ -140,7 +151,10 @@
           const group = palette.filter(([, block]) => block.view[0] === category);
           return group.length ? `<div class="block-program__category is-${category}"><h5>${name}</h5>
             ${group.map(([id, block]) => `<button type="button" class="block-program__grab" data-program-add="${id}" draggable="true">${blockMarkup(block.view)}</button>`).join('')}</div>` : '';
-        }).join('')}</div></div>
+        }).join('')}${branch ? `<div class="block-program__category is-variable"><h5>分支結果</h5>
+          <p>拖入分支，或先點結果積木，再點放置位置。</p>
+          ${Object.entries(branch.outcomes).map(([id, label]) => `<button type="button" class="block-program__grab" data-program-outcome="${id}" draggable="true" disabled aria-pressed="false">${outcomeMarkup(label)}</button>`).join('')}
+        </div>` : ''}</div></div>
         <div data-program-work><h4 tabindex="-1">程式區・積木放置區</h4>
         <button type="button" class="block-program__jump" data-program-jump="palette">回到積木區</button>
         ${task.loop ? `<p>初始化後，後續積木會放在「重複 ${task.loop.times} 次」中。</p>` : ''}
@@ -181,11 +195,13 @@
     const selected = () => task.cases[Number(caseSelect.value)];
     const currentInput = () => ({ ...selected().values,
       ...Object.fromEntries(inputs.map(field => [field.dataset.programValue, field.valueAsNumber])) });
+    const runKey = input => JSON.stringify(branch ? [program, input, branchChoices] : [program, input]);
     const variableForm = variableNames.length ? root.querySelector('[data-program-variable-form]') : null;
 
     function saveDraft() {
       onSave?.({
         blocks: program, caseIndex: Number(caseSelect.value), runs, variables: [...declared],
+        ...(branch ? { branchChoices: [...branchChoices] } : {}),
         fields: Object.fromEntries(inputs.map(input => [input.dataset.programValue, input.value]))
       });
     }
@@ -211,6 +227,9 @@
       const missing = missingVariables(task, task.goal, declared);
       if (missing.length) return show(declarationMessage(missing));
       if (!program.length) return show('先從積木區加入積木。');
+      if (branch && program.includes(branch.id) && branchChoices.includes(null)) {
+        return show('把兩塊「分支結果」積木分別放入「那麼」和「否則」。');
+      }
       if (checked === false) return show('看下方的比對結果，修正積木後再檢查。');
       if (result && !result.passed && checked !== true) return show('看下方結果，調整積木或測試資料，再按「執行本組」重試。', 'run');
       if (!result && checked === undefined && task.goal.some(id => !program.includes(id))) {
@@ -220,7 +239,7 @@
       const count = compareEdits ? runs.length : inputsRun.size;
       const needsMore = count < runTarget && (checked !== true || runTarget > 1 || copyMode);
       const input = currentInput();
-      const trialKey = JSON.stringify([program, input]);
+      const trialKey = runKey(input);
       const inputKey = JSON.stringify(input);
       const triedHere = runs.some(entry => entry.key === trialKey);
       const alreadyTried = compareEdits ? triedHere : inputsRun.has(inputKey);
@@ -258,10 +277,12 @@
 
     // 點選交換：先點一塊（標示為已選），再點另一塊就互換位置；再點同一塊取消。
     let picked = null;
+    let pickedOutcome = null;
 
     function invalidate(message = '') {
       root.removeAttribute('data-program-passed');
       picked = null;
+      pickedOutcome = null;
       checked = undefined;
       stopAudio();
       result = undefined;
@@ -278,6 +299,14 @@
       const rows = program.map((id, index) =>
         `<li data-program-row="${index}" class="block-program__row">
           <button type="button" class="block-program__grab block-program__pick${picked === index ? ' is-picked' : ''}" data-program-drag="${index}" data-program-pick="${index}" draggable="true" aria-pressed="${picked === index}" aria-keyshortcuts="Delete Backspace" aria-label="第 ${index + 1} 塊：${escape(textLabel(task.blocks[id].view[2]))}。${picked === null ? '點選後，再點另一塊即可交換位置' : picked === index ? '已選取，再點一次取消' : `點這裡與第 ${picked + 1} 塊交換`}。鍵盤可按 Delete 移除">${blockMarkup(task.blocks[id].view)}</button>
+          ${id === branch?.id ? `<div class="block-program__c is-control block-program__branch">
+            ${branchNames.map((name, slot) => `<div class="block-program__c-body">
+              <span>${name}</span>
+              <button type="button" data-program-branch-slot="${slot}" aria-keyshortcuts="Delete Backspace"
+                aria-label="${name}：${branchChoices[slot] ? escape(textLabel(outcomeLabel(branch.outcomes[branchChoices[slot]]))) : '空的放置位置'}">
+                ${branchChoices[slot] ? outcomeMarkup(branch.outcomes[branchChoices[slot]]) : '放入結果積木'}
+              </button>
+            </div>`).join('')}</div>` : ''}
         </li>`);
       if (task.loop && rows.length > task.loop.before.length) {
         const split = task.loop.before.length;
@@ -295,6 +324,11 @@
         button.draggable = !button.disabled;
         button.title = missing.length ? declarationMessage(missing) : '';
       }
+      if (branch) for (const button of root.querySelectorAll('[data-program-outcome]')) {
+        button.disabled = !program.includes(branch.id);
+        button.draggable = !button.disabled;
+        button.setAttribute('aria-pressed', String(pickedOutcome === button.dataset.programOutcome));
+      }
     }
 
     function checkVariables() {
@@ -310,17 +344,21 @@
         feedback.textContent = '先加入積木，再比對檢查。';
         return;
       }
-      const { results, sameOrder, missing } = compare(task, program, declared);
+      const { results, sameOrder, missing } = compare(task, program, declared, branchChoices);
       const allPassed = results.every(({ result }) => result.passed);
       checked = allPassed;
       root.toggleAttribute('data-program-passed', allPassed);
       const order = sameOrder ? '積木順序與參考程式一致。' :
         allPassed ? '積木順序與參考程式不同，但所有測試都通過。' :
         missing.length ? `請確認是否缺少：${missing.map(id => textLabel(task.blocks[id].view[2])).join('、')}。` :
+        branch ? '看下方兩組的結果，檢查「那麼」和「否則」放的積木。' :
         task.shufflePalette ? '看下方哪組資料先出錯，再檢查積木順序。' : '請對照參考程式，檢查積木放置順序。';
       feedback.textContent = allPassed ? '所有測試都通過。' : '有測試未通過，請查看下方結果。';
-      const reference = !task.shufflePalette || allPassed ? `<details class="lesson-reference"><summary>查看參考積木順序</summary><ol>${task.goal.map(id =>
-        `<li>${blockMarkup(task.blocks[id].view)}</li>`).join('')}</ol></details>` : '';
+      const reference = allPassed || (!task.shufflePalette && !branch) ? `<details class="lesson-reference"><summary>查看參考積木順序</summary><ol>${task.goal.map(id => {
+        const view = task.blocks[id].view;
+        const complete = id === branch?.id ? [...view, ...branch.solution.map(choice => [['variable', outcomeLabel(branch.outcomes[choice])]])] : view;
+        return `<li>${blockMarkup(complete)}</li>`;
+      }).join('')}</ol></details>` : '';
       comparison.innerHTML = `<p>${escape(order)}</p><ul>${results.map(({ name, result }) =>
         `<li><strong>${escape(name)}｜${result.passed ? '通過' : '再檢查'}</strong>
           ${escape(summary(result))}</li>`).join('')}</ul>${reference}`;
@@ -334,12 +372,22 @@
     }
 
     function removeBlock(index) {
+      if (program[index] === branch?.id) branchChoices.fill(null);
       program.splice(index, 1);
       saveEdit('已移除積木。');
     }
 
+    function placeOutcome(id, slot) {
+      if (!branch || !program.includes(branch.id) || !Object.hasOwn(branch.outcomes, id) || !branchNames[slot]) return;
+      const previous = branchChoices.indexOf(id);
+      if (previous >= 0) branchChoices[previous] = null;
+      branchChoices[slot] = id;
+      saveEdit(`已將「${branch.outcomes[id]}」放入「${branchNames[slot]}」。`);
+    }
+
     function clearDrop() {
       script.querySelectorAll('[data-drop]').forEach(row => row.removeAttribute('data-drop'));
+      if (branch) script.querySelectorAll('[data-branch-drop]').forEach(slot => slot.removeAttribute('data-branch-drop'));
       script.classList.remove('is-drop-end');
       work.classList.remove('is-drop-outside');
     }
@@ -351,6 +399,10 @@
     }
     function showDrop(drag, target, y) {
       clearDrop();
+      if (drag.outcome) {
+        if (work.contains(target)) target.closest('[data-program-branch-slot]')?.setAttribute('data-branch-drop', '');
+        return;
+      }
       if (!work.contains(target)) {
         if (drag.index !== undefined) work.classList.add('is-drop-outside');
         return;
@@ -362,6 +414,11 @@
     }
     function finishDrop(drag, target, y) {
       if (!target) return false;
+      if (drag.outcome) {
+        const slot = work.contains(target) && target.closest('[data-program-branch-slot]');
+        if (slot) placeOutcome(drag.outcome, Number(slot.dataset.programBranchSlot));
+        return Boolean(slot);
+      }
       if (!work.contains(target)) {
         if (drag.index === undefined) return false;
         removeBlock(drag.index);
@@ -383,25 +440,27 @@
 
     let touch;
     root.addEventListener('dragstart', event => {
-      const source = event.target.closest('[data-program-add], [data-program-drag]');
+      const source = event.target.closest('[data-program-add], [data-program-drag], [data-program-outcome]');
       if (!source || source.disabled) return;
       if (touch?.source === source) { event.preventDefault(); return; }
-      const { programAdd, programDrag } = source.dataset;
+      const { programAdd, programDrag, programOutcome } = source.dataset;
       if (programAdd && missingVariables(task, [programAdd], declared).length) return;
-      const drag = programAdd ? { id: programAdd } : { index: Number(programDrag) };
+      const drag = programOutcome ? { outcome: programOutcome } : programAdd ? { id: programAdd } : { index: Number(programDrag) };
       const page = root.ownerDocument;
       const listeners = new AbortController();
       const options = { capture: true, signal: listeners.signal };
       const stop = () => { listeners.abort(); clearDrop(); };
       // Accept drops elsewhere on this page so that cancelling the native drag never deletes a block.
-      const accepts = target => source.isConnected && !source.disabled && (!programAdd || work.contains(target));
-      event.dataTransfer.effectAllowed = programAdd ? 'copy' : 'move';
-      event.dataTransfer.setData('text/plain', programAdd || programDrag);
+      const accepts = target => source.isConnected && !source.disabled && (programOutcome
+        ? work.contains(target) && target.closest('[data-program-branch-slot]') : !programAdd || work.contains(target));
+      const effect = programAdd || programOutcome ? 'copy' : 'move';
+      event.dataTransfer.effectAllowed = effect;
+      event.dataTransfer.setData('text/plain', programOutcome || programAdd || programDrag);
       page.addEventListener('dragover', event => {
         showDrop(drag, event.target, event.clientY);
         if (!accepts(event.target)) return;
         event.preventDefault();
-        event.dataTransfer.dropEffect = programAdd ? 'copy' : 'move';
+        event.dataTransfer.dropEffect = effect;
       }, options);
       page.addEventListener('drop', event => {
         stop();
@@ -491,7 +550,7 @@
       if (!checkVariables()) return;
       if (inputs.some(input => !input.reportValidity())) return;
       const input = currentInput();
-      result = execute(task, program, input, declared);
+      result = execute(task, program, input, declared, branchChoices);
       feedback.textContent = result.error || (result.passed ? '這組測試通過。' : '結果還未達標，請檢查積木與順序。');
       stage.innerHTML = `<p></p>${graph(result)}${result.rows.length ?
         `<div class="block-program__table"><table><thead><tr>${task.columns.map(label => `<th scope="col">${label}</th>`).join('')}</tr></thead>
@@ -505,12 +564,18 @@
           root.querySelector('[data-program-input]').textContent,
           declared.size ? '已建立的變數：' + [...declared].join('、') : '',
           task.loop ? `前 ${task.loop.before.length} 塊執行一次，後續積木重複 ${task.loop.times} 次。` : '',
-          ...program.map((id, index) => `${index + 1}. ${textLabel(task.blocks[id].view[2])}`),
+          ...program.flatMap((id, index) => {
+            const line = `${index + 1}. ${textLabel(task.blocks[id].view[2])}`;
+            return id === branch?.id ? [line, ...branchNames.map((name, slot) => {
+              const outcome = branch.outcomes[branchChoices[slot]];
+              return `   ${name}：${outcome === undefined ? '（空白）' : textLabel(outcomeLabel(outcome))}`;
+            })] : [line];
+          }),
           summary(result),
           task.columns.join('｜'),
           ...result.rows.map(row => row.join('｜'))
         ].filter(Boolean).join('\n');
-        const key = JSON.stringify([program, input]);
+        const key = runKey(input);
         const prior = runs.findIndex(entry => entry.key === key);
         if (prior >= 0) runs.splice(prior, 1);
         runs.push({ key, inputKey: JSON.stringify(input), passed: result.passed === true, text: currentReport });
@@ -525,8 +590,24 @@
     root.addEventListener('click', async event => {
       const button = event.target.closest('button');
       if (!button || button.disabled) return;
-      const { programAdd, programPick } = button.dataset;
+      const { programAdd, programPick, programOutcome, programBranchSlot } = button.dataset;
+      if (programOutcome) {
+        picked = null;
+        pickedOutcome = pickedOutcome === programOutcome ? null : programOutcome;
+        render();
+        feedback.textContent = pickedOutcome ? `已選「${branch.outcomes[pickedOutcome]}」，點「那麼」或「否則」的放置位置。` : '已取消選取。';
+        if (pickedOutcome && event.detail === 0) script.querySelector('[data-program-branch-slot="0"]')?.focus();
+        return;
+      }
+      if (programBranchSlot !== undefined) {
+        if (pickedOutcome) {
+          placeOutcome(pickedOutcome, Number(programBranchSlot));
+          script.querySelector(`[data-program-branch-slot="${programBranchSlot}"]`)?.focus({ preventScroll: true });
+        } else feedback.textContent = '先從積木區選一塊「分支結果」積木。';
+        return;
+      }
       if (programPick !== undefined) {
+        pickedOutcome = null;
         const target = Number(programPick);
         if (picked === null) {
           picked = target;
@@ -553,13 +634,24 @@
       else if (button.hasAttribute('data-program-compare')) showComparison();
       else if (button.hasAttribute('data-program-reset')) {
         program.length = 0;
+        branchChoices.fill(null);
         saveEdit('已清空積木。');
       } else if (button === copy) await copyReport(currentReport);
       else if (button === copyAll) await copyReport(allReports());
     });
     root.addEventListener('keydown', event => {
-      const focused = event.target.dataset.programPick;
-      if ((event.key === 'Delete' || event.key === 'Backspace') && focused !== undefined) {
+      const { programPick: focused, programBranchSlot: slot } = event.target.dataset;
+      const deleting = event.key === 'Delete' || event.key === 'Backspace';
+      if (deleting && slot !== undefined) {
+        event.preventDefault();
+        if (branchChoices[slot]) {
+          branchChoices[slot] = null;
+          saveEdit('已移除分支結果積木。');
+          script.querySelector(`[data-program-branch-slot="${slot}"]`)?.focus({ preventScroll: true });
+        }
+        return;
+      }
+      if (deleting && focused !== undefined) {
         event.preventDefault();
         const index = Number(focused);
         const id = program[index];
@@ -568,8 +660,9 @@
           root.querySelector(`[data-program-add="${id}"]`)).focus({ preventScroll: true });
         return;
       }
-      if (event.key !== 'Escape' || picked === null) return;
+      if (event.key !== 'Escape' || (picked === null && pickedOutcome === null)) return;
       picked = null;
+      pickedOutcome = null;
       render();
       if (focused !== undefined) script.querySelector(`[data-program-pick="${focused}"]`)?.focus();
       feedback.textContent = '已取消選取。';

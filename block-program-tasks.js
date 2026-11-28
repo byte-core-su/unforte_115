@@ -65,10 +65,6 @@
       if (!state.scores) throw new Error('請先讀取三項成績。');
       state.score = weightedScore(state.scores);
     },
-    choose: state => {
-      if (state.score === undefined) throw new Error('請先算出總分，再判斷是否及格。');
-      state.outcome = state.score >= 60 ? '及格' : '未及格';
-    },
     report: state => {
       if (!state.outcome) throw new Error('請先判斷結果，再顯示總分和是否及格。');
       state.text = `總分 ${state.score}｜${state.outcome}`;
@@ -82,8 +78,6 @@
   '動手做：判斷成績是否及格', ['read', 'calculate', 'choose', 'report'], {
     read: ['variable', 'stack', '讀取 [作業]、[測驗]、[平時] 成績'],
     calculate: ['variable', 'stack', '變數 [總分] 設為 {作業 × 0.4 + 測驗 × 0.4 + 平時 × 0.2}'],
-    choose: ['control', 'ifelse', '如果 <總分 ≥ 60> 那麼',
-      [['variable', '變數 [結果] 設為 {及格}']], [['variable', '變數 [結果] 設為 {未及格}']]],
     report: ['looks', 'stack', '說出 {總分和結果}']
   });
 
@@ -153,9 +147,6 @@
 
     '1150702.html': task({
       calculate: state => { state.mean = (state.input.a + state.input.b) / 2; },
-      branch: state => {
-        if (state.mean !== undefined) state.branch = state.mean >= 60 ? '及格' : '未及格';
-      },
       loop: state => {
         state.total = 0;
         repeat(state.input.n, index => { state.total += index + 1; state.rows.push([index + 1, state.total]); });
@@ -164,7 +155,10 @@
         if (state.branch && state.total !== undefined) state.text = `平均 ${state.mean}｜${state.branch}｜1 加到 N ＝ ${state.total}`;
       }
     }, [example('及格', { a: 50, b: 70, n: 3 }), example('未及格', { a: 30, b: 60, n: 5 })],
-    state => Boolean(state.text), ['目前加到', '累計總和'],
+    state => {
+      const mean = (state.input.a + state.input.b) / 2;
+      return state.text === `平均 ${mean}｜${mean >= 60 ? '及格' : '未及格'}｜1 加到 N ＝ ${state.input.n * (state.input.n + 1) / 2}`;
+    }, ['目前加到', '累計總和'],
     [field('a', '第一個數', 0, 100), field('b', '第二個數', 0, 100), field('n', 'N', 1, 20)]),
 
     '1150703.html': task({
@@ -378,9 +372,6 @@
     '1150702.html': {
       goal: ['calculate', 'branch', 'loop', 'report'],
       calculate: ['variable', 'stack', '變數 [平均] 設為 {兩數的平均}'],
-      branch: ['control', 'ifelse', '如果 <平均 ≥ 60> 那麼',
-        [['variable', '變數 [結果] 設為 {及格}']],
-        [['variable', '變數 [結果] 設為 {未及格}']]],
       loop: ['control', 'loop', '重複 {輸入的 N} 次', [['variable', '變數 [總和] 改變 {目前的數}']]],
       report: ['looks', 'stack', '說出 {平均、結果與總和}']
     },
@@ -453,6 +444,24 @@
     task.goal = goal;
     for (const [id, view] of Object.entries(blocks)) task.blocks[id] = { run: task.blocks[id], view };
   }
+  function addBranch(config, id, score, label, resultKey) {
+    const outcomes = { unqualified: '未及格', qualified: '及格' };
+    config.branch = { id, outcomes, solution: ['qualified', 'unqualified'] };
+    config.blocks[id] = {
+      view: ['control', 'stack', `如果 <${label} ≥ 60> 那麼`],
+      run(state, choices) {
+        const value = score(state);
+        if (value === undefined) throw new Error('請先算出成績，再判斷是否及格。');
+        const [then, otherwise] = choices || [];
+        if (!Object.hasOwn(outcomes, then) || !Object.hasOwn(outcomes, otherwise) || then === otherwise) {
+          throw new Error('請在「那麼」和「否則」各放入一塊設定結果的積木。');
+        }
+        state[resultKey] = outcomes[value >= 60 ? then : otherwise];
+      }
+    };
+  }
+  addBranch(branchTask, 'choose', state => state.score, '總分', 'outcome');
+  addBranch(tasks['1150702.html'], 'branch', state => state.mean, '平均', 'branch');
   // Variable dependencies include reads inside loops, conditions and output blocks.
   declareFor(sequenceAverage, { readA: ['A'], readB: ['B'], calculate: ['A', 'B', '平均數'], report: ['平均數'] });
   declareFor(branchTask, {
