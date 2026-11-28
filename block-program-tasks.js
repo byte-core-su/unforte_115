@@ -473,7 +473,17 @@
   declareFor(tasks['1150803.html'], { reset: ['總和'], sum: ['總和'], average: ['總和'] });
   declareFor(tasks['1150804.html'], { pick: ['項次'], add: ['項次'], remove: ['項次'] });
 
-  tasks['1150802.html'].requireTwoRuns = true;
+  tasks['1150702.html'].toolbar = { runTarget: 2 };
+  tasks['1150703.html'].toolbar = { runTarget: 2, change: '換成另一個圖形的邊數與轉角' };
+  tasks['1150704.html'].toolbar = { runTarget: 2, compareEdits: true, change: '把增加長度的積木換到「移動」的另一側' };
+  tasks['1150705.html'].toolbar = { runTarget: 2, change: '換一組繪圖參數' };
+  tasks['1150706.html'].toolbar = { requiredRuns: 3, change: '換一組防禦網參數', copy: 'copy-all' };
+  tasks['1150801.html'].toolbar = { runTarget: 2, change: '改測另一種搜尋結果' };
+  tasks['1150802.html'].toolbar = { requiredRuns: 2, change: '改第 3 個音' };
+  tasks['1150803.html'].toolbar = { compareFirst: true };
+  tasks['1150805.html'].toolbar = { runTarget: 2, copy: 'copy-all' };
+  tasks['1150806.html'].toolbar = { runTarget: 3 };
+  shuffleTask.toolbar = { copy: 'copy', copyBeforeCheck: true };
   tasks['1150806.html'].shufflePalette = true;
   window.BlockProgramTasks = tasks;
   window.BlockProgramPractice = {

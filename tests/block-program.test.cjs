@@ -290,7 +290,7 @@ test('melody completion counts two successful runs with different third notes', 
   const note = {
     dataset: { programValue: 'note' },
     get valueAsNumber() { return Number(this.value); },
-    reportValidity: () => true, labels: [{ textContent: '第 3 音' }], addEventListener() {}
+    reportValidity: () => true, labels: [{ textContent: '第 3 音' }], addEventListener(name, callback) { this[name] = callback; }
   };
   const root = {
     querySelector(selector) {
@@ -308,15 +308,64 @@ test('melody completion counts two successful runs with different third notes', 
   const click = attr => events.get('click')({ target: {
     closest: () => ({ dataset: {}, hasAttribute: name => name === attr })
   } });
+  const hint = () => fields.get('[data-program-next]').textContent;
+  const toolbar = fields.get('[data-program-toolbar]');
+  assert.match(hint(), /執行本組.*0／2 組通過/);
+  assert.match(toolbar.className, /is-run/);
   click('data-program-compare');
   assert.ok(attributes.has('data-program-passed'));
   assert.ok(!attributes.has('data-program-two-runs'));
+  assert.match(hint(), /執行本組.*0／2 組通過/);
   click('data-program-run');
+  assert.match(hint(), /改第 3 個音.*執行本組.*1／2 組通過/);
   click('data-program-run');
   assert.ok(!attributes.has('data-program-two-runs'));
+  assert.match(hint(), /1／2 組通過/);
   note.value = String(Number(note.value) + 1);
+  note.input();
+  assert.doesNotMatch(hint(), /先改/);
   click('data-program-run');
   assert.ok(attributes.has('data-program-two-runs'));
+  assert.match(hint(), /按「比對檢查」/);
+  assert.match(toolbar.className, /is-compare/);
+  click('data-program-compare');
+  assert.match(hint(), /比對已通過.*下一步/);
+  assert.doesNotMatch(toolbar.className, /is-/);
+});
+
+test('shuffle guidance points to the single-run report before checking', async () => {
+  const task = window.BlockProgramPractice['shuffle-block-program'];
+  const nodes = new Map();
+  const events = new Map();
+  const get = selector => {
+    if (!nodes.has(selector)) nodes.set(selector, {
+      value: '0', addEventListener(name, callback) { this[name] = callback; }, replaceChildren() {},
+      querySelector: () => ({}), select() { this.selectionStart = 0; this.selectionEnd = this.value.length; }
+    });
+    return nodes.get(selector);
+  };
+  const root = {
+    querySelector: get, querySelectorAll: () => [],
+    addEventListener: (type, callback) => events.set(type, callback), removeAttribute() {}, toggleAttribute() {}
+  };
+  window.BlockProgram.mount(root, task, { draft: { blocks: task.goal, variables: task.variables } });
+  const hint = () => get('[data-program-next]').textContent;
+  const toolbar = get('[data-program-toolbar]');
+  const click = (attr, button = {}) => events.get('click')({ target: {
+    closest: () => Object.assign(button, { dataset: {}, hasAttribute: name => name === attr })
+  } });
+  assert.match(hint(), /執行本組/);
+  await click('data-program-run');
+  assert.match(hint(), /複製程式與結果/);
+  assert.match(toolbar.className, /is-copy$/);
+  await click('data-program-copy', get('[data-program-copy]'));
+  const output = get('[data-program-output]');
+  assert.equal(output.hidden, false);
+  assert.match(hint(), /複製程式與結果/);
+  output.copy();
+  assert.match(hint(), /比對檢查/);
+  await click('data-program-compare');
+  assert.match(hint(), /下一步/);
 });
 
 test('duel palette reading order cannot pass and its reference appears after a valid program', async () => {

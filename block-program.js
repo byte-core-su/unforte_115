@@ -112,7 +112,11 @@
       typeof entry.text === 'string' && entry.text.length <= 16000).slice(-8) : [];
     let audio;
     let result;
+    let checked;
+    let copiedReport = '';
     let currentReport = '';
+    const { requiredRuns, runTarget = requiredRuns || 1, change = '換一組測試資料', compareEdits, compareFirst, copy: copyMode,
+      copyBeforeCheck } = task.toolbar || {};
     root.innerHTML = `
       <h3>${escape(task.title || '積木程式模擬器')}</h3>
       <p>拖曳或點選積木加入程式。可拖曳排序，也可以點選兩塊交換。把積木拖出放置區後放開即可移除。按「比對檢查」可檢查所有預設資料。</p>
@@ -142,7 +146,9 @@
         ${task.loop ? `<p>初始化後，後續積木會放在「重複 ${task.loop.times} 次」中。</p>` : ''}
         <ol data-program-script></ol></div>
       </div>
-      <div class="block-program__actions">
+      <p class="block-program__toolbar-note">執行本組看一組結果，比對檢查測所有預設資料。清空可重排，複製可把單次或多次結果貼到作業。</p>
+      <p class="block-program__toolbar-hint" role="status"><strong>現在要做的事</strong> <span data-program-next></span></p>
+      <div class="block-program__actions" data-program-toolbar>
         <button type="button" data-program-run>執行本組</button>
         <button type="button" data-program-compare>比對檢查</button>
         <button type="button" data-program-reset>清空積木</button>
@@ -167,10 +173,14 @@
     const comparison = root.querySelector('[data-program-comparison]');
     const copy = root.querySelector('[data-program-copy]');
     const copyAll = root.querySelector('[data-program-copy-all]');
+    const toolbar = root.querySelector('[data-program-toolbar]');
+    const nextHint = root.querySelector('[data-program-next]');
     const output = root.querySelector('[data-program-output]');
     const inputs = [...root.querySelectorAll('[data-program-value]')];
     const caseSelect = root.querySelector('[data-program-case]');
     const selected = () => task.cases[Number(caseSelect.value)];
+    const currentInput = () => ({ ...selected().values,
+      ...Object.fromEntries(inputs.map(field => [field.dataset.programValue, field.valueAsNumber])) });
     const variableForm = variableNames.length ? root.querySelector('[data-program-variable-form]') : null;
 
     function saveDraft() {
@@ -180,13 +190,54 @@
       });
     }
 
+    const recordedInputs = passedOnly => new Set(runs.filter(entry =>
+      !passedOnly || (entry.passed === true && typeof entry.inputKey === 'string'))
+      .map(entry => typeof entry.inputKey === 'string' ? entry.inputKey : entry.key));
+    const allReports = () => runs.map(({ text }, index) => `試跑 ${index + 1}\n${text}`).join('\n\n');
+
     function showRunCount() {
       copyAll.disabled = runs.length === 0;
       copyAll.textContent = runs.length ? `複製多組試跑紀錄（${runs.length} 筆）` : '複製多組試跑紀錄';
-      const count = new Set(runs.filter(entry =>
-        entry.passed === true && typeof entry.inputKey === 'string').map(entry => entry.inputKey)).size;
-      if (task.requireTwoRuns) root.toggleAttribute('data-program-two-runs', count >= 2);
+      const count = recordedInputs(true).size;
+      if (requiredRuns === 2) root.toggleAttribute('data-program-two-runs', count >= 2);
       root.toggleAttribute('data-program-three-runs', count >= 3);
+    }
+
+    function updateToolbar() {
+      const show = (message, button) => {
+        if (nextHint.textContent !== message) nextHint.textContent = message;
+        toolbar.className = `block-program__actions${button ? ' is-' + button : ''}`;
+      };
+      const missing = missingVariables(task, task.goal, declared);
+      if (missing.length) return show(declarationMessage(missing));
+      if (!program.length) return show('先從積木區加入積木。');
+      if (checked === false) return show('看下方的比對結果，修正積木後再檢查。');
+      if (result && !result.passed && checked !== true) return show('看下方結果，調整積木或測試資料，再按「執行本組」重試。', 'run');
+      if (!result && checked === undefined && task.goal.some(id => !program.includes(id))) {
+        return show('繼續排積木。排好後再測試。');
+      }
+      const inputsRun = recordedInputs(requiredRuns);
+      const count = compareEdits ? runs.length : inputsRun.size;
+      const needsMore = count < runTarget && (checked !== true || runTarget > 1 || copyMode);
+      const input = currentInput();
+      const trialKey = JSON.stringify([program, input]);
+      const inputKey = JSON.stringify(input);
+      const triedHere = runs.some(entry => entry.key === trialKey);
+      const alreadyTried = compareEdits ? triedHere : inputsRun.has(inputKey);
+      const needsExample = checked === undefined && !triedHere;
+      const needsCopyResult = copyMode === 'copy' && !currentReport && copiedReport === '';
+      if (!compareFirst && (needsMore || needsExample || needsCopyResult)) {
+        const progress = runTarget > 1 ? `（${Math.min(count, runTarget)}／${runTarget}${requiredRuns ? ' 組通過' : ' 次已記錄'}）` : '';
+        const repeat = needsMore && alreadyTried ? `先${change}，再` : '';
+        return show(`${repeat}按「執行本組」看結果${progress}。`, 'run');
+      }
+      const report = copyMode === 'copy-all' ? allReports() : currentReport;
+      if (copyMode && (copyBeforeCheck || checked === true) && report && report !== copiedReport) {
+        const label = copyMode === 'copy-all' ? '複製多組試跑紀錄' : '複製程式與結果';
+        return show(`按「${label}」，把紀錄貼到作業。`, copyMode);
+      }
+      if (checked === true) return show('比對已通過。可按下方的下一步。');
+      return show('按「比對檢查」，確認預設測試是否全部通過。', 'compare');
     }
 
     async function copyReport(report) {
@@ -194,7 +245,9 @@
       output.hidden = true;
       try {
         await navigator.clipboard.writeText(report);
+        copiedReport = report;
         feedback.textContent = '已複製。請貼到本課作業。';
+        updateToolbar();
       } catch {
         output.value = report;
         output.hidden = false;
@@ -209,6 +262,7 @@
     function invalidate(message = '') {
       root.removeAttribute('data-program-passed');
       picked = null;
+      checked = undefined;
       stopAudio();
       result = undefined;
       currentReport = '';
@@ -217,6 +271,7 @@
       comparison.replaceChildren();
       feedback.textContent = message;
       copy.disabled = true;
+      updateToolbar();
     }
 
     function render() {
@@ -257,6 +312,7 @@
       }
       const { results, sameOrder, missing } = compare(task, program, declared);
       const allPassed = results.every(({ result }) => result.passed);
+      checked = allPassed;
       root.toggleAttribute('data-program-passed', allPassed);
       const order = sameOrder ? '積木順序與參考程式一致。' :
         allPassed ? '積木順序與參考程式不同，但所有測試都通過。' :
@@ -268,6 +324,7 @@
       comparison.innerHTML = `<p>${escape(order)}</p><ul>${results.map(({ name, result }) =>
         `<li><strong>${escape(name)}｜${result.passed ? '通過' : '再檢查'}</strong>
           ${escape(summary(result))}</li>`).join('')}</ul>${reference}`;
+      updateToolbar();
     }
 
     function saveEdit(message) {
@@ -433,8 +490,7 @@
     function run() {
       if (!checkVariables()) return;
       if (inputs.some(input => !input.reportValidity())) return;
-      const input = { ...selected().values };
-      for (const field of inputs) input[field.dataset.programValue] = field.valueAsNumber;
+      const input = currentInput();
       result = execute(task, program, input, declared);
       feedback.textContent = result.error || (result.passed ? '這組測試通過。' : '結果還未達標，請檢查積木與順序。');
       stage.innerHTML = `<p></p>${graph(result)}${result.rows.length ?
@@ -463,6 +519,7 @@
         saveDraft();
       }
       if (result.notes?.length) play(result.notes);
+      updateToolbar();
     }
 
     root.addEventListener('click', async event => {
@@ -498,7 +555,7 @@
         program.length = 0;
         saveEdit('已清空積木。');
       } else if (button === copy) await copyReport(currentReport);
-      else if (button === copyAll) await copyReport(runs.map(({ text }, index) => `試跑 ${index + 1}\n${text}`).join('\n\n'));
+      else if (button === copyAll) await copyReport(allReports());
     });
     root.addEventListener('keydown', event => {
       const focused = event.target.dataset.programPick;
@@ -546,6 +603,11 @@
     }
     caseSelect.addEventListener('change', () => { changeCase(); saveDraft(); });
     for (const input of inputs) input.addEventListener('input', () => { invalidate(); saveDraft(); });
+    output.addEventListener('copy', () => {
+      if (output.selectionStart !== 0 || output.selectionEnd !== output.value.length) return;
+      copiedReport = output.value;
+      updateToolbar();
+    });
     if (Number.isInteger(draft?.caseIndex) && task.cases[draft.caseIndex]) caseSelect.value = String(draft.caseIndex);
     changeCase();
     for (const input of inputs) {
@@ -554,6 +616,7 @@
     }
     render();
     showRunCount();
+    updateToolbar();
   }
 
   window.BlockProgram = { mount, execute, compare, graph };
