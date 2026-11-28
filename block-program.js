@@ -302,7 +302,8 @@
           ${id === branch?.id ? `<div class="block-program__c is-control block-program__branch">
             ${branchNames.map((name, slot) => `<div class="block-program__c-body">
               <span>${name}</span>
-              <button type="button" data-program-branch-slot="${slot}" aria-keyshortcuts="Delete Backspace"
+              <button type="button" data-program-branch-slot="${slot}" draggable="${Boolean(branchChoices[slot])}"
+                ${branchChoices[slot] ? `aria-pressed="${pickedOutcome === branchChoices[slot]}"` : ''} aria-keyshortcuts="Delete Backspace"
                 aria-label="${name}：${branchChoices[slot] ? escape(textLabel(outcomeLabel(branch.outcomes[branchChoices[slot]]))) : '空的放置位置'}">
                 ${branchChoices[slot] ? outcomeMarkup(branch.outcomes[branchChoices[slot]]) : '放入結果積木'}
               </button>
@@ -325,7 +326,7 @@
         button.title = missing.length ? declarationMessage(missing) : '';
       }
       if (branch) for (const button of root.querySelectorAll('[data-program-outcome]')) {
-        button.disabled = !program.includes(branch.id);
+        button.disabled = !program.includes(branch.id) || branchChoices.includes(button.dataset.programOutcome);
         button.draggable = !button.disabled;
         button.setAttribute('aria-pressed', String(pickedOutcome === button.dataset.programOutcome));
       }
@@ -380,9 +381,14 @@
     function placeOutcome(id, slot) {
       if (!branch || !program.includes(branch.id) || !Object.hasOwn(branch.outcomes, id) || !branchNames[slot]) return;
       const previous = branchChoices.indexOf(id);
-      if (previous >= 0) branchChoices[previous] = null;
+      if (previous >= 0) branchChoices[previous] = branchChoices[slot];
       branchChoices[slot] = id;
       saveEdit(`已將「${branch.outcomes[id]}」放入「${branchNames[slot]}」。`);
+    }
+
+    function removeOutcome(slot) {
+      branchChoices[slot] = null;
+      saveEdit('已移除分支結果積木。');
     }
 
     function clearDrop() {
@@ -401,6 +407,7 @@
       clearDrop();
       if (drag.outcome) {
         if (work.contains(target)) target.closest('[data-program-branch-slot]')?.setAttribute('data-branch-drop', '');
+        else if (drag.slot !== undefined) work.classList.add('is-drop-outside');
         return;
       }
       if (!work.contains(target)) {
@@ -415,9 +422,15 @@
     function finishDrop(drag, target, y) {
       if (!target) return false;
       if (drag.outcome) {
-        const slot = work.contains(target) && target.closest('[data-program-branch-slot]');
-        if (slot) placeOutcome(drag.outcome, Number(slot.dataset.programBranchSlot));
-        return Boolean(slot);
+        if (!work.contains(target)) {
+          if (drag.slot === undefined) return false;
+          removeOutcome(drag.slot);
+          return true;
+        }
+        const slot = target.closest('[data-program-branch-slot]');
+        if (!slot || Number(slot.dataset.programBranchSlot) === drag.slot) return false;
+        placeOutcome(drag.outcome, Number(slot.dataset.programBranchSlot));
+        return true;
       }
       if (!work.contains(target)) {
         if (drag.index === undefined) return false;
@@ -439,23 +452,36 @@
     }
 
     let touch;
+    function dragFrom(source) {
+      const { programAdd, programDrag, programOutcome, programBranchSlot } = source.dataset;
+      if (programBranchSlot !== undefined) {
+        const slot = Number(programBranchSlot);
+        return branchChoices[slot] ? { outcome: branchChoices[slot], slot } : null;
+      }
+      if (programOutcome) return { outcome: programOutcome };
+      return programAdd ? { id: programAdd } : { index: Number(programDrag) };
+    }
+
     root.addEventListener('dragstart', event => {
-      const source = event.target.closest('[data-program-add], [data-program-drag], [data-program-outcome]');
+      const source = event.target.closest('[data-program-add], [data-program-drag], [data-program-outcome], [data-program-branch-slot]');
       if (!source || source.disabled) return;
       if (touch?.source === source) { event.preventDefault(); return; }
-      const { programAdd, programDrag, programOutcome } = source.dataset;
-      if (programAdd && missingVariables(task, [programAdd], declared).length) return;
-      const drag = programOutcome ? { outcome: programOutcome } : programAdd ? { id: programAdd } : { index: Number(programDrag) };
+      const drag = dragFrom(source);
+      if (!drag || (drag.id && missingVariables(task, [drag.id], declared).length)) return;
       const page = root.ownerDocument;
       const listeners = new AbortController();
       const options = { capture: true, signal: listeners.signal };
       const stop = () => { listeners.abort(); clearDrop(); };
       // Accept drops elsewhere on this page so that cancelling the native drag never deletes a block.
-      const accepts = target => source.isConnected && !source.disabled && (programOutcome
-        ? work.contains(target) && target.closest('[data-program-branch-slot]') : !programAdd || work.contains(target));
-      const effect = programAdd || programOutcome ? 'copy' : 'move';
+      const fromPalette = drag.id || (drag.outcome && drag.slot === undefined);
+      const accepts = target => {
+        if (!source.isConnected || source.disabled) return false;
+        if (!work.contains(target)) return !fromPalette;
+        return !drag.outcome || Boolean(target.closest('[data-program-branch-slot]'));
+      };
+      const effect = fromPalette ? 'copy' : 'move';
       event.dataTransfer.effectAllowed = effect;
-      event.dataTransfer.setData('text/plain', programOutcome || programAdd || programDrag);
+      event.dataTransfer.setData('text/plain', drag.outcome || drag.id || String(drag.index));
       page.addEventListener('dragover', event => {
         showDrop(drag, event.target, event.clientY);
         if (!accepts(event.target)) return;
@@ -472,9 +498,11 @@
     });
 
     root.addEventListener('pointerdown', event => {
-      const source = event.target.closest('[data-program-drag]');
+      const source = event.target.closest('[data-program-drag], [data-program-branch-slot][draggable="true"]');
       if (!source || !event.isPrimary || event.pointerType === 'mouse' || event.button !== 0) return;
-      touch = { source, pointer: event.pointerId, index: Number(source.dataset.programDrag), x: event.clientX, y: event.clientY };
+      const drag = dragFrom(source);
+      if (!drag) return;
+      touch = { ...drag, source, pointer: event.pointerId, x: event.clientX, y: event.clientY };
       source.setPointerCapture(event.pointerId);
     });
     root.addEventListener('pointermove', event => {
@@ -600,10 +628,21 @@
         return;
       }
       if (programBranchSlot !== undefined) {
+        const slot = Number(programBranchSlot);
+        const placed = branchChoices[slot];
         if (pickedOutcome) {
-          placeOutcome(pickedOutcome, Number(programBranchSlot));
-          script.querySelector(`[data-program-branch-slot="${programBranchSlot}"]`)?.focus({ preventScroll: true });
+          if (pickedOutcome === placed) {
+            pickedOutcome = null;
+            render();
+            feedback.textContent = '已取消選取。';
+          } else placeOutcome(pickedOutcome, slot);
+        } else if (placed) {
+          picked = null;
+          pickedOutcome = placed;
+          render();
+          feedback.textContent = '再點另一個分支即可移動或交換積木。';
         } else feedback.textContent = '先從積木區選一塊「分支結果」積木。';
+        script.querySelector(`[data-program-branch-slot="${slot}"]`)?.focus({ preventScroll: true });
         return;
       }
       if (programPick !== undefined) {
@@ -645,8 +684,7 @@
       if (deleting && slot !== undefined) {
         event.preventDefault();
         if (branchChoices[slot]) {
-          branchChoices[slot] = null;
-          saveEdit('已移除分支結果積木。');
+          removeOutcome(slot);
           script.querySelector(`[data-program-branch-slot="${slot}"]`)?.focus({ preventScroll: true });
         }
         return;
@@ -665,6 +703,7 @@
       pickedOutcome = null;
       render();
       if (focused !== undefined) script.querySelector(`[data-program-pick="${focused}"]`)?.focus();
+      if (slot !== undefined) script.querySelector(`[data-program-branch-slot="${slot}"]`)?.focus();
       feedback.textContent = '已取消選取。';
     });
     if (variableForm) {
