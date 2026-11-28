@@ -140,7 +140,9 @@ test('flow hints show the sequence, decision or loop used in the practice', () =
   assert.match(hint('rep'), /數字和總和都設為 0.*重複N次.*數字加 1.*把數字加進總和.*輸出總和/s);
 });
 
-test('flow puzzles must be completed before standalone practice unlocks', () => {
+test('completed flow puzzles lead to standalone practice without revealing the blocks', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', '1150702.html'), 'utf8');
+  assert.doesNotMatch(html, /成功！積木對照|(?:seq|sel|rep)-scratch-(?:wrapper|list)/);
   const { context, get } = loadLesson('1150702.html');
   for (const [kind, count, next, init, place] of [
     ['seq', 6, '開始平均數實作', context.initSeqGame, context.tryPlaceSeqItem],
@@ -153,7 +155,7 @@ test('flow puzzles must be completed before standalone practice unlocks', () => 
     assert.equal(message['data-lesson-activity'], undefined);
     place(count);
     assert.equal(message['data-lesson-activity'], '');
-    assert.ok(message.textContent.includes(next));
+    assert.equal(message.textContent, `流程排對了。按下方的「${next}」，照流程自己排積木。`);
     init();
     assert.equal(message['data-lesson-activity'], undefined);
   }

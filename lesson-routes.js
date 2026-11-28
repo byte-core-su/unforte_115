@@ -119,7 +119,7 @@
     '1150702.html': route([], [
       structure('seq', '循序結構', {
         runs: '#seq-out[data-lesson-activity]',
-        demoTodo: '先預測平均數，再計算核對。完成 IPO 配對後排好流程圖，查看積木對照。',
+        demoTodo: '先預測平均數，再計算核對。完成 IPO 配對後排好流程圖，接著開始平均數實作。',
         pending: '先計算核對、答對 IPO 配對，再排好流程圖。',
         practiceTitle: '循序結構：平均數實作', nextLabel: '開始平均數實作',
         practiceTodo: '排好積木，讀取 A、B 並顯示平均數。執行一組資料，再按「比對檢查」。',

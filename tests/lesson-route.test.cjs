@@ -70,6 +70,7 @@ for (const page of pages) {
       assert.equal(step.parts[1].flowHint(), id);
       assert.equal(step.activity.selector, `#${id}-block-program[data-program-passed]`);
       assert.equal(extraPrograms[`${id}-block-program`].cases.length, 2);
+      assert.equal(extraPrograms[`${id}-block-program`].shufflePalette, true);
     }
   }
   const lessonProgram = steps.find(step => step.anchors.includes('#block-program'));
