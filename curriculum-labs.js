@@ -47,8 +47,8 @@
       html: `<div class="curriculum-lab__questions" data-quiz="g8-ethics"></div>`
     },
     '1150805.html': {
-      title: '同一副牌，兩種排法',
-      intro: '洗牌會打亂順序，排序會按規則排好。兩種做法都要保留原本的牌。',
+      title: '洗牌前後有哪些牌？',
+      intro: '洗牌會打亂順序。每種牌的張數都應和原來一樣。',
       html: `
         <div id="g8-shuffle-task">
         <details class="lesson-reference" open>
@@ -59,7 +59,7 @@
             <p>操作後：牌堆 ［1、2、3］，洗牌清單 ［3］。原牌堆空了就停止。</p>
           </div>
         </details>
-        <h3>第 1 題　找出正確的洗牌結果</h3>
+        <h3>找出正確的洗牌結果</h3>
         <p id="g8-shuffle-prompt"></p>
         <div class="curriculum-lab__controls">
           <label>洗牌結果 <select id="g8-shuffle-choice">
@@ -68,9 +68,9 @@
           <button type="button" id="g8-shuffle-check">檢查牌數</button>
         </div>
         <p id="g8-shuffle-state" class="curriculum-lab__result" role="status"></p>
-        </div>
-        <div id="g8-sort-task" hidden>
-          <h3 id="g8-sort-title" tabindex="-1">第 2 題　比較相鄰兩項</h3>
+        </div>`,
+      sortingHtml: `
+          <h2 id="g8-sort-title">比較相鄰兩項</h2>
           <p id="g8-sort-state" class="curriculum-lab__result" role="status"></p>
           <div id="g8-sort-actions">
             <div class="curriculum-lab__controls">
@@ -91,8 +91,7 @@
             <button type="button" id="g8-sort-copy">複製洗牌與排序紀錄</button>
             <p id="g8-sort-copy-status" role="status"></p>
             <textarea id="g8-sort-report" aria-label="洗牌與排序紀錄" rows="3" readonly hidden></textarea>
-          </div>
-        </div>`
+          </div>`
     },
     '1150806.html': {
       title: `用自訂積木分工完成${escapeHtml(duel.activity)}`,
@@ -382,7 +381,15 @@
   }
 
   if (page === '1150805.html') {
-    const get = id => section.querySelector(`#g8-${id}`);
+    const sorting = document.createElement('section');
+    sorting.id = 'sorting-lab';
+    sorting.className = 'curriculum-lab';
+    sorting.hidden = true;
+    sorting.setAttribute('aria-labelledby', 'g8-sort-title');
+    sorting.innerHTML = `<div class="curriculum-lab__card">${lab.sortingHtml}</div>`;
+    section.after(sorting);
+
+    const get = id => (id.startsWith('sort-') ? sorting : section).querySelector(`#g8-${id}`);
     const asList = items => `［${items.join('、')}］`;
     const [first, second, repeated] = shuffle([2, 3, 4, 5, 6, 7]).slice(0, 3);
     const deck = [first, second, repeated, repeated].sort((a, b) => a - b);
@@ -424,10 +431,10 @@
       get('shuffle-state').textContent = feedback[shuffleChoice.value] || '請先選一個結果。';
       if (shuffleChoice.value !== 'valid') return;
       shuffleCheck.disabled = shuffleChoice.disabled = true;
-      get('shuffle-task').hidden = true;
-      get('sort-task').hidden = false;
-      askComparison(`${feedback.valid} 接下來做排序。`);
-      get('sort-title').focus();
+      get('shuffle-state').textContent += ' 按「開始洗牌實作」，試著用積木做出洗牌程式。';
+      askComparison();
+      sorting.hidden = false;
+      section.setAttribute('data-lesson-activity', '');
     });
 
     function answerComparison(swap) {
@@ -483,7 +490,7 @@
         '停止條件：完整一輪都沒交換，可以提早停止。'
       ].join('\n');
       get('sort-evidence').hidden = false;
-      section.setAttribute('data-lesson-activity', '');
+      sorting.setAttribute('data-lesson-activity', '');
       get('sort-copy').focus();
     });
     get('sort-copy').addEventListener('click', async () => {

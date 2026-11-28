@@ -36,7 +36,7 @@ for (const page of pages) {
   vm.runInNewContext(read('block-program-tasks.js'), { window });
   vm.runInNewContext(read('lesson-routes.js'), { window, location: { pathname: `/${page}` } });
   assert.ok(started, `${page} should start a learning route`);
-  const { steps, references = [], program, next, teacherFinish } = started;
+  const { steps, references = [], program, extraPrograms, next, teacherFinish } = started;
   assert.equal(steps[0].title, '認識任務');
   assert.equal(steps[0].anchors[0], '#learning-guide');
   assert.equal(steps[0].checks, undefined, `${page}: introduction has no completion checklist`);
@@ -56,6 +56,39 @@ for (const page of pages) {
   assert.ok(secondPeriod > 1 && steps.slice(secondPeriod).every(step => step.period === 2), `${page}: clear second period boundary`);
   const firstOptional = steps.findIndex(step => step.optional);
   if (firstOptional >= 0) assert.ok(steps.slice(firstOptional, -1).every(step => step.optional), `${page}: extensions follow required activities`);
+  if (page === '1150702.html') {
+    for (const [index, id, label] of [[1, 'seq', '開始平均數實作'], [2, 'sel', '開始及格判斷實作'], [3, 'rep', '開始累加實作']]) {
+      const step = steps[index];
+      assert.equal(step.parts[0].nextLabel, label);
+      assert.ok(step.parts[0].activity.selector.includes(`#${id}-flow-msg[data-lesson-activity]`));
+      assert.equal(step.parts[1].anchors[0], `#${id}-block-program`);
+      assert.equal(step.parts[1].resume, true);
+      assert.equal(step.activity.selector, `#${id}-block-program[data-program-passed]`);
+      assert.equal(extraPrograms[`${id}-block-program`].cases.length, 2);
+    }
+  }
+  const lessonProgram = steps.find(step => step.anchors.includes('#block-program'));
+  if (page === '1150701.html') {
+    assert.equal(steps[2], lessonProgram);
+    assert.ok(!lessonProgram.optional);
+  }
+  if (page === '1150802.html') {
+    assert.equal(steps[2], lessonProgram);
+    assert.equal(steps[3].title, '錄音與素材判斷');
+    assert.match(lessonProgram.activity.selector, /data-program-two-runs/);
+  }
+  if (page === '1150803.html') {
+    assert.equal(steps[4], lessonProgram);
+    assert.ok(!lessonProgram.optional);
+  }
+  if (page === '1150805.html') {
+    const shuffle = steps[1];
+    assert.equal(shuffle.parts[1].anchors[0], '#shuffle-block-program');
+    assert.equal(shuffle.parts[1].activity.selector, '#shuffle-block-program[data-program-passed]');
+    assert.equal(shuffle.parts[2].anchors[0], '#sorting-lab');
+    assert.equal(shuffle.activity.selector, '#sorting-lab[data-lesson-activity]');
+    assert.equal(extraPrograms['shuffle-block-program'].cases.length, 2);
+  }
   assert.match(html, /src="block-program\.js"/);
   assert.doesNotMatch(html, /scratch\.mit\.edu|href="[^"]*\.sb3/i);
   const practice = steps.at(-2);
@@ -77,12 +110,15 @@ for (const page of pages) {
     }
   }
   if (html.includes('curriculum-labs.js')) assert.ok(steps.some(step => (step.anchors || []).includes('#curriculum-lab')));
-  const generated = new Map([['#learning-guide', 'learning-guides.js'], ['#adaptive-practice', 'adaptive-practice.js'], ['#curriculum-lab', 'curriculum-labs.js'], ['#block-program', 'lesson-route.js']]);
-  for (const locator of steps.flatMap(step => step.anchors || [])) {
+  const simulators = new Set(['#block-program', ...Object.keys(extraPrograms || {}).map(id => '#' + id)]);
+  const generated = new Map([['#learning-guide', 'learning-guides.js'], ['#adaptive-practice', 'adaptive-practice.js'], ['#curriculum-lab', 'curriculum-labs.js'], ['#sorting-lab', 'curriculum-labs.js']]);
+  for (const locator of steps.flatMap(step => [...(step.anchors || []), ...(step.parts || []).flatMap(part => part.anchors || [])])) {
     const selectors = typeof locator === 'string' ? [locator] : locator.common || [locator.up];
     for (const selector of selectors) {
       assert.match(selector, /^#[\w-]+$/, `${page}: use a fixed ID`);
-      if (generated.has(selector)) {
+      if (simulators.has(selector)) {
+        assert.ok(html.includes('src="lesson-route.js"'));
+      } else if (generated.has(selector)) {
         const file = generated.get(selector);
         assert.ok(html.includes(`src="${file}"`));
         assert.ok(read(file).includes(`.id = '${selector.slice(1)}'`));
@@ -127,7 +163,7 @@ for (const page of pages) {
   const guide = element(body);
   const main = element(body);
   const firstFrame = element(main);
-  const secondFrame = element(main);
+  const secondFrame = element(body);
   const first = element(firstFrame);
   const second = element(secondFrame);
   const legacy = element(main);
@@ -142,20 +178,25 @@ for (const page of pages) {
     createElement: () => { const node = element(); created.push(node); return node; }
   };
   let refresh;
+  let savedRoute;
   const window = { TeacherDemo: { isOn: () => false }, dispatchEvent() {} };
   vm.runInNewContext(read('lesson-route.js'), {
     window, document, location: { pathname: '/test.html' },
-    localStorage: { getItem: () => null, setItem() {} },
+    localStorage: { getItem: () => savedRoute, setItem: (_, value) => { savedRoute = value; } },
     MutationObserver: class { constructor(callback) { refresh = callback; } observe() {} },
     setTimeout: callback => { callback(); return 0; }, requestAnimationFrame() {}, Event: class {}, Node: {}
   });
-  window.LessonRoute.start({ steps: [
+  const config = { steps: [
     { title: '看任務', anchors: ['#learning-guide'] },
-    { title: '完成兩項操作', anchors: [{ up: '#first' }, { up: '#second' }],
-      parts: [{ title: '第一項', activity: { selector: '#first-passed', pending: '先完成第一項。' } }, { title: '第二項' }],
+    { title: '完成兩項操作', anchors: ['#first'],
+      parts: [
+        { title: '第一項', nextLabel: '開始實作', activity: { selector: '#first-passed', pending: '先完成第一項。' } },
+        { title: '第二項', anchors: ['#second'], resume: true }
+      ],
       activity: { selector: '#both-passed', pending: '先完成兩項。' } },
     { title: '交件' }
-  ] });
+  ] };
+  window.LessonRoute.start(config);
   const [panel, completion, progress] = created;
   const hidden = item => item.hasAttribute('data-route-locked') || item.hasAttribute('data-route-outside-task') ||
     Boolean(item.parentElement && hidden(item.parentElement));
@@ -164,12 +205,14 @@ for (const page of pages) {
   advanceOpening();
   assert.ok(hidden(intro) && hidden(guide) && hidden(second) && hidden(legacy));
   assert.equal(hidden(first), false);
+  assert.match(completion.innerHTML, /開始實作/);
   assert.equal(completion.button.disabled, true);
   lookup.set('#first-passed', first);
   refresh();
   assert.equal(completion.button.disabled, false);
   completion.action('done');
   assert.match(panel.innerHTML, /第二項/);
+  const paused = savedRoute;
   assert.equal(hidden(first), true);
   assert.equal(hidden(second), false);
   assert.equal(completion.button.disabled, true);
@@ -183,6 +226,11 @@ for (const page of pages) {
   progress.action('resume');
   assert.ok(hidden(first) && hidden(second));
   assert.match(panel.innerHTML, /交件/);
+  savedRoute = paused;
+  window.LessonRoute.start(config);
+  const [resumedPanel] = created.slice(3);
+  assert.match(resumedPanel.innerHTML, /第二項/);
+  assert.ok(hidden(first) && !hidden(second));
 }
 
 // CodeGame keeps its own guided route. Python Lab offers independent units.

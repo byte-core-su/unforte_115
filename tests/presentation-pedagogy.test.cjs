@@ -97,7 +97,9 @@ test('presentation links reach current local teaching pages and visible example 
     const generated = { 'adaptive-practice': 'adaptive-practice.js', 'learning-guide': 'learning-guides.js', 'block-program': 'lesson-route.js' }[id];
     if (generated) {
       assert.ok(html.includes(`src="${generated}"`), href);
-      assert.ok(fs.readFileSync(path.join(presentation, '..', generated), 'utf8').includes(`.id = '${id}'`));
+      const source = fs.readFileSync(path.join(presentation, '..', generated), 'utf8');
+      if (id === 'block-program') assert.match(source, /'block-program': config\.program/);
+      else assert.ok(source.includes(`.id = '${id}'`));
     } else assert.ok(html.includes(`id="${id}"`), href);
     if (['adaptive-practice', 'energy-trace', 'polygon-simulator', 'block-program'].includes(id)) assert.equal(url.searchParams.get('route'), 'all', href);
   }

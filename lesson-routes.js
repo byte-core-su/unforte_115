@@ -72,14 +72,25 @@
     const secondPeriod = plannedStart >= 0 ? plannedStart : steps.findIndex(step => step.anchors?.includes('#block-program'));
     return steps.map((step, index) => ({ ...step, period: index < secondPeriod ? 1 : 2 }));
   };
-  const tab = (name, runs) => ({
-    activity: activity(
-      `body:has(#${name}-ipo-msg[data-lesson-activity]):has(${runs})`,
-      name === 'sel' ? '請試出及格與不及格各一次，再通過 IPO 配對。' : '請先執行計算，再通過 IPO 配對。'
-    ),
-    enter: () => window.switchL2Tab?.(name),
-    review: () => window.switchL2Tab?.(name, false)
-  });
+  function structure(name, title, { runs, demoTodo, pending, practiceTitle, nextLabel, practiceTodo, checks, hints }) {
+    const simulator = `#${name}-block-program`;
+    return {
+      title, anchors: [{ common: ['#l2-tab-seq', '#l2-content-rep'] }],
+      enter: () => window.switchL2Tab?.(name),
+      review: () => window.switchL2Tab?.(name, false),
+      todo: `${demoTodo} ${practiceTodo}`,
+      parts: [
+        { title: `${title}：看懂流程`, todo: demoTodo, nextLabel, activity: activity(
+          `body:has(${runs}):has(#${name}-ipo-msg[data-lesson-activity]):has(#${name}-flow-msg[data-lesson-activity])`, pending
+        ) },
+        { title: practiceTitle, anchors: [simulator], resume: true, todo: practiceTodo, hints }
+      ],
+      activity: activity(`${simulator}[data-program-passed]`, '先完成程式，再用「比對檢查」通過兩組資料。'),
+      checks,
+      hints: ['先找出輸入的資料，再找計算或判斷，最後確認程式要顯示什麼。']
+    };
+  }
+
 
   const routes = {
     '1150701.html': route([], [
@@ -88,29 +99,44 @@
         todo: '按「開始測驗」完成 10 題積木診斷，看完結果。',
         checks: ['完成 10 題並看完結果', '選一塊積木，寫下何時執行、會改變什麼'],
         hints: ['先看積木顏色：黃色是事件、藍色是動作、橘色是控制、紫色是外觀、橘紅色是變數。', '答錯沒關係，診斷是用來找起點，不影響進入下一課。'] },
+      program({ title: '綠旗小程式',
+        todo: '在模擬器排好事件和動作積木，執行後確認角色往前移動。',
+        checks: ['執行後角色移動 10 點', '能說出哪塊積木讓程式開始'],
+        hints: ['從黃色「當綠旗被點擊」開始，下面接藍色「移動 10 點」。'] }),
       { title: '資訊使用判斷', anchors: ['#curriculum-lab'], secondPeriod: true,
         activity: achieved('#curriculum-lab', '依序完成三個情境，每題答對後才能繼續。'),
         todo: `每次看一個情境，選一個做法後按「${labels.checkJudgment}」。`,
         checks: ['三題都檢查過，並讀完每題的原因'],
-        hints: ['想一想：這樣做會不會讓別人知道你的真實姓名、帳號或密碼？', '網路上的圖片、音樂要先確認授權；看不出來就改用可使用的素材。'] },
-      program({ title: '綠旗小程式', optional: true,
-        todo: '在模擬器排好事件和動作積木，執行後確認角色往前移動。',
-        checks: ['執行後角色移動 10 點', '能說出哪塊積木讓程式開始'],
-        hints: ['從黃色「當綠旗被點擊」開始，下面接藍色「移動 10 點」。'] })
+        hints: ['想一想：這樣做會不會讓別人知道你的真實姓名、帳號或密碼？', '網路上的圖片、音樂要先確認授權；看不出來就改用可使用的素材。'] }
     ]),
     '1150702.html': route([], [
-      { title: '循序結構', anchors: [{ common: ['#l2-tab-seq', '#l2-content-rep'] }], ...tab('seq', '#seq-out[data-lesson-activity]'),
-        todo: '先預測平均數再按「計算」，接著依步驟完成 IPO 配對，按「驗證配對」。',
-        checks: ['先預測，再按「計算」核對過', 'IPO 配對驗證通過'],
-        hints: ['Input 是使用者給的資料，Process 是電腦計算，Output 是顯示結果。', '流程從「開始」到「結束」由上往下，一次做一件事。'] },
-      { title: '選擇結構', anchors: [{ common: ['#l2-tab-seq', '#l2-content-rep'] }], ...tab('sel', '#sel-out[data-lesson-activity="both"]'),
-        todo: '輸入成績，先預測會不會及格，再依步驟完成配對驗證。',
-        checks: ['測過一次及格、一次不及格', '配對驗證通過'],
-        hints: ['「如果…那麼…否則」：條件成立走「那麼」，不成立走「否則」。', '故意輸入一組會不及格的成績，看程式走哪一邊。'] },
-      { title: '重複結構', anchors: [{ common: ['#l2-tab-seq', '#l2-content-rep'] }], ...tab('rep', '#iter-out[data-lesson-activity]'),
-        todo: '先預測 1 加到 N 的總和，再執行並完成配對驗證。',
-        checks: ['先預測，再執行核對過', '配對驗證通過'],
-        hints: ['重複執行 N 次：框裡的積木會做 N 遍。', 'N 很小時（例如 3），可以先用心算 1+2+3 驗證。'] },
+      structure('seq', '循序結構', {
+        runs: '#seq-out[data-lesson-activity]',
+        demoTodo: '先預測平均數，再計算核對。完成 IPO 配對後排好流程圖，查看積木對照。',
+        pending: '先計算核對、答對 IPO 配對，再排好流程圖。',
+        practiceTitle: '循序結構：平均數實作', nextLabel: '開始平均數實作',
+        practiceTodo: '排好積木，讀取 A、B 並顯示平均數。執行一組資料，再按「比對檢查」。',
+        checks: ['程式能顯示整數和小數兩組平均數'],
+        hints: ['想想哪些變數要先取得數值，才能拿來計算。']
+      }),
+      structure('sel', '選擇結構', {
+        runs: '#sel-out[data-lesson-activity="both"]',
+        demoTodo: '試出一次及格、一次不及格，完成 IPO 配對，再排出兩條分支的流程。',
+        pending: '先試出兩種結果、答對 IPO 配對，再排好流程圖。',
+        practiceTitle: '選擇結構：及格判斷實作', nextLabel: '開始及格判斷實作',
+        practiceTodo: '排積木算出加權總分，再用「如果…那麼…否則」判斷及格。試跑後按「比對檢查」。',
+        checks: ['剛好 60 分顯示及格，低於 60 分顯示未及格'],
+        hints: ['先算總分，再判斷它是否大於或等於 60。']
+      }),
+      structure('rep', '重複結構', {
+        runs: '#iter-out[data-lesson-activity]',
+        demoTodo: '先預測 1 加到 N 的總和，再執行、完成 IPO 配對並排好流程圖。',
+        pending: '先執行核對、答對 IPO 配對，再排好流程圖。',
+        practiceTitle: '重複結構：累加實作', nextLabel: '開始累加實作',
+        practiceTodo: '排積木把數字與總和歸零，再用迴圈從 1 加到 N。試跑後按「比對檢查」。',
+        checks: ['N 為 1 和 5 時，兩組累加結果都正確'],
+        hints: ['每一輪先讓數字加 1，再把這個數字加進總和。']
+      }),
       program({
         todo: '在模擬器組合循序、選擇和重複積木。切換兩組資料，先預測結果再分別執行。',
         checks: ['已組合三種結構並測過兩組資料', '選一段分支或迴圈，記下預測與實際結果；結果不同時，找出第一個造成差異的積木'],
@@ -231,15 +257,16 @@
         todo: '選一段自己的短錄音，和原曲比對。請選沒有他人聲音或個資的檔案。',
         checks: ['完成一次比對，並看懂結果'],
         hints: ['結果會受雜音影響，只是練習回饋，不是評分。'] },
+      program({
+        activity: activity('#block-program[data-program-passed][data-program-two-runs]', '先用兩個不同的第 3 音各執行一次，再按「比對檢查」。'),
+        todo: '排好積木，按「執行本組」播放短旋律。改掉第 3 個音再執行一次，比較差異，最後按「比對檢查」。',
+        checks: ['短旋律能依序播放', '改動一項後，說得出聽到的差異', '寫好索引對照表（第幾項＝哪個音）'],
+        hints: ['第一項的索引是 1。改第 3 個音時，記下原本和改後的數值。'] }),
       { title: '錄音與素材判斷', anchors: ['#curriculum-lab'],
         activity: achieved('#curriculum-lab', '依序完成兩個情境，每題答對後才能繼續。'),
         todo: `每個情境選一個做法，按「${labels.checkJudgment}」。`,
         checks: ['每題都檢查過，並讀完原因'],
-        hints: ['分享錄音前想一想：裡面有沒有別人的聲音或個資？', '現成的旋律或音檔要先確認授權。'] },
-      program({
-        todo: '排好積木並播放短旋律。改掉第 3 個音再播一次，比較聽到的差異。',
-        checks: ['短旋律能依序播放', '改動一項後，說得出聽到的差異', '寫好索引對照表（第幾項＝哪個音）'],
-        hints: ['第一項的索引是 1。改第 3 個音時，記下原本和改後的數值。'] })
+        hints: ['分享錄音前想一想：裡面有沒有別人的聲音或個資？', '現成的旋律或音檔要先確認授權。'] }
     ]),
     '1150803.html': route([], [
       { title: '暖身：變數累加', anchors: [{ up: '#route-accumulator-warmup' }],
@@ -258,7 +285,7 @@
         todo: '按「找出重複的步驟」，看具體的計算怎麼改寫成用「編號」變數的迴圈。',
         checks: ['說得出「第 1 項、第 2 項…」怎麼改寫成「第 編號 項」'],
         hints: ['找出每一行哪個數字在變，那個數字就適合變成變數。'] },
-      program({ title: '積木程式：總和與平均', optional: true,
+      program({ title: '積木程式：總和與平均',
         todo: '排好積木後按「比對檢查」，核對多筆、單筆和空清單三組結果。切換資料後，也可以按「執行本組」看逐筆累計。',
         checks: ['總和與平均正確', '單筆資料結果正確', '空清單時程式不會出錯（有先判斷）'],
         hints: ['算平均前先用「如果 清單的長度 > 0 那麼」判斷。'] })
@@ -288,12 +315,22 @@
     ]),
     '1150805.html': route([], [
       { title: '洗牌與排序挑戰', anchors: ['#curriculum-lab'],
-        activity: achieved('#curriculum-lab', '請通過洗牌的牌數檢查，以及排序的交換和停止判斷。'),
-        todo: '先看一輪洗牌怎麼移牌。接著依本次牌堆找出正確的洗牌結果，並判斷排序何時交換、何時停止。',
-        checks: ['洗牌後，每種數值出現的次數不變', '根據比較結果決定是否交換，並判斷一整輪未交換時可以停止'],
-        hints: ['先數每種牌有幾張。排序時，左邊比右邊大才交換。'] },
+        todo: '先判斷洗牌結果，再動手寫洗牌程式，最後練習相鄰比較排序。',
+        parts: [
+          { title: '洗牌示範：核對每張牌', todo: '看示範如何移走一張牌，再找出保留原牌堆每張牌的結果。',
+            activity: achieved('#curriculum-lab', '請先選出保留每張牌的洗牌結果。'), nextLabel: '開始洗牌實作' },
+          { title: '洗牌實作：排積木並執行', anchors: ['#shuffle-block-program'],
+            todo: '排好積木，每輪抽一張牌、放進新牌堆，再從原牌堆刪除。執行一組並複製洗牌紀錄，再按「比對檢查」。',
+            activity: activity('#shuffle-block-program[data-program-passed]', '用「比對檢查」確認兩副牌都沒有多牌或少牌。'),
+            nextLabel: '開始相鄰比較' },
+          { title: '排序練習：比較相鄰兩項', anchors: ['#sorting-lab'],
+            todo: '判斷相鄰兩張牌是否要交換，再選出可以提早停止的條件。' }
+        ],
+        activity: achieved('#sorting-lab', '請完成相鄰比較與停止條件的判斷。'),
+        checks: ['能按大小決定是否交換，並在一整輪都沒交換時停止'],
+        hints: ['洗牌前後要數每種牌有幾張。排序時，左邊比右邊大才交換。'] },
       program({
-        todo: '排好排序積木，執行兩組資料。把排序追蹤和上一個活動的洗牌紀錄貼到本課作業。',
+        todo: '排好排序積木，執行兩組資料。把排序追蹤和洗牌實作的紀錄貼到本課作業。',
         checks: ['排序程式能執行，並有比較與交換紀錄', '洗牌和排序前後，每個數值出現的次數都相同'],
         hints: ['前項比後項大才交換。比對各數值各有幾筆，例如原來有兩個 3，處理後也要有兩個 3。'] })
     ]),
@@ -341,5 +378,12 @@
   };
 
   window.LessonRoutes = routes;
-  if (routes[page] && window.LessonRoute) window.LessonRoute.start({ steps: routes[page], references: references[page], program: window.BlockProgramTasks?.[page], next, teacherFinish });
+  const practiceIds = {
+    '1150702.html': ['seq-block-program', 'sel-block-program', 'rep-block-program'],
+    '1150805.html': ['shuffle-block-program']
+  };
+  const extraPrograms = Object.fromEntries((practiceIds[page] || []).map(id => [id, window.BlockProgramPractice?.[id]]));
+  if (routes[page] && window.LessonRoute) window.LessonRoute.start({
+    steps: routes[page], references: references[page], program: window.BlockProgramTasks?.[page], extraPrograms, next, teacherFinish
+  });
 })();

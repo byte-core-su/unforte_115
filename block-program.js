@@ -102,7 +102,7 @@
     let result;
     let currentReport = '';
     root.innerHTML = `
-      <h3>積木程式模擬器</h3>
+      <h3>${escape(task.title || '積木程式模擬器')}</h3>
       <p>拖曳或點選積木加入程式。要調整順序：先點一塊，再點另一塊，兩塊就會交換位置（也可以直接拖曳）。按「比對檢查」可一次檢查所有預設資料。</p>
       <div class="block-program__cases">
         <label>測試資料 <select data-program-case>${task.cases.map(({ name }, index) => `<option value="${index}">${name}</option>`).join('')}</select></label>
@@ -160,8 +160,10 @@
     function showRunCount() {
       copyAll.disabled = runs.length === 0;
       copyAll.textContent = runs.length ? `複製多組試跑紀錄（${runs.length} 筆）` : '複製多組試跑紀錄';
-      root.toggleAttribute('data-program-three-runs', new Set(runs.filter(entry =>
-        entry.passed === true && typeof entry.inputKey === 'string').map(entry => entry.inputKey)).size >= 3);
+      const count = new Set(runs.filter(entry =>
+        entry.passed === true && typeof entry.inputKey === 'string').map(entry => entry.inputKey)).size;
+      if (task.requireTwoRuns) root.toggleAttribute('data-program-two-runs', count >= 2);
+      root.toggleAttribute('data-program-three-runs', count >= 3);
     }
 
     async function copyReport(report) {

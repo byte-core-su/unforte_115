@@ -29,6 +29,42 @@ test('all lesson programs run their cases and each required block matters', () =
   }
 });
 
+test('standalone sequence reads both numbers, then calculates and displays the average', () => {
+  const task = window.BlockProgramPractice['seq-block-program'];
+  const { execute, compare } = window.BlockProgram;
+  assert.deepEqual(Array.from(task.cases, ({ values }) => execute(task, task.goal, values).text), ['平均數是 19', '平均數是 12.5']);
+  assert.ok(compare(task, ['readB', 'readA', 'calculate', 'report']).results.every(({ result }) => result.passed));
+  for (const program of [['readA', 'calculate', 'readB', 'report'], ['readA', 'readB', 'report', 'calculate'], ['readA', 'readB', 'calculate']]) {
+    assert.ok(compare(task, program).results.every(({ result }) => !result.passed));
+  }
+  assert.equal(execute(task, task.goal, { a: 0, b: 77 }).text, '平均數是 38.5');
+});
+
+test('standalone branch, loop and shuffle execute correctly and need every block', () => {
+  const { execute, compare } = window.BlockProgram;
+  const [branch, loop, shuffle] = ['sel', 'rep', 'shuffle'].map(id => window.BlockProgramPractice[id + '-block-program']);
+  for (const task of [branch, loop, shuffle]) {
+    assert.ok(compare(task, task.goal).results.every(({ result }) => result.passed));
+    for (const block of task.goal) {
+      const incomplete = task.goal.filter(id => id !== block);
+      assert.ok(compare(task, incomplete).results.every(({ result }) => !result.passed), block);
+    }
+  }
+  assert.deepEqual(Array.from(branch.cases, ({ values }) => execute(branch, branch.goal, values).text),
+    ['總分 60｜及格', '總分 59｜未及格']);
+  assert.equal(execute(loop, loop.goal, { n: 4 }).text, '1 加到 4 的總和是 10');
+  assert.deepEqual(Array.from(execute(loop, loop.goal, { n: 4 }).rows, row => row[1]), [1, 3, 6, 10]);
+  for (const { values } of shuffle.cases) {
+    const before = [...values.data];
+    const result = execute(shuffle, shuffle.goal, values);
+    assert.deepEqual(Array.from(result.shuffled).sort(), [...before].sort());
+    assert.deepEqual(Array.from(values.data), before);
+    assert.equal(result.source.length, 0);
+    assert.equal(result.rows.length, before.length);
+  }
+  assert.ok(compare(shuffle, ['setup', 'pick', 'remove', 'add']).results.every(({ result }) => !result.passed));
+});
+
 test('comparison reports every case, missing blocks, and valid alternative orders', () => {
   const { compare } = window.BlockProgram;
   for (const [file, program] of Object.entries(keys)) {
@@ -48,6 +84,43 @@ test('comparison reports every case, missing blocks, and valid alternative order
   assert.equal(misplaced.results[0].result.passed, true);
   assert.match(misplaced.results[2].result.error, /除以 0/);
   assert.deepEqual(Array.from(compare(statistics, ['reset', 'sum', 'average']).missing), ['guard']);
+});
+
+test('melody completion counts two successful runs with different third notes', () => {
+  const task = window.BlockProgramTasks['1150802.html'];
+  const fields = new Map();
+  const events = new Map();
+  const attributes = new Set();
+  const note = {
+    dataset: { programValue: 'note' },
+    get valueAsNumber() { return Number(this.value); },
+    reportValidity: () => true, labels: [{ textContent: '第 3 音' }], addEventListener() {}
+  };
+  const root = {
+    querySelector(selector) {
+      if (!fields.has(selector)) fields.set(selector, {
+        value: '0', addEventListener() {}, replaceChildren() {}, querySelector: () => ({})
+      });
+      return fields.get(selector);
+    },
+    querySelectorAll: selector => selector === '[data-program-value]' ? [note] : [],
+    addEventListener: (type, listener) => { events.set(type, listener); },
+    removeAttribute: name => { attributes.delete(name); },
+    toggleAttribute(name, value) { if (value) attributes.add(name); else attributes.delete(name); }
+  };
+  window.BlockProgram.mount(root, task, { draft: { blocks: task.goal } });
+  const click = attr => events.get('click')({ target: {
+    closest: () => ({ dataset: {}, hasAttribute: name => name === attr })
+  } });
+  click('data-program-compare');
+  assert.ok(attributes.has('data-program-passed'));
+  assert.ok(!attributes.has('data-program-two-runs'));
+  click('data-program-run');
+  click('data-program-run');
+  assert.ok(!attributes.has('data-program-two-runs'));
+  note.value = String(Number(note.value) + 1);
+  click('data-program-run');
+  assert.ok(attributes.has('data-program-two-runs'));
 });
 
 test('duel palette reading order cannot pass and its reference appears after a valid program', async () => {

@@ -25,6 +25,121 @@
   const polygon = (state, edges, angle) => repeat(edges, () => { move(state, 35); turn(state, angle); });
   const closed = points => Boolean(points?.length > 2 && Math.hypot(...points.at(-1)) < 0.001);
 
+  function practice(config, title, goal, views) {
+    config.title = title;
+    config.goal = goal;
+    config.shufflePalette = true;
+    for (const [id, view] of Object.entries(views)) config.blocks[id] = { run: config.blocks[id], view };
+    return config;
+  }
+
+  const sequenceAverage = task({
+    readA: state => { state.a = state.input.a; },
+    readB: state => { state.b = state.input.b; },
+    calculate: state => {
+      if (state.a === undefined || state.b === undefined) throw new Error('請先讀取 A 和 B，再計算平均數。');
+      state.mean = (state.a + state.b) / 2;
+    },
+    report: state => {
+      if (state.mean === undefined) throw new Error('請先計算平均數，再顯示結果。');
+      state.text = `平均數是 ${state.mean}`;
+    }
+  }, [example('整數結果', { a: 14, b: 24 }), example('小數結果', { a: 9, b: 16 })],
+  state => state.text === `平均數是 ${(state.input.a + state.input.b) / 2}`, [],
+  [field('a', 'A', 0, 100), field('b', 'B', 0, 100)]);
+  practice(sequenceAverage, '動手做：計算兩數的平均', ['readA', 'readB', 'calculate', 'report'], {
+    readA: ['variable', 'stack', '讀取第一個數，存入 [A]'],
+    readB: ['variable', 'stack', '讀取第二個數，存入 [B]'],
+    calculate: ['variable', 'stack', '變數 [平均數] 設為 {(A + B) ÷ 2}'],
+    report: ['looks', 'stack', '說出 {平均數}']
+  });
+
+  const weightedScore = ({ hw, test, daily }) => (hw * 2 + test * 2 + daily) / 5;
+  const branchTask = practice(task({
+    read: state => { state.scores = state.input; },
+    calculate: state => {
+      if (!state.scores) throw new Error('請先讀取三項成績。');
+      state.score = weightedScore(state.scores);
+    },
+    choose: state => {
+      if (state.score === undefined) throw new Error('請先算出總分，再判斷是否及格。');
+      state.outcome = state.score >= 60 ? '及格' : '未及格';
+    },
+    report: state => {
+      if (!state.outcome) throw new Error('請先判斷結果，再顯示總分和是否及格。');
+      state.text = `總分 ${state.score}｜${state.outcome}`;
+    }
+  }, [example('剛好 60 分', { hw: 50, test: 60, daily: 80 }),
+    example('低於 60 分', { hw: 50, test: 60, daily: 75 })],
+  state => {
+    const expected = weightedScore(state.input);
+    return state.text === `總分 ${expected}｜${expected >= 60 ? '及格' : '未及格'}`;
+  }, [], [field('hw', '作業', 0, 100), field('test', '測驗', 0, 100), field('daily', '平時', 0, 100)]),
+  '動手做：判斷成績是否及格', ['read', 'calculate', 'choose', 'report'], {
+    read: ['variable', 'stack', '讀取 [作業]、[測驗]、[平時] 成績'],
+    calculate: ['variable', 'stack', '變數 [總分] 設為 {作業 × 0.4 + 測驗 × 0.4 + 平時 × 0.2}'],
+    choose: ['control', 'ifelse', '如果 <總分 ≥ 60> 那麼',
+      [['variable', '變數 [結果] 設為 {及格}']], [['variable', '變數 [結果] 設為 {未及格}']]],
+    report: ['looks', 'stack', '說出 {總分和結果}']
+  });
+
+  const repeatTask = practice(task({
+    resetNumber: state => { state.number = 0; },
+    resetTotal,
+    addNumbers: state => {
+      if (state.number === undefined || state.total === undefined) throw new Error('請先把數字與總和都設為 0。');
+      repeat(state.input.n, () => {
+        state.number++;
+        state.total += state.number;
+        state.rows.push([state.number, state.total]);
+      });
+    },
+    report: state => {
+      if (!state.rows.length) throw new Error('請先執行累加，再顯示總和。');
+      state.text = `1 加到 ${state.input.n} 的總和是 ${state.total}`;
+    }
+  }, [example('只加一個數', { n: 1 }), example('加五個數', { n: 5 })],
+  state => state.rows.length === state.input.n &&
+    state.text === `1 加到 ${state.input.n} 的總和是 ${state.input.n * (state.input.n + 1) / 2}`,
+  ['目前的數字', '累計總和'], [field('n', 'N', 1, 20)]),
+  '動手做：用迴圈從 1 加到 N', ['resetNumber', 'resetTotal', 'addNumbers', 'report'], {
+    resetNumber: ['variable', 'stack', '變數 [數字] 設為 {0}'],
+    resetTotal: ['variable', 'stack', '變數 [總和] 設為 {0}'],
+    addNumbers: ['control', 'loop', '重複 {N} 次',
+      [['variable', '變數 [數字] 改變 {1}'], ['variable', '變數 [總和] 改變 {數字}']]],
+    report: ['looks', 'stack', '說出 {總和}']
+  });
+
+  const shuffleTask = practice(task({
+    setup: state => { state.source = [...state.input.data]; state.shuffled = []; },
+    pick: state => {
+      if (!state.source.length) throw new Error('原牌堆已經沒有牌。');
+      state.index = Math.floor(Math.random() * state.source.length);
+    },
+    add: state => {
+      if (state.index === undefined) throw new Error('請先隨機選出牌的位置。');
+      state.shuffled.push(state.source[state.index]);
+      state.added = true;
+    },
+    remove: state => {
+      if (!state.added) throw new Error('請先把這張牌放進新牌堆，再從原牌堆刪除。');
+      const [card] = state.source.splice(state.index, 1);
+      state.rows.push([state.index + 1, card, list(state.source), list(state.shuffled)]);
+      state.index = undefined;
+      state.added = false;
+      if (!state.source.length) state.text = `洗牌完成：${list(state.shuffled)}`;
+    }
+  }, [example('兩張 3', { data: [1, 2, 3, 3] }), example('兩對相同的牌', { data: [4, 4, 7, 7] })],
+  state => state.source?.length === 0 && same([...state.shuffled].sort(), [...state.input.data].sort()),
+  ['抽出的項次', '牌面', '剩餘原牌堆', '新牌堆']),
+  '動手做：用積木洗牌', ['setup', 'pick', 'add', 'remove'], {
+    setup: ['list', 'stack', '建立 [原牌堆]，清空 [新牌堆]'],
+    pick: ['variable', 'stack', '變數 [項次] 設為 {隨機取數 1 到原牌堆長度}'],
+    add: ['list', 'stack', '添加 {原牌堆的第 項次 項} 到 [新牌堆]'],
+    remove: ['list', 'stack', '刪除 [原牌堆] 的第 {項次} 項']
+  });
+  shuffleTask.loop = { before: ['setup'], times: shuffleTask.cases[0].values.data.length };
+
   const tasks = {
     '1150701.html': task({
       flag: shape,
@@ -324,6 +439,11 @@
     task.goal = goal;
     for (const [id, view] of Object.entries(blocks)) task.blocks[id] = { run: task.blocks[id], view };
   }
+  tasks['1150802.html'].requireTwoRuns = true;
   tasks['1150806.html'].shufflePalette = true;
   window.BlockProgramTasks = tasks;
+  window.BlockProgramPractice = {
+    'seq-block-program': sequenceAverage, 'sel-block-program': branchTask,
+    'rep-block-program': repeatTask, 'shuffle-block-program': shuffleTask
+  };
 })();

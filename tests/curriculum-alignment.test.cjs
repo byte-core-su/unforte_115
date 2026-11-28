@@ -46,10 +46,13 @@ test('grade 8 ethics codes distinguish review, partial coverage and exclusions',
   assert.match(plan, /資 H-IV-4 不列為本課涵蓋證據/);
 });
 
-test('reference code and optional modules are not reported as universal implementation', () => {
+test('statistics requires program evidence and optional modules stay optional', () => {
   const source = read('LESSON_PLAN_GRADE_8.md');
   const unit = source.split('### 第 3 課')[1].split('### 第 4 課')[0];
-  assert.match(unit, /資 P-IV-3 僅作參考程式閱讀，非獨立實作採證/);
+  assert.match(unit, /資 A-IV-2、資 P-IV-3/);
+  assert.match(unit, /組裝能計算總和與平均的積木程式。三組測試都須通過/);
+  const matrix = read('CURRICULUM_ALIGNMENT.md');
+  assert.match(matrix, /3 能源統計.*資 P-IV-3.*學生組裝的加總與平均程式/);
   const grade7 = read('LESSON_PLAN_GRADE_7.md');
   const extension = grade7.split('### 第 5 課')[1].split('### 第 6 課')[0];
   assert.match(extension, /資 P-IV-4、資 P-IV-5 僅列選做延伸/);
@@ -83,23 +86,30 @@ test('student labs show activity titles and keep clear of the dynamic render roo
       });
       return controls.get(selector);
     };
-    const section = {
+    let sorting;
+    const makeSection = () => ({
       setAttribute(name, value) { this[name] = value; },
       removeAttribute(name) { delete this[name]; },
+      after(sibling) { sorting = sibling; },
       querySelector(selector) { return selector === '[data-quiz]' ? null : control(selector); }
-    };
+    });
     const main = {
       id: dynamic ? 'app-container' : '', innerHTML: '',
       appendChild(element) { assert.ok(!dynamic); mounted = element; },
       insertAdjacentElement(position, element) { assert.ok(dynamic); assert.equal(position, 'afterend'); mounted = element; }
     };
     vm.runInNewContext(read('curriculum-labs.js'), {
-      document: { querySelector: () => main, createElement: () => section },
+      document: { querySelector: () => main, createElement: makeSection },
       window: { CourseScenarios, location: { pathname: `/${page}` } }, Math
     });
-    assert.equal(mounted, section);
+    assert.equal(mounted.id, 'curriculum-lab');
     assert.equal(mounted['aria-labelledby'], 'curriculum-lab-title');
     assert.match(mounted.innerHTML, /<h2 id="curriculum-lab-title">[^<]+<\/h2>/);
     assert.doesNotMatch(mounted.innerHTML, /課綱|採證|[A-Za-z]-IV-\d|lesson-plan-grade-/);
+    if (page === '1150805.html') {
+      assert.equal(sorting.id, 'sorting-lab');
+      assert.equal(sorting.hidden, true);
+      assert.equal(sorting['aria-labelledby'], 'g8-sort-title');
+    }
   }
 });

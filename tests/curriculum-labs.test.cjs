@@ -20,21 +20,27 @@ function loadLab(page, scenario = CourseScenarios.active, random = Math.random) 
     }
     return elements.get(id);
   };
-  const section = {
+  const sections = [];
+  const makeSection = () => ({
     className: '', innerHTML: '',
+    after() {},
     setAttribute(name, value) { this[name] = value; },
     removeAttribute(name) { delete this[name]; },
     querySelector(selector) { return selector === '[data-quiz]' ? null : element(selector); }
-  };
+  });
   const main = { appendChild() {} };
   const document = {
     querySelector(selector) { return selector === 'main' ? main : null; },
-    createElement() { return section; }
+    createElement() {
+      const node = makeSection();
+      sections.push(node);
+      return node;
+    }
   };
   const window = { CourseScenarios: { ...CourseScenarios, active: scenario }, location: { pathname: `/${page}` } };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../lesson-labels.js'), 'utf8'), { window });
   vm.runInNewContext(source, { document, window, Math: Object.assign(Object.create(Math), { random }) });
-  return Object.assign(element, { section });
+  return Object.assign(element, { section: sections[0], sorting: sections[1] });
 }
 
 {
@@ -168,7 +174,7 @@ for (const scenario of [CourseScenarios.active, campus]) {
   const parseCards = text => text.match(/［([\d、]+)］/)[1].split('、').map(Number);
   for (const random of [() => 0, () => 0.4, () => 0.8]) {
     const get = loadLab('1150805.html', CourseScenarios.active, random);
-    const passed = () => get.section['data-lesson-activity'] === '';
+    const passed = () => get.sorting['data-lesson-activity'] === '';
     const state = get('#g8-sort-state');
     const choice = get('#g8-shuffle-choice');
     const original = parseCards(get('#g8-shuffle-prompt').textContent);
@@ -183,12 +189,15 @@ for (const scenario of [CourseScenarios.active, campus]) {
     choice.value = 'extra';
     get('#g8-shuffle-check').click();
     assert.match(get('#g8-shuffle-state').textContent, /總張數相同.*少了一張/);
-    assert.ok(!get('#g8-shuffle-task').hidden);
+    assert.equal(get.sorting.hidden, true);
+    assert.equal(get.section['data-lesson-activity'], undefined);
     assert.equal(passed(), false);
     choice.value = 'valid';
     get('#g8-shuffle-check').click();
-    assert.equal(get('#g8-shuffle-task').hidden, true);
-    assert.equal(get('#g8-sort-task').hidden, false);
+    assert.equal(get.section['data-lesson-activity'], '');
+    assert.match(get('#g8-shuffle-state').textContent, /開始洗牌實作/);
+    assert.equal(get.sorting.hidden, false);
+    assert.equal(passed(), false);
     for (let comparison = 0; comparison < 2; comparison++) {
       const [, left, right] = state.textContent.match(/比較 (\d+) 和 (\d+)/);
       const swap = Number(left) > Number(right);

@@ -15,6 +15,7 @@ function loadLesson(filename) {
     id, value: '', textContent: '', innerHTML: '', className: '', listeners: {}, children: [],
     options: ['3', '4', '5', '6', 'custom'].map(value => ({ value })),
     setAttribute(name, value) { this[name] = value; },
+    removeAttribute(name) { delete this[name]; },
     addEventListener(name, callback) { this.listeners[name] = callback; },
     appendChild() {}, focus() {}, select() {}, cloneNode() { return node(); },
     classList: { add() {}, remove() {} }
@@ -24,7 +25,7 @@ function loadLesson(filename) {
     return elements.get(id);
   };
   const context = {
-    document: { getElementById: get, addEventListener() {}, createElementNS: () => node() },
+    document: { getElementById: get, addEventListener() {}, createElement: () => node(), createElementNS: () => node() },
     window: { CourseScenarios, addEventListener() {} }, Math,
     setInterval(callback) { timers.add(callback); return callback; },
     clearInterval(callback) { timers.delete(callback); },
@@ -128,6 +129,25 @@ function loadLesson(filename) {
   context.setDefenseCase(5, 5, 50, 3);
   assert.equal(signature(), '5,5,50,3');
 }
+
+test('flow puzzles must be completed before standalone practice unlocks', () => {
+  const { context, get } = loadLesson('1150702.html');
+  for (const [kind, count, next, init, place] of [
+    ['seq', 6, '開始平均數實作', context.initSeqGame, context.tryPlaceSeqItem],
+    ['sel', 10, '開始及格判斷實作', context.initSelGame, context.tryPlaceSelItem],
+    ['rep', 9, '開始累加實作', context.initRepGame, context.tryPlaceRepItem]
+  ]) {
+    const message = get(`${kind}-flow-msg`);
+    init();
+    for (let id = 1; id < count; id++) place(id);
+    assert.equal(message['data-lesson-activity'], undefined);
+    place(count);
+    assert.equal(message['data-lesson-activity'], '');
+    assert.ok(message.textContent.includes(next));
+    init();
+    assert.equal(message['data-lesson-activity'], undefined);
+  }
+});
 
 test('polygon transfer is needed after the worked shapes', () => {
   const { context, get, finishDrawing } = loadLesson('1150703.html');

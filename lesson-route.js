@@ -80,7 +80,8 @@
     const hasNextPart = () => Boolean(viewedPart() && partIndex() + 1 < viewedStep().parts.length);
 
     function saveRoute() {
-      storageAvailable = save({ route: { version, current, finished, skipped: [...skipped], answers, submitted: Boolean(ticked[0]) } });
+      const part = steps[current].parts?.[currentPart]?.resume ? currentPart : undefined;
+      storageAvailable = save({ route: { version, current, part, finished, skipped: [...skipped], answers, submitted: Boolean(ticked[0]) } });
     }
 
     function resolve() {
@@ -88,19 +89,21 @@
       steps.forEach((step, index) => {
         const foreign = anchorsByStep.flatMap((list, other) => other === index ? [] : list.map(item => item.node)).filter(Boolean);
         const anchors = anchorsByStep[index];
+        step.missing = anchors.some(item => !item.node);
         const resolveRegions = (items, excluded = foreign) => items.filter(item => item.node)
           .map(item => regionFor(item.node, item.locator, excluded));
         if (step.parts) {
           let start = 0;
           step.parts.forEach(part => {
-            const end = start + (part.anchorCount || 1);
+            const end = part.anchors ? start : start + (part.anchorCount || 1);
+            const items = part.anchors?.map(locator => ({ locator, node: findAnchor(locator) })) || anchors.slice(start, end);
             const otherParts = [...anchors.slice(0, start), ...anchors.slice(end)].map(item => item.node).filter(Boolean);
-            part.regions = resolveRegions(anchors.slice(start, end), [...foreign, ...otherParts]);
+            part.regions = resolveRegions(items, [...foreign, ...otherParts]);
+            if (items.some(item => !item.node)) step.missing = true;
             start = end;
           });
         }
         step.regions = step.parts ? step.parts.flatMap(part => part.regions) : resolveRegions(anchors);
-        step.missing = anchors.some(item => !item.node);
       });
     }
 
@@ -159,7 +162,7 @@
         apply();
         updateCompletion();
       }, 300);
-    }).observe(document.body, { childList: true, subtree: true, attributeFilter: ['data-lesson-activity', 'data-program-passed'] });
+    }).observe(document.body, { childList: true, subtree: true, attributeFilter: ['data-lesson-activity', 'data-program-passed', 'data-program-two-runs', 'data-program-three-runs'] });
 
     const panel = document.createElement('section');
     panel.className = 'lesson-route';
@@ -169,15 +172,20 @@
     completion.setAttribute('aria-label', '完成這一步');
     const main = document.querySelector('main');
     main.classList.add('lesson-activity');
-    if (config.program && window.BlockProgram) {
-      const simulator = document.createElement('section');
-      simulator.id = 'block-program';
-      simulator.className = 'block-program';
-      main.after(simulator);
-      window.BlockProgram.mount(simulator, config.program, demo ? undefined : {
-        draft: saved.program,
-        onSave: program => save({ program })
-      });
+    if (window.BlockProgram) {
+      const programs = { 'block-program': config.program, ...config.extraPrograms };
+      for (const [id, task] of Object.entries(programs)) {
+        if (!task) continue;
+        const simulator = document.createElement('section');
+        simulator.id = id;
+        simulator.className = 'block-program';
+        main.after(simulator);
+        const draftKey = id === 'block-program' ? 'program' : id;
+        window.BlockProgram.mount(simulator, task, demo ? undefined : {
+          draft: saved[draftKey],
+          onSave: program => save({ [draftKey]: program })
+        });
+      }
     }
     main.after(panel, completion);
     const startButton = document.querySelector('[data-lesson-start]');
@@ -303,7 +311,7 @@
 
     function focusStep() {
       requestAnimationFrame(() => {
-        const programHeading = viewedStep().regions.find(region => region.id === 'block-program')?.querySelector('h3');
+        const programHeading = viewedRegions().find(region => region.classList.contains('block-program'))?.querySelector('h3');
         const heading = programHeading || (panel.hidden ? (guideHeading || guide)?.querySelector('h1') : panel.querySelector('.lesson-route__title'));
         if (programHeading) {
           reveal(programHeading, 'start');
@@ -323,9 +331,9 @@
       window.dispatchEvent(new Event('resize'));
     }
 
-    function enter(index, { focus = true, submitted = false } = {}) {
+    function enter(index, { focus = true, submitted = false, part = 0 } = {}) {
       current = index;
-      currentPart = 0;
+      currentPart = part;
       viewing = null;
       hintsShown = 0;
       ticked = [submitted];
@@ -390,7 +398,7 @@
       const choice = part && step.optional;
       const continuesPart = hasNextPart() && !choice;
       const checks = continuesPart ? [] : step.checks || [];
-      const hints = viewing === null ? step.hints || [] : [];
+      const hints = viewing === null ? part?.hints || step.hints || [] : [];
       const { before, during, after } = step.questions || {};
       panel.innerHTML = `
         <div class="lesson-route__bar">
@@ -413,7 +421,7 @@
             ${hasNextPart() ? '<button type="button" data-action="next-part">回看後一小步</button>' : ''}
           </div>` : ''}
         </div>`;
-      const action = continuesPart ? '繼續下一小步' : current === steps.length - 1 ? '完成本課' : '完成這一步';
+      const action = continuesPart ? part.nextLabel || '繼續下一小步' : current === steps.length - 1 ? '完成本課' : '完成這一步';
       completion.innerHTML = `
         <div class="lesson-route__body">
           ${checks.length ? `<p class="lesson-route__todo"><b>怎樣算達標</b></p><ul class="evidence-list" role="list">${checks.map(check => `<li>${escapeHtml(check)}</li>`).join('')}</ul>` : ''}
@@ -424,7 +432,7 @@
             ${part && partIndex() > 0 ? '<button type="button" data-action="previous-part">回看前一小步</button>' : ''}
             ${choice && hasNextPart() ? '<button type="button" data-action="next-part">看下一項選做</button>' : ''}
             ${step.optional && (demo || !step.regions.length) ? '<button type="button" data-action="skip">略過選做</button>' : ''}
-            <button type="button" class="lesson-route__primary" data-action="done">${action}</button>
+            <button type="button" class="lesson-route__primary" data-action="done">${escapeHtml(action)}</button>
           </div>
         </div>`;
       updateCompletion();
@@ -518,8 +526,10 @@
 
     function changePart(index) {
       if (!viewedPart() || !viewedStep().parts[index]) return;
-      if (viewing === null) currentPart = index;
-      else reviewPart = index;
+      if (viewing === null) {
+        currentPart = index;
+        saveRoute();
+      } else reviewPart = index;
       hintsShown = 0;
       updateView();
       focusStep();
@@ -549,7 +559,8 @@
       guide?.querySelector('.lesson-route__entry')?.setAttribute('disabled', '');
       if (startButton) startButton.disabled = false;
     }
-    enter(resume ? route.current : 0, { focus: false, submitted: resume && route.submitted === true });
+    const savedPart = resume && steps[route.current].parts?.[route.part]?.resume ? route.part : 0;
+    enter(resume ? route.current : 0, { focus: false, submitted: resume && route.submitted === true, part: savedPart });
     if (showAll && location.hash) {
       const target = document.getElementById(location.hash.slice(1));
       if (target) requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
@@ -558,8 +569,11 @@
 
   // Wait until the page (including script-built or React parts) shows the anchors we need.
   function startWhenReady(config, timeout = 8000) {
-    const needed = [...config.steps.flatMap(step => step.anchors || []), ...(config.references || [])]
-      .filter(locator => locator !== '#block-program');
+    const simulatorAnchors = new Set(['#block-program', ...Object.keys(config.extraPrograms || {}).map(id => '#' + id)]);
+    const anchors = config.steps.flatMap(step => [
+      ...(step.anchors || []), ...(step.parts || []).flatMap(part => part.anchors || [])
+    ]);
+    const needed = [...anchors, ...(config.references || [])].filter(locator => !simulatorAnchors.has(locator));
     const began = Date.now();
     (function poll() {
       if (needed.every(locator => findAnchor(locator)) || Date.now() - began > timeout) start(config);
