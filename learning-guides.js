@@ -163,10 +163,8 @@
   document.body.classList.add('site-course', gradeClass);
   section.className = 'learning-guide';
   section.setAttribute('aria-label', '本課學習導航');
-  // Teachers land on student-facing pages; give them a direct way to the matching lesson plan.
   const planGrade = page.startsWith('11508') ? 8 : 7;
   const lessonNumber = Number(page.slice(6, 7));
-  const planHref = guide.lessonPlan || `lesson-plan-grade-${planGrade}.html#lesson-${lessonNumber}`;
   const { title: missionTitle } = active.grades[planGrade].cards[lessonNumber - 1];
   const title = guide.title || missionTitle;
   const heading = missionTitle === title ? title : `${missionTitle}（${title}）`;
@@ -178,7 +176,6 @@
     <div class="learning-guide__card">
       <div class="learning-guide__top">
         <span class="learning-guide__tag">${escapeHtml(guide.grade)}</span>
-        <a class="learning-guide__teacher" href="${escapeHtml(planHref)}" target="_blank" rel="noopener">教師備課：本課教案 ↗</a>
       </div>
       <h1 id="learning-guide-title">${escapeHtml(heading)}</h1>
       <p>${escapeHtml(guide.missionGoal || guide.action)}</p>
@@ -188,8 +185,7 @@
       <div class="learning-guide__grid">
         <div class="learning-guide__item"><strong>從哪裡開始</strong>${guide.missionGoal ? `<div>${escapeHtml(guide.action)}</div>` : ''}<button type="button" class="learning-guide__start" data-lesson-start disabled>載入活動中…</button><p class="learning-guide__status" role="status"></p></div>
         <div class="learning-guide__item"><strong>最後交什麼</strong>
-          ${guide.evidence?.length ? `<ul class="evidence-list" role="list">${guide.evidence.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : '<p>請參考本課教案。</p>'}
-          <a class="learning-guide__records" href="${escapeHtml(guide.records || 'student-records.html')}" target="_blank" rel="noopener">打開學習紀錄表 ↗</a>
+          ${guide.evidence?.length ? `<ul class="evidence-list" role="list">${guide.evidence.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : '<p>依老師在班級平台公布的作業要求繳交。</p>'}
         </div>
       </div>
       <div class="learning-guide__links">

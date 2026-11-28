@@ -20,6 +20,8 @@ execFileSync(process.execPath, [path.join(root, 'scripts/build-lesson-plans.cjs'
 
 for (const grade of [7, 8]) {
   const overview = fs.readFileSync(path.join(root, `1150${grade}00.html`), 'utf8');
+  assert.doesNotMatch(overview, /href="[^"]*(?:lesson-plan-grade|student-records|teacher-resources)\b/);
+  assert.match(prep, new RegExp(`href="student-records\\.html#grade-${grade}"`));
   const curriculumMap = fs.readFileSync(path.join(root, 'curriculum-map.html'), 'utf8');
   for (let lesson = 1; lesson <= 6; lesson++) {
     const page = `1150${grade}0${lesson}.html`;
@@ -89,7 +91,7 @@ for (const grade of [7, 8]) {
       assert.equal(preview?.questions.before, module.activity.questions.before);
       assert.equal(preview?.questions.during, module.activity.questions.during);
       assert.equal(practice?.questions.after, module.activity.questions.after);
-      assert.equal(practice.link.href, module.resources.records);
+      assert.equal(practice.link, undefined, `${id}: the record template stays in teacher prep`);
       for (const question of Object.values(module.activity.questions)) {
         assert.ok(planSection.includes(CourseScenarios.escapeHtml(question)));
         assert.ok(recordSection.includes(CourseScenarios.escapeHtml(question)));
@@ -100,12 +102,15 @@ for (const grade of [7, 8]) {
     }
     assert.deepEqual(Array.from(exit.evidence), module.evidence);
     assert.equal(exit.checks[0], module.successCriteria);
-    assert.equal(exit.link.href, module.resources.records);
+    assert.ok(steps.every(step => !step.link), `${id}: the student route stays on the lesson page`);
+    assert.match(exit.todo, /班級平台.*繳交/);
+    assert.ok(prep.includes(`href="${module.resources.records}"`), `${id}: teachers can reach the record template`);
     assert.match(section.innerHTML, /從哪裡開始[\s\S]*最後交什麼/);
     assert.match(section.innerHTML, /data-lesson-start/);
     assert.doesNotMatch(section.innerHTML, /怎樣算達標|離堂檢核/);
-    assert.match(section.innerHTML, new RegExp(`href="student-record-${id}\\.html"[^>]*>打開學習紀錄表`));
-    assert.match(studentHeading, new RegExp(`href="lesson-plan-grade-${grade}\\.html#lesson-${lesson}"[^>]*>教師備課：本課教案`), `${page}: teachers should reach this lesson's plan`);
+    const teacherResources = /href="[^"]*(?:lesson-plan-grade|student-record|teacher-resources)\b|教師備課：本課教案/;
+    assert.doesNotMatch(section.innerHTML, teacherResources, `${page}: start guide only shows student materials`);
+    assert.doesNotMatch(studentHeading, teacherResources, `${page}: student heading has no teacher resource links`);
   }
   const filename = `lesson-plan-grade-${grade}.html`;
   const html = fs.readFileSync(path.join(root, filename), 'utf8');

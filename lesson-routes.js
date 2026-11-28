@@ -57,12 +57,11 @@
   });
   const exit = () => ({
     title: '離堂任務',
-    todo: '打開本課紀錄表，把下列成果整理成一份，交到老師指定的班級平台。',
+    todo: '依照下方的必交項目整理成果，填入老師在班級平台提供的作業，再繳交。',
     submission: true,
     evidence: guide.evidence,
     checks: [guide.successCriteria || '已依老師說明檢查成果'],
-    hints: ['有積木程式時，可回到實作步驟複製程式與試跑紀錄，再貼到作業。'],
-    link: { href: guide.records || 'student-records.html', label: '打開學習紀錄表 ↗' }
+    hints: ['有積木程式時，可回到實作步驟複製程式與試跑紀錄，再貼到作業。']
   });
   const route = (introExtra, middle, { warmup, requirePractice = false } = {}) => {
     const steps = [
@@ -284,7 +283,6 @@
       program({
         todo: draw.practice,
         questions: { after: draw.questions.after },
-        link: { href: drawLesson.records, label: '開啟本課學習紀錄表 ↗' },
         checks: [drawLesson.successCriteria],
         hints: ['隨機範圍要用「1 到 清單的長度」，不要寫死 30。'] })
     ]),

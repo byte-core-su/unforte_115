@@ -73,8 +73,7 @@ button { transition: transform .18s ease, box-shadow .18s ease, background-color
   background: linear-gradient(110deg, var(--grade-soft), #fff);
 }
 
-.course-overview__header a,
-.course-overview__links a {
+.course-overview__header a {
   color: #334155;
   font-size: .9rem;
   font-weight: 700;
@@ -97,8 +96,6 @@ button { transition: transform .18s ease, box-shadow .18s ease, background-color
 .course-overview h2 { margin: 0; font-size: 1.3rem; }
 .course-overview main { padding-block: 1.5rem 2rem; }
 
-.course-overview__heading,
-.course-overview__links,
 .course-overview__meta {
   display: flex;
   flex-wrap: wrap;
@@ -106,7 +103,7 @@ button { transition: transform .18s ease, box-shadow .18s ease, background-color
   gap: .6rem 1rem;
 }
 
-.course-overview__heading { justify-content: space-between; margin-bottom: 1rem; }
+.course-overview__heading { margin-bottom: 1rem; }
 
 .course-overview__grid {
   display: grid;
@@ -309,21 +306,6 @@ button { transition: transform .18s ease, box-shadow .18s ease, background-color
   gap: .4rem 1rem;
 }
 
-.learning-guide__teacher {
-  margin-bottom: .6rem;
-  border: 1px solid var(--grade-border);
-  border-radius: .6rem;
-  background: #fff;
-  padding: .25rem .65rem;
-  color: #475569;
-  font-size: .8rem;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.learning-guide__teacher:hover,
-.learning-guide__teacher:focus-visible { color: var(--grade-primary); border-color: var(--grade-primary); }
-
 .learning-guide h1 {
   margin: 0 0 .55rem;
   color: var(--site-text);
@@ -369,14 +351,12 @@ button { transition: transform .18s ease, box-shadow .18s ease, background-color
 .learning-guide__start:disabled { opacity: .65; cursor: wait; }
 .learning-guide__status { margin: .4rem 0 0; color: #9a3412; }
 .learning-guide__status:empty { display: none; }
-.learning-guide__records { display: block; margin-top: .4rem; }
 .learning-guide__links {
   display: grid;
   gap: .45rem;
   margin-top: .8rem;
   font-size: .85rem;
 }
-.learning-guide__records,
 .learning-guide__links > a { color: #334155; text-decoration: underline; text-underline-offset: .18em; }
 .learning-guide__links > a { justify-self: start; }
 .learning-guide__story > summary { cursor: pointer; }
