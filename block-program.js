@@ -115,7 +115,7 @@
     let currentReport = '';
     root.innerHTML = `
       <h3>${escape(task.title || '積木程式模擬器')}</h3>
-      <p>拖曳或點選積木加入程式。要調整順序：先點一塊，再點另一塊，兩塊就會交換位置（也可以直接拖曳）。按「比對檢查」可一次檢查所有預設資料。</p>
+      <p>拖曳或點選積木加入程式。可拖曳排序，也可以點選兩塊交換。把積木拖出放置區後放開即可移除。按「比對檢查」可檢查所有預設資料。</p>
       <div class="block-program__cases">
         <label>測試資料 <select data-program-case>${task.cases.map(({ name }, index) => `<option value="${index}">${name}</option>`).join('')}</select></label>
         ${task.fields.map(({ key, label, min, max }) => `<label>${label} <input data-program-value="${key}" type="number" min="${min}" max="${max}" required></label>`).join('')}
@@ -222,10 +222,8 @@
     function render() {
       const rows = program.map((id, index) =>
         `<li data-program-row="${index}" class="block-program__row">
-          <button type="button" class="block-program__grab block-program__pick${picked === index ? ' is-picked' : ''}" data-program-drag="${index}" data-program-pick="${index}" draggable="true" aria-pressed="${picked === index}" aria-label="第 ${index + 1} 塊：${escape(textLabel(task.blocks[id].view[2]))}。${picked === null ? '點選後，再點另一塊即可交換位置' : picked === index ? '已選取，再點一次取消' : `點這裡與第 ${picked + 1} 塊交換`}">${blockMarkup(task.blocks[id].view)}</button>
-          <div class="block-program__actions">
-            <button type="button" data-program-edit="0" data-index="${index}" aria-label="移除第 ${index + 1} 塊">移除</button>
-          </div></li>`);
+          <button type="button" class="block-program__grab block-program__pick${picked === index ? ' is-picked' : ''}" data-program-drag="${index}" data-program-pick="${index}" draggable="true" aria-pressed="${picked === index}" aria-keyshortcuts="Delete Backspace" aria-label="第 ${index + 1} 塊：${escape(textLabel(task.blocks[id].view[2]))}。${picked === null ? '點選後，再點另一塊即可交換位置' : picked === index ? '已選取，再點一次取消' : `點這裡與第 ${picked + 1} 塊交換`}。鍵盤可按 Delete 移除">${blockMarkup(task.blocks[id].view)}</button>
+        </li>`);
       if (task.loop && rows.length > task.loop.before.length) {
         const split = task.loop.before.length;
         script.innerHTML = rows.slice(0, split).join('') +
@@ -272,56 +270,126 @@
           ${escape(summary(result))}</li>`).join('')}</ul>${reference}`;
     }
 
-    let drag;
+    function saveEdit(message) {
+      invalidate(message);
+      saveDraft();
+      render();
+    }
+
+    function removeBlock(index) {
+      program.splice(index, 1);
+      saveEdit('已移除積木。');
+    }
+
     function clearDrop() {
       script.querySelectorAll('[data-drop]').forEach(row => row.removeAttribute('data-drop'));
       script.classList.remove('is-drop-end');
+      work.classList.remove('is-drop-outside');
     }
-    function destination(event) {
-      const row = event.target.closest('[data-program-row]');
+    function destination(target, y) {
+      const row = target.closest('[data-program-row]');
       if (!row) return program.length;
       const rect = row.getBoundingClientRect();
-      return Number(row.dataset.programRow) + (event.clientY > rect.top + rect.height / 2 ? 1 : 0);
+      return Number(row.dataset.programRow) + (y > rect.top + rect.height / 2 ? 1 : 0);
     }
-    root.addEventListener('dragstart', event => {
-      const source = event.target.closest('[data-program-add], [data-program-drag]');
-      if (!source || source.disabled) return;
-      const { programAdd, programDrag } = source.dataset;
-      if (programAdd && missingVariables(task, [programAdd], declared).length) return;
-      drag = programAdd ? { id: programAdd } : { index: Number(programDrag) };
-      event.dataTransfer.effectAllowed = programAdd ? 'copy' : 'move';
-      event.dataTransfer.setData('text/plain', programAdd || programDrag);
-    });
-    work.addEventListener('dragover', event => {
-      if (!drag) return;
-      event.preventDefault();
-      event.dataTransfer.dropEffect = drag.id ? 'copy' : 'move';
+    function showDrop(drag, target, y) {
       clearDrop();
-      const position = destination(event);
+      if (!work.contains(target)) {
+        if (drag.index !== undefined) work.classList.add('is-drop-outside');
+        return;
+      }
+      const position = destination(target, y);
       const row = script.querySelector(`[data-program-row="${position}"]`);
       if (row) row.setAttribute('data-drop', '');
       else script.classList.add('is-drop-end');
-    });
-    work.addEventListener('dragleave', event => {
-      if (!work.contains(event.relatedTarget)) clearDrop();
-    });
-    work.addEventListener('drop', event => {
-      if (!drag) return;
-      event.preventDefault();
-      let position = destination(event);
-      if (drag.id) program.splice(position, 0, drag.id);
-      else {
-        const [id] = program.splice(drag.index, 1);
-        if (drag.index < position) position--;
-        program.splice(position, 0, id);
+    }
+    function finishDrop(drag, target, y) {
+      if (!target) return false;
+      if (!work.contains(target)) {
+        if (drag.index === undefined) return false;
+        removeBlock(drag.index);
+        return true;
       }
-      invalidate(drag.id ? '已加入積木。' : '已移動積木。');
-      saveDraft();
-      drag = undefined;
-      clearDrop();
-      render();
+      const position = destination(target, y);
+      if (drag.id) {
+        program.splice(position, 0, drag.id);
+        saveEdit('已加入積木。');
+      } else {
+        const next = position > drag.index ? position - 1 : position;
+        if (next === drag.index) return false;
+        const [id] = program.splice(drag.index, 1);
+        program.splice(next, 0, id);
+        saveEdit('已移動積木。');
+      }
+      return true;
+    }
+
+    let touch;
+    root.addEventListener('dragstart', event => {
+      const source = event.target.closest('[data-program-add], [data-program-drag]');
+      if (!source || source.disabled) return;
+      if (touch?.source === source) { event.preventDefault(); return; }
+      const { programAdd, programDrag } = source.dataset;
+      if (programAdd && missingVariables(task, [programAdd], declared).length) return;
+      const drag = programAdd ? { id: programAdd } : { index: Number(programDrag) };
+      const page = root.ownerDocument;
+      const listeners = new AbortController();
+      const options = { capture: true, signal: listeners.signal };
+      const stop = () => { listeners.abort(); clearDrop(); };
+      // Accept drops elsewhere on this page so that cancelling the native drag never deletes a block.
+      const accepts = target => source.isConnected && !source.disabled && (!programAdd || work.contains(target));
+      event.dataTransfer.effectAllowed = programAdd ? 'copy' : 'move';
+      event.dataTransfer.setData('text/plain', programAdd || programDrag);
+      page.addEventListener('dragover', event => {
+        showDrop(drag, event.target, event.clientY);
+        if (!accepts(event.target)) return;
+        event.preventDefault();
+        event.dataTransfer.dropEffect = programAdd ? 'copy' : 'move';
+      }, options);
+      page.addEventListener('drop', event => {
+        stop();
+        if (!accepts(event.target)) return;
+        event.preventDefault();
+        finishDrop(drag, event.target, event.clientY);
+      }, options);
+      page.addEventListener('dragend', stop, options);
     });
-    root.addEventListener('dragend', () => { drag = undefined; clearDrop(); });
+
+    root.addEventListener('pointerdown', event => {
+      const source = event.target.closest('[data-program-drag]');
+      if (!source || !event.isPrimary || event.pointerType === 'mouse' || event.button !== 0) return;
+      touch = { source, pointer: event.pointerId, index: Number(source.dataset.programDrag), x: event.clientX, y: event.clientY };
+      source.setPointerCapture(event.pointerId);
+    });
+    root.addEventListener('pointermove', event => {
+      if (touch?.pointer !== event.pointerId) return;
+      if (!touch.preview) {
+        if (Math.hypot(event.clientX - touch.x, event.clientY - touch.y) < 8) return;
+        touch.preview = touch.source.firstElementChild.cloneNode(true);
+        touch.preview.classList.add('block-program__drag-preview');
+        touch.preview.setAttribute('aria-hidden', 'true');
+        touch.source.classList.add('is-dragging');
+        root.append(touch.preview);
+      }
+      touch.preview.style.left = `${event.clientX + 14}px`;
+      touch.preview.style.top = `${event.clientY + 14}px`;
+      showDrop(touch, root.ownerDocument.elementFromPoint(event.clientX, event.clientY), event.clientY);
+    });
+    function endTouch(event) {
+      if (touch?.pointer !== event.pointerId) return;
+      const drag = touch;
+      touch = undefined;
+      if (!drag.preview) return;
+      drag.preview.remove();
+      drag.source.classList.remove('is-dragging');
+      clearDrop();
+      if (event.type === 'pointerup' && drag.source.isConnected) {
+        const target = root.ownerDocument.elementFromPoint(event.clientX, event.clientY);
+        // Replace the source even on a no-op drop so the gesture can't turn into a tile click.
+        if (!finishDrop(drag, target, event.clientY)) render();
+      }
+    }
+    for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) root.addEventListener(event, endTouch);
 
     function changeCase() {
       const { values } = selected();
@@ -400,7 +468,7 @@
     root.addEventListener('click', async event => {
       const button = event.target.closest('button');
       if (!button || button.disabled) return;
-      const { programAdd, programEdit, programPick, index } = button.dataset;
+      const { programAdd, programPick } = button.dataset;
       if (programPick !== undefined) {
         const target = Number(programPick);
         if (picked === null) {
@@ -414,41 +482,36 @@
         } else {
           const first = picked;
           [program[first], program[target]] = [program[target], program[first]];
-          invalidate(`已交換第 ${first + 1} 塊和第 ${target + 1} 塊。`);
-          saveDraft();
-          render();
+          saveEdit(`已交換第 ${first + 1} 塊和第 ${target + 1} 塊。`);
         }
         script.querySelector(`[data-program-pick="${target}"]`)?.focus({ preventScroll: true });
       } else if (programAdd) {
         if (missingVariables(task, [programAdd], declared).length) return;
         program.push(programAdd);
-        invalidate('已加入積木。');
-        saveDraft();
-        render();
+        saveEdit('已加入積木。');
         if (event.detail === 0) {
           (root.querySelector('[data-program-add]:not(:disabled)') || root.querySelector('[data-program-run]')).focus();
         }
-      } else if (programEdit !== undefined) {
-        const from = Number(index);
-        program.splice(from, 1);
-        invalidate('已移除積木。');
-        saveDraft();
-        render();
-        const row = script.querySelector(`[data-program-row="${Math.min(from, program.length - 1)}"]`);
-        (row?.querySelector('[data-program-edit]') || root.querySelector('[data-program-add]:not(:disabled)')).focus();
       } else if (button.hasAttribute('data-program-run')) run();
       else if (button.hasAttribute('data-program-compare')) showComparison();
       else if (button.hasAttribute('data-program-reset')) {
         program.length = 0;
-        invalidate('已清空積木。');
-        saveDraft();
-        render();
+        saveEdit('已清空積木。');
       } else if (button === copy) await copyReport(currentReport);
       else if (button === copyAll) await copyReport(runs.map(({ text }, index) => `試跑 ${index + 1}\n${text}`).join('\n\n'));
     });
     root.addEventListener('keydown', event => {
-      if (event.key !== 'Escape' || picked === null) return;
       const focused = event.target.dataset.programPick;
+      if ((event.key === 'Delete' || event.key === 'Backspace') && focused !== undefined) {
+        event.preventDefault();
+        const index = Number(focused);
+        const id = program[index];
+        removeBlock(index);
+        (script.querySelector(`[data-program-pick="${Math.min(index, program.length - 1)}"]`) ||
+          root.querySelector(`[data-program-add="${id}"]`)).focus({ preventScroll: true });
+        return;
+      }
+      if (event.key !== 'Escape' || picked === null) return;
       picked = null;
       render();
       if (focused !== undefined) script.querySelector(`[data-program-pick="${focused}"]`)?.focus();

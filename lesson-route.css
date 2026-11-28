@@ -221,7 +221,7 @@ html:not([data-teacher-route]) [data-draw-pseudocode]:not(:has(#btn-check-puzzle
   list-style: none;
   background: #f8fafc radial-gradient(#dbe4ed 1px, transparent 1px) 0 0 / 13px 13px;
 }
-[data-program-script] .block-program__actions { margin-block: .25rem; }
+[data-program-work].is-drop-outside [data-program-script] { border-color: #b91c1c; }
 .block-program .is-motion { --block-color: #4c97ff; --block-edge: #3373cc; }
 .block-program .is-looks { --block-color: #9966ff; --block-edge: #774dcb; }
 .block-program .is-event { --block-color: #ffbf00; --block-edge: #c99000; }
@@ -237,9 +237,9 @@ html:not([data-teacher-route]) [data-draw-pseudocode]:not(:has(#btn-check-puzzle
   font-size: .88rem;
   font-weight: 800;
 }
-.block-program__grab { display: block; max-width: 100%; padding: 0; margin: 0 0 .48rem; text-align: start; cursor: grab; }
-.block-program__grab:active { cursor: grabbing; }
-.block-program__pick { border: 0; background: none; border-radius: .55rem; }
+.block-program__grab { display: block; max-width: 100%; padding: 0; margin: 0 0 .48rem; text-align: start; }
+.block-program__pick { border: 0; background: none; border-radius: .55rem; touch-action: none; }
+.block-program__pick.is-dragging { opacity: .4; }
 .block-program__pick.is-picked { outline: 3px solid #2563eb; outline-offset: 3px; }
 .block-program__pick.is-picked .block-program__tile { box-shadow: 0 0 0 4px #dbeafe; }
 .block-program__tile {
@@ -260,6 +260,7 @@ html:not([data-teacher-route]) [data-draw-pseudocode]:not(:has(#btn-check-puzzle
   font-weight: 750;
   overflow-wrap: anywhere;
 }
+.block-program__tile.block-program__drag-preview { position: fixed; z-index: 20; max-width: calc(100vw - 2rem); pointer-events: none; }
 .block-program__tile::after {
   position: absolute;
   z-index: 1;
@@ -311,6 +312,8 @@ html:not([data-teacher-route]) [data-draw-pseudocode]:not(:has(#btn-check-puzzle
 .block-program [data-program-comparison] ol { padding-inline-start: 1.2rem; list-style: decimal; }
 .block-program [data-program-comparison] ol li { margin-block: .5rem; }
 .block-program button:not(:disabled) { cursor: pointer; }
+.block-program .block-program__grab:not(:disabled) { cursor: grab; }
+.block-program .block-program__grab:active:not(:disabled) { cursor: grabbing; }
 .block-program button:disabled { opacity: .5; }
 .block-program button[data-program-run] { background: #166534; color: #fff; font-weight: 700; }
 .block-program [data-program-feedback] { margin: .55rem 0; font-weight: 700; }

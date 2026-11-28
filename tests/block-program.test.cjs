@@ -5,7 +5,7 @@ const path = require('node:path');
 const { test } = require('node:test');
 const window = {};
 for (const file of ['block-program-tasks.js', 'block-program.js']) {
-  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', file), 'utf8'), { window });
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', file), 'utf8'), { window, AbortController });
 }
 const execute = (task, program, input) => window.BlockProgram.execute(task, program, input, task.variables);
 const compare = (task, program) => window.BlockProgram.compare(task, program, task.variables);
@@ -166,6 +166,120 @@ test('creating variables unlocks dependent blocks and preserves an existing draf
   assert.deepEqual(Array.from(saved.blocks), []);
   assert.deepEqual(Array.from(saved.variables), Array.from(task.variables));
   assert.ok(resumed.palette.every(block => !block.disabled));
+});
+
+test('dropping outside removes a program block, while ordering, taps and cancelled drags keep their meaning', () => {
+  const task = window.BlockProgramTasks['1150701.html'];
+  const nodes = new Map();
+  const events = new Map();
+  const pageEvents = new Map();
+  const focus = [];
+  const makeNode = () => {
+    const classes = new Set();
+    return {
+      value: '0', isConnected: true, style: {}, classList: {
+        add: value => classes.add(value), remove: value => classes.delete(value), contains: value => classes.has(value)
+      },
+      addEventListener() {}, setAttribute() {}, replaceChildren() {}, setPointerCapture() {},
+      remove() { this.isConnected = false; }, focus() { focus.push(this); }
+    };
+  };
+  const get = selector => {
+    if (!nodes.has(selector)) nodes.set(selector, makeNode());
+    return nodes.get(selector);
+  };
+  const palette = task.goal.map(id => {
+    const button = get(`[data-program-add="${id}"]`);
+    button.dataset = { programAdd: id };
+    return button;
+  });
+  const work = get('[data-program-work]');
+  const script = get('[data-program-script]');
+  work.contains = target => target === work || Boolean(target?.inWork);
+  script.querySelectorAll = () => [];
+  script.querySelector = () => null;
+  const outside = { closest: () => null };
+  work.closest = () => null;
+  let point = outside;
+  let preview;
+  const drafts = [];
+  const flags = new Set();
+  const root = {
+    ownerDocument: {
+      elementFromPoint: () => point,
+      addEventListener: (type, callback, { signal }) => pageEvents.set(type, event => {
+        if (!signal.aborted) callback(event);
+      })
+    },
+    querySelector: get, querySelectorAll: selector => selector === '[data-program-add]' ? palette : [],
+    addEventListener: (type, callback) => events.set(type, callback),
+    append: node => { preview = node; },
+    removeAttribute: flag => flags.delete(flag),
+    toggleAttribute: (flag, on) => on ? flags.add(flag) : flags.delete(flag)
+  };
+  const programBlock = index => ({
+    ...makeNode(), dataset: { programDrag: String(index), programPick: String(index) },
+    firstElementChild: { cloneNode: makeNode }
+  });
+  window.BlockProgram.mount(root, task, { draft: { blocks: task.goal }, onSave: next => drafts.push(Array.from(next.blocks)) });
+  const transfer = { setData() {} };
+  function eventOn(type, target, props = {}) {
+    const event = { type, target, clientY: 20, dataTransfer: transfer, preventDefault() { this.prevented = true; }, ...props };
+    (pageEvents.get(type) || events.get(type))(event);
+    return event;
+  }
+  const drag = source => eventOn('dragstart', { closest: () => source });
+  const touch = (type, source, x) => eventOn(type, { closest: () => source },
+    { clientX: x, pointerType: 'touch', pointerId: 1, isPrimary: true, button: 0 });
+
+  assert.doesNotMatch(script.innerHTML, /data-program-edit/);
+  eventOn('click', { closest: () => ({ dataset: {}, hasAttribute: name => name === 'data-program-compare' }) });
+  assert.equal(flags.has('data-program-passed'), true);
+  drag(programBlock(0));
+  assert.equal(eventOn('dragover', outside).prevented, true);
+  assert.ok(work.classList.contains('is-drop-outside'));
+  eventOn('dragend', outside);
+  assert.equal(drafts.length, 0);
+  assert.ok(!work.classList.contains('is-drop-outside'));
+  drag(programBlock(0));
+  eventOn('drop', work);
+  assert.deepEqual(drafts.at(-1), ['move', 'flag']);
+  drag(programBlock(1));
+  eventOn('drop', outside);
+  assert.deepEqual(drafts.at(-1), ['move']);
+  assert.equal(flags.has('data-program-passed'), false);
+  assert.equal(palette[0].disabled, false);
+  drag(palette[0]);
+  assert.equal(eventOn('dragover', outside).prevented, undefined);
+  eventOn('drop', outside);
+  assert.deepEqual(drafts.at(-1), ['move']);
+  drag(palette[0]);
+  eventOn('drop', work);
+  assert.deepEqual(drafts.at(-1), ['move', 'flag']);
+
+  const source = programBlock(0);
+  touch('pointerdown', source, 5);
+  touch('pointerup', source, 5);
+  assert.deepEqual(drafts.at(-1), ['move', 'flag']);
+  touch('pointerdown', source, 5);
+  touch('pointermove', source, 30);
+  assert.ok(preview?.isConnected && work.classList.contains('is-drop-outside'));
+  touch('pointercancel', source, 30);
+  assert.ok(!preview.isConnected && !work.classList.contains('is-drop-outside'));
+  assert.deepEqual(drafts.at(-1), ['move', 'flag']);
+  point = work;
+  touch('pointerdown', source, 5);
+  touch('pointermove', source, 30);
+  touch('pointerup', source, 30);
+  assert.deepEqual(drafts.at(-1), ['flag', 'move']);
+  point = outside;
+  touch('pointerdown', source, 5);
+  touch('pointermove', source, 30);
+  touch('pointerup', source, 30);
+  assert.deepEqual(drafts.at(-1), ['move']);
+  assert.equal(eventOn('keydown', source, { key: 'Delete' }).prevented, true);
+  assert.deepEqual(drafts.at(-1), []);
+  assert.equal(focus.at(-1), palette[1]);
 });
 
 test('melody completion counts two successful runs with different third notes', () => {
