@@ -3,6 +3,10 @@
 
   const task = (blocks, cases, pass, columns, fields = []) => ({ blocks, cases, pass, columns, fields });
   const example = (name, values) => ({ name, values });
+  const declareFor = (config, dependencies) => {
+    for (const [id, names] of Object.entries(dependencies)) config.blocks[id].variables = names;
+    config.variables = [...new Set(Object.values(dependencies).flat())];
+  };
   const field = (key, label, min, max) => ({ key, label, min, max });
   const repeat = (count, action) => { for (let index = 0; index < count; index++) action(index); };
   const shuffle = values => {
@@ -105,7 +109,7 @@
   '動手做：用迴圈從 1 加到 N', ['resetNumber', 'resetTotal', 'addNumbers', 'report'], {
     resetNumber: ['variable', 'stack', '變數 [數字] 設為 {0}'],
     resetTotal: ['variable', 'stack', '變數 [總和] 設為 {0}'],
-    addNumbers: ['control', 'loop', '重複 {N} 次',
+    addNumbers: ['control', 'loop', '重複 {輸入的 N} 次',
       [['variable', '變數 [數字] 改變 {1}'], ['variable', '變數 [總和] 改變 {數字}']]],
     report: ['looks', 'stack', '說出 {總和}']
   });
@@ -202,11 +206,18 @@
     [field('edges', '邊數 N', 3, 12), field('copies', '圖形數 X', 2, 24)]),
 
     '1150706.html': task({
-      configure: state => { shape(state); state.width = state.input.width; },
+      configure: state => {
+        shape(state);
+        const { edges, copies, width } = state.input;
+        state.edges = edges;
+        state.copies = copies;
+        state.width = width;
+      },
       draw: state => {
-        repeat(state.input.copies, () => {
-          polygon(state, state.input.edges, 360 / state.input.edges);
-          turn(state, 360 / state.input.copies);
+        if (state.copies === undefined) throw new Error('請先設定邊數、圖形數和筆跡寬度。');
+        repeat(state.copies, () => {
+          polygon(state, state.edges, 360 / state.edges);
+          turn(state, 360 / state.copies);
         });
       },
       report: state => {
@@ -218,7 +229,7 @@
           const t = Math.max(0, Math.min(1, ((impact[0] - a) * dx + (impact[1] - b) * dy) / (dx * dx + dy * dy)));
           return Math.hypot(a + t * dx - impact[0], b + t * dy - impact[1]) <= state.width / 2 + 3;
         });
-        state.text = `固定測試點：${hit ? '擋住' : '未擋住'}｜消耗量 ${state.input.copies * state.width}`;
+        state.text = `固定測試點：${hit ? '擋住' : '未擋住'}｜消耗量 ${state.copies * state.width}`;
         state.marker = impact;
       }
     }, [example('測試一', { edges: 3, copies: 2, width: 2 }), example('測試二', { edges: 3, copies: 3, width: 4 }),
@@ -244,13 +255,16 @@
     state => Boolean(state.text) && state.rows.length === (state.found || state.input.data.length), ['索引', '比對的值']),
 
     '1150802.html': task({
-      notes: state => { state.notes = []; },
+      notes: state => { state.notes = []; state.index = 1; },
       play: state => {
-        if (!state.notes) throw new Error('先建立音符清單。');
-        [60, 60, state.input.note, 67].forEach((note, index) => {
+        if (!state.notes || state.index === undefined) throw new Error('先建立音符清單並把索引設為 1。');
+        const melody = [60, 60, state.input.note, 67];
+        while (state.index <= melody.length) {
+          const note = melody[state.index - 1];
           state.notes.push(note);
-          state.rows.push([index + 1, note]);
-        });
+          state.rows.push([state.index, note]);
+          state.index++;
+        }
         state.text = '已依索引順序讀完音符。';
       },
       first: state => { state.notes?.push(60); }
@@ -367,8 +381,8 @@
       branch: ['control', 'ifelse', '如果 <平均 ≥ 60> 那麼',
         [['variable', '變數 [結果] 設為 {及格}']],
         [['variable', '變數 [結果] 設為 {未及格}']]],
-      loop: ['control', 'loop', '重複 {N} 次', [['variable', '變數 [總和] 改變 {目前的數}']]],
-      report: ['looks', 'stack', '說出 {平均、判斷結果與總和}']
+      loop: ['control', 'loop', '重複 {輸入的 N} 次', [['variable', '變數 [總和] 改變 {目前的數}']]],
+      report: ['looks', 'stack', '說出 {平均、結果與總和}']
     },
     '1150703.html': {
       goal: ['pen', 'draw'],
@@ -402,7 +416,7 @@
     },
     '1150802.html': {
       goal: ['notes', 'play'],
-      notes: ['list', 'stack', '建立 [音符清單]，從第 {1} 項開始'],
+      notes: ['list', 'stack', '建立 [音符清單]，變數 [索引] 設為 {1}'],
       play: ['control', 'loop', '重複 {音符清單的長度} 次', [['music', '演奏音符 {目前音符} 持續 {一拍}'], ['variable', '變數 [索引] 改變 {1}']]],
       first: ['music', 'stack', '演奏音符 {清單第 1 項}']
     },
@@ -417,7 +431,7 @@
       goal: ['setup', 'pick', 'add', 'remove'],
       setup: ['list', 'stack', '建立 [候選清單]，刪除 [已選] 的所有項目'],
       pick: ['variable', 'stack', '變數 [項次] 設為 {隨機取數 1 到候選長度}'],
-      add: ['list', 'stack', '添加 {抽到的座號} 到 [已選]'],
+      add: ['list', 'stack', '添加 {候選清單的第 項次 項} 到 [已選]'],
       remove: ['list', 'stack', '刪除 [候選清單] 的第 {項次} 項']
     },
     '1150805.html': {
@@ -439,6 +453,26 @@
     task.goal = goal;
     for (const [id, view] of Object.entries(blocks)) task.blocks[id] = { run: task.blocks[id], view };
   }
+  // Variable dependencies include reads inside loops, conditions and output blocks.
+  declareFor(sequenceAverage, { readA: ['A'], readB: ['B'], calculate: ['A', 'B', '平均數'], report: ['平均數'] });
+  declareFor(branchTask, {
+    read: ['作業', '測驗', '平時'], calculate: ['作業', '測驗', '平時', '總分'],
+    choose: ['總分', '結果'], report: ['總分', '結果']
+  });
+  declareFor(repeatTask, { resetNumber: ['數字'], resetTotal: ['總和'], addNumbers: ['數字', '總和'], report: ['總和'] });
+  declareFor(shuffleTask, { pick: ['項次'], add: ['項次'], remove: ['項次'] });
+  declareFor(tasks['1150702.html'], {
+    calculate: ['平均'], branch: ['平均', '結果'], loop: ['總和'], report: ['平均', '結果', '總和']
+  });
+  declareFor(tasks['1150704.html'], { start: ['長度'], update: ['長度'], draw: ['長度'] });
+  declareFor(tasks['1150706.html'], {
+    configure: ['邊數', '圖形數', '筆跡寬度'], draw: ['邊數', '圖形數'], report: ['圖形數', '筆跡寬度']
+  });
+  declareFor(tasks['1150801.html'], { start: ['位置'], compare: ['位置'], report: ['位置'] });
+  declareFor(tasks['1150802.html'], { notes: ['索引'], play: ['索引'] });
+  declareFor(tasks['1150803.html'], { reset: ['總和'], sum: ['總和'], average: ['總和'] });
+  declareFor(tasks['1150804.html'], { pick: ['項次'], add: ['項次'], remove: ['項次'] });
+
   tasks['1150802.html'].requireTwoRuns = true;
   tasks['1150806.html'].shufflePalette = true;
   window.BlockProgramTasks = tasks;

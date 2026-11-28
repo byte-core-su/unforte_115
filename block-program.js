@@ -1,7 +1,14 @@
 (() => {
   'use strict';
 
-  function execute(task, program, input) {
+  function missingVariables(task, program, declared) {
+    const names = new Set(program.flatMap(id => task.blocks[id]?.variables || []));
+    return [...names].filter(name => !declared.has(name));
+  }
+
+  const declarationMessage = names => '請先新增變數：' + names.join('、') + '。';
+
+  function execute(task, program, input, variables = []) {
     const state = { input, rows: [], text: '' };
     const run = ids => {
       for (const id of ids) {
@@ -11,6 +18,8 @@
     };
     try {
       if (!program.length) throw new Error('先加入積木，再執行。');
+      const missing = missingVariables(task, program, new Set(variables));
+      if (missing.length) throw new Error(declarationMessage(missing));
       if (task.loop) {
         const { before, times } = task.loop;
         const first = program.slice(0, before.length);
@@ -69,8 +78,8 @@
       <span class="block-program__tile is-${category} block-program__c-foot" aria-hidden="true">${label.startsWith('重複') ? '↶' : ''}</span></span>`;
   }
 
-  function compare(task, program) {
-    const results = task.cases.map(({ name, values }) => ({ name, result: execute(task, program, values) }));
+  function compare(task, program, variables) {
+    const results = task.cases.map(({ name, values }) => ({ name, result: execute(task, program, values, variables) }));
     const sameOrder = task.goal.length === program.length && task.goal.every((id, index) => id === program[index]);
     const missing = task.goal.filter(id => !program.includes(id));
     return { results, sameOrder, missing };
@@ -85,6 +94,9 @@
 
   function mount(root, task, { draft, onSave } = {}) {
     const palette = Object.entries(task.blocks);
+    const variableNames = task.variables || [];
+    const savedVariables = Array.isArray(draft?.variables) ? draft.variables : [];
+    const declared = new Set(savedVariables.filter(name => variableNames.includes(name)));
     if (task.shufflePalette) {
       for (let i = palette.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -109,6 +121,16 @@
         ${task.fields.map(({ key, label, min, max }) => `<label>${label} <input data-program-value="${key}" type="number" min="${min}" max="${max}" required></label>`).join('')}
       </div>
       <p data-program-input></p>
+      ${variableNames.length ? `<form class="block-program__variables" data-program-variable-form>
+        <h4>建立變數</h4>
+        <p>依積木上的名稱逐一新增。建立後，再用積木存入或讀取數值。</p>
+        <p>本題會用到：${variableNames.map(escape).join('、')}</p>
+        <div class="block-program__actions">
+          <label>變數名稱 <input type="text" data-program-variable-name maxlength="40" autocomplete="off" required></label>
+          <button type="submit">新增變數</button>
+        </div>
+        <p data-program-variable-status role="status"></p>
+      </form>` : ''}
       <div class="block-program__workspace">
         <div><h4 data-program-palette-heading tabindex="-1">積木區</h4><button type="button" class="block-program__jump" data-program-jump="work">前往程式區</button><div class="block-program__palette">${Object.entries(categories).map(([category, name]) => {
           const group = palette.filter(([, block]) => block.view[0] === category);
@@ -149,10 +171,11 @@
     const inputs = [...root.querySelectorAll('[data-program-value]')];
     const caseSelect = root.querySelector('[data-program-case]');
     const selected = () => task.cases[Number(caseSelect.value)];
+    const variableForm = variableNames.length ? root.querySelector('[data-program-variable-form]') : null;
 
     function saveDraft() {
       onSave?.({
-        blocks: program, caseIndex: Number(caseSelect.value), runs,
+        blocks: program, caseIndex: Number(caseSelect.value), runs, variables: [...declared],
         fields: Object.fromEntries(inputs.map(input => [input.dataset.programValue, input.value]))
       });
     }
@@ -213,17 +236,28 @@
           </li>`;
       } else script.innerHTML = rows.join('') || '<li>把第一塊積木拖到這裡，或從積木區點選加入。</li>';
       for (const button of root.querySelectorAll('[data-program-add]')) {
-        button.disabled = program.includes(button.dataset.programAdd);
+        const id = button.dataset.programAdd;
+        const missing = missingVariables(task, [id], declared);
+        button.disabled = program.includes(id) || missing.length > 0;
         button.draggable = !button.disabled;
+        button.title = missing.length ? declarationMessage(missing) : '';
       }
     }
 
+    function checkVariables() {
+      const missing = missingVariables(task, program.length ? program : task.goal, declared);
+      if (!missing.length) return true;
+      feedback.textContent = declarationMessage(missing);
+      return false;
+    }
+
     function showComparison() {
+      if (!checkVariables()) return;
       if (!program.length) {
         feedback.textContent = '先加入積木，再比對檢查。';
         return;
       }
-      const { results, sameOrder, missing } = compare(task, program);
+      const { results, sameOrder, missing } = compare(task, program, declared);
       const allPassed = results.every(({ result }) => result.passed);
       root.toggleAttribute('data-program-passed', allPassed);
       const order = sameOrder ? '積木順序與參考程式一致。' :
@@ -253,6 +287,7 @@
       const source = event.target.closest('[data-program-add], [data-program-drag]');
       if (!source || source.disabled) return;
       const { programAdd, programDrag } = source.dataset;
+      if (programAdd && missingVariables(task, [programAdd], declared).length) return;
       drag = programAdd ? { id: programAdd } : { index: Number(programDrag) };
       event.dataTransfer.effectAllowed = programAdd ? 'copy' : 'move';
       event.dataTransfer.setData('text/plain', programAdd || programDrag);
@@ -328,10 +363,11 @@
     }
 
     function run() {
+      if (!checkVariables()) return;
       if (inputs.some(input => !input.reportValidity())) return;
       const input = { ...selected().values };
       for (const field of inputs) input[field.dataset.programValue] = field.valueAsNumber;
-      result = execute(task, program, input);
+      result = execute(task, program, input, declared);
       feedback.textContent = result.error || (result.passed ? '這組測試通過。' : '結果還未達標，請檢查積木與順序。');
       stage.innerHTML = `<p></p>${graph(result)}${result.rows.length ?
         `<div class="block-program__table"><table><thead><tr>${task.columns.map(label => `<th scope="col">${label}</th>`).join('')}</tr></thead>
@@ -343,6 +379,7 @@
           selected().name,
           ...inputs.map(field => `${field.labels[0].textContent.trim()}：${field.value}`),
           root.querySelector('[data-program-input]').textContent,
+          declared.size ? '已建立的變數：' + [...declared].join('、') : '',
           task.loop ? `前 ${task.loop.before.length} 塊執行一次，後續積木重複 ${task.loop.times} 次。` : '',
           ...program.map((id, index) => `${index + 1}. ${textLabel(task.blocks[id].view[2])}`),
           summary(result),
@@ -383,6 +420,7 @@
         }
         script.querySelector(`[data-program-pick="${target}"]`)?.focus({ preventScroll: true });
       } else if (programAdd) {
+        if (missingVariables(task, [programAdd], declared).length) return;
         program.push(programAdd);
         invalidate('已加入積木。');
         saveDraft();
@@ -416,6 +454,33 @@
       if (focused !== undefined) script.querySelector(`[data-program-pick="${focused}"]`)?.focus();
       feedback.textContent = '已取消選取。';
     });
+    if (variableForm) {
+      const field = variableForm.querySelector('[data-program-variable-name]');
+      const status = variableForm.querySelector('[data-program-variable-status]');
+      const showDeclarations = (message = '') => {
+        const names = declared.size ? [...declared].join('、') : '尚未建立';
+        status.textContent = (message ? message + ' ' : '') + '已建立的變數：' + names + '。';
+      };
+      showDeclarations();
+      variableForm.addEventListener('submit', event => {
+        event.preventDefault();
+        const typed = field.value.trim().normalize('NFKC').toUpperCase();
+        const name = variableNames.find(candidate => candidate.toUpperCase() === typed);
+        if (!name) {
+          showDeclarations('請輸入本題積木上的變數名稱。');
+        } else if (declared.has(name)) {
+          showDeclarations('「' + name + '」已經建立。');
+        } else {
+          declared.add(name);
+          field.value = '';
+          invalidate();
+          showDeclarations('已新增「' + name + '」。');
+          saveDraft();
+          render();
+        }
+        field.focus();
+      });
+    }
     caseSelect.addEventListener('change', () => { changeCase(); saveDraft(); });
     for (const input of inputs) input.addEventListener('input', () => { invalidate(); saveDraft(); });
     if (Number.isInteger(draft?.caseIndex) && task.cases[draft.caseIndex]) caseSelect.value = String(draft.caseIndex);
