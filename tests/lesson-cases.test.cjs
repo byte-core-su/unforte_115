@@ -13,10 +13,12 @@ function loadLesson(filename) {
   const timers = new Set();
   const node = id => ({
     id, value: '', textContent: '', innerHTML: '', className: '', listeners: {}, children: [],
+    get valueAsNumber() { return String(this.value).trim() ? Number(this.value) : NaN; },
     options: ['3', '4', '5', '6', 'custom'].map(value => ({ value })),
     setAttribute(name, value) { this[name] = value; },
     removeAttribute(name) { delete this[name]; },
     hasAttribute(name) { return Object.hasOwn(this, name); },
+    getAttribute(name) { return this.hasAttribute(name) ? this[name] : null; },
     toggleAttribute(name, enabled) { if (enabled) this.setAttribute(name, ''); else this.removeAttribute(name); },
     addEventListener(name, callback) { this.listeners[name] = callback; },
     appendChild() {}, focus() {}, select() {}, cloneNode() { return node(); },
@@ -70,6 +72,10 @@ function loadLesson(filename) {
     assert.ok(html.includes(`body:has(#${kind}-ipo-msg[data-lesson-activity]) #${kind}-ipo-followup`));
     assert.ok(html.includes(`id="${kind}-ipo-followup" class="ipo-followup`));
     const fields = ['input', 'proc', 'out'].map(role => `sel-${kind}-${role}`);
+    if (kind === 'sel') {
+      get('sel-out').setAttribute('data-lesson-activity', 'both');
+      context.showSelectionTrialProgress();
+    }
     const orders = fields.map(id => {
       const select = html.match(new RegExp(`<select id="${id}"[^>]*>([\\s\\S]*?)<\\/select>`))[1];
       const choices = Array.from(select.matchAll(/<option value="(in|proc|out)">/g), match => match[1]);
@@ -87,6 +93,43 @@ function loadLesson(filename) {
   }
   assert.equal(positions.size, 3, 'each activity needs a different answer-position pattern');
 }
+
+test('selection trials guide students to both outcomes before unlocking IPO', () => {
+  const fields = ['sel-hw', 'sel-test', 'sel-daily'];
+  for (const [score, first, firstLabel, secondLabel] of [[60, 'pass', '及格', '不及格'], [59, 'fail', '不及格', '及格']]) {
+    const { context, get } = loadLesson('1150702.html');
+    const output = get('sel-out');
+    const marker = () => output.getAttribute('data-lesson-activity');
+    const progress = get('sel-trial-progress');
+    const ipo = get('sel-ipo-quiz');
+    context.initSelGame();
+    assert.match(progress.textContent, /0／2/);
+    assert.equal(ipo.hidden, true);
+    context.runSelCalc();
+    assert.equal(marker(), null, 'blank grades must not count as a failing test');
+    ['in', 'proc', 'out'].forEach((answer, index) => { get(`sel-sel-${['input', 'proc', 'out'][index]}`).value = answer; });
+    context.checkSelIPO();
+    assert.equal(get('sel-ipo-msg').hasAttribute('data-lesson-activity'), false);
+    fields.forEach(id => { get(id).value = score; });
+    context.runSelCalc();
+    assert.equal(marker(), first);
+    assert.match(progress.textContent, new RegExp(`1／2.*已測${firstLabel}.*再產生一題.*測出${secondLabel}`));
+    context.runSelCalc();
+    assert.equal(marker(), first);
+    assert.equal(ipo.hidden, true);
+    context.setNumericExercise('sel');
+    assert.match(progress.textContent, new RegExp(`1／2.*按「判斷成績」測出${secondLabel}`));
+    assert.equal(marker(), first, 'loading data alone must not count as running a test');
+    context.runSelCalc();
+    assert.equal(marker(), 'both');
+    assert.match(progress.textContent, /2／2.*判斷 IPO/);
+    assert.equal(ipo.hidden, false);
+    context.checkSelIPO();
+    assert.equal(get('sel-ipo-msg').hasAttribute('data-lesson-activity'), true);
+    context.runSelCalc();
+    assert.equal(marker(), 'both');
+  }
+});
 
 {
   const { context, get } = loadLesson('1150703.html');

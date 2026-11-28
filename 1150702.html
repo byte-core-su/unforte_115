@@ -185,7 +185,7 @@
                             <h4 class="text-lg font-bold text-slate-700 mb-3 flex items-center border-b border-slate-100 pb-3">
                                 <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">1</span> 步驟一：IPO 運算實驗室
                             </h4>
-                            <p class="text-sm text-slate-500 mb-4 font-light">先動手輸入各項成績，觀察電腦計算後判斷及格與否的結果。</p>
+                            <p class="text-sm text-slate-500 mb-4 font-light">按「判斷成績」各測出一次及格和不及格，再進入「判斷 IPO」。</p>
                             <div class="space-y-3 mb-4 bg-slate-50 p-4 rounded-xl text-sm font-medium text-slate-600">
                                 <div class="flex items-center justify-between"><span>作業成績 (40%)：</span><input type="number" id="sel-hw" placeholder="0-100" class="w-16 border border-slate-300 rounded p-1.5 text-center font-bold focus:border-indigo-500 focus:outline-none"></div>
                                 <div class="flex items-center justify-between"><span>測驗成績 (40%)：</span><input type="number" id="sel-test" placeholder="0-100" class="w-16 border border-slate-300 rounded p-1.5 text-center font-bold focus:border-indigo-500 focus:outline-none"></div>
@@ -194,10 +194,11 @@
                             <button onclick="runSelCalc()" class="w-full bg-slate-800 text-white px-4 py-2.5 rounded hover:bg-slate-700 transition shadow-sm text-sm font-bold mb-4">判斷成績</button>
                             <div class="flex flex-wrap gap-2 mb-4"><button type="button" onclick="setNumericExercise('sel')" class="text-xs font-bold bg-indigo-100 text-indigo-800 px-3 py-2 rounded">再產生一題</button><button type="button" onclick="setNumericExercise('sel', true)" class="text-xs font-bold bg-slate-100 text-slate-700 px-3 py-2 rounded">固定示範</button></div>
                             <div id="sel-out" class="text-sm font-bold text-slate-600 bg-indigo-50 text-indigo-800 p-4 rounded border border-indigo-100 min-h-[50px] flex items-center justify-center text-center">等待輸入數值...</div>
+                            <p id="sel-trial-progress" class="mt-3 text-sm font-bold text-indigo-800" role="status">已測 0／2 種。及格、不及格都還沒測過。</p>
                         </div>
 
                         <!-- 步驟二：判斷 IPO -->
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm" id="sel-ipo-quiz">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm" id="sel-ipo-quiz" hidden>
                             <h4 class="text-lg font-bold text-slate-700 mb-3 flex items-center border-b border-slate-100 pb-3">
                                 <span class="bg-slate-100 text-slate-500 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">2</span> 步驟二：判斷 IPO (輸入-處理-輸出)
                             </h4>
@@ -409,6 +410,7 @@
         let l1QuizPassed = false;
         let l2Completed = { seq: false, sel: false, rep: false };
         const numericExercisePrevious = { seq: '', sel: '', rep: '' };
+        const selectionScoreIds = ['sel-hw', 'sel-test', 'sel-daily'];
 
         function setNumericExercise(kind, demo = false) {
             const randomInt = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
@@ -417,16 +419,19 @@
             do {
                 if (kind === 'seq') values = demo ? [10, 20] : [randomInt(1, 50), randomInt(1, 50)];
                 else if (kind === 'sel') {
-                    const base = randomInt(0, 1) ? 70 : 48;
+                    const tried = document.getElementById('sel-out').getAttribute('data-lesson-activity');
+                    const base = tried === 'pass' ? 48 : tried === 'fail' ? 70 : randomInt(0, 1) ? 70 : 48;
                     values = demo ? [70, 60, 80] : Array.from({ length: 3 }, () => Math.max(0, Math.min(100, base + randomInt(-10, 10))));
                 } else values = demo ? [10] : [randomInt(5, 30)];
             } while (!demo && values.join(',') === numericExercisePrevious[kind] && ++attempts < 12);
             if (!demo && values.join(',') === numericExercisePrevious[kind]) values[0] = values[0] === 100 ? values[0] - 1 : values[0] + 1;
             numericExercisePrevious[kind] = values.join(',');
-            const ids = kind === 'seq' ? ['seq-a', 'seq-b'] : kind === 'sel' ? ['sel-hw', 'sel-test', 'sel-daily'] : ['iter-n'];
+            const ids = kind === 'seq' ? ['seq-a', 'seq-b'] : kind === 'sel' ? selectionScoreIds : ['iter-n'];
             ids.forEach((id, index) => { document.getElementById(id).value = values[index]; });
             const output = document.getElementById(kind === 'rep' ? 'iter-out' : `${kind}-out`);
-            output.textContent = `${demo ? '固定示範' : '練習題'}已準備好：先預測結果，再按計算核對。`;
+            const action = kind === 'sel' ? '按「判斷成績」核對' : '按計算核對';
+            output.textContent = `${demo ? '固定示範' : '練習題'}已準備好。先預測結果，再${action}。`;
+            if (kind === 'sel') showSelectionTrialProgress(!demo);
         }
 
         let activeL2Tab;
@@ -648,6 +653,8 @@
                 ipoMsgEl.textContent = "";
                 ipoMsgEl.removeAttribute('data-lesson-activity');
             }
+            document.getElementById('sel-out').removeAttribute('data-lesson-activity');
+            showSelectionTrialProgress();
             resetSelFlow();
         }
         function tryPlaceSelItem(id) {
@@ -712,6 +719,7 @@
             const msg = document.getElementById('sel-ipo-msg');
 
             if(!inEl || !procEl || !outEl || !msg) return;
+            if (document.getElementById('sel-ipo-quiz').hidden) return;
 
             const inVal = inEl.value;
             const procVal = procEl.value;
@@ -752,16 +760,32 @@
             out.setAttribute('data-lesson-activity', '');
         }
 
+        function showSelectionTrialProgress(nextCaseReady = false) {
+            const tried = document.getElementById('sel-out').getAttribute('data-lesson-activity');
+            const nextAction = nextCaseReady ? '按「判斷成績」' : '按「再產生一題」，再按「判斷成績」';
+            const messages = {
+                pass: `已測 1／2 種。已測及格。${nextAction}測出不及格。`,
+                fail: `已測 1／2 種。已測不及格。${nextAction}測出及格。`,
+                both: '已測 2／2 種。及格與不及格都已測過。接著做下方的「判斷 IPO」。'
+            };
+            document.getElementById('sel-trial-progress').textContent = messages[tried] || '已測 0／2 種。及格、不及格都還沒測過。';
+            document.getElementById('sel-ipo-quiz').hidden = tried !== 'both' && !window.TeacherDemo?.isOn();
+        }
+
         function runSelCalc() {
-            let hw = parseFloat(document.getElementById('sel-hw').value)||0;
-            let test = parseFloat(document.getElementById('sel-test').value)||0;
-            let daily = parseFloat(document.getElementById('sel-daily').value)||0;
-            let s = (hw*0.4) + (test*0.4) + (daily*0.2);
             const out = document.getElementById('sel-out');
+            const scores = selectionScoreIds.map(id => document.getElementById(id).valueAsNumber);
+            if (scores.some(score => !Number.isFinite(score) || score < 0 || score > 100)) {
+                out.textContent = '三項成績都要輸入 0 到 100 的數字。';
+                return;
+            }
+            const [homework, test, daily] = scores;
+            const s = (homework * 2 + test * 2 + daily) / 5;
             const result = s >= 60 ? 'pass' : 'fail';
             const previous = out.getAttribute('data-lesson-activity');
             out.setAttribute('data-lesson-activity', previous && previous !== result ? 'both' : result);
-            document.getElementById('sel-out').innerHTML = `計算總分：${s.toFixed(1)}分 ➔ <strong class='${s>=60?'text-emerald-600':'text-rose-600'} text-lg ml-1'>${s>=60?'及格 🎉':'不及格 😢'}</strong>`;
+            out.innerHTML = `計算總分：${s.toFixed(1)}分 ➔ <strong class='${s>=60?'text-emerald-600':'text-rose-600'} text-lg ml-1'>${s>=60?'及格 🎉':'不及格 😢'}</strong>`;
+            showSelectionTrialProgress();
         }
 
         // --- Repetition Game ---
