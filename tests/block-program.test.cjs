@@ -154,6 +154,9 @@ test('branch placement starts empty on old drafts, can be fixed, and survives re
   }
   const ui = mount();
   assert.equal((ui.script().match(/放入結果積木/g) || []).length, 2);
+  const visibleBranch = ui.script().replace(/<[^>]*>/g, '');
+  assert.equal((visibleBranch.match(/那麼/g) || []).length, 1);
+  assert.match(ui.script(), /data-program-branch-slot="0"[\s\S]*?<span class="block-program__tile is-control is-stack">否則<\/span>[\s\S]*?data-program-branch-slot="1"[\s\S]*?block-program__c-foot/);
   await ui.check();
   assert.equal(ui.flags.has('data-program-passed'), false);
   await ui.place('unqualified', 0);

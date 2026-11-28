@@ -316,9 +316,9 @@ html:not([data-teacher-route]) [data-draw-pseudocode]:not(:has(#btn-check-puzzle
   list-style: none;
 }
 .block-program__tile.block-program__c-foot { min-height: .85rem; padding-block: 0; line-height: 1.1; text-align: right; }
-.block-program__branch { min-width: min(14rem, 100%); margin: -.48rem 0 .55rem; }
-.block-program__branch .block-program__c-body { display: grid; gap: .35rem; }
-.block-program__branch .block-program__c-body > span { font-size: .85rem; font-weight: 700; }
+.block-program__branch { min-width: min(14rem, 100%); margin-bottom: .48rem; }
+.block-program__branch > .block-program__pick { width: 100%; margin: 0; }
+.block-program__branch > .block-program__pick > .block-program__tile { width: 100%; }
 .block-program [data-program-branch-slot] {
   min-height: 2.75rem;
   padding: .3rem .45rem;

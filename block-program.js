@@ -296,19 +296,21 @@
     }
 
     function render() {
-      const rows = program.map((id, index) =>
-        `<li data-program-row="${index}" class="block-program__row">
+      const rows = program.map((id, index) => {
+        const isBranch = id === branch?.id;
+        return `<li data-program-row="${index}" class="block-program__row${isBranch ? ' block-program__c is-control block-program__branch' : ''}">
           <button type="button" class="block-program__grab block-program__pick${picked === index ? ' is-picked' : ''}" data-program-drag="${index}" data-program-pick="${index}" draggable="true" aria-pressed="${picked === index}" aria-keyshortcuts="Delete Backspace" aria-label="第 ${index + 1} 塊：${escape(textLabel(task.blocks[id].view[2]))}。${picked === null ? '點選後，再點另一塊即可交換位置' : picked === index ? '已選取，再點一次取消' : `點這裡與第 ${picked + 1} 塊交換`}。鍵盤可按 Delete 移除">${blockMarkup(task.blocks[id].view)}</button>
-          ${id === branch?.id ? `<div class="block-program__c is-control block-program__branch">
-            ${branchNames.map((name, slot) => `<div class="block-program__c-body">
-              <span>${name}</span>
+          ${isBranch ? `${branchNames.map((name, slot) => `${slot ? blockMarkup(['control', 'stack', name]) : ''}
+            <div class="block-program__c-body">
               <button type="button" data-program-branch-slot="${slot}" draggable="${Boolean(branchChoices[slot])}"
                 ${branchChoices[slot] ? `aria-pressed="${pickedOutcome === branchChoices[slot]}"` : ''} aria-keyshortcuts="Delete Backspace"
                 aria-label="${name}：${branchChoices[slot] ? escape(textLabel(outcomeLabel(branch.outcomes[branchChoices[slot]]))) : '空的放置位置'}">
                 ${branchChoices[slot] ? outcomeMarkup(branch.outcomes[branchChoices[slot]]) : '放入結果積木'}
               </button>
-            </div>`).join('')}</div>` : ''}
-        </li>`);
+            </div>`).join('')}
+            <span class="block-program__tile is-control block-program__c-foot" aria-hidden="true"></span>` : ''}
+        </li>`;
+      });
       if (task.loop && rows.length > task.loop.before.length) {
         const split = task.loop.before.length;
         script.innerHTML = rows.slice(0, split).join('') +
