@@ -108,7 +108,8 @@ test('student labs show activity titles and keep clear of the dynamic render roo
     assert.doesNotMatch(mounted.innerHTML, /課綱|採證|[A-Za-z]-IV-\d|lesson-plan-grade-/);
     if (page === '1150805.html') {
       assert.equal(sorting.id, 'sorting-lab');
-      assert.equal(sorting.hidden, true);
+      assert.equal(sorting.hidden, undefined);
+      assert.equal(sorting['data-route-locked'], '');
       assert.equal(sorting['aria-labelledby'], 'g8-sort-title');
     }
   }

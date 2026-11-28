@@ -86,6 +86,7 @@ for (const page of pages) {
     assert.equal(shuffle.parts[1].anchors[0], '#shuffle-block-program');
     assert.equal(shuffle.parts[1].activity.selector, '#shuffle-block-program[data-program-passed]');
     assert.equal(shuffle.parts[2].anchors[0], '#sorting-lab');
+    assert.equal(shuffle.parts[2].resume, true);
     assert.equal(shuffle.activity.selector, '#sorting-lab[data-lesson-activity]');
     assert.equal(extraPrograms['shuffle-block-program'].cases.length, 2);
   }
@@ -179,6 +180,7 @@ for (const page of pages) {
   };
   let refresh;
   let savedRoute;
+  const reviewed = [];
   const window = { TeacherDemo: { isOn: () => false }, dispatchEvent() {} };
   vm.runInNewContext(read('lesson-route.js'), {
     window, document, location: { pathname: '/test.html' },
@@ -188,9 +190,10 @@ for (const page of pages) {
   });
   const config = { steps: [
     { title: '看任務', anchors: ['#learning-guide'] },
-    { title: '完成兩項操作', anchors: ['#first'],
+    { title: '完成兩項操作', anchors: ['#first'], review: reviewing => reviewed.push(reviewing),
       parts: [
-        { title: '第一項', nextLabel: '開始實作', activity: { selector: '#first-passed', pending: '先完成第一項。' } },
+        { title: '第一項', nextLabel: '開始實作', reviewTodo: '重新排列流程圖', reviewNextLabel: '回看積木實作',
+          activity: { selector: '#first-passed', pending: '先完成第一項。' } },
         { title: '第二項', anchors: ['#second'], resume: true }
       ],
       activity: { selector: '#both-passed', pending: '先完成兩項。' } },
@@ -216,10 +219,21 @@ for (const page of pages) {
   assert.equal(hidden(first), true);
   assert.equal(hidden(second), false);
   assert.equal(completion.button.disabled, true);
+  completion.action('previous-part');
+  assert.equal(reviewed.at(-1), true);
+  assert.match(panel.innerHTML, /重新排列流程圖/);
+  assert.match(panel.innerHTML, /回看積木實作/);
+  assert.ok(!hidden(first) && hidden(second));
+  assert.equal(savedRoute, paused, 'review should keep the active part and its saved progress');
+  progress.action('resume');
+  assert.equal(reviewed.at(-1), false);
+  assert.ok(hidden(first) && !hidden(second));
+  assert.equal(completion.button.disabled, true);
   lookup.set('#both-passed', second);
   completion.action('done');
   assert.ok(hidden(first) && hidden(second));
   progress.node(1);
+  assert.equal(reviewed.at(-1), true);
   assert.ok(!hidden(first) && hidden(second));
   panel.action('next-part');
   assert.ok(hidden(first) && !hidden(second));

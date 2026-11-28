@@ -7,7 +7,7 @@ const campus = require('./fixtures/campus-scenario.cjs');
 
 const source = fs.readFileSync(path.join(__dirname, '..', 'curriculum-labs.js'), 'utf8');
 
-function loadLab(page, scenario = CourseScenarios.active, random = Math.random) {
+function loadLab(page, scenario = CourseScenarios.active, random = Math.random, quiz = null) {
   const elements = new Map();
   const element = id => {
     if (!elements.has(id)) {
@@ -26,7 +26,7 @@ function loadLab(page, scenario = CourseScenarios.active, random = Math.random) 
     after() {},
     setAttribute(name, value) { this[name] = value; },
     removeAttribute(name) { delete this[name]; },
-    querySelector(selector) { return selector === '[data-quiz]' ? null : element(selector); }
+    querySelector(selector) { return selector === '[data-quiz]' ? quiz : element(selector); }
   });
   const main = { appendChild() {} };
   const document = {
@@ -189,15 +189,12 @@ for (const scenario of [CourseScenarios.active, campus]) {
     choice.value = 'extra';
     get('#g8-shuffle-check').click();
     assert.match(get('#g8-shuffle-state').textContent, /總張數相同.*少了一張/);
-    assert.equal(get.sorting.hidden, true);
+    assert.equal(get.sorting.hidden, undefined);
+    assert.equal(get.sorting['data-route-locked'], '');
+    assert.match(state.textContent, /比較 \d+ 和 \d+/);
     assert.equal(get.section['data-lesson-activity'], undefined);
     assert.equal(passed(), false);
-    choice.value = 'valid';
-    get('#g8-shuffle-check').click();
-    assert.equal(get.section['data-lesson-activity'], '');
-    assert.match(get('#g8-shuffle-state').textContent, /開始洗牌實作/);
-    assert.equal(get.sorting.hidden, false);
-    assert.equal(passed(), false);
+    assert.equal(get.section['data-lesson-activity'], undefined, 'sorting is initialized after reload without completing shuffle again');
     for (let comparison = 0; comparison < 2; comparison++) {
       const [, left, right] = state.textContent.match(/比較 (\d+) 和 (\d+)/);
       const swap = Number(left) > Number(right);
@@ -215,6 +212,23 @@ for (const scenario of [CourseScenarios.active, campus]) {
     assert.equal(passed(), true);
     assert.deepEqual(parseCards(get('#g8-sort-report').value), original);
     assert.match(get('#g8-sort-report').value, /完整一輪都沒交換/);
+    get('#g8-sort-retry').click();
+    assert.equal(passed(), false);
+    assert.equal(get('#g8-sort-evidence').hidden, true);
+    assert.equal(get('#g8-sort-report').value, '');
+    assert.equal(get('#g8-sort-stop').disabled, false);
+    assert.equal(get('#g8-sort-actions').hidden, false);
+    assert.match(state.textContent, /比較 \d+ 和 \d+/);
+
+    choice.value = 'valid';
+    get('#g8-shuffle-check').click();
+    assert.equal(get.section['data-lesson-activity'], '');
+    assert.match(get('#g8-shuffle-state').textContent, /開始洗牌實作/);
+    get('#g8-shuffle-retry').click();
+    assert.equal(get.section['data-lesson-activity'], undefined);
+    assert.equal(choice.value, '');
+    assert.equal(choice.disabled, false);
+    assert.equal(get('#g8-shuffle-retry').hidden, true);
   }
   assert.ok(decks.size > 1);
   assert.ok(optionOrder.size > 1);
@@ -239,6 +253,41 @@ for (const scenario of [CourseScenarios.active, campus]) {
     options.listeners.click({ target: { dataset: { module: name } } });
   }
   assert.match(get('#g8-module-state').textContent, /建立數字卡庫 → 洗牌數字卡 → 分配數字卡 → 逐項比較。順序正確/);
+}
+
+for (const [page, quizType, answers] of [['1150701.html', 'g7-safety', [1, 0, 2]], ['1150802.html', 'g8-ethics', [1, 0]]]) {
+  let controls, choice, markup;
+  const quiz = {
+    dataset: { quiz: quizType },
+    set innerHTML(text) {
+      markup = text;
+      choice = undefined;
+      const button = (hidden = false) => ({
+        hidden, disabled: false, addEventListener(_type, callback) { this.press = callback; }
+      });
+      controls = new Map([
+        ['fieldset', { querySelector: () => choice }], ['[role="status"]', {}],
+        ['[data-quiz-check]', button()], ['[data-quiz-next]', button(true)],
+        ['[data-quiz-retry]', button(true)], ['input', { focus() {} }]
+      ]);
+    },
+    querySelector: selector => controls.get(selector)
+  };
+  const get = loadLab(page, CourseScenarios.active, () => 0.4, quiz);
+  const label = suffix => quiz.querySelector('[data-quiz-' + suffix + ']');
+  for (let attempt = 0; attempt < 2; attempt++) {
+    assert.match(markup, /<legend>1 \/ [23]/);
+    assert.equal(label('retry').hidden, true);
+    assert.equal(get.section['data-lesson-activity'], undefined);
+    answers.forEach((answer, i) => {
+      choice = { value: String(answer) };
+      label('check').press();
+      if (i + 1 < answers.length) label('next').press();
+    });
+    assert.equal(get.section['data-lesson-activity'], '');
+    assert.equal(label('retry').hidden, false);
+    label('retry').press();
+  }
 }
 
 console.log('curriculum-labs challenges passed');

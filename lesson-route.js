@@ -301,11 +301,11 @@
       });
     }
 
-    function showStep(index = null) {
+    function showStep(index = null, part = 0) {
       viewing = index;
-      reviewPart = 0;
+      reviewPart = part;
+      if (!atEnd()) viewedStep().review?.(viewing !== null);
       updateView();
-      if (!atEnd()) viewedStep().review?.();
       focusStep();
     }
 
@@ -400,6 +400,7 @@
       const checks = continuesPart ? [] : step.checks || [];
       const hints = viewing === null ? part?.hints || step.hints || [] : [];
       const { before, during, after } = step.questions || {};
+      const todo = (viewing !== null && part?.reviewTodo) || part?.todo || step.todo;
       panel.innerHTML = `
         <div class="lesson-route__bar">
           <span class="lesson-route__count">${viewing !== null ? '回看步驟' : current === 0 ? '起點' : `第 ${current}／${steps.length - 1} 步`}</span>${demo ? '<span class="lesson-route__teacher">教師示範</span>' : ''}
@@ -409,7 +410,7 @@
         ${demo ? `<div class="lesson-route__demo"><span>教師示範模式，可直接選取上方步驟。</span><button type="button" data-action="show-all">${showAll ? '恢復逐步路線' : '全部展開'}</button><button type="button" data-action="end-demo">結束示範</button></div>` : ''}
         <div class="lesson-route__body">
           ${before ? `<p class="lesson-route__todo"><b>操作前先猜</b>${escapeHtml(before)}</p>` : ''}
-          <p class="lesson-route__todo"><b>要做什麼</b>${escapeHtml(part?.todo || step.todo || '')}</p>
+          <p class="lesson-route__todo"><b>要做什麼</b>${escapeHtml(todo || '')}</p>
           ${step.evidence?.length ? `<ul class="evidence-list" role="list">${step.evidence.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''}
           ${viewing !== null && answers[step.index] ? `<p class="lesson-route__todo"><b>我的紀錄</b>${escapeHtml(answers[step.index])}</p>` : ''}
           ${during ? `<p class="lesson-route__todo"><b>操作中觀察</b>${escapeHtml(during)}</p>` : ''}
@@ -418,7 +419,7 @@
           ${hints.length ? `<div class="lesson-route__hints">${hints.slice(0, hintsShown).map((hint, i) => `<p tabindex="-1"><b>提示 ${i + 1}</b>${escapeHtml(hint)}</p>`).join('')}${hintsShown < hints.length ? `<button type="button" data-action="hint">卡住了？看提示 ${hintsShown + 1}／${hints.length}</button>` : ''}</div>` : ''}
           ${part && viewing !== null ? `<div class="lesson-route__actions">
             ${partIndex() > 0 ? '<button type="button" data-action="previous-part">回看前一小步</button>' : ''}
-            ${hasNextPart() ? '<button type="button" data-action="next-part">回看後一小步</button>' : ''}
+            ${hasNextPart() ? `<button type="button" data-action="next-part">${escapeHtml(part.reviewNextLabel || '回看後一小步')}</button>` : ''}
           </div>` : ''}
         </div>`;
       const action = continuesPart ? part.nextLabel || '繼續下一小步' : current === steps.length - 1 ? '完成本課' : '完成這一步';
@@ -481,6 +482,10 @@
       if (action === 'resume') { showStep(); return; }
       if (action === 'show-all') { showAll = !showAll; apply(); render(); window.dispatchEvent(new Event('resize')); return; }
       if (action === 'end-demo') { teacher.end(); return; }
+      if (action === 'previous-part' && viewing === null && viewedPart()?.resume && viewedStep().review) {
+        showStep(current, partIndex() - 1);
+        return;
+      }
       if (action === 'previous-part' || action === 'next-part') {
         changePart(partIndex() + (action === 'previous-part' ? -1 : 1));
         return;

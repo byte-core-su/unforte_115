@@ -16,9 +16,11 @@ function loadLesson(filename) {
     options: ['3', '4', '5', '6', 'custom'].map(value => ({ value })),
     setAttribute(name, value) { this[name] = value; },
     removeAttribute(name) { delete this[name]; },
+    hasAttribute(name) { return Object.hasOwn(this, name); },
+    toggleAttribute(name, enabled) { if (enabled) this.setAttribute(name, ''); else this.removeAttribute(name); },
     addEventListener(name, callback) { this.listeners[name] = callback; },
     appendChild() {}, focus() {}, select() {}, cloneNode() { return node(); },
-    classList: { add() {}, remove() {} }
+    classList: { add() {}, remove() {}, replace() {} }
   });
   const get = id => {
     if (!elements.has(id)) elements.set(id, node(id));
@@ -146,6 +148,40 @@ test('flow puzzles must be completed before standalone practice unlocks', () => 
     assert.ok(message.textContent.includes(next));
     init();
     assert.equal(message['data-lesson-activity'], undefined);
+  }
+});
+
+test('a finished structure reopens its flow after reload and can be replayed without answering IPO again', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', '1150702.html'), 'utf8');
+  assert.match(html, /\[data-l2-review\] \.ipo-followup \{ display: block; \}/);
+  for (const [id, suffix, count] of [['seq', 'Seq', 6], ['sel', 'Sel', 10], ['rep', 'Rep', 9]]) {
+    const { context, get } = loadLesson('1150702.html');
+    const view = get('l2-content-' + id);
+    const ipo = get(id + '-ipo-msg');
+    const flow = get(id + '-flow-msg');
+    assert.ok(html.includes('onclick="reset' + suffix + 'Flow()"'));
+    assert.equal(view.hasAttribute('data-l2-review'), false);
+
+    context.switchL2Tab(id, false, true);
+    assert.equal(view.hasAttribute('data-l2-review'), true);
+    assert.equal(ipo.hasAttribute('data-lesson-activity'), false);
+    assert.equal(vm.runInNewContext('c' + suffix + '.length', context), count);
+    for (let index = 1; index <= count; index++) context['tryPlace' + suffix + 'Item'](index);
+    assert.equal(flow.hasAttribute('data-lesson-activity'), true);
+    assert.match(flow.textContent, /可以查看積木對照/);
+
+    context.switchL2Tab(id === 'seq' ? 'sel' : 'seq');
+    assert.equal(view.hasAttribute('data-l2-review'), false);
+    context.switchL2Tab(id, false, true);
+    assert.equal(flow.hasAttribute('data-lesson-activity'), true);
+    ipo.setAttribute('data-lesson-activity', '');
+    context['reset' + suffix + 'Flow']();
+    assert.equal(flow.hasAttribute('data-lesson-activity'), false);
+    assert.equal(ipo.hasAttribute('data-lesson-activity'), true);
+    assert.equal(vm.runInNewContext('c' + suffix + '.length', context), count);
+    context.switchL2Tab(id);
+    assert.equal(view.hasAttribute('data-l2-review'), false);
+    assert.equal(ipo.hasAttribute('data-lesson-activity'), false);
   }
 });
 

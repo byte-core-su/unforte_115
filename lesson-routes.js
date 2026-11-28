@@ -77,10 +77,12 @@
     return {
       title, anchors: [{ common: ['#l2-tab-seq', '#l2-content-rep'] }],
       enter: () => window.switchL2Tab?.(name),
-      review: () => window.switchL2Tab?.(name, false),
+      review: reviewing => window.switchL2Tab?.(name, false, reviewing),
       todo: `${demoTodo} ${practiceTodo}`,
       parts: [
-        { title: `${title}：看懂流程`, todo: demoTodo, nextLabel, activity: activity(
+        { title: `${title}：看懂流程`, todo: demoTodo, nextLabel,
+          reviewTodo: "可以查看流程圖，或按「重新排列流程圖」再做一次。", reviewNextLabel: "回看積木實作",
+          activity: activity(
           `body:has(${runs}):has(#${name}-ipo-msg[data-lesson-activity]):has(#${name}-flow-msg[data-lesson-activity])`, pending
         ) },
         { title: practiceTitle, anchors: [simulator], resume: true, todo: practiceTodo, hints }
@@ -323,7 +325,7 @@
             todo: '排好積木，每輪抽一張牌、放進新牌堆，再從原牌堆刪除。執行一組並複製洗牌紀錄，再按「比對檢查」。',
             activity: activity('#shuffle-block-program[data-program-passed]', '用「比對檢查」確認兩副牌都沒有多牌或少牌。'),
             nextLabel: '開始相鄰比較' },
-          { title: '排序練習：比較相鄰兩項', anchors: ['#sorting-lab'],
+          { title: '排序練習：比較相鄰兩項', anchors: ['#sorting-lab'], resume: true,
             todo: '判斷相鄰兩張牌是否要交換，再選出可以提早停止的條件。' }
         ],
         activity: achieved('#sorting-lab', '請完成相鄰比較與停止條件的判斷。'),

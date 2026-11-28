@@ -66,6 +66,7 @@
             <option value="">請選一個結果</option>
           </select></label>
           <button type="button" id="g8-shuffle-check">檢查牌數</button>
+          <button type="button" id="g8-shuffle-retry" class="curriculum-lab__secondary" hidden>重做洗牌判斷</button>
         </div>
         <p id="g8-shuffle-state" class="curriculum-lab__result" role="status"></p>
         </div>`,
@@ -89,6 +90,7 @@
           </div>
           <div id="g8-sort-evidence" class="curriculum-lab__result" hidden>
             <button type="button" id="g8-sort-copy">複製洗牌與排序紀錄</button>
+            <button type="button" id="g8-sort-retry" class="curriculum-lab__secondary">重做相鄰比較</button>
             <p id="g8-sort-copy-status" role="status"></p>
             <textarea id="g8-sort-report" aria-label="洗牌與排序紀錄" rows="3" readonly hidden></textarea>
           </div>`
@@ -147,11 +149,13 @@
       <div class="curriculum-lab__controls">
         <button type="button" data-quiz-check>${window.LessonLabels.checkJudgment}</button>
         <button type="button" data-quiz-next hidden>下一題</button>
+        <button type="button" data-quiz-retry class="curriculum-lab__secondary" hidden>重新作答</button>
       </div>
       <p class="curriculum-lab__result" role="status"></p>`;
       const fieldset = quizRoot.querySelector('fieldset');
       const check = quizRoot.querySelector('[data-quiz-check]');
       const next = quizRoot.querySelector('[data-quiz-next]');
+      const retry = quizRoot.querySelector('[data-quiz-retry]');
       const result = quizRoot.querySelector('[role="status"]');
       check.addEventListener('click', () => {
         const selected = fieldset.querySelector('input:checked');
@@ -160,6 +164,7 @@
         if (!correct) return;
         fieldset.disabled = check.disabled = true;
         if (questionIndex + 1 === questions.length) {
+          retry.hidden = false;
           section.setAttribute('data-lesson-activity', '');
           return;
         }
@@ -167,6 +172,12 @@
       });
       next.addEventListener('click', () => {
         questionIndex++;
+        showQuestion();
+        quizRoot.querySelector('input').focus();
+      });
+      retry.addEventListener('click', () => {
+        questionIndex = 0;
+        section.removeAttribute('data-lesson-activity');
         showQuestion();
         quizRoot.querySelector('input').focus();
       });
@@ -384,7 +395,7 @@
     const sorting = document.createElement('section');
     sorting.id = 'sorting-lab';
     sorting.className = 'curriculum-lab';
-    sorting.hidden = true;
+    sorting.setAttribute('data-route-locked', '');
     sorting.setAttribute('aria-labelledby', 'g8-sort-title');
     sorting.innerHTML = `<div class="curriculum-lab__card">${lab.sortingHtml}</div>`;
     section.after(sorting);
@@ -422,6 +433,7 @@
       ['missing', asList(shuffle([first, second, repeated]))]
     ]);
     const shuffleCheck = get('shuffle-check');
+    const shuffleRetry = get('shuffle-retry');
     shuffleCheck.addEventListener('click', () => {
       const feedback = {
         extra: `總張數相同，但數字 ${second} 多了一張，數字 ${repeated} 少了一張。`,
@@ -432,13 +444,20 @@
       if (shuffleChoice.value !== 'valid') return;
       shuffleCheck.disabled = shuffleChoice.disabled = true;
       get('shuffle-state').textContent += ' 按「開始洗牌實作」，試著用積木做出洗牌程式。';
-      askComparison();
-      sorting.hidden = false;
+      shuffleRetry.hidden = false;
       section.setAttribute('data-lesson-activity', '');
+    });
+    shuffleRetry.addEventListener('click', () => {
+      shuffleChoice.value = '';
+      shuffleCheck.disabled = shuffleChoice.disabled = false;
+      shuffleRetry.hidden = true;
+      get('shuffle-state').textContent = '';
+      section.removeAttribute('data-lesson-activity');
+      shuffleChoice.focus();
     });
 
     function answerComparison(swap) {
-      if (!shuffleCheck.disabled || index >= 2) return;
+      if (index >= 2) return;
       if (swap !== (values[index] > values[index + 1])) {
         askComparison('再試一次。左邊比右邊大才交換。');
         return;
@@ -475,6 +494,25 @@
     ]);
     const sortCheck = get('sort-check');
     const report = get('sort-report');
+    get('sort-retry').addEventListener('click', () => {
+      values.splice(0, values.length, ...shuffled);
+      index = 0;
+      sortFinished = false;
+      trace.length = 0;
+      stopChoice.value = '';
+      sortCheck.disabled = stopChoice.disabled = false;
+      report.value = '';
+      report.hidden = true;
+      get('sort-copy-status').textContent = '';
+      get('sort-trace').innerHTML = '';
+      get('sort-evidence').hidden = true;
+      get('sort-stop-task').hidden = true;
+      get('sort-actions').hidden = false;
+      sorting.removeAttribute('data-lesson-activity');
+      askComparison();
+      get('sort-swap').focus();
+    });
+    askComparison();
     sortCheck.addEventListener('click', () => {
       if (!sortFinished) return;
       if (stopChoice.value !== 'round') {
