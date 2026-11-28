@@ -81,6 +81,34 @@
     const hasNextPart = () => Boolean(viewedPart() && partIndex() + 1 < viewedStep().parts.length);
     const nextPart = () => hasNextPart() ? viewedStep().parts[partIndex() + 1] : null;
     const previousPartButton = '<button type="button" data-action="previous-part">回看前一小步</button>';
+    let flowDialog;
+    let flowTimer;
+
+    function showFlowHint(content) {
+      if (!flowDialog) {
+        flowDialog = document.createElement('dialog');
+        flowDialog.className = 'lesson-flow-hint';
+        flowDialog.setAttribute('aria-labelledby', 'lesson-flow-hint-title');
+        flowDialog.setAttribute('aria-describedby', 'lesson-flow-hint-content lesson-flow-hint-timing');
+        flowDialog.innerHTML = `
+          <form method="dialog" class="lesson-flow-hint__header">
+            <h2 id="lesson-flow-hint-title">流程圖提示</h2>
+            <button type="submit" autofocus>關閉</button>
+          </form>
+          <div id="lesson-flow-hint-content" data-flow-hint-content></div>
+          <p id="lesson-flow-hint-timing">5 秒後自動關閉，可再開啟查看。</p>`;
+        flowDialog.addEventListener('close', () => {
+          if (!flowDialog.open) clearTimeout(flowTimer);
+        });
+        document.body.append(flowDialog);
+      }
+      if (flowDialog.open) return;
+      clearTimeout(flowTimer);
+      flowDialog.querySelector('[data-flow-hint-content]').innerHTML = content;
+      flowDialog.showModal();
+      flowDialog.scrollTop = 0;
+      flowTimer = setTimeout(() => { if (flowDialog.open) flowDialog.close(); }, 5000);
+    }
 
     function reviewActions() {
       const part = viewedPart();
@@ -423,6 +451,9 @@
       }
       const step = viewedStep();
       const part = viewedPart();
+      const backControl = part?.flowHint
+        ? '<button type="button" data-action="flow-hint" aria-haspopup="dialog">流程圖提示</button>'
+        : part && partIndex() > 0 ? previousPartButton : '';
       const choice = part && step.optional;
       const continuesPart = hasNextPart() && !choice;
       const checks = continuesPart ? [] : step.checks || [];
@@ -448,7 +479,7 @@
       if (viewing !== null) {
         const { primary, shortcut } = reviewActions();
         completion.innerHTML = `<div class="lesson-route__body"><div class="lesson-route__actions">
-          ${part && partIndex() > 0 ? previousPartButton : ''}
+          ${backControl}
           ${shortcut ? `<button type="button" data-action="review-program">${escapeHtml(shortcut)}</button>` : ''}
           <button type="button" class="lesson-route__primary" data-action="${primary.action}">${escapeHtml(primary.label)}</button>
         </div></div>`;
@@ -463,7 +494,7 @@
           ${step.submission ? `<label class="lesson-route__submit"><input type="checkbox" data-check="0" ${ticked[0] ? 'checked' : ''}> 已到班級平台繳交</label>` : ''}
           <p class="lesson-route__msg" role="status"></p>
           <div class="lesson-route__actions">
-            ${part && partIndex() > 0 ? previousPartButton : ''}
+            ${backControl}
             ${choice && hasNextPart() ? '<button type="button" data-action="next-part">看下一項選做</button>' : ''}
             ${step.optional ? '<button type="button" data-action="skip">略過選做</button>' : ''}
             <button type="button" class="lesson-route__primary" data-action="done">${escapeHtml(action)}</button>
@@ -521,6 +552,11 @@
       }
       if (action === 'show-all') { showAll = !showAll; apply(); render(); window.dispatchEvent(new Event('resize')); return; }
       if (action === 'end-demo') { teacher.end(); return; }
+      if (action === 'flow-hint') {
+        const content = viewedPart()?.flowHint?.();
+        if (content) showFlowHint(content);
+        return;
+      }
       if (action === 'previous-part' && viewing === null && partIndex() > 0 && !viewedStep().optional) {
         showStep(current, partIndex() - 1);
         return;

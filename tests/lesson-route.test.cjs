@@ -66,6 +66,8 @@ for (const page of pages) {
       assert.ok(step.parts[0].activity.selector.includes(`#${id}-flow-msg[data-lesson-activity]`));
       assert.equal(step.parts[1].anchors[0], `#${id}-block-program`);
       assert.equal(step.parts[1].resume, true);
+      window.structureFlowHint = structure => structure;
+      assert.equal(step.parts[1].flowHint(), id);
       assert.equal(step.activity.selector, `#${id}-block-program[data-program-passed]`);
       assert.equal(extraPrograms[`${id}-block-program`].cases.length, 2);
     }
@@ -148,6 +150,7 @@ for (const page of pages) {
     const listeners = {};
     const button = {};
     const message = {};
+    const flowContent = {};
     const node = {
       children, parentElement: parent, isConnected: true,
       classList: { add() {} }, style: { setProperty() {} },
@@ -158,8 +161,10 @@ for (const page of pages) {
       after(...siblings) { for (const sibling of siblings) sibling.parentElement = node.parentElement; },
       append(child) { child.parentElement = node; },
       before() {}, querySelectorAll: () => [],
-      querySelector: selector => ({ '[data-action="done"]': button, '.lesson-route__msg': message })[selector],
+      querySelector: selector => ({ '[data-action="done"]': button, '.lesson-route__msg': message, '[data-flow-hint-content]': flowContent })[selector],
       addEventListener: (name, callback) => { listeners[name] = callback; },
+      showModal() { this.open = true; },
+      close() { this.open = false; listeners.close?.(); },
       action: name => listeners.click({ target: { closest: selector => selector === '[data-action]' ? { dataset: { action: name } } : null } }),
       node: index => listeners.click({ target: { closest: () => ({ dataset: { node: String(index) } }) } }),
       compareDocumentPosition: () => 0,
@@ -192,13 +197,18 @@ for (const page of pages) {
   };
   let refresh;
   let savedRoute;
+  const flowTimers = new Set();
   const reviewed = [];
   const window = { TeacherDemo: { isOn: () => false }, dispatchEvent() {} };
   vm.runInNewContext(read('lesson-route.js'), {
     window, document, location: { pathname: '/test.html' },
     localStorage: { getItem: () => savedRoute, setItem: (_, value) => { savedRoute = value; } },
     MutationObserver: class { constructor(callback) { refresh = callback; } observe() {} },
-    setTimeout: callback => { callback(); return 0; }, requestAnimationFrame() {}, Event: class {}, Node: {}
+    setTimeout(callback, delay) {
+      if (delay === 5000) { flowTimers.add(callback); return callback; }
+      callback();
+      return 0;
+    }, clearTimeout: callback => flowTimers.delete(callback), requestAnimationFrame() {}, Event: class {}, Node: {}
   });
   const config = { steps: [
     { title: '看任務', anchors: ['#learning-guide'] },
@@ -293,10 +303,32 @@ for (const page of pages) {
   assert.match(panel.innerHTML, /本課學習路線已完成/);
   assert.equal(savedRoute, finished, 'replaying an activity should preserve the completed route');
   savedRoute = paused;
+  lookup.delete('#both-passed');
+  config.steps[1].parts[1].flowHint = () => '<p>提示圖</p>';
   window.LessonRoute.start(config);
-  const [resumedPanel] = created.slice(3);
+  const [resumedPanel, resumedCompletion] = created.slice(3);
   assert.match(resumedPanel.innerHTML, /第二項/);
   assert.ok(hidden(first) && !hidden(second));
+  assert.match(resumedCompletion.innerHTML, /流程圖提示/);
+  assert.doesNotMatch(resumedCompletion.innerHTML, /回看前一小步/);
+  resumedCompletion.action('flow-hint');
+  const dialog = created.at(-1);
+  assert.equal(dialog.open, true);
+  assert.equal(dialog.querySelector('[data-flow-hint-content]').innerHTML, '<p>提示圖</p>');
+  assert.equal(flowTimers.size, 1);
+  dialog.close();
+  assert.equal(flowTimers.size, 0);
+  resumedCompletion.action('flow-hint');
+  assert.equal(created.at(-1), dialog);
+  assert.equal(dialog.open, true);
+  assert.equal(flowTimers.size, 1);
+  const [autoClose] = flowTimers;
+  autoClose();
+  assert.equal(dialog.open, false);
+  assert.equal(flowTimers.size, 0);
+  assert.ok(hidden(first) && !hidden(second));
+  assert.equal(resumedCompletion.button.disabled, true);
+  assert.equal(savedRoute, paused);
 }
 
 // CodeGame keeps its own guided route. Python Lab offers independent units.

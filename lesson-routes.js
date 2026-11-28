@@ -87,7 +87,7 @@
           activity: activity(
           `body:has(${runs}):has(#${name}-ipo-msg[data-lesson-activity]):has(#${name}-flow-msg[data-lesson-activity])`, pending
         ) },
-        { title: practiceTitle, anchors: [simulator], resume: true,
+        { title: practiceTitle, anchors: [simulator], resume: true, flowHint: () => window.structureFlowHint(name),
           todo: `先新增本題需要的變數。${practiceTodo}`,
           reviewTodo: '要從頭排一次，可按「清空積木」。已建立的變數仍可使用。排好後再試跑及比對。',
           hints }

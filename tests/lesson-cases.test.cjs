@@ -132,6 +132,14 @@ function loadLesson(filename) {
   assert.equal(signature(), '5,5,50,3');
 }
 
+test('flow hints show the sequence, decision or loop used in the practice', () => {
+  const { context } = loadLesson('1150702.html');
+  const hint = context.window.structureFlowHint;
+  assert.match(hint('seq'), /開始.*輸入 A、B.*平均數 = \(A\+B\)\/2.*輸出平均數.*結束/s);
+  assert.match(hint('sel'), /總分 ≥ 60？.*是 → 結果為及格.*否 → 結果為未及格.*輸出總分和結果/s);
+  assert.match(hint('rep'), /數字和總和都設為 0.*重複N次.*數字加 1.*把數字加進總和.*輸出總和/s);
+});
+
 test('flow puzzles must be completed before standalone practice unlocks', () => {
   const { context, get } = loadLesson('1150702.html');
   for (const [kind, count, next, init, place] of [

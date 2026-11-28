@@ -958,6 +958,22 @@
             outEl.setAttribute('data-lesson-activity', '');
             outEl.innerHTML = `1加到${n}的總和: <strong class='text-rose-600 text-lg ml-1'>${(1+n)*n/2}</strong>`;
         }
+        window.structureFlowHint = function (structure) {
+            const node = (label, kind = 'step') => `<div class="lesson-flow-hint__node is-${kind}">${label}</div>`;
+            const arrow = '<span class="lesson-flow-hint__arrow" aria-hidden="true">↓</span>';
+            const flows = {
+                seq: [node('輸入 A、B', 'io'), node(seqData[4]), node(seqData[5], 'io')],
+                sel: [node('輸入作業、測驗與平時成績', 'io'), node('總分 = 作業 × 0.4 ＋ 測驗 × 0.4 ＋ 平時 × 0.2'),
+                    node('總分 ≥ 60？', 'condition'),
+                    '<div class="lesson-flow-hint__branches">' + node('是 → 結果為及格') + node('否 → 結果為未及格') + '</div>',
+                    node('輸出總分和結果', 'io')],
+                rep: [node('輸入 N', 'io'), node('數字和總和都設為 0'),
+                    `<div class="lesson-flow-hint__loop"><strong>↻ ${repDataGame[5]}</strong>
+                      ${node('數字加 1')}${arrow}${node('把數字加進總和')}</div>`, node('輸出總和', 'io')]
+            };
+            const steps = flows[structure];
+            return `<div class="lesson-flow-hint__chart">${[node(seqData[1], 'terminal'), ...steps, node(seqData[6], 'terminal')].join(arrow)}</div>`;
+        };
     </script>
 </body>
 </html>
