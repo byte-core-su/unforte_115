@@ -151,6 +151,7 @@ for (const page of pages) {
     const button = {};
     const message = {};
     const flowContent = {};
+    const countdown = {};
     const node = {
       children, parentElement: parent, isConnected: true,
       classList: { add() {} }, style: { setProperty() {} },
@@ -161,7 +162,8 @@ for (const page of pages) {
       after(...siblings) { for (const sibling of siblings) sibling.parentElement = node.parentElement; },
       append(child) { child.parentElement = node; },
       before() {}, querySelectorAll: () => [],
-      querySelector: selector => ({ '[data-action="done"]': button, '.lesson-route__msg': message, '[data-flow-hint-content]': flowContent })[selector],
+      querySelector: selector => ({ '[data-action="done"]': button, '.lesson-route__msg': message,
+        '[data-flow-hint-content]': flowContent, '[data-flow-hint-seconds]': countdown })[selector],
       addEventListener: (name, callback) => { listeners[name] = callback; },
       showModal() { this.open = true; },
       close() { this.open = false; listeners.close?.(); },
@@ -197,7 +199,15 @@ for (const page of pages) {
   };
   let refresh;
   let savedRoute;
-  const flowTimers = new Set();
+  let now = 0;
+  const flowTimers = new Map();
+  function advanceCountdown(milliseconds) {
+    const [[callback, due]] = flowTimers;
+    now += milliseconds;
+    assert.ok(now >= due);
+    flowTimers.delete(callback);
+    callback();
+  }
   const reviewed = [];
   const window = { TeacherDemo: { isOn: () => false }, dispatchEvent() {} };
   vm.runInNewContext(read('lesson-route.js'), {
@@ -205,10 +215,10 @@ for (const page of pages) {
     localStorage: { getItem: () => savedRoute, setItem: (_, value) => { savedRoute = value; } },
     MutationObserver: class { constructor(callback) { refresh = callback; } observe() {} },
     setTimeout(callback, delay) {
-      if (delay === 5000) { flowTimers.add(callback); return callback; }
+      if (delay !== 300) { flowTimers.set(callback, now + delay); return callback; }
       callback();
       return 0;
-    }, clearTimeout: callback => flowTimers.delete(callback), requestAnimationFrame() {}, Event: class {}, Node: {}
+    }, performance: { now: () => now }, clearTimeout: callback => flowTimers.delete(callback), requestAnimationFrame() {}, Event: class {}, Node: {}
   });
   const config = { steps: [
     { title: '看任務', anchors: ['#learning-guide'] },
@@ -315,15 +325,24 @@ for (const page of pages) {
   const dialog = created.at(-1);
   assert.equal(dialog.open, true);
   assert.equal(dialog.querySelector('[data-flow-hint-content]').innerHTML, '<p>提示圖</p>');
+  const remaining = () => dialog.querySelector('[data-flow-hint-seconds]').textContent;
+  assert.equal(remaining(), '5');
   assert.equal(flowTimers.size, 1);
+  advanceCountdown(2000);
+  assert.equal(remaining(), '3');
   dialog.close();
   assert.equal(flowTimers.size, 0);
   resumedCompletion.action('flow-hint');
   assert.equal(created.at(-1), dialog);
   assert.equal(dialog.open, true);
+  assert.equal(remaining(), '5');
   assert.equal(flowTimers.size, 1);
-  const [autoClose] = flowTimers;
-  autoClose();
+  for (const seconds of ['4', '3', '2', '1']) {
+    advanceCountdown(1000);
+    assert.equal(dialog.open, true);
+    assert.equal(remaining(), seconds);
+  }
+  advanceCountdown(1000);
   assert.equal(dialog.open, false);
   assert.equal(flowTimers.size, 0);
   assert.ok(hidden(first) && !hidden(second));

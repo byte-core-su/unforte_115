@@ -96,7 +96,7 @@
             <button type="submit" autofocus>關閉</button>
           </form>
           <div id="lesson-flow-hint-content" data-flow-hint-content></div>
-          <p id="lesson-flow-hint-timing">5 秒後自動關閉，可再開啟查看。</p>`;
+          <p id="lesson-flow-hint-timing">剩餘 <strong data-flow-hint-seconds>5</strong> 秒。可再開啟查看。</p>`;
         flowDialog.addEventListener('close', () => {
           if (!flowDialog.open) clearTimeout(flowTimer);
         });
@@ -105,9 +105,20 @@
       if (flowDialog.open) return;
       clearTimeout(flowTimer);
       flowDialog.querySelector('[data-flow-hint-content]').innerHTML = content;
+      const countdown = flowDialog.querySelector('[data-flow-hint-seconds]');
+      countdown.textContent = '5';
       flowDialog.showModal();
       flowDialog.scrollTop = 0;
-      flowTimer = setTimeout(() => { if (flowDialog.open) flowDialog.close(); }, 5000);
+      const endsAt = performance.now() + 5000;
+      function tick() {
+        if (!flowDialog.open) return;
+        const millisecondsLeft = endsAt - performance.now();
+        if (millisecondsLeft <= 0) { flowDialog.close(); return; }
+        const secondsLeft = Math.ceil(millisecondsLeft / 1000);
+        countdown.textContent = String(secondsLeft);
+        flowTimer = setTimeout(tick, Math.ceil(millisecondsLeft - (secondsLeft - 1) * 1000));
+      }
+      flowTimer = setTimeout(tick, 1000);
     }
 
     function reviewActions() {
