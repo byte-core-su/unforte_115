@@ -9,6 +9,7 @@
   'use strict';
 
   const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  const isProgram = step => Boolean(step?.anchors?.some(anchor => /^#(?:[\w-]+-)?block-program$/.test(anchor)));
   const teacher = window.TeacherDemo;
   const demo = teacher.isOn();
   if (demo) document.documentElement.setAttribute('data-teacher-route', '');
@@ -78,6 +79,25 @@
     const atEnd = () => finished && viewing === null;
     const viewedPart = () => showAll || atEnd() ? undefined : viewedStep().parts?.[partIndex()];
     const hasNextPart = () => Boolean(viewedPart() && partIndex() + 1 < viewedStep().parts.length);
+    const nextPart = () => hasNextPart() ? viewedStep().parts[partIndex() + 1] : null;
+    const previousPartButton = '<button type="button" data-action="previous-part">回看前一小步</button>';
+
+    function reviewActions() {
+      const part = viewedPart();
+      const followingPart = viewing < current || partIndex() < currentPart ? nextPart() : null;
+      const available = steps.slice(viewing + 1, current + 1).filter(step => !skipped.has(step.index));
+      const next = available[0];
+      const program = available.find(isProgram);
+      const resumeLabel = finished ? '回到終點' : '回到目前步驟';
+      const stepLabel = step => step.index === current && !finished
+        ? step.resumeLabel || `繼續：${step.title}`
+        : step.reviewLabel || (isProgram(step) ? '重做積木實作' : `回看：${step.title}`);
+      const primary = followingPart
+        ? { action: 'next-part', label: part.reviewNextLabel || (isProgram(followingPart) ? '重做積木實作' : `回看：${followingPart.title}`) }
+        : next ? { action: 'review-next', label: stepLabel(next) } : { action: 'resume', label: resumeLabel };
+      const canShortcut = program && (followingPart ? !isProgram(followingPart) : program !== next);
+      return { primary, next, program, shortcut: canShortcut ? stepLabel(program) : '' };
+    }
 
     function saveRoute() {
       const part = steps[current].parts?.[currentPart]?.resume ? currentPart : undefined;
@@ -205,6 +225,11 @@
     progress.setAttribute('aria-label', '本課進度');
     (guideHeading || guide || main).before(progress);
 
+    const completionSlot = () => {
+      const anchor = viewedPart()?.completionAnchor;
+      return anchor ? findAnchor(anchor) : null;
+    };
+
     function placeControls() {
       const unique = [...new Set(viewedRegions().map(region => main.contains(region) ? main : region))];
       const regions = unique.filter(region => !unique.some(other => other !== region && other.contains(region)))
@@ -212,8 +237,11 @@
       if (!atEnd() && regions.length) {
         // Keep the route controls at the same width as the activity's outer container.
         if (regions[0].previousElementSibling !== panel) regions[0].before(panel);
+        const slot = completionSlot();
         const last = regions.at(-1);
-        if (last.nextElementSibling !== completion) last.after(completion);
+        if (slot) {
+          if (completion.parentElement !== slot) slot.append(completion);
+        } else if (last.nextElementSibling !== completion) last.after(completion);
       } else {
         const practice = document.querySelector('#adaptive-practice');
         const anchor = practice || main;
@@ -376,7 +404,7 @@
 
     function render() {
       panel.hidden = Boolean(startButton && !demo && viewedStep().index === 0);
-      completion.hidden = panel.hidden || atEnd() || viewing !== null;
+      completion.hidden = panel.hidden || atEnd();
       if (atEnd()) {
         if (startButton) startButton.textContent = '查看本課完成結果';
         const next = config.next || (demo ? config.teacherFinish : null);
@@ -405,7 +433,6 @@
         <div class="lesson-route__bar">
           <span class="lesson-route__count">${viewing !== null ? '回看步驟' : current === 0 ? '起點' : `第 ${current}／${steps.length - 1} 步`}</span>${demo ? '<span class="lesson-route__teacher">教師示範</span>' : ''}
           <h2 class="lesson-route__title" tabindex="-1">${escapeHtml(part?.title || step.title)}${step.optional ? '<span class="lesson-route__tag">選做</span>' : ''}</h2>
-          ${!demo && viewing === null && step.optional && step.regions.length ? '<div class="lesson-route__actions"><button type="button" data-action="skip">略過選做</button></div>' : ''}
         </div>
         ${demo ? `<div class="lesson-route__demo"><span>教師示範模式，可直接選取上方步驟。</span><button type="button" data-action="show-all">${showAll ? '恢復逐步路線' : '全部展開'}</button><button type="button" data-action="end-demo">結束示範</button></div>` : ''}
         <div class="lesson-route__body">
@@ -417,12 +444,18 @@
           ${after ? `<p class="lesson-route__todo"><b>做完後說明</b>${escapeHtml(after)}</p>` : ''}
           ${step.link ? `<p class="lesson-route__link"><a href="${escapeHtml(step.link.href)}" target="_blank" rel="noopener">${escapeHtml(step.link.label)}</a></p>` : ''}
           ${hints.length ? `<div class="lesson-route__hints">${hints.slice(0, hintsShown).map((hint, i) => `<p tabindex="-1"><b>提示 ${i + 1}</b>${escapeHtml(hint)}</p>`).join('')}${hintsShown < hints.length ? `<button type="button" data-action="hint">卡住了？看提示 ${hintsShown + 1}／${hints.length}</button>` : ''}</div>` : ''}
-          ${part && viewing !== null ? `<div class="lesson-route__actions">
-            ${partIndex() > 0 ? '<button type="button" data-action="previous-part">回看前一小步</button>' : ''}
-            ${hasNextPart() ? `<button type="button" data-action="next-part">${escapeHtml(part.reviewNextLabel || '回看後一小步')}</button>` : ''}
-          </div>` : ''}
         </div>`;
-      const action = continuesPart ? part.nextLabel || '繼續下一小步' : current === steps.length - 1 ? '完成本課' : '完成這一步';
+      if (viewing !== null) {
+        const { primary, shortcut } = reviewActions();
+        completion.innerHTML = `<div class="lesson-route__body"><div class="lesson-route__actions">
+          ${part && partIndex() > 0 ? previousPartButton : ''}
+          ${shortcut ? `<button type="button" data-action="review-program">${escapeHtml(shortcut)}</button>` : ''}
+          <button type="button" class="lesson-route__primary" data-action="${primary.action}">${escapeHtml(primary.label)}</button>
+        </div></div>`;
+        return;
+      }
+      const next = continuesPart ? nextPart() : steps[current + 1];
+      const action = (continuesPart && part.nextLabel) || (next ? next.startLabel || `前往${next.title}` : '完成本課');
       completion.innerHTML = `
         <div class="lesson-route__body">
           ${checks.length ? `<p class="lesson-route__todo"><b>怎樣算達標</b></p><ul class="evidence-list" role="list">${checks.map(check => `<li>${escapeHtml(check)}</li>`).join('')}</ul>` : ''}
@@ -430,9 +463,9 @@
           ${step.submission ? `<label class="lesson-route__submit"><input type="checkbox" data-check="0" ${ticked[0] ? 'checked' : ''}> 已到班級平台繳交</label>` : ''}
           <p class="lesson-route__msg" role="status"></p>
           <div class="lesson-route__actions">
-            ${part && partIndex() > 0 ? '<button type="button" data-action="previous-part">回看前一小步</button>' : ''}
+            ${part && partIndex() > 0 ? previousPartButton : ''}
             ${choice && hasNextPart() ? '<button type="button" data-action="next-part">看下一項選做</button>' : ''}
-            ${step.optional && (demo || !step.regions.length) ? '<button type="button" data-action="skip">略過選做</button>' : ''}
+            ${step.optional ? '<button type="button" data-action="skip">略過選做</button>' : ''}
             <button type="button" class="lesson-route__primary" data-action="done">${escapeHtml(action)}</button>
           </div>
         </div>`;
@@ -440,7 +473,7 @@
     }
 
     function updateCompletion() {
-      if (completion.hidden) return false;
+      if (completion.hidden || viewing !== null) return false;
       const button = completion.querySelector('[data-action="done"]');
       if (!button) return false;
       const step = steps[current];
@@ -480,9 +513,15 @@
         return;
       }
       if (action === 'resume') { showStep(); return; }
+      if (viewing !== null && (action === 'review-next' || action === 'review-program')) {
+        const { next, program } = reviewActions();
+        const target = action === 'review-next' ? next : program;
+        if (target) showStep(target.index === current && !finished ? null : target.index);
+        return;
+      }
       if (action === 'show-all') { showAll = !showAll; apply(); render(); window.dispatchEvent(new Event('resize')); return; }
       if (action === 'end-demo') { teacher.end(); return; }
-      if (action === 'previous-part' && viewing === null && viewedPart()?.resume && viewedStep().review) {
+      if (action === 'previous-part' && viewing === null && partIndex() > 0 && !viewedStep().optional) {
         showStep(current, partIndex() - 1);
         return;
       }
@@ -496,7 +535,7 @@
         reveal(panel.querySelector('.lesson-route__hints p:last-of-type'));
         return;
       }
-      if (action === 'skip' && steps[current].optional) { skipped.add(current); advance(); return; }
+      if (action === 'skip' && viewing === null && steps[current].optional) { skipped.add(current); advance(); return; }
       if (action === 'done') {
         if (!updateCompletion()) return;
         const step = viewedStep();
@@ -531,6 +570,10 @@
 
     function changePart(index) {
       if (!viewedPart() || !viewedStep().parts[index]) return;
+      if (viewing === current && index >= currentPart) {
+        if (index === currentPart) showStep();
+        return;
+      }
       if (viewing === null) {
         currentPart = index;
         saveRoute();

@@ -81,11 +81,16 @@
       todo: `${demoTodo} ${practiceTodo}`,
       parts: [
         { title: `${title}：看懂流程`, todo: demoTodo, nextLabel,
-          reviewTodo: "可以查看流程圖，或按「重新排列流程圖」再做一次。", reviewNextLabel: "回看積木實作",
+          completionAnchor: `#${name}-flow-completion`,
+          reviewTodo: '可重新排列流程圖，或按流程圖下方的「重做積木實作」。',
+          reviewNextLabel: '重做積木實作',
           activity: activity(
           `body:has(${runs}):has(#${name}-ipo-msg[data-lesson-activity]):has(#${name}-flow-msg[data-lesson-activity])`, pending
         ) },
-        { title: practiceTitle, anchors: [simulator], resume: true, todo: practiceTodo, hints }
+        { title: practiceTitle, anchors: [simulator], resume: true,
+          todo: `先新增本題需要的變數。${practiceTodo}`,
+          reviewTodo: '要從頭排一次，可按「清空積木」。已建立的變數仍可使用。排好後再試跑及比對。',
+          hints }
       ],
       activity: activity(`${simulator}[data-program-passed]`, '先完成程式，再用「比對檢查」通過兩組資料。'),
       checks,
@@ -320,7 +325,8 @@
         todo: '先判斷洗牌結果，再動手寫洗牌程式，最後練習相鄰比較排序。',
         parts: [
           { title: '洗牌示範：核對每張牌', todo: '看示範如何移走一張牌，再找出保留原牌堆每張牌的結果。',
-            activity: achieved('#curriculum-lab', '請先選出保留每張牌的洗牌結果。'), nextLabel: '開始洗牌實作' },
+            activity: achieved('#curriculum-lab', '請先選出保留每張牌的洗牌結果。'), nextLabel: '開始洗牌實作',
+            reviewNextLabel: '重做洗牌實作' },
           { title: '洗牌實作：排積木並執行', anchors: ['#shuffle-block-program'],
             todo: '排好積木，每輪抽一張牌、放進新牌堆，再從原牌堆刪除。執行一組並複製洗牌紀錄，再按「比對檢查」。',
             activity: activity('#shuffle-block-program[data-program-passed]', '用「比對檢查」確認兩副牌都沒有多牌或少牌。'),
@@ -332,6 +338,7 @@
         checks: ['能按大小決定是否交換，並在一整輪都沒交換時停止'],
         hints: ['洗牌前後要數每種牌有幾張。排序時，左邊比右邊大才交換。'] },
       program({
+        startLabel: '開始排序積木實作', resumeLabel: '繼續排序積木實作', reviewLabel: '重做排序積木實作',
         todo: '排好排序積木，執行兩組資料。把排序追蹤和洗牌實作的紀錄貼到本課作業。',
         checks: ['排序程式能執行，並有比較與交換紀錄', '洗牌和排序前後，每個數值出現的次數都相同'],
         hints: ['前項比後項大才交換。比對各數值各有幾筆，例如原來有兩個 3，處理後也要有兩個 3。'] })

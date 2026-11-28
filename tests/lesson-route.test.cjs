@@ -60,6 +60,9 @@ for (const page of pages) {
     for (const [index, id, label] of [[1, 'seq', '開始平均數實作'], [2, 'sel', '開始及格判斷實作'], [3, 'rep', '開始累加實作']]) {
       const step = steps[index];
       assert.equal(step.parts[0].nextLabel, label);
+      assert.equal(step.parts[0].reviewNextLabel, '重做積木實作');
+      assert.equal(step.parts[0].completionAnchor, `#${id}-flow-completion`);
+      assert.ok(html.includes(`id="${id}-flow-completion"`));
       assert.ok(step.parts[0].activity.selector.includes(`#${id}-flow-msg[data-lesson-activity]`));
       assert.equal(step.parts[1].anchors[0], `#${id}-block-program`);
       assert.equal(step.parts[1].resume, true);
@@ -68,6 +71,10 @@ for (const page of pages) {
     }
   }
   const lessonProgram = steps.find(step => step.anchors.includes('#block-program'));
+  if (page.startsWith('11507')) {
+    assert.ok(!lessonProgram.optional, `${page}: block programming is required`);
+    assert.match(lessonProgram.activity.selector, /data-program-passed/);
+  }
   if (page === '1150701.html') {
     assert.equal(steps[2], lessonProgram);
     assert.ok(!lessonProgram.optional);
@@ -148,7 +155,9 @@ for (const page of pages) {
       setAttribute: name => attrs.add(name), removeAttribute: name => attrs.delete(name),
       hasAttribute: name => attrs.has(name),
       toggleAttribute(name, on) { if (on) attrs.add(name); else attrs.delete(name); },
-      after() {}, before() {}, querySelectorAll: () => [],
+      after(...siblings) { for (const sibling of siblings) sibling.parentElement = node.parentElement; },
+      append(child) { child.parentElement = node; },
+      before() {}, querySelectorAll: () => [],
       querySelector: selector => ({ '[data-action="done"]': button, '.lesson-route__msg': message })[selector],
       addEventListener: (name, callback) => { listeners[name] = callback; },
       action: name => listeners.click({ target: { closest: selector => selector === '[data-action]' ? { dataset: { action: name } } : null } }),
@@ -166,12 +175,15 @@ for (const page of pages) {
   const firstFrame = element(main);
   const secondFrame = element(body);
   const first = element(firstFrame);
+  const flowControls = element(first);
   const second = element(secondFrame);
+  const practice = element(body);
   const legacy = element(main);
   const start = element(guide);
   let advanceOpening;
   start.addEventListener = (_, callback) => { advanceOpening = callback; };
-  const lookup = new Map([['main', main], ['#learning-guide', guide], ['[data-lesson-start]', start], ['#first', first], ['#second', second]]);
+  const lookup = new Map([['main', main], ['#learning-guide', guide], ['[data-lesson-start]', start], ['#first', first],
+    ['#flow-controls', flowControls], ['#second', second], ['#block-program', practice]]);
   const created = [];
   const document = {
     body, querySelector: selector => lookup.get(selector),
@@ -192,11 +204,15 @@ for (const page of pages) {
     { title: '看任務', anchors: ['#learning-guide'] },
     { title: '完成兩項操作', anchors: ['#first'], review: reviewing => reviewed.push(reviewing),
       parts: [
-        { title: '第一項', nextLabel: '開始實作', reviewTodo: '重新排列流程圖', reviewNextLabel: '回看積木實作',
+        { title: '第一項', nextLabel: '開始實作', completionAnchor: '#flow-controls',
+          reviewTodo: '重新排列流程圖', reviewNextLabel: '重做積木實作',
           activity: { selector: '#first-passed', pending: '先完成第一項。' } },
         { title: '第二項', anchors: ['#second'], resume: true }
       ],
       activity: { selector: '#both-passed', pending: '先完成兩項。' } },
+    { title: '再做一題' },
+    { title: '積木程式實作', anchors: ['#block-program'], activity: { selector: '#practice-passed', pending: '先比對積木。' } },
+    { title: '選做', optional: true },
     { title: '交件' }
   ] };
   window.LessonRoute.start(config);
@@ -208,6 +224,7 @@ for (const page of pages) {
   advanceOpening();
   assert.ok(hidden(intro) && hidden(guide) && hidden(second) && hidden(legacy));
   assert.equal(hidden(first), false);
+  assert.equal(completion.parentElement, flowControls);
   assert.match(completion.innerHTML, /開始實作/);
   assert.equal(completion.button.disabled, true);
   lookup.set('#first-passed', first);
@@ -215,6 +232,7 @@ for (const page of pages) {
   assert.equal(completion.button.disabled, false);
   completion.action('done');
   assert.match(panel.innerHTML, /第二項/);
+  assert.notEqual(completion.parentElement, flowControls);
   const paused = savedRoute;
   assert.equal(hidden(first), true);
   assert.equal(hidden(second), false);
@@ -222,10 +240,13 @@ for (const page of pages) {
   completion.action('previous-part');
   assert.equal(reviewed.at(-1), true);
   assert.match(panel.innerHTML, /重新排列流程圖/);
-  assert.match(panel.innerHTML, /回看積木實作/);
+  assert.doesNotMatch(panel.innerHTML, /重做積木實作/);
+  assert.match(completion.innerHTML, /重做積木實作/);
+  assert.equal(completion.parentElement, flowControls);
+  assert.equal(completion.hidden, false);
   assert.ok(!hidden(first) && hidden(second));
   assert.equal(savedRoute, paused, 'review should keep the active part and its saved progress');
-  progress.action('resume');
+  completion.action('next-part');
   assert.equal(reviewed.at(-1), false);
   assert.ok(hidden(first) && !hidden(second));
   assert.equal(completion.button.disabled, true);
@@ -235,11 +256,42 @@ for (const page of pages) {
   progress.node(1);
   assert.equal(reviewed.at(-1), true);
   assert.ok(!hidden(first) && hidden(second));
-  panel.action('next-part');
+  assert.doesNotMatch(completion.innerHTML, /data-action="review-program"/);
+  lookup.delete('#first-passed');
+  completion.action('next-part');
   assert.ok(hidden(first) && !hidden(second));
-  progress.action('resume');
+  assert.match(completion.innerHTML, /繼續：再做一題/);
+  completion.action('review-next');
   assert.ok(hidden(first) && hidden(second));
+  assert.match(completion.innerHTML, /前往積木程式實作/);
+  completion.action('done');
+  assert.equal(hidden(practice), false);
+  assert.equal(completion.button.disabled, true);
+  progress.node(1);
+  completion.action('next-part');
+  assert.match(completion.innerHTML, /繼續：積木程式實作/);
+  completion.action('review-program');
+  assert.equal(hidden(practice), false);
+  assert.equal(completion.button.disabled, true);
+  lookup.set('#practice-passed', practice);
+  completion.action('done');
+  completion.action('skip');
   assert.match(panel.innerHTML, /交件/);
+  completion.action('done');
+  const finished = savedRoute;
+  progress.node(1);
+  completion.action('next-part');
+  assert.match(completion.innerHTML, /重做積木實作/);
+  completion.action('review-program');
+  assert.equal(hidden(practice), false);
+  assert.match(completion.innerHTML, /回看：交件/);
+  assert.doesNotMatch(completion.innerHTML, /回看：選做/);
+  completion.action('review-next');
+  assert.equal(hidden(practice), true);
+  assert.match(completion.innerHTML, /回到終點/);
+  completion.action('resume');
+  assert.match(panel.innerHTML, /本課學習路線已完成/);
+  assert.equal(savedRoute, finished, 'replaying an activity should preserve the completed route');
   savedRoute = paused;
   window.LessonRoute.start(config);
   const [resumedPanel] = created.slice(3);

@@ -168,7 +168,7 @@ test('a finished structure reopens its flow after reload and can be replayed wit
     assert.equal(vm.runInNewContext('c' + suffix + '.length', context), count);
     for (let index = 1; index <= count; index++) context['tryPlace' + suffix + 'Item'](index);
     assert.equal(flow.hasAttribute('data-lesson-activity'), true);
-    assert.match(flow.textContent, /可以查看積木對照/);
+    assert.match(flow.textContent, /下方的「重做積木實作」/);
 
     context.switchL2Tab(id === 'seq' ? 'sel' : 'seq');
     assert.equal(view.hasAttribute('data-l2-review'), false);
